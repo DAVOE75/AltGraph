@@ -276,9 +276,8 @@ class RouteProfile2DView(context: Context) : View(context) {
             }
         }
         
-        // Vertical line indicating cyclist position
         val lineTopY = 30f // almost touching the top border
-        canvas.drawLine(currentX, bottomY, currentX, lineTopY, dashLinePaint)
+        // (Drawn later after km background)
         
 
 
@@ -378,17 +377,18 @@ class RouteProfile2DView(context: Context) : View(context) {
             val mapW = mapBoxRight - mapBoxLeft
             val mapH = mapBoxBottom - mapBoxTop
             
-            // Draw faint concentric lines as "contour" background
+            // Draw faint concentric lines as "contour" background extending all the way to the right below the climb list
             val contourBgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = Color.parseColor("#15FFFFFF") // Much fainter white
                 style = Paint.Style.STROKE
                 strokeWidth = 2f
             }
             canvas.save()
-            canvas.clipRect(mapBoxLeft, mapBoxTop, mapBoxRight, mapBoxBottom)
+            canvas.clipRect(mapBoxLeft, mapBoxTop, drawW - 10f, mapBoxBottom)
             for (r in 10..400 step 20) {
                 canvas.drawCircle(mapBoxLeft + mapW * 0.3f, mapBoxTop + mapH * 0.4f, r.toFloat(), contourBgPaint)
                 canvas.drawCircle(mapBoxRight - mapW * 0.2f, mapBoxBottom - mapH * 0.2f, r.toFloat(), contourBgPaint)
+                canvas.drawCircle(drawW * 0.7f, mapBoxTop + mapH * 0.5f, r.toFloat(), contourBgPaint)
             }
             canvas.restore()
             
@@ -450,6 +450,34 @@ class RouteProfile2DView(context: Context) : View(context) {
             }
             
             canvas.drawPath(mapPathFuture, miniMapFuturePaint)
+
+            // If highlightClimbs is enabled, highlight climbs in blue on the minimap route track
+            if (highlightClimbs && distinctClimbs.isNotEmpty()) {
+                val miniMapClimbPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.parseColor("#00E5FF") // Bright cyan/blue highlight for climbs on map
+                    strokeWidth = 4.5f
+                    style = Paint.Style.STROKE
+                    strokeCap = Paint.Cap.ROUND
+                    strokeJoin = Paint.Join.ROUND
+                }
+                for (climb in distinctClimbs) {
+                    val startPct = (climb.startDistance / totalDistance).toFloat().coerceIn(0f, 1f)
+                    val endPct = (climb.endDistance / totalDistance).toFloat().coerceIn(0f, 1f)
+                    val sIdx = (startPct * (routeCoords.size - 1)).toInt().coerceIn(0, routeCoords.size - 1)
+                    val eIdx = (endPct * (routeCoords.size - 1)).toInt().coerceIn(0, routeCoords.size - 1)
+                    if (eIdx > sIdx) {
+                        val climbTrackPath = Path()
+                        for (ci in sIdx..eIdx) {
+                            val cpt = routeCoords[ci]
+                            val cpx = (offX + (cpt.second - minLng) * Math.cos(Math.toRadians(midLat)) * scale).toFloat()
+                            val cpy = (offY + contentH - (cpt.first - minLat) * scale).toFloat()
+                            if (ci == sIdx) climbTrackPath.moveTo(cpx, cpy) else climbTrackPath.lineTo(cpx, cpy)
+                        }
+                        canvas.drawPath(climbTrackPath, miniMapClimbPaint)
+                    }
+                }
+            }
+
             canvas.drawPath(mapPathPast, miniMapPastPaint)
             
             val dotP = Paint().apply { color = Color.WHITE; style = Paint.Style.FILL }
@@ -500,7 +528,7 @@ class RouteProfile2DView(context: Context) : View(context) {
             drawFlag(canvas, pxEnd, pyEnd, "#FFFFFF", 0.6f) // End Flag (White, smaller)
         }
 
-        // --- DRAW KM TEXTS LAST SO THEY ARE ON TOP OF EVERYTHING ---
+        // --- DRAW KM TEXTS AND CYCLIST LINE LAST SO THEY ARE ON TOP OF EVERYTHING ---
         val kmDoneText = String.format("%.1f km", currentDistance / 1000.0)
         val doneWidth = kmDoneTextPaint.measureText(kmDoneText)
         
@@ -515,15 +543,20 @@ class RouteProfile2DView(context: Context) : View(context) {
         
         val bgPaint = Paint().apply { color = Color.BLACK; style = Paint.Style.FILL }
         
-        // Done KM (Green): Left side (Negative Y)
-        canvas.drawRect(-doneWidth / 2f - 10f, -40f, doneWidth / 2f + 10f, 2f, bgPaint)
+        // Cuadrado/rectángulo negro completo y unificado para bloquear completamente el fondo
+        val maxHalfWidth = maxOf(doneWidth, remainWidth) / 2f + 16f
+        canvas.drawRect(-maxHalfWidth, -48f, maxHalfWidth, 54f, bgPaint)
+        
+        // Done KM: Left side (Negative Y)
         canvas.drawText(kmDoneText, 0f, -10f, kmDoneTextPaint)
         
-        // Remaining KM (White): Right side (Positive Y)
-        canvas.drawRect(-remainWidth / 2f - 10f, 10f, remainWidth / 2f + 10f, 50f, bgPaint)
+        // Remaining KM: Right side (Positive Y)
         canvas.drawText(kmRemainText, 0f, 40f, kmRemainTextPaint)
         
         canvas.restore()
+
+        // Línea blanca indicadora del ciclista dibujada POR ENCIMA de todo (incluido el fondo de km)
+        canvas.drawLine(currentX, bottomY, currentX, lineTopY, dashLinePaint)
 
         canvas.restore()
     }
