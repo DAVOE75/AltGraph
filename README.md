@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v1.0.77 ELITE)
+# ALTGRAPH (v1.0.78 ELITE)
 <p>Leer en: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md">🇪🇸 Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md">🇬🇧 English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md">🇫🇷 Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md">🇮🇹 Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md">🇩🇪 Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md">🇵🇹 Português</a></p>
 
 **ALTGRAPH** es una extensión de rendimiento y altimetría profesional de última generación para ciclocomputadores **Hammerhead Karoo** (Karoo 2 y Karoo 3) desarrollada por **hesiOX** utilizando el SDK oficial `karoo-ext`.
@@ -11,7 +11,7 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
-## 🔥 VERSIÓN 1.0.77: PERFIL TV 2D (ELITE) 🔥
+## 🔥 VERSIÓN 1.0.78: PERFIL TV 2D (ELITE) 🔥
 
 - **Perfil TV 2D (Novedad ELITE)**: Se ha añadido un nuevo campo de datos que replica los gráficos altimétricos estilo retransmisión ciclista (Giro/Tour). Dibuja la silueta de toda la etapa y rellena dinámicamente con un degradado en tu color neón favorito (Verde, Blanco, Azul, Amarillo, Rojo o Violeta) la zona pedaleada, mostrando la posición exacta en tiempo real.
 - **Detección y Lista de Puertos**: Sombra y traza los puertos en el perfil y en el minimapa en tono gris claro contrastado, con una cabecera centrada y listado detallado de categorías, distancias y pendientes.
