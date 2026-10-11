@@ -147,4 +147,6 @@
     <string name="color_neon_purple">Violeta</string>
     <string name="pref_elite_highlight_climbs_title">Destacar subidas na rota</string>
     <string name="pref_elite_highlight_climbs_desc">Sombreia as montanhas em cor no perfil da etapa</string>
+    <string name="profile_tv_climb_list_title">Lista de subidas</string>
+    <string name="profile_tv_climb_item_prefix">Sub</string>
 </resources>

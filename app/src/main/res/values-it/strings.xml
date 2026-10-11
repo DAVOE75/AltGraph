@@ -148,4 +148,6 @@
     <string name="color_neon_purple">Viola</string>
     <string name="pref_elite_highlight_climbs_title">Evidenzia salite sul percorso</string>
     <string name="pref_elite_highlight_climbs_desc">Evidenzia i colli a colori sul profilo della tappa</string>
+    <string name="profile_tv_climb_list_title">Lista delle salite</string>
+    <string name="profile_tv_climb_item_prefix">Sal</string>
 </resources>

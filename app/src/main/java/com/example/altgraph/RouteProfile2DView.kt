@@ -213,11 +213,11 @@ class RouteProfile2DView(context: Context) : View(context) {
         if (highlightClimbs && distinctClimbs.isNotEmpty()) {
             val climbFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 style = Paint.Style.FILL
-                shader = LinearGradient(0f, topY, 0f, bottomY, Color.parseColor("#1E88E5"), Color.parseColor("#0D47A1"), Shader.TileMode.CLAMP)
+                shader = LinearGradient(0f, topY, 0f, bottomY, Color.parseColor("#666666"), Color.parseColor("#262626"), Shader.TileMode.CLAMP)
             }
             val climbLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = Color.parseColor("#42A5F5")
-                strokeWidth = 3f
+                color = Color.parseColor("#CCCCCC") // Light grey leaning towards white
+                strokeWidth = 3.5f
                 style = Paint.Style.STROKE
             }
             for (climb in distinctClimbs) {
@@ -319,8 +319,41 @@ class RouteProfile2DView(context: Context) : View(context) {
         }.sortedBy { it.first.startDistance }
 
         if (catClimbs.isNotEmpty()) {
-            var climbY = 90f // Below the distance text
             val listStartX = drawW * 0.50f // Moved slightly to the left (50%) to give more room for larger text
+
+            // Title: LISTA DE PUERTOS centered above the climb list (localized)
+            val listTitle = try {
+                context.getString(R.string.profile_tv_climb_list_title).uppercase()
+            } catch (e: Exception) {
+                "LISTA DE PUERTOS"
+            }
+            val ptoPrefix = try {
+                context.getString(R.string.profile_tv_climb_item_prefix)
+            } catch (e: Exception) {
+                "Pto"
+            }
+
+            val maxItemWidth = catClimbs.maxOfOrNull { item ->
+                val ptoStr = "$ptoPrefix 9 "
+                val catStr = "(${item.second})"
+                val startKm = item.first.startDistance / 1000.0
+                val lenKm = item.first.length / 1000.0
+                val avg = item.first.avgGrade
+                val startStr = String.format(" km %.1f | %.1f km al %.1f%%", startKm, lenKm, avg)
+                climbListPaint.measureText(ptoStr) + climbListCatPaint.measureText(catStr) + climbListPaint.measureText(startStr)
+            } ?: (drawW - listStartX - 10f)
+            val listWidth = maxItemWidth.coerceAtMost(drawW - 10f - listStartX)
+            val headerCenterX = listStartX + listWidth / 2f
+
+            val climbHeaderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.WHITE
+                textSize = 17f * fontSizeScale
+                textAlign = Paint.Align.CENTER
+            }
+            FontHelper.applyFontToPaint(climbHeaderPaint, fontFamilyKey, Typeface.BOLD)
+            canvas.drawText(listTitle, headerCenterX, 62f, climbHeaderPaint)
+
+            var climbY = 90f // Below the header
 
             for ((i, item) in catClimbs.withIndex()) {
                 val climb = item.first
@@ -340,7 +373,7 @@ class RouteProfile2DView(context: Context) : View(context) {
                 }
 
                 // Line 1: Pto 1 (3ª) km 3.5 | 0.5 km al 6.5%
-                val ptoStr = "Pto ${i + 1} "
+                val ptoStr = "$ptoPrefix ${i + 1} "
                 canvas.drawText(ptoStr, listStartX, climbY, climbListPaint)
                 val ptoWidth = climbListPaint.measureText(ptoStr)
 
@@ -451,10 +484,10 @@ class RouteProfile2DView(context: Context) : View(context) {
             
             canvas.drawPath(mapPathFuture, miniMapFuturePaint)
 
-            // If highlightClimbs is enabled, highlight climbs in blue on the minimap route track
+            // If highlightClimbs is enabled, highlight climbs in light grey on the minimap route track
             if (highlightClimbs && distinctClimbs.isNotEmpty()) {
                 val miniMapClimbPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = Color.parseColor("#00E5FF") // Bright cyan/blue highlight for climbs on map
+                    color = Color.parseColor("#CCCCCC") // Light grey leaning towards white
                     strokeWidth = 4.5f
                     style = Paint.Style.STROKE
                     strokeCap = Paint.Cap.ROUND

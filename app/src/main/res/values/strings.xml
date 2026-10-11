@@ -211,4 +211,6 @@
     <string name="color_neon_purple">Purple</string>
     <string name="pref_elite_highlight_climbs_title">Highlight climbs on route</string>
     <string name="pref_elite_highlight_climbs_desc">Shades mountain passes in color on the stage profile</string>
+    <string name="profile_tv_climb_list_title">Climb List</string>
+    <string name="profile_tv_climb_item_prefix">Climb</string>
 </resources>

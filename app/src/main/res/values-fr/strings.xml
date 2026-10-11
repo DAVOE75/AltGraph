@@ -148,4 +148,6 @@
     <string name="color_neon_purple">Violet</string>
     <string name="pref_elite_highlight_climbs_title">Mettre en évidence les cols</string>
     <string name="pref_elite_highlight_climbs_desc">Ombre les cols en couleur sur le profil de l\'étape</string>
+    <string name="profile_tv_climb_list_title">Liste des cols</string>
+    <string name="profile_tv_climb_item_prefix">Col</string>
 </resources>
