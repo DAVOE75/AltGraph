@@ -159,17 +159,24 @@ Permite al ciclista elegir entre 6 formas visuales de interpretar la montaña de
 5. **💎 Monolito de Obsidiana y Plasma (`Monolito`)**: Montaña esculpida en cristal de obsidiana facetado oscuro (`#151D2C` a `#04070D`), faceta superior 3D en cristal pulido, núcleo interior de plasma radiante y cresta superior en haz láser blanco con resplandor neón celeste.
 6. **🗺️ Mapa Isométrico Global (`GPS Real`)**: El motor intercepta los datos de Latitud y Longitud nativos de tu ruta `.fit` o GPX y dibuja la montaña sobre una cuadrícula isométrica real imitando a vista de pájaro el trazado topográfico físico de la carretera (con sus curvas y herraduras exactas).
 ### 🎨 Escala de Gradientes Intensa de Alta Visibilidad
-* **$\le -10.0\%$**: Azul marino oscuro `![#041E42](https://placehold.co/15x15/041E42/041E42.png)` (Descenso pronunciado).
-* **$-10.0\%$ a $-5.0\%$**: Azul oscuro `![#004B87](https://placehold.co/15x15/004B87/004B87.png)` (Descenso medio).
-* **$-5.0\%$ a $-2.0\%$**: Azul medio `![#0072CE](https://placehold.co/15x15/0072CE/0072CE.png)` (Descenso suave).
-* **$-2.0\%$ a $<0.0\%$**: Azul claro celeste `![#41B6E6](https://placehold.co/15x15/41B6E6/41B6E6.png)` (Falso llano bajada).
-* **$0.0\%$ a $3.0\%$**: Verde bosque intenso `![#388E3C](https://placehold.co/15x15/388E3C/388E3C.png)`.
-* **$3.0\%$ a $5.0\%$**: Amarillo fuerte `![#FBC02D](https://placehold.co/15x15/FBC02D/FBC02D.png)`.
-* **$5.0\%$ a $8.0\%$**: Naranja intenso `![#F57C00](https://placehold.co/15x15/F57C00/F57C00.png)`.
-* **$8.0\%$ a $10.0\%$**: Naranja oscuro / teja `![#E65100](https://placehold.co/15x15/E65100/E65100.png)`.
-* **$10.0\%$ a $13.0\%$**: Rojo intenso `![#D32F2F](https://placehold.co/15x15/D32F2F/D32F2F.png)`.
-* **$13.0\%$ a $17.0\%$**: Granate rojo oscuro `![#B71C1C](https://placehold.co/15x15/B71C1C/B71C1C.png)`.
-* **$> 17.0\%$**: Negro azabache `![#000000](https://placehold.co/15x15/000000/000000.png)`.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/escala_gradientes.png" width="750" alt="Escala de Gradientes de Alta Visibilidad" />
+</p>
+
+| Pendiente | Color | Tonalidad | Sensación / Terreno |
+| :--- | :---: | :--- | :--- |
+| **≤ -10.0%** | 🔵 | Azul marino oscuro | Descenso muy pronunciado |
+| **-10.0% a -5.0%** | 🔵 | Azul oscuro | Descenso medio |
+| **-5.0% a -2.0%** | 🔵 | Azul medio | Descenso suave |
+| **-2.0% a < 0.0%** | 🩵 | Azul claro celeste | Falso llano bajada |
+| **0.0% a 3.0%** | 🟢 | Verde bosque intenso | Llano / Falso llano subida |
+| **3.0% a 5.0%** | 🟡 | Amarillo fuerte | Subida moderada |
+| **5.0% a 8.0%** | 🟠 | Naranja intenso | Subida exigente |
+| **8.0% a 10.0%** | 🟠 | Naranja oscuro / teja | Rampa dura |
+| **10.0% a 13.0%** | 🔴 | Rojo intenso | Muro duro |
+| **13.0% a 17.0%** | 🟤 | Granate rojo oscuro | Muro muy duro |
+| **> 17.0%** | ⚫ | Negro azabache | Pendiente extrema (>17%) |
 ### 🔄 Ventana Rodante Cuántica de 50m y Avance Físico
 * El faro del ciclista asciende físicamente por el contorno superior de la pendiente de 0 a 50m.
 * Al completar cada múltiplo de 50 metros, la ventana se desplaza limpiamente 50m a la izquierda sin saltos abruptos de escala.

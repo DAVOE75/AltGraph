@@ -125,17 +125,24 @@ Allows the cyclist to choose between 6 visual ways to interpret the mountain fro
 4. **⚡ Force Field & Fatigue (`Campo Fuerza`)**: Relief with gravitational tension lines anchored with pixel precision to the slope, a kinetic sine wave at the base (cyan when advancing with inertia, rapid crimson when the slope slows your cadence), and an ascending pace guideline (VAM) floating smoothly over the profile.
 5. **💎 Obsidian & Plasma Monolith (`Monolito`)**: Mountain sculpted in dark faceted obsidian crystal, polished 3D upper facet, a radiant inner plasma core, and a top crest glowing with a white laser beam and a light blue neon aura.
 ### 🎨 High Visibility Intense Gradient Scale
-* **<= -10.0%**: Dark navy blue `#041E42` (Steep descent).
-* **-10.0% to -5.0%**: Dark blue `#004B87` (Medium descent).
-* **-5.0% to -2.0%**: Medium blue `#0072CE` (Mild descent).
-* **-2.0% to <0.0%**: Light blue `#41B6E6` (False flat descent).
-* **0.0% to 3.0%**: Intense forest green `#388E3C`.
-* **3.0% to 5.0%**: Strong yellow `#FBC02D`.
-* **5.0% to 8.0%**: Intense orange `#F57C00`.
-* **8.0% to 10.0%**: Dark orange / terracotta `#E65100`.
-* **10.0% to 13.0%**: Intense red `#D32F2F`.
-* **13.0% to 17.0%**: Dark garnet red `#B71C1C`.
-* **> 17.0%**: Jet black `#000000`.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/escala_gradientes.png" width="750" alt="High Visibility Gradient Scale" />
+</p>
+
+| Gradient Range | Color | Hue | Riding Feel / Terrain |
+| :--- | :---: | :--- | :--- |
+| **≤ -10.0%** | 🔵 | Dark navy blue | Very steep descent |
+| **-10.0% to -5.0%** | 🔵 | Dark blue | Medium descent |
+| **-5.0% to -2.0%** | 🔵 | Medium blue | Mild descent |
+| **-2.0% to < 0.0%** | 🩵 | Light sky blue | False flat downhill |
+| **0.0% to 3.0%** | 🟢 | Intense forest green | Flat / Gentle incline |
+| **3.0% to 5.0%** | 🟡 | Strong yellow | Moderate climb |
+| **5.0% to 8.0%** | 🟠 | Intense orange | Demanding climb |
+| **8.0% to 10.0%** | 🟠 | Dark terracotta orange | Steep ramp |
+| **10.0% to 13.0%** | 🔴 | Intense red | Severe wall |
+| **13.0% to 17.0%** | 🟤 | Dark garnet red | Extreme wall |
+| **> 17.0%** | ⚫ | Jet black | Extreme grade (>17%) |
 ### 🔄 50m Quantum Rolling Window and Physical Advance
 * The cyclist's beacon physically ascends the upper contour of the slope from 0 to 50m.
 * Upon completing each 50-meter multiple, the window cleanly shifts 50m to the left without abrupt scale jumps.
