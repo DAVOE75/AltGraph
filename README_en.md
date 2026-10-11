@@ -126,16 +126,12 @@ Allows the cyclist to choose between 6 visual ways to interpret the mountain fro
 5. **💎 Obsidian & Plasma Monolith (`Monolito`)**: Mountain sculpted in dark faceted obsidian crystal, polished 3D upper facet, a radiant inner plasma core, and a top crest glowing with a white laser beam and a light blue neon aura.
 ### 🎨 High Visibility Intense Gradient Scale
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/escala_gradientes.png" width="750" alt="High Visibility Gradient Scale" />
-</p>
-
 | Gradient Range | Color | Hue | Riding Feel / Terrain |
 | :--- | :---: | :--- | :--- |
 | **≤ -10.0%** | 🔵 | Dark navy blue | Very steep descent |
 | **-10.0% to -5.0%** | 🔵 | Dark blue | Medium descent |
 | **-5.0% to -2.0%** | 🔵 | Medium blue | Mild descent |
-| **-2.0% to < 0.0%** | 🩵 | Light sky blue | False flat downhill |
+| **-2.0% to < 0.0%** | 🔵 | Light sky blue | False flat downhill |
 | **0.0% to 3.0%** | 🟢 | Intense forest green | Flat / Gentle incline |
 | **3.0% to 5.0%** | 🟡 | Strong yellow | Moderate climb |
 | **5.0% to 8.0%** | 🟠 | Intense orange | Demanding climb |

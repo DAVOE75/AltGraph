@@ -160,16 +160,12 @@ Permite al ciclista elegir entre 6 formas visuales de interpretar la montaña de
 6. **🗺️ Mapa Isométrico Global (`GPS Real`)**: El motor intercepta los datos de Latitud y Longitud nativos de tu ruta `.fit` o GPX y dibuja la montaña sobre una cuadrícula isométrica real imitando a vista de pájaro el trazado topográfico físico de la carretera (con sus curvas y herraduras exactas).
 ### 🎨 Escala de Gradientes Intensa de Alta Visibilidad
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/escala_gradientes.png" width="750" alt="Escala de Gradientes de Alta Visibilidad" />
-</p>
-
 | Pendiente | Color | Tonalidad | Sensación / Terreno |
 | :--- | :---: | :--- | :--- |
 | **≤ -10.0%** | 🔵 | Azul marino oscuro | Descenso muy pronunciado |
 | **-10.0% a -5.0%** | 🔵 | Azul oscuro | Descenso medio |
 | **-5.0% a -2.0%** | 🔵 | Azul medio | Descenso suave |
-| **-2.0% a < 0.0%** | 🩵 | Azul claro celeste | Falso llano bajada |
+| **-2.0% a < 0.0%** | 🔵 | Azul claro celeste | Falso llano bajada |
 | **0.0% a 3.0%** | 🟢 | Verde bosque intenso | Llano / Falso llano subida |
 | **3.0% a 5.0%** | 🟡 | Amarillo fuerte | Subida moderada |
 | **5.0% a 8.0%** | 🟠 | Naranja intenso | Subida exigente |
