@@ -1,90 +1,147 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="ALTGRAPH Logo" width="160" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="Logo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v0.5.0 STABLE)
+# ALTGRAPH (v1.0.78 ELITE)
 <p>Leggi in: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md">🇪🇸 Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md">🇬🇧 English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md">🇫🇷 Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md">🇮🇹 Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md">🇩🇪 Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md">🇵🇹 Português</a></p>
-**ALTGRAPH** è un'estensione professionale per l'altimetria e le prestazioni di ultima generazione per i ciclocomputer **Hammerhead Karoo** (Karoo 2 e Karoo 3), sviluppata da **David García Pascual** utilizzando l'SDK ufficiale `karoo-ext`.
-Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **Suite di 6 Modelli di Visualizzazione Altimetrica** con selettore dinamico in tempo reale, risoluzione adattiva multiscala, calcolo topografico, rilevamento matematico dei tornanti, filtraggio POI, layout a schermo intero ruotato a 90°, passo **VAM** e calcolo scientifico del **Grado di Fatica (GF)**.
----
 
+**ALTGRAPH** è un'estensione professionale per l'altimetria e le prestazioni ciclistiche di ultima generazione per i ciclocomputer **Hammerhead Karoo** (Karoo 2 e Karoo 3), sviluppata da **hesiOX** utilizzando l'SDK ufficiale `karoo-ext`.
+Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **Suite di 6 Modelli di Visualizzazione Altimetrica 3D** con selettore dinamico in tempo reale, scala monocromatica continua di 15 livelli, avanzamento quantistico con finestra scorrevole di 50 metri, risoluzione adattiva multiscala, analisi dei passi di montagna, calcolo topografico opzionale (proiezione orizzontale pura), rilevamento matematico dei tornanti, filtraggio per categorie di POI (Paesi, Fontane, Punti Panoramici, Cime), controlli touch di zoom, caratteri Google Sans / Condensed, layout a schermo intero ruotato di 90°, passo **VAM** target e calcolo scientifico del **Grado di Fatica (GF)**.
 
-
-## 🐛 VERSIONE 1.0.2: CORREZIONI CRITICHE 🐛
-
-- **Correzione Bug su Percorsi Circolari/Andata e Ritorno**: Risolto un problema in cui il GPS si agganciava erroneamente alla fine del percorso fin dall'inizio, facendo sì che il grafico procedesse a ritroso ("bug snap-to-end").
-- **Miglioramento dell'Interfaccia (Radar)**: L'indicatore di pendenza massima ora mostra una freccia colorata (Rossa per salita, Blu Scuro per discesa) sopra la percentuale, migliorandone visibilità e stile.
-
-## 🚀 NOVITÀ NELLA VERSIONE 1.0.0: RADAR ALTIMETRICO E ESPERIENZA PRO 🚀
-
-Siamo arrivati alla versione **1.0.0**! Questo aggiornamento porta una riprogettazione completa dell'esperienza, rendendo il controllo e la visualizzazione più precisi e professionali che mai.
-
-### 🌟 Radar Altimetrico (Nuova Modalità di Visualizzazione 3D)
-La nuova modalità **Radar Altimetrico** si sovrappone alla mappa del Karoo, consentendoti di vedere sia la navigazione pura che il rilievo del terreno in arrivo, tutto splendidamente integrato nella stessa schermata.
 <p align="center">
-  <img src="art/screenshot_radar_altimetrico.png" width="400" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />
 </p>
 
-### 🔧 Nuove Funzionalità e Miglioramenti:
-- **Barra delle Zone di Allenamento**: Integrazione completa della barra colorata inferiore (7 zone) basata sui dati del misuratore di potenza o della frequenza cardiaca nella modalità Radar Altimetrico.
-- **Controllo Preciso dello Zoom (+ / -)**: Sostituzione della vecchia lente d'ingrandimento con i pulsanti dedicati **[+]** e **[-]**. Ora puoi ingrandire fino a **blocchi da 50 metri**, bypassando l'algoritmo "Smart Zoom" se desideri il controllo manuale assoluto.
-- **Scorrimento Orizzontale (< / >)**: Nuovi pulsanti interattivi nella vista del profilo che ti consentono di trascinare liberamente il grafico a sinistra e a destra senza alterare la scala. Anticipa la salita!
-- **Modalità Paesaggio (Landscape) Nativa**: Pieno supporto per Karoo montato orizzontalmente. Ora i pulsanti touch e il profilo si riorientano perfettamente in base al tuo campo visivo, posizionando i controlli in modo ergonomico.
-- **Icona del Ciclista in Tempo Reale**: La pallina (posizione attuale del ciclista) ora si sposta fluidamente attraverso il profilo grafico e i colori di elevazione, fornendoti un feedback immediato su dove ti trovi lungo il percorso.
-- **Bussola Dinamica**: Nascondimento intelligente della bussola in visualizzazioni diverse dalla mappa isometrica globale, ripulendo l'interfaccia.
+## 🔥 VERSIONE 1.0.78: PROFILO TV 2D (ELITE) 🔥
 
-## 📸 Capturas en Pantalla Real de Karoo 3
+- **Profilo TV 2D (Novità ELITE)**: Nuovo campo dati visivo che replica i profili altimetrici delle trasmissioni televisive dei Grandi Giri (Giro d'Italia, Tour de France, La Vuelta). Disegna la sagoma dell'intera tappa e colora dinamicamente in tempo reale l'area percorsa con la tonalità neon preferita (**Rosa Giro d'Italia**, **Giallo Tour de France**, **Rosso La Vuelta**, Verde Classiche, Ciano o Bianco Puro).
+- **Rilevamento Salite e Elenco Centrato**: Evidenziazione dei colli in grigio chiaro ad alto contrasto sul profilo e sulla minimappa del percorso, con intestazione centrata e dettagli completi (categorie, distanze e pendenze medie).
+- **Rotazione Orizzontale a 90°**: Impostazione esclusiva nel menu Elite per ruotare il grafico di 90° e sfruttare la massima larghezza visiva sul Karoo.
 
-| 🎨 Scheda Stile | 🎛️ Menu Selezione | 📊 Dashboard Completo |
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/rutapuritoTV.png" width="500" alt="Profilo TV Bianco" />
+</p>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfiltv.png" width="250" alt="Profilo TV Giallo" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfiltv1.png" width="250" alt="Profilo TV Rosa" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfiltvve.png" width="250" alt="Profilo TV Rosso" />
+</p>
+
+## 🚀 VERSIONE 1.0.44: PACING DINAMICO E SFUMATURE FLUIDE 🚀
+
+- **Power Guide / Pacing (Novità ELITE)**: Sistema intelligente di gestione del ritmo integrato nel Radar Altimetrico. In base alla tua FTP, Altgraph calcola in tempo reale i watt ideali per ogni tratto della salita e mostra avvisi strategici sullo schermo (`⚡ OBIETTIVO: 240W` o `🔴 SPINGI: 300W`). Il tuo direttore sportivo personale sul manubrio!
+- **Sfumature Fluide (Novità ELITE)**: Opzione per ammorbidire le transizioni visive tra blocchi di pendenza differente nel Radar Altimetrico.
+
+<p align="center"><img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_smooth_gradients_v2.png" width="400" alt="Sfumature Fluide" /></p>
+
+## 🚀 VERSIONE 1.0.43: TEXTURE DEL TERRENO (GRAVEL/MTB) 🚀
+
+- **Texture di Superficie (Novità ELITE)**: Attiva texture dinamiche del terreno sul nastro 3D (pattern per ghiaia e sterrato sovrapposti al dislivello).
+
+## 🚀 STABILITÀ, RISOLUZIONE E MOTORE DI TRACCIAMENTO (v1.0.10 - v1.0.40) 🚀
+
+- **Risoluzione Radar Personalizzabile**: Imposta la risoluzione su **20m, 50m, 100m, 150m, 300m, 500m o 1km**.
+- **Motore di Tracciamento GPS Blindato**: Algoritmo riscritto per eliminare salti al km 0 durante i ricalcoli del percorso.
+- **Traduzioni Native**: Completamente tradotto in italiano, inglese, spagnolo, francese, tedesco e portoghese.
+
+## 🚀 VERSIONE 1.0.9: ISTOGRAMMA DELLE ZONE DI PENDENZA ELITE 🚀
+
+- **Zone di Pendenza (Istogramma %)**: Visualizza il tempo e la percentuale di distanza trascorsa in ciascuna delle 8 fasce di pendenza (dalla discesa alle pendenze estreme >17%).
+
+<p align="center"><img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_gradient_zones.png" width="300" alt="Zone di Pendenza" /></p>
+
+## 🌟 VERSIONE 1.0.5: SCALA DINAMICA E TRACCIATO A COLORI 🌟
+
+| 🗺️ Percorso a Colori | 🗺️ Dettaglio Tratti Duri | 🗺️ Vista Singola Salita |
 | :---: | :---: | :---: |
-| <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_settings_estilo.png" width="220" alt="🎨 Scheda Stile" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_data_selection.png" width="220" alt="🎛️ Menu Selezione" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_dashboard_completo.png" width="220" alt="📊 Dashboard Completo" /> |
+| <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_map_route_colors.png" width="220" alt="Percorso 1" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_map_route_colors_2.png" width="220" alt="Percorso 2" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_map_route_colors_3.png" width="220" alt="Salita" /> |
+
+## 🚀 VERSIONE 1.0.0: RADAR ALTIMETRICO ED ESPERIENZA PRO 🚀
+
+### 🌟 Radar Altimetrico (Sovrapposizione Mappa 3D)
+Sovrappone l'altimetria prospettica direttamente sulla mappa di navigazione del Karoo.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_radar_altimetrico.png" width="400" alt="Radar Altimetrico" />
+</p>
+
+## 📸 Schermate Reali su Karoo 3
+
+| 🎨 Pannello Stile | 🎛️ Menu Selezione | 📊 Dashboard Completa |
+| :---: | :---: | :---: |
+| <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_settings_estilo.png" width="220" alt="Stile" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_data_selection.png" width="220" alt="Selezione" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_dashboard_completo.png" width="220" alt="Dashboard" /> |
 
 | 🏔️ Altimetria 3D (200m) | 🏔️ Altimetria 3D (1km) | 🏔️ Altimetria 3D (10km) |
 | :---: | :---: | :---: |
-| <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_3d_profile.png" width="220" alt="🏔️ Altimetria 3D (200m)" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_3d_profile_1km.png" width="220" alt="🏔️ Altimetria 3D (1km)" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_3d_profile_10km.png" width="220" alt="🏔️ Altimetria 3D (10km)" /> |
+| <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_3d_profile.png" width="220" alt="3D 200m" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_3d_profile_1km.png" width="220" alt="3D 1km" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_3d_profile_10km.png" width="220" alt="3D 10km" /> |
 
-| 🏔️ Altimetria 3D (20km) | 🏔️ Altimetria 3D (200km) | 🏔️ Visualizzatore - 3ª Cat |
+| 🏔️ Altimetria 3D (20km) | 🏔️ Altimetria 3D (200km) | 🏔️ Visore Salite (3ª Cat) |
 | :---: | :---: | :---: |
-| <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_3d_profile_20km.png" width="220" alt="🏔️ Altimetria 3D (20km)" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_3d_profile_200km.png" width="220" alt="🏔️ Altimetria 3D (200km)" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_climb_viewer.png" width="220" alt="🏔️ Visualizzatore - 3ª Cat" /> |
+| <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_3d_profile_20km.png" width="220" alt="3D 20km" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_3d_profile_200km.png" width="220" alt="3D 200km" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_climb_viewer.png" width="220" alt="Visore Salite 3ª Cat" /> |
 
-| 🏔️ Visualizzatore - HC | 🏔️ Visualizzatore (Isometrico) <div align="center">
-
-| 🗺️ GPS Isometrico (Globale) |
+| 🏔️ Visore Salite (HC) | 🏔️ Visore Salite (Isometrico) | 🗺️ GPS Isometrico (Globale) |
 | :---: | :---: | :---: |
-| <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_climb_viewer_especial.png" width="220" alt="🏔️ Visualizzatore - HC" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_climb_viewer_iso.png" width="220" alt="🏔️ Visualizzatore (Isometrico)" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_3d_profile_gps.png" width="220" alt="🗺️ GPS Isometrico (Globale)" /> |
+| <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_climb_viewer_especial.png" width="220" alt="Visore HC" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_climb_viewer_iso.png" width="220" alt="Visore Iso" /> | <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_3d_profile_gps.png" width="220" alt="GPS Iso" /> |
 
-</div>
+---
+
+## 🌟 Suite di 6 Modelli di Altimetria Rivoluzionari
+1. **🏔️ Classica 3D**: Profilo con bisello 3D elegante, sfumatura continua 0–15% ed etichette nitide.
+2. **🌅 Orizzonte Isometrico**: Prospettiva cockpit 3D con fascio di luce dinamico inclinato alla pendenza.
+3. **❄️ Oasi e Crogioli Tattici**: Evidenziazione di tratti di recupero (`❄️ OASIS`) e allarmi per rampe ripide (`🔥 MURO`).
+4. **⚡ Campo di Forza e Fatica**: Linee di tensione gravitazionale e guida di ritmo VAM.
+5. **💎 Monolito di Ossidiana**: Cristallo di ossidiana sfaccettato scuro con nucleo di plasma radiante.
+6. **🗺️ Mappa Isometrica Globale**: Ricostruzione isometrica reale della strada dai dati GPS.
+
+### 🎨 Scala delle Pendenze ad Alta Visibilità
+
+| Pendenza | Colore | Tonalità | Sensazione / Terreno |
+| :--- | :---: | :--- | :--- |
+| **≤ -10.0%** | 🔵 | Blu navy scuro | Discesa molto ripida |
+| **-10.0% a -5.0%** | 🔵 | Blu scuro | Discesa sostenuta |
+| **-5.0% a -2.0%** | 🔵 | Blu medio | Discesa lieve |
+| **-2.0% a < 0.0%** | 🔵 | Celeste chiaro | Falsopiano in discesa |
+| **0.0% a 3.0%** | 🟢 | Verde foresta intenso | Pianura / Falsopiano in salita |
+| **3.0% a 5.0%** | 🟡 | Giallo intenso | Salita moderata |
+| **5.0% a 8.0%** | 🟠 | Arancione intenso | Salita impegnativa |
+| **8.0% a 10.0%** | 🟠 | Arancione mattone | Rampa dura |
+| **10.0% a 13.0%** | 🔴 | Rosso intenso | Muro duro |
+| **13.0% a 17.0%** | 🟤 | Granata scuro | Muro estremo |
+| **> 17.0%** | ⚫ | Nero pece | Pendenza estrema (>17%) |
+
+### ⚡ Architettura Zero-Allocation per Karoo 3
+* Motore di rendering privo di allocazione di memoria: zero pause del Garbage Collector (GC).
+* Riutilizzo in tempo reale dei buffer Bitmap e Canvas.
+
+---
 
 ## 🆚 ALTGRAPH vs Climber Nativo di Karoo
-ALTGRAPH non sostituisce il Climber nativo, ma lo integra offrendo una **vista grafica completa** e personalizzabile. Le differenze principali sono:
-- **Risoluzione Adattiva e Rendering Continuo**: Il profilo avanza fisicamente in finestre scorrevoli di 50m. Le barre non "saltano" staticamente, ma scorrono verso di te al ritmo della tua pedalata.
-- **Modelli di Visualizzazione**: Il Climber nativo ha una vista fissa; ALTGRAPH offre 5 modelli rivoluzionari.
-- **Scale Touch Dinamiche**: Cambia istantaneamente lo zoom del percorso (200m, 1km, 10km, 20km, 50km, ecc.) toccando semplicemente la lente d'ingrandimento.
-- **Grado di Fatica (GF)**: L'unico strumento su Karoo che calcola la durezza scientifica di una salita basandosi sul coefficiente APM.
+ALTGRAPH non sostituisce il Climber nativo, ma lo completa offrendo una **prospettiva grafica totale**:
+- **Avanzamento Continuo in Finestra di 50m**: Il profilo scorre senza scatti rigidi, in perfetta sintonia con la pedalata.
+- **6 Modelli Visivi**: Esperienza personalizzata rispetto a un'unica vista fissa.
+- **Zoom Touch Istantaneo**: Passa tra 200m, 1km, 10km, 20km e 50km con un semplice tocco sullo schermo.
+- **Grado di Fatica (GF)**: Calcolo scientifico della difficoltà della salita basato sugli algoritmi APM.
 
-## ⚙️ Caratteristiche e Funzioni nel Dettaglio
-### 📈 Campi Dati Esclusivi (Dashboard Tattica)
-- **🧠 Stratega dell'Altimetria**: Mostra un blocco visivo intelligente che riassume i prossimi chilometri a colori.
-- **⚡ Grado di Fatica (GF)**: Motore scientifico basato sul coefficiente APM che valuta la reale durezza della salita in diretta.
-- **🚀 Ritmo VAM Obiettivo**: Calcola la pendenza esatta sotto le tue ruote e ti dice a quale **velocità (km/h)** devi andare per raggiungere il tuo obiettivo in vetta.
-- **📐 Tendenza 3D e Rampa Max**: Ti avvisa se la pendenza sta diventando più dura o più dolce prima che le tue gambe lo sentano.
-### 🗺️ Navigazione e Topografia Avanzata
-- **Icone Topografiche Ufficiali**: Identificazione di Vette, Passi (Map-Pin), Paesi e Fontane.
-- **Rilevamento Matematico delle Curve**: L'algoritmo rileva i tornanti stretti e ti avvisa graficamente.
-- **Temi Scuri ad Alto Contrasto**: Interfaccia progettata per una leggibilità istantanea sotto la luce solare diretta.
+---
 
 ## 📲 Installazione su Karoo 2 e Karoo 3
-Basata sull'SDK ufficiale `karoo-ext`, l'installazione **non richiede permessi di root** o modifiche pericolose del sistema. È sicura al 100%.
-**Tramite Sideloading (Consigliato per Karoo 3)**
-1. Scarica l'ultimo file `.apk` dalla sezione [Releases](https://github.com/DAVOE75/ALTGRAPH/releases).
-2. Invialo al tuo Karoo usando l'app ufficiale **Hammerhead Companion**.
-3. Una volta installata, l'estensione si aggiornerà automaticamente leggendo il `manifest.json`.
+Basato sull'SDK ufficiale `karoo-ext`, l'installazione **non richiede permessi di root** ed è sicura al 100%.
 
-#### 🔮 Roadmap e Prossimi Sviluppi (Modalità Free-Ride)
+**Tramite Sideloading (Consigliato per Karoo 3):**
+1. Scarica il file `app-release.apk` dall'ultima versione su [GitHub Releases](https://github.com/DAVOE75/ALTGRAPH/releases).
+2. Trasferiscilo al tuo Karoo usando l'app ufficiale **Hammerhead Companion** sul tuo smartphone.
+3. Una volta installata, ALTGRAPH cercherà automaticamente i futuri aggiornamenti.
 
-Il prossimo grande traguardo nello sviluppo di ALTGRAPH è la **Generazione Altimetrica in Tempo Reale (Modalità Free-Ride)**. 
-Attualmente, l'estensione richiede il caricamento di un percorso (GPX) per ottenere i profili. Non appena Hammerhead sbloccherà l'accesso ai dati di altimetria imminente nel suo SDK, **ALTGRAPH genererà il grafico 3D e le metriche tattiche al volo**, senza bisogno di un tracciato caricato. Potrai esplorare liberamente e la montagna si disegnerà davanti a te in tempo reale.
+**Tramite ADB (Avanzato):**
+1. Abilita le Opzioni Sviluppatore e il debug USB sul Karoo.
+2. Collega il dispositivo al PC ed esegui: `adb install -r app-release.apk`
 
-#### 📄 Licenza e Disclaimer
+---
 
-Questo progetto open source è distribuito sotto licenza **MIT** - Copyright 2026 David García Pascual.
-*Disclaimer: Questa estensione non è affiliata, approvata, sponsorizzata o supportata da Hammerhead o SRAM.*
+## ☕ Supporta il progetto
+
+Se trovi utile ALTGRAPH e desideri supportarne lo sviluppo continuo:
+
+<div align="center">
+  <a href="https://buymeacoffee.com/hesiox" target="_blank">
+    <img src="https://img.shields.io/badge/☕_Offrimi_un_caffè-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black" alt="Offrimi un caffè" />
+  </a>
+</div>
