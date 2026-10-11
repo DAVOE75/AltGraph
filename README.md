@@ -22,7 +22,7 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 <p align="center">
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfiltv.png" width="250" alt="TV Profile Amarillo" />
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfiltv1.png" width="250" alt="TV Profile Rosa" />
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfilvve.png" width="250" alt="TV Profile Rojo" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfiltvve.png" width="250" alt="TV Profile Rojo" />
 </p>
 
 ## 🚀 VERSIÓN 1.0.44: PACING DINÁMICO Y DIFUMINADO 🚀

@@ -21,7 +21,7 @@ It revolutionizes the traditional concept of cycling altimetry by incorporating 
 <p align="center">
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfiltv.png" width="250" alt="TV Profile Yellow" />
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfiltv1.png" width="250" alt="TV Profile Pink" />
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfilvve.png" width="250" alt="TV Profile Red" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfiltvve.png" width="250" alt="TV Profile Red" />
 </p>
 
 ## 🚀 VERSION 1.0.44: DYNAMIC PACING (POWER GUIDE) 🚀
