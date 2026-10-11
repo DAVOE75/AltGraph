@@ -202,4 +202,13 @@
     <string name="data_type_profile_tv_2d_title">TV Profile 2D</string>
     <string name="pref_elite_profile_tv_2d_title">TV Profile 2D</string>
     <string name="profile_tv_2d_gain">Altitude gain %1$.0f m</string>
+    <string name="pref_elite_profile_tv_color_title">TV Profile Neon Color</string>
+    <string name="color_neon_green">Green</string>
+    <string name="color_neon_white">White</string>
+    <string name="color_neon_blue">Blue</string>
+    <string name="color_neon_yellow">Yellow</string>
+    <string name="color_neon_red">Red</string>
+    <string name="color_neon_purple">Purple</string>
+    <string name="pref_elite_highlight_climbs_title">Highlight climbs on route</string>
+    <string name="pref_elite_highlight_climbs_desc">Shades mountain passes in color on the stage profile</string>
 </resources>

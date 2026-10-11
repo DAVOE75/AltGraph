@@ -202,4 +202,13 @@
     <string name="data_type_profile_tv_2d_title">Perfil TV 2D</string>
     <string name="pref_elite_profile_tv_2d_title">Perfil TV 2D</string>
     <string name="profile_tv_2d_gain">Desnivel acumulado %1$.0f m</string>
+    <string name="pref_elite_profile_tv_color_title">Color Neón Perfil TV</string>
+    <string name="color_neon_green">Verde</string>
+    <string name="color_neon_white">Blanco</string>
+    <string name="color_neon_blue">Azul</string>
+    <string name="color_neon_yellow">Amarillo</string>
+    <string name="color_neon_red">Rojo</string>
+    <string name="color_neon_purple">Violeta</string>
+    <string name="pref_elite_highlight_climbs_title">Marcar puertos en la ruta</string>
+    <string name="pref_elite_highlight_climbs_desc">Sombrea los puertos de montaña en color sobre el perfil de la etapa</string>
 </resources>

@@ -139,4 +139,13 @@
     <string name="data_type_profile_tv_2d_title">Profilo TV 2D</string>
     <string name="pref_elite_profile_tv_2d_title">Profilo TV 2D</string>
     <string name="profile_tv_2d_gain">Dislivello %1$.0f m</string>
+    <string name="pref_elite_profile_tv_color_title">Colore neon del profilo TV</string>
+    <string name="color_neon_green">Verde</string>
+    <string name="color_neon_white">Bianco</string>
+    <string name="color_neon_blue">Blu</string>
+    <string name="color_neon_yellow">Giallo</string>
+    <string name="color_neon_red">Rosso</string>
+    <string name="color_neon_purple">Viola</string>
+    <string name="pref_elite_highlight_climbs_title">Evidenzia salite sul percorso</string>
+    <string name="pref_elite_highlight_climbs_desc">Evidenzia i colli a colori sul profilo della tappa</string>
 </resources>

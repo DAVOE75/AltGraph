@@ -3,16 +3,16 @@
     <string name="app_name">ALTGRAPH</string>
 
     <!-- Extension Data Fields -->
-    <string name="data_type_altimetria_title">Höhenprofil-Stratege</string>
-    <string name="data_type_altimetria_desc">Dynamisches Höhenprofil mit Steigungen und Angriffsalarmen</string>
+    <string name="data_type_altimetria_title">HÃ¶henprofil-Stratege</string>
+    <string name="data_type_altimetria_desc">Dynamisches HÃ¶henprofil mit Steigungen und Angriffsalarmen</string>
 
-    <string name="data_type_altimetria_3d_title">3D Höhenprofil</string>
-    <string name="data_type_altimetria_3d_desc">Isometrisches 3D-Höhenprofil mit Geländerelief</string>
+    <string name="data_type_altimetria_3d_title">3D HÃ¶henprofil</string>
+    <string name="data_type_altimetria_3d_desc">Isometrisches 3D-HÃ¶henprofil mit GelÃ¤nderelief</string>
 
-    <string name="data_type_fatigue_grade_title">Ermüdungsgrad (GF)</string>
-    <string name="data_type_fatigue_grade_desc">Wissenschaftlicher Schwierigkeits- und Ermüdungsindex</string>
-    <string name="data_type_climb_viewer_title">3D Pässe-Viewer</string>
-    <string name="data_type_climb_viewer_desc">Unabhängiger 3D-Viewer für die Bergpässe der Route</string>
+    <string name="data_type_fatigue_grade_title">ErmÃ¼dungsgrad (GF)</string>
+    <string name="data_type_fatigue_grade_desc">Wissenschaftlicher Schwierigkeits- und ErmÃ¼dungsindex</string>
+    <string name="data_type_climb_viewer_title">3D PÃ¤sse-Viewer</string>
+    <string name="data_type_climb_viewer_desc">UnabhÃ¤ngiger 3D-Viewer fÃ¼r die BergpÃ¤sse der Route</string>
 
     <string name="data_type_climb_pacing_title">Ziel-VAM-Tempo</string>
     <string name="data_type_climb_pacing_desc">Ziel-VAM-Assistent (m/h) basierend auf aktueller Steigung</string>
@@ -38,56 +38,56 @@
     <string name="header_climb_strategist">STEIGUNGS-STRATEGE</string>
     <string name="label_dist_remaining">RESTDISTANZ</string>
     <string name="label_time_to_summit">ZEIT BIS ZUM GIPFEL</string>
-    <string name="label_next_blocks">NÄCHSTE %1$d m (%2$d m BLÖCKE)</string>
+    <string name="label_next_blocks">NÃ„CHSTE %1$d m (%2$d m BLÃ–CKE)</string>
     <string name="label_current_gradient">AKTUELLE STEIGUNG</string>
     <string name="label_avg_gradient_tramo">DURCHSCHNITTSSTEIGUNG</string>
     <string name="label_max_gradient_tramo">MAXIMALE STEIGUNG</string>
     <string name="alert_attack">ANGRIFF!</string>
-    <string name="alert_attack_sub">Steile Rampe im nächsten Abschnitt</string>
+    <string name="alert_attack_sub">Steile Rampe im nÃ¤chsten Abschnitt</string>
 
     <!-- Settings Panel Strings -->
     <string name="title_settings">Einstellungspanel</string>
     <string name="setting_font_family">Schriftart (Google Sans / Condensed)</string>
     <string name="setting_block_size">Blockdistanz des Profils</string>
-    <string name="setting_visible_blocks_count">Anzahl sichtbarer Blöcke (1 bis 10)</string>
+    <string name="setting_visible_blocks_count">Anzahl sichtbarer BlÃ¶cke (1 bis 10)</string>
     <string name="setting_lookahead_meters_3d">3D-Vorausschaudistanz (X-Achse)</string>
-    <string name="setting_attack_threshold">Schwelle für Angriffs-Alarm (%)</string>
+    <string name="setting_attack_threshold">Schwelle fÃ¼r Angriffs-Alarm (%)</string>
     <string name="setting_target_vam">Ziel-VAM (m/h)</string>
-    <string name="setting_asphalt_factor">Asphaltqualität (TA)</string>
+    <string name="setting_asphalt_factor">AsphaltqualitÃ¤t (TA)</string>
     <string name="setting_enable_alerts">Visuelle Angriffs-Alarme aktivieren</string>
-    <string name="setting_font_size_3d">Schriftgröße 3D-Höhenprofil</string>
-    <string name="setting_show_block_percentages">Steigung % in Blöcken anzeigen</string>
-    <string name="setting_show_3d_cotas">Höhenmarkierungen im 3D-Diagramm</string>
-    <string name="setting_show_3d_ramps">Steile Rampen (≥10%) in 3D anzeigen</string>
+    <string name="setting_font_size_3d">SchriftgrÃ¶ÃŸe 3D-HÃ¶henprofil</string>
+    <string name="setting_show_block_percentages">Steigung % in BlÃ¶cken anzeigen</string>
+    <string name="setting_show_3d_cotas">HÃ¶henmarkierungen im 3D-Diagramm</string>
+    <string name="setting_show_3d_ramps">Steile Rampen (â‰¥10%) in 3D anzeigen</string>
     <string name="setting_show_route_compass">Kompass auf der Globalen Route anzeigen</string>
-    <string name="setting_ramp_min_slope">Mindeststeigung für Rampenpfeil (%)</string>
-    <string name="setting_ramp_max_slope">Maximalsteigung für Rampenpfeil (%)</string>
+    <string name="setting_ramp_min_slope">Mindeststeigung fÃ¼r Rampenpfeil (%)</string>
+    <string name="setting_ramp_max_slope">Maximalsteigung fÃ¼r Rampenpfeil (%)</string>
     <string name="setting_show_max_gradient">Max. Steigung im 3D-Header anzeigen</string>
-    <string name="setting_rotate_90_cw">Diagramm um 90° drehen (Querformat)</string>
+    <string name="setting_rotate_90_cw">Diagramm um 90Â° drehen (Querformat)</string>
     <string name="setting_use_topographic">Topografische Steigungsberechnung verwenden (horizontale Projektion)</string>
     <string name="setting_show_hairpins">Haarnadelkurven anzeigen (Schwarze Linien)</string>
     <string name="setting_poi_filter">Interessenpunkte-Filter (POIs)</string>
-    <string name="setting_poi_towns">🏘️ Städte &amp; Dörfer</string>
-    <string name="setting_poi_water">💧 Wasserquellen</string>
-    <string name="setting_poi_viewpoints">📸 Aussichtspunkte</string>
-    <string name="setting_poi_summits">📡 Gipfel &amp; Pässe</string>
-    <string name="setting_show_3d_zoom">Touch-Zoom-Steuerung (🔍) im 3D-Diagramm aktivieren</string>
+    <string name="setting_poi_towns">ðŸ�˜ï¸� StÃ¤dte &amp; DÃ¶rfer</string>
+    <string name="setting_poi_water">ðŸ’§ Wasserquellen</string>
+    <string name="setting_poi_viewpoints">ðŸ“¸ Aussichtspunkte</string>
+    <string name="setting_poi_summits">ðŸ“¡ Gipfel &amp; PÃ¤sse</string>
+    <string name="setting_show_3d_zoom">Touch-Zoom-Steuerung (ðŸ”�) im 3D-Diagramm aktivieren</string>
     <string name="setting_custom_maps_title">Benutzerdefinierte Kartografie-Verwaltung</string>
-    <string name="setting_custom_maps_desc">Erkennt und importiert hochauflösende Vektorkarten-Pakete (.mbtiles / .map) für Karoo</string>
+    <string name="setting_custom_maps_desc">Erkennt und importiert hochauflÃ¶sende Vektorkarten-Pakete (.mbtiles / .map) fÃ¼r Karoo</string>
     <string name="font_normal">Normal</string>
-    <string name="font_large">Groß</string>
-    <string name="font_xl">Sehr Groß</string>
+    <string name="font_large">GroÃŸ</string>
+    <string name="font_xl">Sehr GroÃŸ</string>
     <string name="status_saved">Einstellungen automatisch gespeichert</string>
     <string name="btn_save_and_exit">Speichern &amp; Beenden</string>
 
     <!-- Zone Colors -->
-    <string name="zone_green">GRÜN</string>
+    <string name="zone_green">GRÃœN</string>
     <string name="zone_yellow">GELB</string>
     <string name="zone_orange">ORANGE</string>
     <string name="zone_red">ROT</string>
     <string name="zone_purple">VIOLETT</string>
 
-    <!-- Maßstabslegende für das Passprofile -->
+    <!-- MaÃŸstabslegende fÃ¼r das Passprofile -->
     <string name="scale_legend_major_block_m">Jeder Block = %1$dm</string>
     <string name="scale_legend_major_block_km">Jeder Block = %1$skm</string>
     <string name="scale_legend_sub_block">Jeder Teilblock = %1$dm</string>
@@ -105,14 +105,14 @@
     <string name="elite_btn_activate">AKTIVIEREN</string>
     <string name="elite_strava_segments">Strava Live Segments 3D (Beta)</string>
     <string name="elite_weather_overlay">Wind- &amp; Wetter-Overlay</string>
-    <string name="elite_radar_enabled">Höhenradar (Data Field)</string>
+    <string name="elite_radar_enabled">HÃ¶henradar (Data Field)</string>
     <string name="elite_map_overlay_mode">Karten-Overlay-Modus</string>
     <string name="elite_map_overlay_off">Aus</string>
     <string name="elite_map_overlay_climbs">Nur Anstiege</string>
     <string name="elite_map_overlay_all">Gesamte Route</string>
     <string name="elite_toast_unlocked">Elite-Funktionen entsperrt!</string>
-    <string name="elite_toast_invalid">Ungültige Lizenz</string>
-    <string name="label_radar_resolution">Blockauflösung (Meter)</string>
+    <string name="elite_toast_invalid">UngÃ¼ltige Lizenz</string>
+    <string name="label_radar_resolution">BlockauflÃ¶sung (Meter)</string>
     <string name="radar_resolution_auto">Auto</string>
     <string name="radar_resolution_20m">20m</string>
     <string name="radar_resolution_50m">50m</string>
@@ -121,22 +121,31 @@
     <string name="radar_resolution_300m">300m</string>
     <string name="radar_resolution_500m">500m</string>
     <string name="radar_resolution_1km">1km</string>
-    <string name="setting_show_surface_textures">Geländetexturen (Gravel/MTB)</string>
+    <string name="setting_show_surface_textures">GelÃ¤ndetexturen (Gravel/MTB)</string>
     <string name="setting_power_guide">Pacing / Power Guide (Warnungen)</string>
-    <string name="setting_smooth_gradients">Gefälle-Glättung (Gradients)</string>
+    <string name="setting_smooth_gradients">GefÃ¤lle-GlÃ¤ttung (Gradients)</string>
 
     <string name="alert_wall">Mauer %1$s%% in %2$s</string>
     <string name="alert_summit">Gipfel in %1$s</string>
     <string name="alert_climb">Anstieg in %1$s - %2$s bei %3$s%%</string>
     <string name="alert_finish">Ziel in %1$s</string>
-    <string name="alert_power_push">🔴 DRÜCKEN: %1$s | %2$s</string>
-    <string name="alert_power_target">⚡ ZIEL: %1$s | %2$s</string>
-    <string name="alert_power_prepare">🏔️ VORBEREITEN: %1$s | %2$s</string>
-    <string name="data_type_profile_tv_2d_desc">2D-Höhenprofil-Diagramm im Stil von Radsportübertragungen</string>
+    <string name="alert_power_push">ðŸ”´ DRÃœCKEN: %1$s | %2$s</string>
+    <string name="alert_power_target">âš¡ ZIEL: %1$s | %2$s</string>
+    <string name="alert_power_prepare">ðŸ�”ï¸� VORBEREITEN: %1$s | %2$s</string>
+    <string name="data_type_profile_tv_2d_desc">2D-HÃ¶henprofil-Diagramm im Stil von RadsportÃ¼bertragungen</string>
     <string name="pref_elite_profile_tv_2d_desc">Zeigt das gesamte Etappenprofil, wobei der gefahrene Bereich farbig ist</string>
-    <string name="pref_elite_profile_tv_2d_rotate_title">TV-Profil um 90º drehen</string>
+    <string name="pref_elite_profile_tv_2d_rotate_title">TV-Profil um 90Âº drehen</string>
     <string name="pref_elite_profile_tv_2d_rotate_desc">Zeichnet das 2D-Profil horizontal (Querformat)</string>
     <string name="data_type_profile_tv_2d_title">TV-Profil 2D</string>
     <string name="pref_elite_profile_tv_2d_title">TV-Profil 2D</string>
-    <string name="profile_tv_2d_gain">H�henmeter %1$.0f m</string>
+    <string name="profile_tv_2d_gain">Höhenmeter %1$.0f m</string>
+    <string name="pref_elite_profile_tv_color_title">TV-Profil Neonfarbe</string>
+    <string name="color_neon_green">Grün</string>
+    <string name="color_neon_white">Weiß</string>
+    <string name="color_neon_blue">Blau</string>
+    <string name="color_neon_yellow">Gelb</string>
+    <string name="color_neon_red">Rot</string>
+    <string name="color_neon_purple">Violett</string>
+    <string name="pref_elite_highlight_climbs_title">Anstiege auf der Route hervorheben</string>
+    <string name="pref_elite_highlight_climbs_desc">Schattiert Bergwertungen farbig im Etappenprofil</string>
 </resources>

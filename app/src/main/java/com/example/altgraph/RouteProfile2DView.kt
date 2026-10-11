@@ -17,6 +17,8 @@ class RouteProfile2DView(context: Context) : View(context) {
     var fontFamilyKey: String = "sans-serif-condensed"
     var fontSizeScale: Float = 1.0f
     var activeClimbs: List<RouteClimb> = emptyList()
+    var tvColor: String = "green"
+    var highlightClimbs: Boolean = false
     
     private val pathLine = Path()
     private val pathFill = Path()
@@ -115,6 +117,19 @@ class RouteProfile2DView(context: Context) : View(context) {
         FontHelper.applyFontToPaint(climbListCatPaint, fontFamilyKey, Typeface.BOLD)
         climbListCatPaint.textSize = 20f * fontSizeScale
         
+        // Theme colors for TV profile (Green, White, Blue, Yellow, Red, Purple)
+        val (primaryColor, gradientBottomColor, dimmedColor) = when (tvColor) {
+            "white" -> Triple(Color.parseColor("#FFFFFF"), Color.parseColor("#333333"), Color.parseColor("#77FFFFFF"))
+            "blue" -> Triple(Color.parseColor("#00E5FF"), Color.parseColor("#002244"), Color.parseColor("#7700E5FF"))
+            "yellow" -> Triple(Color.parseColor("#FFEA00"), Color.parseColor("#443300"), Color.parseColor("#77FFEA00"))
+            "red" -> Triple(Color.parseColor("#FF1744"), Color.parseColor("#440011"), Color.parseColor("#77FF1744"))
+            "purple" -> Triple(Color.parseColor("#D500F9"), Color.parseColor("#330044"), Color.parseColor("#77D500F9"))
+            else -> Triple(Color.parseColor("#00E676"), Color.parseColor("#003311"), Color.parseColor("#7700E676"))
+        }
+        val primaryHex = String.format("#%06X", (0xFFFFFF and primaryColor))
+
+        linePaint.color = primaryColor
+        kmDoneTextPaint.color = primaryColor
         FontHelper.applyFontToPaint(kmDoneTextPaint, fontFamilyKey, Typeface.BOLD)
         kmDoneTextPaint.textSize = 22f * fontSizeScale
         
@@ -182,10 +197,45 @@ class RouteProfile2DView(context: Context) : View(context) {
             }
         }
 
-        // Draw future outline
+        val distinctClimbs = activeClimbs.deduplicateOverlappingClimbs()
+
+        // 1. Draw future outline & optional background fill for mountain silhouette
+        if (highlightClimbs) {
+            val futureFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.parseColor("#30555555") // Faint dark grey base silhouette
+                style = Paint.Style.FILL
+            }
+            canvas.drawPath(pathFill, futureFillPaint)
+        }
         canvas.drawPath(pathLine, futureLinePaint)
 
-        // Calculate progress
+        // 2. Highlight climbs on route profile if enabled
+        if (highlightClimbs && distinctClimbs.isNotEmpty()) {
+            val climbFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.FILL
+                shader = LinearGradient(0f, topY, 0f, bottomY, Color.parseColor("#1E88E5"), Color.parseColor("#0D47A1"), Shader.TileMode.CLAMP)
+            }
+            val climbLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.parseColor("#42A5F5")
+                strokeWidth = 3f
+                style = Paint.Style.STROKE
+            }
+            for (climb in distinctClimbs) {
+                val startPct = (climb.startDistance / totalDistance).toFloat().coerceIn(0f, 1f)
+                val endPct = (climb.endDistance / totalDistance).toFloat().coerceIn(0f, 1f)
+                val cStartX = startX + startPct * drawW
+                val cEndX = startX + endPct * drawW
+                if (cEndX > cStartX) {
+                    canvas.save()
+                    canvas.clipRect(cStartX, 0f, cEndX, drawH)
+                    canvas.drawPath(pathFill, climbFillPaint)
+                    canvas.drawPath(pathLine, climbLinePaint)
+                    canvas.restore()
+                }
+            }
+        }
+
+        // 3. Calculate progress and draw ridden area in chosen neon color
         val progress = (currentDistance / totalDistance).toFloat().coerceIn(0f, 1f)
         val currentX = startX + progress * drawW
 
@@ -195,8 +245,8 @@ class RouteProfile2DView(context: Context) : View(context) {
         
         val gradient = LinearGradient(
             0f, topY, 0f, bottomY,
-            Color.parseColor("#00E676"),
-            Color.parseColor("#003311"),
+            primaryColor,
+            gradientBottomColor,
             Shader.TileMode.CLAMP
         )
         fillPaint.shader = gradient
@@ -207,7 +257,6 @@ class RouteProfile2DView(context: Context) : View(context) {
         canvas.restore()
 
         // Draw peaks for climbs
-        val distinctClimbs = activeClimbs.deduplicateOverlappingClimbs()
         for (climb in distinctClimbs) {
             val catUp = climb.category.uppercase()
             val mappedCat = when {
@@ -246,7 +295,7 @@ class RouteProfile2DView(context: Context) : View(context) {
         // Draw Start and End Flags
         val firstY = bottomY - ((profileElevations.firstOrNull() ?: minElev) - minElev) / elevRange * (bottomY - topY)
         val lastY = bottomY - ((profileElevations.lastOrNull() ?: minElev) - minElev) / elevRange * (bottomY - topY)
-        drawFlag(canvas, startX + 10f, firstY, "#00E676") // Start Flag (Green)
+        drawFlag(canvas, startX + 10f, firstY, primaryHex) // Start Flag (Primary Neon)
         drawFlag(canvas, endX - 10f, lastY, "#FFFFFF") // End Flag (White/Checkered)
 
         // Draw Top Texts
@@ -281,11 +330,11 @@ class RouteProfile2DView(context: Context) : View(context) {
                 val lenKm = climb.length / 1000.0
                 val avg = climb.avgGrade
                 
-                // Dim green if passed, normal if not
+                // Dim primary color if passed, normal if not
                 val isPassed = climb.endDistance <= currentDistance
                 if (isPassed) {
-                    climbListPaint.color = Color.parseColor("#7700E676") // Atenuado
-                    climbListCatPaint.color = Color.parseColor("#7700E676")
+                    climbListPaint.color = dimmedColor // Atenuado
+                    climbListCatPaint.color = dimmedColor
                 } else {
                     climbListPaint.color = Color.parseColor("#DDDDDD")
                     climbListCatPaint.color = Color.parseColor("#F59E0B")
@@ -390,7 +439,7 @@ class RouteProfile2DView(context: Context) : View(context) {
             }
             
             val miniMapPastPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = Color.parseColor("#00E676")
+                color = primaryColor
                 strokeWidth = 3f
                 style = Paint.Style.STROKE
             }
@@ -443,7 +492,7 @@ class RouteProfile2DView(context: Context) : View(context) {
             val startPt = routeCoords.first()
             val pxStart = (offX + (startPt.second - minLng) * Math.cos(Math.toRadians(midLat)) * scale).toFloat()
             val pyStart = (offY + contentH - (startPt.first - minLat) * scale).toFloat()
-            drawFlag(canvas, pxStart, pyStart, "#00E676", 0.6f) // Start Flag (Green, smaller)
+            drawFlag(canvas, pxStart, pyStart, primaryHex, 0.6f) // Start Flag (Primary Neon, smaller)
             
             val endPt = routeCoords.last()
             val pxEnd = (offX + (endPt.second - minLng) * Math.cos(Math.toRadians(midLat)) * scale).toFloat()

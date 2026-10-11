@@ -129,6 +129,8 @@ class RouteProfile2DDataField(extension: String) : DataTypeImpl(extension, "prof
                             routeProfileView.fontSizeScale = prefs.fontSize3dScale
                             routeProfileView.altitudeGainText = context.getString(R.string.profile_tv_2d_gain, routeProfileView.altitudeGain)
                             routeProfileView.activeClimbs = snap.routeClimbs
+                            routeProfileView.tvColor = prefs.eliteProfileTvColor
+                            routeProfileView.highlightClimbs = prefs.eliteHighlightClimbs
 
                             // Draw view
                             routeProfileView.draw(currentCanvas)

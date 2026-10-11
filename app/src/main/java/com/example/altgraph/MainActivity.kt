@@ -1236,6 +1236,70 @@ class MainActivity : Activity() {
         profileTvRotateCard.addView(textProfileTvRotateDesc)
         tabEliteContainer.addView(profileTvRotateCard)
 
+        // Profile TV Neon Color Selector
+        val profileTvColorCard = createCardContainer()
+        val profileTvColorLabel = createSectionLabel(getString(R.string.pref_elite_profile_tv_color_title))
+        profileTvColorCard.addView(profileTvColorLabel)
+
+        val neonColors = listOf(
+            "green" to getString(R.string.color_neon_green),
+            "white" to getString(R.string.color_neon_white),
+            "blue" to getString(R.string.color_neon_blue),
+            "yellow" to getString(R.string.color_neon_yellow),
+            "red" to getString(R.string.color_neon_red),
+            "purple" to getString(R.string.color_neon_purple)
+        )
+
+        val colorButtons = mutableListOf<Button>()
+        val colorRow1 = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply { bottomMargin = 6 }
+        }
+        val colorRow2 = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        }
+
+        neonColors.forEachIndexed { idx, pair ->
+            val colorKey = pair.first
+            val colorName = pair.second
+            val isActive = prefs.eliteProfileTvColor == colorKey
+            val btn = createSegmentButton(colorName, isActive) {
+                prefs.eliteProfileTvColor = colorKey
+                updateSegmentActiveStates(colorButtons, idx)
+            }.apply {
+                isEnabled = prefs.isEliteUnlocked
+            }
+            colorButtons.add(btn)
+            if (idx < 3) colorRow1.addView(btn) else colorRow2.addView(btn)
+        }
+
+        profileTvColorCard.addView(colorRow1)
+        profileTvColorCard.addView(colorRow2)
+        tabEliteContainer.addView(profileTvColorCard)
+
+        // Highlight Climbs on Route Profile
+        val highlightClimbsCard = createCardContainer()
+        val switchHighlightClimbs = Switch(this).apply {
+            text = getString(R.string.pref_elite_highlight_climbs_title)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.eliteHighlightClimbs
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, isChecked ->
+                prefs.eliteHighlightClimbs = isChecked
+            }
+        }
+        val textHighlightClimbsDesc = TextView(this).apply {
+            text = getString(R.string.pref_elite_highlight_climbs_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 0)
+        }
+        highlightClimbsCard.addView(switchHighlightClimbs)
+        highlightClimbsCard.addView(textHighlightClimbsDesc)
+        tabEliteContainer.addView(highlightClimbsCard)
+
         // Power Zone Bar
         val powerBarCard = createCardContainer()
         powerBarCard.orientation = LinearLayout.VERTICAL
@@ -1319,6 +1383,8 @@ class MainActivity : Activity() {
             switchSmoothGradients.isEnabled = unlocked
             switchShowSurfaceTextures.isEnabled = unlocked
             switchProfileTvRotate.isEnabled = unlocked
+            switchHighlightClimbs.isEnabled = unlocked
+            colorButtons.forEach { it.isEnabled = unlocked }
             ftpInput.isEnabled = unlocked
             radarResSpinner.isEnabled = unlocked
             mapOverlaySpinner.isEnabled = unlocked
@@ -1341,6 +1407,9 @@ class MainActivity : Activity() {
                 switchSmoothGradients.isChecked = prefs.eliteSmoothGradientsEnabled
                 switchShowSurfaceTextures.isChecked = prefs.showSurfaceTextures
                 switchProfileTvRotate.isChecked = prefs.eliteProfileTv2dRotate
+                switchHighlightClimbs.isChecked = prefs.eliteHighlightClimbs
+                val activeColorIdx = neonColors.indexOfFirst { it.first == prefs.eliteProfileTvColor }
+                if (activeColorIdx >= 0) updateSegmentActiveStates(colorButtons, activeColorIdx)
             }
             
             if (unlocked) {

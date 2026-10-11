@@ -3,39 +3,39 @@
     <string name="app_name">ALTGRAPH</string>
 
     <!-- Extension Data Fields -->
-    <string name="data_type_altimetria_title">Stratège d\'Altimétrie</string>
+    <string name="data_type_altimetria_title">StratÃ¨ge d\'AltimÃ©trie</string>
     <string name="data_type_altimetria_desc">Graphique de profil dynamique avec pourcentages et alertes d\'attaque</string>
 
-    <string name="data_type_altimetria_3d_title">Altimétrie 3D</string>
-    <string name="data_type_altimetria_3d_desc">Profil 3D en perspective isométrique avec relief de pente</string>
+    <string name="data_type_altimetria_3d_title">AltimÃ©trie 3D</string>
+    <string name="data_type_altimetria_3d_desc">Profil 3D en perspective isomÃ©trique avec relief de pente</string>
 
     <string name="data_type_fatigue_grade_title">Indice de Fatigue (GF)</string>
-    <string name="data_type_fatigue_grade_desc">Indice scientifique de difficulté et fatigue de la montée</string>
+    <string name="data_type_fatigue_grade_desc">Indice scientifique de difficultÃ© et fatigue de la montÃ©e</string>
     <string name="data_type_climb_viewer_title">Visionneur de Cols 3D</string>
-    <string name="data_type_climb_viewer_desc">Visionneur 3D indépendant des cols de montagne de l\'itinéraire</string>
+    <string name="data_type_climb_viewer_desc">Visionneur 3D indÃ©pendant des cols de montagne de l\'itinÃ©raire</string>
 
     <string name="data_type_climb_pacing_title">Rythme VAM Cible</string>
     <string name="data_type_climb_pacing_desc">Assistant de rythme VAM (m/h) selon la pente actuelle</string>
 
     <string name="data_type_gradient_trend_title">Tendance 3D et Pente Max</string>
-    <string name="data_type_gradient_trend_desc">Tendance de pente en temps réel et pic maximum du segment</string>
+    <string name="data_type_gradient_trend_desc">Tendance de pente en temps rÃ©el et pic maximum du segment</string>
 
     <string name="data_type_grade_zones_title">Zones de Pente</string>
-    <string name="data_type_grade_zones_desc">Histogramme en pourcentage en temps réel (Plat, Dur, Mur...)</string>
+    <string name="data_type_grade_zones_desc">Histogramme en pourcentage en temps rÃ©el (Plat, Dur, Mur...)</string>
     <string name="grade_zone_descent">Descente</string>
     <string name="grade_zone_flat">Plat</string>
     <string name="grade_zone_mild">Doux</string>
     <string name="grade_zone_medium">Moyen</string>
     <string name="grade_zone_hard">Dur</string>
-    <string name="grade_zone_very_hard">Très Dur</string>
+    <string name="grade_zone_very_hard">TrÃ¨s Dur</string>
     <string name="grade_zone_wall">Mur</string>
-    <string name="grade_zone_extreme">Extrême</string>
+    <string name="grade_zone_extreme">ExtrÃªme</string>
 
     <string name="data_type_altgraph_map_title">Carte Topographique IGN (ALTGRAPH)</string>
-    <string name="data_type_altgraph_map_desc">Carte topographique IGN 1:25.000 MBTILES plein écran avec itinéraire et position GPS</string>
+    <string name="data_type_altgraph_map_desc">Carte topographique IGN 1:25.000 MBTILES plein Ã©cran avec itinÃ©raire et position GPS</string>
 
     <!-- UI Labels for AltimetriaView -->
-    <string name="header_climb_strategist">STRATÈGE DE COL</string>
+    <string name="header_climb_strategist">STRATÃˆGE DE COL</string>
     <string name="label_dist_remaining">DIST. RESTANTE</string>
     <string name="label_time_to_summit">TEMPS AU SOMMET</string>
     <string name="label_next_blocks">PROCHAINS %1$d m (BLOCKS DE %2$d m)</string>
@@ -43,41 +43,41 @@
     <string name="label_avg_gradient_tramo">PENTE MOYENNE</string>
     <string name="label_max_gradient_tramo">PENTE MAXIMAL</string>
     <string name="alert_attack">ATTAQUE!</string>
-    <string name="alert_attack_sub">Rampe raide dans le prochain tronçon</string>
+    <string name="alert_attack_sub">Rampe raide dans le prochain tronÃ§on</string>
 
     <!-- Settings Panel Strings -->
     <string name="title_settings">Panneau de Configuration</string>
-    <string name="setting_font_family">Police de Caractères (Google Sans / Condensed)</string>
+    <string name="setting_font_family">Police de CaractÃ¨res (Google Sans / Condensed)</string>
     <string name="setting_block_size">Distance par Block de Profil</string>
-    <string name="setting_visible_blocks_count">Nombre de Tronçons Visibles (1 à 10)</string>
+    <string name="setting_visible_blocks_count">Nombre de TronÃ§ons Visibles (1 Ã  10)</string>
     <string name="setting_lookahead_meters_3d">Distance d\'Anticipation 3D (Axe X)</string>
     <string name="setting_attack_threshold">Seuil d\'Alerte d\'Attaque (%)</string>
     <string name="setting_target_vam">VAM Cible (m/h)</string>
-    <string name="setting_asphalt_factor">Qualité de l\'Asphalte (TA)</string>
+    <string name="setting_asphalt_factor">QualitÃ© de l\'Asphalte (TA)</string>
     <string name="setting_enable_alerts">Activer les Alertes Visuelles d\'Attaque</string>
-    <string name="setting_font_size_3d">Taille de Police en Altimétrie 3D</string>
+    <string name="setting_font_size_3d">Taille de Police en AltimÃ©trie 3D</string>
     <string name="setting_show_block_percentages">Afficher % de Pente dans les Blocks</string>
     <string name="setting_show_3d_cotas">Afficher Altitudes sur Graphique 3D</string>
-    <string name="setting_show_3d_ramps">Afficher Rampes Raides (≥10%) en 3D</string>
+    <string name="setting_show_3d_ramps">Afficher Rampes Raides (â‰¥10%) en 3D</string>
     <string name="setting_show_route_compass">Afficher la Boussole sur la Route Globale</string>
-    <string name="setting_ramp_min_slope">Pente Minimale pour Flèche de Rampe (%)</string>
-    <string name="setting_ramp_max_slope">Pente Maximale pour Flèche de Rampe (%)</string>
-    <string name="setting_show_max_gradient">Afficher Pente Max dans l\'En-tête 3D</string>
-    <string name="setting_rotate_90_cw">Pivoter Graphique 90° (Mode Paysage)</string>
-    <string name="setting_use_topographic">Utiliser la méthode de calcul topographique (Projection horizontale)</string>
-    <string name="setting_show_hairpins">Afficher Virages en Épingle (Lignes Noires)</string>
-    <string name="setting_poi_filter">Filtre des Points d\'Intérêt (POIs)</string>
-    <string name="setting_poi_towns">🏘️ Villes et Villages</string>
-    <string name="setting_poi_water">💧 Points d\'Eau</string>
-    <string name="setting_poi_viewpoints">📸 Points de Vue</string>
-    <string name="setting_poi_summits">📡 Sommets et Cols</string>
-    <string name="setting_show_3d_zoom">Activer le Zoom Tactile (🔍) sur Graphique 3D</string>
-    <string name="setting_custom_maps_title">Gestionnaire de Cartographie Personnalisée</string>
-    <string name="setting_custom_maps_desc">Permet de détecter et d\'importer des cartes vectorielles hors ligne haute définition (.mbtiles / .map) pour Karoo</string>
+    <string name="setting_ramp_min_slope">Pente Minimale pour FlÃ¨che de Rampe (%)</string>
+    <string name="setting_ramp_max_slope">Pente Maximale pour FlÃ¨che de Rampe (%)</string>
+    <string name="setting_show_max_gradient">Afficher Pente Max dans l\'En-tÃªte 3D</string>
+    <string name="setting_rotate_90_cw">Pivoter Graphique 90Â° (Mode Paysage)</string>
+    <string name="setting_use_topographic">Utiliser la mÃ©thode de calcul topographique (Projection horizontale)</string>
+    <string name="setting_show_hairpins">Afficher Virages en Ã‰pingle (Lignes Noires)</string>
+    <string name="setting_poi_filter">Filtre des Points d\'IntÃ©rÃªt (POIs)</string>
+    <string name="setting_poi_towns">ðŸ�˜ï¸� Villes et Villages</string>
+    <string name="setting_poi_water">ðŸ’§ Points d\'Eau</string>
+    <string name="setting_poi_viewpoints">ðŸ“¸ Points de Vue</string>
+    <string name="setting_poi_summits">ðŸ“¡ Sommets et Cols</string>
+    <string name="setting_show_3d_zoom">Activer le Zoom Tactile (ðŸ”�) sur Graphique 3D</string>
+    <string name="setting_custom_maps_title">Gestionnaire de Cartographie PersonnalisÃ©e</string>
+    <string name="setting_custom_maps_desc">Permet de dÃ©tecter et d\'importer des cartes vectorielles hors ligne haute dÃ©finition (.mbtiles / .map) pour Karoo</string>
     <string name="font_normal">Normale</string>
     <string name="font_large">Grande</string>
-    <string name="font_xl">Très Gr.</string>
-    <string name="status_saved">Paramètres Enregistrés Automatiquement</string>
+    <string name="font_xl">TrÃ¨s Gr.</string>
+    <string name="status_saved">ParamÃ¨tres EnregistrÃ©s Automatiquement</string>
     <string name="btn_save_and_exit">Enregistrer &amp; Quitter</string>
 
     <!-- Zone Colors -->
@@ -87,32 +87,32 @@
     <string name="zone_red">ROUGE</string>
     <string name="zone_purple">VIOLET</string>
 
-    <!-- Légende d'échelle pour le profil de col -->
+    <!-- LÃ©gende d'Ã©chelle pour le profil de col -->
     <string name="scale_legend_major_block_m">Chaque bloc = %1$dm</string>
     <string name="scale_legend_major_block_km">Chaque bloc = %1$skm</string>
     <string name="scale_legend_sub_block">Chaque sous-bloc = %1$dm</string>
 
     <!-- Pro Features -->
     <string name="setting_smart_zoom">Activer Smart Zoom Tactique (Auto-Scale)</string>
-    <string name="setting_oasis_tracking">Activer Oasis Tracking (Zones de Récupération)</string>
-    <string name="setting_virtual_pacer">Activer Virtual Pacer Biomécanique (Fantôme)</string>
+    <string name="setting_oasis_tracking">Activer Oasis Tracking (Zones de RÃ©cupÃ©ration)</string>
+    <string name="setting_virtual_pacer">Activer Virtual Pacer BiomÃ©canique (FantÃ´me)</string>
     <string name="setting_switchback_rendering">Activer Dynamique de Lacets 3D</string>
     <string name="setting_energy_management">Activer Energy Management System (Batterie Humaine)</string>
 
-    <string name="elite_status_unlocked">STATUT : DÉBLOQUÉ</string>
-    <string name="elite_status_locked">STATUT : BLOQUÉ (Licence requise)</string>
+    <string name="elite_status_unlocked">STATUT : DÃ‰BLOQUÃ‰</string>
+    <string name="elite_status_locked">STATUT : BLOQUÃ‰ (Licence requise)</string>
     <string name="elite_hint_license">Entrez la licence (ex: ALTGRAPH-ELITE-2026)</string>
     <string name="elite_btn_activate">ACTIVER</string>
-    <string name="elite_strava_segments">Strava Live Segments 3D (Bêta)</string>
-    <string name="elite_weather_overlay">Calque Vent &amp; Météo</string>
-    <string name="elite_radar_enabled">Radar Altimétrique (Data Field)</string>
+    <string name="elite_strava_segments">Strava Live Segments 3D (BÃªta)</string>
+    <string name="elite_weather_overlay">Calque Vent &amp; MÃ©tÃ©o</string>
+    <string name="elite_radar_enabled">Radar AltimÃ©trique (Data Field)</string>
     <string name="elite_map_overlay_mode">Mode Superposition Carte</string>
-    <string name="elite_map_overlay_off">Désactivé</string>
-    <string name="elite_map_overlay_climbs">Seulement Montées</string>
-    <string name="elite_map_overlay_all">Itinéraire Complet</string>
-    <string name="elite_toast_unlocked">Fonctions Elite débloquées !</string>
+    <string name="elite_map_overlay_off">DÃ©sactivÃ©</string>
+    <string name="elite_map_overlay_climbs">Seulement MontÃ©es</string>
+    <string name="elite_map_overlay_all">ItinÃ©raire Complet</string>
+    <string name="elite_toast_unlocked">Fonctions Elite dÃ©bloquÃ©es !</string>
     <string name="elite_toast_invalid">Licence invalide</string>
-    <string name="label_radar_resolution">Résolution de bloc (Mètres)</string>
+    <string name="label_radar_resolution">RÃ©solution de bloc (MÃ¨tres)</string>
     <string name="radar_resolution_auto">Auto</string>
     <string name="radar_resolution_20m">20m</string>
     <string name="radar_resolution_50m">50m</string>
@@ -125,18 +125,27 @@
     <string name="setting_power_guide">Pacing / Power Guide (Alertes)</string>
     <string name="setting_smooth_gradients">Lissage des pentes (Gradients)</string>
 
-    <string name="alert_wall">Mur %1$s%% à %2$s</string>
+    <string name="alert_wall">Mur %1$s%% Ã  %2$s</string>
     <string name="alert_summit">Sommet dans %1$s</string>
-    <string name="alert_climb">Col à %1$s - %2$s à %3$s%%</string>
-    <string name="alert_finish">Arrivée dans %1$s</string>
-    <string name="alert_power_push">🔴 POUSSEZ: %1$s | %2$s</string>
-    <string name="alert_power_target">⚡ CIBLE: %1$s | %2$s</string>
-    <string name="alert_power_prepare">🏔️ PRÉPAREZ: %1$s | %2$s</string>
-    <string name="data_type_profile_tv_2d_desc">Graphique d\'élévation 2D style diffusion cycliste</string>
-    <string name="pref_elite_profile_tv_2d_desc">Affiche le profil complet de l\'étape avec la zone terminée en couleur</string>
-    <string name="pref_elite_profile_tv_2d_rotate_title">Tourner Profil TV 90º</string>
+    <string name="alert_climb">Col Ã  %1$s - %2$s Ã  %3$s%%</string>
+    <string name="alert_finish">ArrivÃ©e dans %1$s</string>
+    <string name="alert_power_push">ðŸ”´ POUSSEZ: %1$s | %2$s</string>
+    <string name="alert_power_target">âš¡ CIBLE: %1$s | %2$s</string>
+    <string name="alert_power_prepare">ðŸ�”ï¸� PRÃ‰PAREZ: %1$s | %2$s</string>
+    <string name="data_type_profile_tv_2d_desc">Graphique d\'Ã©lÃ©vation 2D style diffusion cycliste</string>
+    <string name="pref_elite_profile_tv_2d_desc">Affiche le profil complet de l\'Ã©tape avec la zone terminÃ©e en couleur</string>
+    <string name="pref_elite_profile_tv_2d_rotate_title">Tourner Profil TV 90Âº</string>
     <string name="pref_elite_profile_tv_2d_rotate_desc">Dessine le graphique en mode paysage (horizontal)</string>
     <string name="data_type_profile_tv_2d_title">Profil TV 2D</string>
     <string name="pref_elite_profile_tv_2d_title">Profil TV 2D</string>
-    <string name="profile_tv_2d_gain">D�nivel� positif %1$.0f m</string>
+    <string name="profile_tv_2d_gain">Dénivelé positif %1$.0f m</string>
+    <string name="pref_elite_profile_tv_color_title">Couleur néon du profil TV</string>
+    <string name="color_neon_green">Vert</string>
+    <string name="color_neon_white">Blanc</string>
+    <string name="color_neon_blue">Bleu</string>
+    <string name="color_neon_yellow">Jaune</string>
+    <string name="color_neon_red">Rouge</string>
+    <string name="color_neon_purple">Violet</string>
+    <string name="pref_elite_highlight_climbs_title">Mettre en évidence les cols</string>
+    <string name="pref_elite_highlight_climbs_desc">Ombre les cols en couleur sur le profil de l\'étape</string>
 </resources>
