@@ -17,7 +17,7 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 - **Detección y Lista de Puertos**: Sombra y traza los puertos en el perfil y en el minimapa en tono gris claro contrastado, con una cabecera centrada y listado detallado de categorías, distancias y pendientes.
 - **Rotación Apaisada**: Incluye un ajuste exclusivo en el menú Elite para girar el gráfico 90º, ideal para colocar el campo de datos en vertical pero disfrutar del gráfico en su máxima anchura visual.
 <p align="center">
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/rutapuritotv.png" width="500" alt="TV Profile Blanco" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/rutapuritoTV.png" width="500" alt="TV Profile Blanco" />
 </p>
 <p align="center">
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_tv_profile_red.png" width="380" alt="TV Profile Rojo" />
