@@ -207,7 +207,8 @@ class RouteProfile2DView(context: Context) : View(context) {
         canvas.restore()
 
         // Draw peaks for climbs
-        for (climb in activeClimbs) {
+        val distinctClimbs = activeClimbs.deduplicateOverlappingClimbs()
+        for (climb in distinctClimbs) {
             val catUp = climb.category.uppercase()
             val mappedCat = when {
                 catUp.contains("1") -> "1ª"
@@ -256,7 +257,7 @@ class RouteProfile2DView(context: Context) : View(context) {
         canvas.drawText(distText, 20f, 55f, subTextPaint)
 
         // Draw Classified Climbs List on the Right
-        val catClimbs = activeClimbs.mapNotNull { climb ->
+        val catClimbs = distinctClimbs.mapNotNull { climb ->
             val catUp = climb.category.uppercase()
             val mappedCat = when {
                 catUp.contains("1") -> "1ª"
@@ -412,7 +413,7 @@ class RouteProfile2DView(context: Context) : View(context) {
                 style = Paint.Style.FILL
             }
             
-            for (climb in activeClimbs) {
+            for (climb in distinctClimbs) {
                 val catUp = climb.category.uppercase()
                 val mappedCat = when {
                     catUp.contains("1") -> "1ª"

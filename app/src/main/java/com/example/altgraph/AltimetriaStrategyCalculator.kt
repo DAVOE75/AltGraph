@@ -31,6 +31,36 @@ data class RouteClimb(
     var category: String = ""
 )
 
+fun List<RouteClimb>.deduplicateOverlappingClimbs(): List<RouteClimb> {
+    if (this.size <= 1) return this
+
+    // Procesa primero los puertos más largos para descartar cualquier puerto más corto que solape
+    val sortedByLength = this.sortedByDescending { it.length }
+    val result = mutableListOf<RouteClimb>()
+
+    for (climb in sortedByLength) {
+        val overlaps = result.any { existing ->
+            val overlapStart = maxOf(existing.startDistance, climb.startDistance)
+            val overlapEnd = minOf(existing.endDistance, climb.endDistance)
+            val overlap = overlapEnd - overlapStart
+            val minLen = minOf(existing.length, climb.length)
+
+            // Considerar solapado si:
+            // 1) La distancia solapada es significativa (> 100m o > 20% del puerto más corto)
+            // 2) O ambas cimas están muy cerca (< 300m) y los inicios están cerca (< 500m)
+            overlap > 100.0 ||
+                (minLen > 0 && overlap / minLen > 0.2) ||
+                (Math.abs(existing.endDistance - climb.endDistance) < 300.0 && Math.abs(existing.startDistance - climb.startDistance) < 500.0)
+        }
+
+        if (!overlaps) {
+            result.add(climb)
+        }
+    }
+
+    return result.sortedBy { it.startDistance }
+}
+
 data class StrategyData(
     val remainingDistance: Double,
     val timeToSummit: Long,
@@ -416,16 +446,15 @@ class AltimetriaStrategyCalculator {
         if (routeKeyForClimbs != routeKey) {
             routeKeyForClimbs = routeKey
             if (incoming.isNotEmpty()) {
-                routeClimbs = incoming.map { calculateClimbCategory(it) }
+                val categorized = incoming.map { calculateClimbCategory(it) }
+                routeClimbs = categorized.deduplicateOverlappingClimbs()
                 Log.d("AltiCalc", "syncRouteClimbs: Nueva ruta '$routeKey'. Inicializados ${routeClimbs.size} puertos.")
             }
         } else if (incoming.isNotEmpty()) {
-            val currentStartDists = routeClimbs.map { it.startDistance }.toSet()
-            val newClimbs = incoming.filter { it.startDistance !in currentStartDists }.map { calculateClimbCategory(it) }
-            if (newClimbs.isNotEmpty()) {
-                routeClimbs = (routeClimbs + newClimbs).sortedBy { it.startDistance }
-                Log.d("AltiCalc", "syncRouteClimbs: Añadidos ${newClimbs.size} nuevos puertos a '$routeKey'. Total: ${routeClimbs.size}")
-            }
+            val categorizedIncoming = incoming.map { calculateClimbCategory(it) }
+            val merged = routeClimbs + categorizedIncoming
+            routeClimbs = merged.deduplicateOverlappingClimbs()
+            Log.d("AltiCalc", "syncRouteClimbs: Actualizados ${routeClimbs.size} puertos en '$routeKey'.")
         }
     }
 
@@ -574,8 +603,8 @@ class AltimetriaStrategyCalculator {
         }
         
         if (customClimbs.isNotEmpty() && this.routeClimbs.isEmpty()) {
-            this.routeClimbs = customClimbs.sortedBy { it.startDistance }
-            Log.e("AltiCalc", "Detected ${customClimbs.size} custom climbs!")
+            this.routeClimbs = customClimbs.deduplicateOverlappingClimbs()
+            Log.e("AltiCalc", "Detected ${this.routeClimbs.size} custom climbs!")
         }
     }
 
