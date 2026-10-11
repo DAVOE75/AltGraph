@@ -110,10 +110,10 @@ class RouteProfile2DView(context: Context) : View(context) {
         subTextPaint.textSize = 18f * fontSizeScale
         
         FontHelper.applyFontToPaint(climbListPaint, fontFamilyKey, Typeface.NORMAL)
-        climbListPaint.textSize = 17f * fontSizeScale
+        climbListPaint.textSize = 20f * fontSizeScale
         
         FontHelper.applyFontToPaint(climbListCatPaint, fontFamilyKey, Typeface.BOLD)
-        climbListCatPaint.textSize = 17f * fontSizeScale
+        climbListCatPaint.textSize = 20f * fontSizeScale
         
         FontHelper.applyFontToPaint(kmDoneTextPaint, fontFamilyKey, Typeface.BOLD)
         kmDoneTextPaint.textSize = 22f * fontSizeScale
@@ -271,7 +271,7 @@ class RouteProfile2DView(context: Context) : View(context) {
 
         if (catClimbs.isNotEmpty()) {
             var climbY = 90f // Below the distance text
-            val listStartX = drawW * 0.6f // Aligned to 60% towards the right
+            val listStartX = drawW * 0.50f // Moved slightly to the left (50%) to give more room for larger text
 
             for ((i, item) in catClimbs.withIndex()) {
                 val climb = item.first
@@ -302,7 +302,7 @@ class RouteProfile2DView(context: Context) : View(context) {
                 val startStr = String.format(" km %.1f | %.1f km al %.1f%%", startKm, lenKm, avg)
                 canvas.drawText(startStr, listStartX + ptoWidth + catWidth, climbY, climbListPaint)
 
-                climbY += 22f * fontSizeScale
+                climbY += 25f * fontSizeScale
                 if (climbY > drawH - 20f) break // Avoid drawing out of bounds
             }
         }
