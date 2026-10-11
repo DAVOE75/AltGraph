@@ -16,8 +16,12 @@ It revolutionizes the traditional concept of cycling altimetry by incorporating 
 - **Landscape Rotation**: Includes an exclusive Elite toggle to rotate the chart 90º for maximum visual width on Karoo.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_tv_profile.png" width="380" alt="TV Profile Green" />
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_tv_profile_purple.png" width="380" alt="TV Profile Purple" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/rutapuritoTV.png" width="500" alt="TV Profile White" />
+</p>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfiltv.png" width="250" alt="TV Profile Yellow" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfiltv1.png" width="250" alt="TV Profile Pink" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/perfilvve.png" width="250" alt="TV Profile Red" />
 </p>
 
 ## 🚀 VERSION 1.0.44: DYNAMIC PACING (POWER GUIDE) 🚀
