@@ -9,6 +9,17 @@ It revolutionizes the traditional concept of cycling altimetry by incorporating 
 
 
 
+## 🔥 VERSION 1.0.77: TV PROFILE 2D (ELITE) 🔥
+
+- **TV Profile 2D (ELITE Novelty)**: A new visual data field that replicates cycling broadcast elevation profiles (Giro/Tour). Draws the entire stage silhouette and dynamically fills the ridden area with your chosen neon gradient (Green, White, Blue, Yellow, Red, or Purple), showing real-time rider position.
+- **Climb Detection & Climb List**: Highlights mountain passes on the elevation profile and minimap in distinct light grey, with a centered header and detailed breakdown of categories, distances, and average grades.
+- **Landscape Rotation**: Includes an exclusive Elite toggle to rotate the chart 90º for maximum visual width on Karoo.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_tv_profile.png" width="380" alt="TV Profile Green" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_tv_profile_purple.png" width="380" alt="TV Profile Purple" />
+</p>
+
 ## 🚀 VERSION 1.0.44: DYNAMIC PACING (POWER GUIDE) 🚀
 
 - **Power Guide / Pacing (ELITE Novelty)**: A new intelligent system has been added to the Altimetry Radar. Based on your FTP, Altgraph will calculate the ideal watts for each section of the climb in real-time and show you strategy alerts on screen (e.g. '⚡ TARGET: 240W' or '🔴 PUSH: 300W'). Your own sports director on your handlebars!
