@@ -16,7 +16,9 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 - **Perfil TV 2D (Novedad ELITE)**: Se ha añadido un nuevo campo de datos que replica los gráficos altimétricos estilo retransmisión ciclista (Giro/Tour). Dibuja la silueta de toda la etapa y rellena dinámicamente con un degradado en tu color neón favorito (Verde, Blanco, Azul, Amarillo, Rojo o Violeta) la zona pedaleada, mostrando la posición exacta en tiempo real.
 - **Detección y Lista de Puertos**: Sombra y traza los puertos en el perfil y en el minimapa en tono gris claro contrastado, con una cabecera centrada y listado detallado de categorías, distancias y pendientes.
 - **Rotación Apaisada**: Incluye un ajuste exclusivo en el menú Elite para girar el gráfico 90º, ideal para colocar el campo de datos en vertical pero disfrutar del gráfico en su máxima anchura visual.
-
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_tv_profile_red.png" width="380" alt="TV Profile Rojo" />
+</p>
 <p align="center">
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_tv_profile.png" width="380" alt="TV Profile Verde" />
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_tv_profile_purple.png" width="380" alt="TV Profile Violeta" />
