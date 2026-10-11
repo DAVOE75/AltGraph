@@ -121,9 +121,9 @@ class RouteProfile2DView(context: Context) : View(context) {
         val (primaryColor, gradientBottomColor, dimmedColor) = when (tvColor) {
             "white" -> Triple(Color.parseColor("#FFFFFF"), Color.parseColor("#333333"), Color.parseColor("#77FFFFFF"))
             "blue" -> Triple(Color.parseColor("#00E5FF"), Color.parseColor("#002244"), Color.parseColor("#7700E5FF"))
-            "yellow" -> Triple(Color.parseColor("#FFEA00"), Color.parseColor("#443300"), Color.parseColor("#77FFEA00"))
-            "red" -> Triple(Color.parseColor("#FF1744"), Color.parseColor("#440011"), Color.parseColor("#77FF1744"))
-            "purple" -> Triple(Color.parseColor("#D500F9"), Color.parseColor("#330044"), Color.parseColor("#77D500F9"))
+            "yellow" -> Triple(Color.parseColor("#FFDE00"), Color.parseColor("#423800"), Color.parseColor("#77FFDE00")) // Tour de France (Maillot Jaune)
+            "red" -> Triple(Color.parseColor("#E30613"), Color.parseColor("#400206"), Color.parseColor("#77E30613")) // Vuelta a España (La Roja)
+            "purple" -> Triple(Color.parseColor("#FF3385"), Color.parseColor("#450022"), Color.parseColor("#77FF3385")) // Giro d'Italia (Maglia Rosa)
             else -> Triple(Color.parseColor("#00E676"), Color.parseColor("#003311"), Color.parseColor("#7700E676"))
         }
         val primaryHex = String.format("#%06X", (0xFFFFFF and primaryColor))

@@ -145,7 +145,7 @@
     <string name="color_neon_blue">Bleu</string>
     <string name="color_neon_yellow">Jaune</string>
     <string name="color_neon_red">Rouge</string>
-    <string name="color_neon_purple">Violet</string>
+    <string name="color_neon_purple">Rose / Violet</string>
     <string name="pref_elite_highlight_climbs_title">Mettre en évidence les cols</string>
     <string name="pref_elite_highlight_climbs_desc">Ombre les cols en couleur sur le profil de l\'étape</string>
     <string name="profile_tv_climb_list_title">Liste des cols</string>

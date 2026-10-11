@@ -145,7 +145,7 @@
     <string name="color_neon_blue">Blau</string>
     <string name="color_neon_yellow">Gelb</string>
     <string name="color_neon_red">Rot</string>
-    <string name="color_neon_purple">Violett</string>
+    <string name="color_neon_purple">Rosa / Violett</string>
     <string name="pref_elite_highlight_climbs_title">Anstiege auf der Route hervorheben</string>
     <string name="pref_elite_highlight_climbs_desc">Schattiert Bergwertungen farbig im Etappenprofil</string>
     <string name="profile_tv_climb_list_title">Anstiegsliste</string>

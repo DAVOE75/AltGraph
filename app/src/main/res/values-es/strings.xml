@@ -208,7 +208,7 @@
     <string name="color_neon_blue">Azul</string>
     <string name="color_neon_yellow">Amarillo</string>
     <string name="color_neon_red">Rojo</string>
-    <string name="color_neon_purple">Violeta</string>
+    <string name="color_neon_purple">Rosa / Violeta</string>
     <string name="pref_elite_highlight_climbs_title">Marcar puertos en la ruta</string>
     <string name="pref_elite_highlight_climbs_desc">Sombrea los puertos de montaña en color sobre el perfil de la etapa</string>
     <string name="profile_tv_climb_list_title">Lista de puertos</string>
