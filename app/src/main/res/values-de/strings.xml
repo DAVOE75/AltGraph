@@ -124,6 +124,7 @@
     <string name="setting_show_surface_textures">GelÃ¤ndetexturen (Gravel/MTB)</string>
     <string name="setting_power_guide">Pacing / Power Guide (Warnungen)</string>
     <string name="setting_smooth_gradients">GefÃ¤lle-GlÃ¤ttung (Gradients)</string>
+    <string name="setting_smooth_map_overlay">FarbverlÃ¤ufe fÃ¼r Route auf Basiskarte glÃ¤tten</string>
 
     <string name="alert_wall">Mauer %1$s%% in %2$s</string>
     <string name="alert_summit">Gipfel in %1$s</string>

@@ -222,6 +222,10 @@ class AppPreferences(context: Context) {
         get() = if (isEliteUnlocked) prefs.getString(KEY_ELITE_MAP_OVERLAY_MODE, "climbs") ?: "climbs" else "off"
         set(value) = prefs.edit().putString(KEY_ELITE_MAP_OVERLAY_MODE, value).apply()
 
+    var eliteSmoothMapOverlayEnabled: Boolean
+        get() = prefs.getBoolean(KEY_ELITE_SMOOTH_MAP_OVERLAY, false) && isEliteUnlocked
+        set(value) = prefs.edit().putBoolean(KEY_ELITE_SMOOTH_MAP_OVERLAY, value).apply()
+
     var userFtp: Int
         get() = prefs.getInt(KEY_USER_FTP, 250)
         set(value) = prefs.edit().putInt(KEY_USER_FTP, value).apply()
@@ -299,6 +303,7 @@ class AppPreferences(context: Context) {
         private const val KEY_ELITE_PROFILE_TV_COLOR = "elite_profile_tv_color"
         private const val KEY_ELITE_HIGHLIGHT_CLIMBS = "elite_highlight_climbs"
         private const val KEY_ELITE_MAP_OVERLAY_MODE = "elite_map_overlay_mode"
+        private const val KEY_ELITE_SMOOTH_MAP_OVERLAY = "elite_smooth_map_overlay"
         private const val KEY_USER_FTP = "user_ftp"
         private const val KEY_ELITE_RADAR_RESOLUTION = "elite_radar_resolution"
 

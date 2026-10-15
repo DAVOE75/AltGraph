@@ -1065,6 +1065,18 @@ class MainActivity : Activity() {
             }
         }
         mapOverlayLayout.addView(mapOverlaySpinner)
+        
+        val switchSmoothMap = Switch(this).apply {
+            text = getString(R.string.setting_smooth_map_overlay)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.eliteSmoothMapOverlayEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setPadding(0, 16, 0, 0)
+            setOnCheckedChangeListener { _, v -> prefs.eliteSmoothMapOverlayEnabled = v }
+        }
+        mapOverlayLayout.addView(switchSmoothMap)
+
         mapOverlayCard.addView(mapOverlayLayout)
         tabEliteContainer.addView(mapOverlayCard)
 

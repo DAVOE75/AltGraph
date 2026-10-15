@@ -114,25 +114,64 @@ class MapOverlayManager(
             val customResolution = prefs.eliteRadarResolution
             val minSegmentM = if (customResolution > 0) customResolution.toDouble() else 300.0
             val finalSegments = mergeShortSegments(filteredSegments, minSegmentM)
+            val smoothOverlay = prefs.eliteSmoothMapOverlayEnabled
 
             // Escalar a la distancia del perfil: los tramos se miden sobre él
             val path = RoutePath.fromPolyline(pathEncoded, elevPoints.lastOrNull()?.distance) ?: return
 
-            Log.d("MapOverlayManager", "updateOverlay: created ${finalSegments.size} segments to draw")
+            Log.d("MapOverlayManager", "updateOverlay: created ${finalSegments.size} segments (smooth=$smoothOverlay)")
             if (stopped) return // el decode puede tardar: no emitir si ya se paró
             clearPolylines(emitter)
 
-            for ((index, segment) in finalSegments.withIndex()) {
+            var polylineCount = 0
+            for (i in finalSegments.indices) {
                 if (stopped) return
-                val subPath = path.subPath(segment.startDist, segment.endDist)
+                val seg = finalSegments[i]
+                val nextSeg = finalSegments.getOrNull(i + 1)
+                val c1 = Color.parseColor(GradeColorScale.getColorHex(seg.grade))
 
-                if (subPath.size >= 2) {
-                    val encoded = PolylineCodec.encode(subPath, 1e5)
-                    val colorHex = GradeColorScale.getColorHex(segment.grade)
-                    val colorInt = Color.parseColor(colorHex)
-                    val polylineId = "altgraph-grade-$index"
-                    if (!emit(emitter, ShowPolyline(id = polylineId, encodedPolyline = encoded, color = colorInt, width = 8))) return
-                    activePolylines.add(polylineId)
+                val segLen = seg.endDist - seg.startDist
+                val canSmoothTransition = smoothOverlay && nextSeg != null && nextSeg.startDist == seg.endDist && segLen >= 80.0
+
+                if (canSmoothTransition && nextSeg != null) {
+                    val c2 = Color.parseColor(GradeColorScale.getColorHex(nextSeg.grade))
+                    val blendZoneM = minOf(60.0, segLen * 0.4)
+                    val solidEnd = seg.endDist - blendZoneM
+
+                    // Tramo principal con color base
+                    val mainSubPath = path.subPath(seg.startDist, solidEnd)
+                    if (mainSubPath.size >= 2) {
+                        val encoded = PolylineCodec.encode(mainSubPath, 1e5)
+                        val polylineId = "altgraph-grade-${polylineCount++}"
+                        if (!emit(emitter, ShowPolyline(id = polylineId, encodedPolyline = encoded, color = c1, width = 8))) return
+                        activePolylines.add(polylineId)
+                    }
+
+                    // Zona de difuminado dividida en 3 micropasos interpolados
+                    val steps = 3
+                    val stepDist = blendZoneM / steps
+                    for (s in 0 until steps) {
+                        if (stopped) return
+                        val pStart = solidEnd + s * stepDist
+                        val pEnd = solidEnd + (s + 1) * stepDist
+                        val t = (s + 0.5f) / steps.toFloat()
+                        val blendedColor = blendColors(c1, c2, t)
+                        val blendSubPath = path.subPath(pStart, pEnd)
+                        if (blendSubPath.size >= 2) {
+                            val encoded = PolylineCodec.encode(blendSubPath, 1e5)
+                            val polylineId = "altgraph-grade-${polylineCount++}"
+                            if (!emit(emitter, ShowPolyline(id = polylineId, encodedPolyline = encoded, color = blendedColor, width = 8))) return
+                            activePolylines.add(polylineId)
+                        }
+                    }
+                } else {
+                    val subPath = path.subPath(seg.startDist, seg.endDist)
+                    if (subPath.size >= 2) {
+                        val encoded = PolylineCodec.encode(subPath, 1e5)
+                        val polylineId = "altgraph-grade-${polylineCount++}"
+                        if (!emit(emitter, ShowPolyline(id = polylineId, encodedPolyline = encoded, color = c1, width = 8))) return
+                        activePolylines.add(polylineId)
+                    }
                 }
             }
             Log.d("MapOverlayManager", "updateOverlay: Emitted ${activePolylines.size} polylines!")
@@ -259,6 +298,14 @@ class MapOverlayManager(
             val lb = length(b)
             val grade = if (la + lb > 0) (a.grade * la + b.grade * lb) / (la + lb) else a.grade
             return GradeSegment(a.startDist, b.endDist, grade)
+        }
+
+        private fun blendColors(color1: Int, color2: Int, ratio: Float): Int {
+            val inverseRatio = 1f - ratio
+            val r = (Color.red(color1) * inverseRatio + Color.red(color2) * ratio).toInt().coerceIn(0, 255)
+            val g = (Color.green(color1) * inverseRatio + Color.green(color2) * ratio).toInt().coerceIn(0, 255)
+            val b = (Color.blue(color1) * inverseRatio + Color.blue(color2) * ratio).toInt().coerceIn(0, 255)
+            return Color.rgb(r, g, b)
         }
     }
 

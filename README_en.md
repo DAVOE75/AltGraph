@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v1.0.79 ELITE)
+# ALTGRAPH (v1.0.80 ELITE)
 <p>Read in: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md">🇪🇸 Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md">🇬🇧 English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md">🇫🇷 Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md">🇮🇹 Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md">🇩🇪 Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md">🇵🇹 Português</a></p>
 
 <p align="center">
@@ -19,10 +19,11 @@ It revolutionizes traditional cycling elevation profiles by featuring a **Suite 
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
-## 🔥 VERSION 1.0.79: ADAPTIVE 3D ROUTE ZOOM 🔥
+## 🔥 VERSION 1.0.80: BASE MAP ROUTE COLOR SMOOTHING & OPTIMIZED ICONS 🔥
 
-- **Adaptive Zoom to Route Length**: In the 3D elevation view (both normal and landscape), zoom controls dynamically adapt to the actual route length. The maximum zoom-out limit (-) automatically matches the total route distance, preventing flat phantom segments when the route is shorter than standard zoom scales.
-- **Full Panoramic Fit**: Zooming out fully scales the entire route to 100% of the screen without artificial flat tails.
+- **Smooth Grade Transitions on Base Map**: Just like in classic radar view, added the option to blend and smooth color transitions along the colored route polyline on the base map.
+- **Official Standardized Icons**: Perfect square aspect ratio mipmap generation for ultra-crisp display in Karoo's About section and Extension Store.
+- **Full Multi-Language Support**: Complete translations across Spanish, English, French, Italian, German, and Portuguese.
 
 ## 🔥 VERSION 1.0.78: TV PROFILE 2D (ELITE) 🔥
 

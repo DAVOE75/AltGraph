@@ -123,6 +123,7 @@
     <string name="setting_show_surface_textures">Texturas de Terreno (Gravel/MTB)</string>
     <string name="setting_power_guide">Pacing / Power Guide (Alertas)</string>
     <string name="setting_smooth_gradients">SuavizaÃ§Ã£o de inclinaÃ§Ãµes (Gradients)</string>
+    <string name="setting_smooth_map_overlay">Suavizar coloraÃ§Ã£o da rota no mapa base</string>
 
     <string name="alert_wall">Muro %1$s%% a %2$s</string>
     <string name="alert_summit">Topo a %1$s</string>
