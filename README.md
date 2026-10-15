@@ -9,7 +9,7 @@
   <a href="https://github.com/DAVOE75/ALTGRAPH/releases"><img src="https://img.shields.io/github/downloads/DAVOE75/ALTGRAPH/total?style=flat-square&logo=github&logoColor=white&label=Descargas&color=0091EA" alt="Descargas totales" /></a>
   <img src="https://img.shields.io/badge/Dispositivo-Karoo_2_•_Karoo_3-1B1B1B?style=flat-square&logo=googlemaps&logoColor=00E676" alt="Compatibilidad Karoo" />
   <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/LICENSE"><img src="https://img.shields.io/github/license/DAVOE75/ALTGRAPH?style=flat-square&label=Licencia&color=455A64" alt="Licencia" /></a>
-  <a href="https://buymeacoffee.com/davoe75"><img src="https://img.shields.io/badge/Donar-Buy_Me_a_Coffee-FF813F?style=flat-square&logo=buy-me-a-coffee&logoColor=white" alt="Buy Me A Coffee" /></a>
+  <a href="https://buymeacoffee.com/hesiox"><img src="https://img.shields.io/badge/Donar-Buy_Me_a_Coffee-FF813F?style=flat-square&logo=buy-me-a-coffee&logoColor=white" alt="Buy Me A Coffee" /></a>
 </p>
 
 **ALTGRAPH** es una extensión de rendimiento y altimetría profesional de última generación para ciclocomputadores **Hammerhead Karoo** (Karoo 2 y Karoo 3) desarrollada por **hesiOX** utilizando el SDK oficial `karoo-ext`.
