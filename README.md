@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v1.0.78 ELITE)
+# ALTGRAPH (v1.0.79 ELITE)
 <p>Leer en: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md">🇪🇸 Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md">🇬🇧 English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md">🇫🇷 Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md">🇮🇹 Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md">🇩🇪 Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md">🇵🇹 Português</a></p>
 
 <p align="center">
@@ -18,6 +18,11 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 <p align="center">
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## 🔥 VERSIÓN 1.0.79: ZOOM ADAPTATIVO A LA RUTA 3D 🔥
+
+- **Zoom Adaptativo al Total de la Ruta**: En la vista 3D (tanto en modo vertical como apaisado), los controles de zoom se adaptan dinámicamente a la longitud real de la ruta. El límite máximo de zoom al alejar (-) se ajusta automáticamente a los kilómetros totales de la ruta en lugar de dejar un tramo plano fantasma si la ruta es menor que la escala de zoom.
+- **Enfoque Panorámico Completo**: Al alejar al máximo sobre la ruta, la ventana muestra la totalidad del recorrido ajustado al 100% de la pantalla sin deformaciones ni llanos artificiales.
 
 ## 🔥 VERSIÓN 1.0.78: PERFIL TV 2D (ELITE) 🔥
 

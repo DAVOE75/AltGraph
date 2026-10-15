@@ -1054,17 +1054,18 @@ class AltimetriaStrategyCalculator {
         windowStartDist = (windowStartDist + manualPanOffsetMeters).coerceAtLeast(0.0)
         
         var actualLookahead = lookaheadDist
+        val totalRouteLength = routeElevationProfile.lastOrNull()?.distance ?: (routePoints.lastOrNull()?.distance ?: 0.0)
         
-        // PANORAMIC FIX: Si el zoom es de 100km o más (ultra panorámico), forzamos
-        // el inicio de la ventana al kilómetro 0 para mostrar la ruta completa, 
-        // tal y como se ve en el Hammerhead Dashboard.
-        if (lookaheadDist >= 100000.0) {
+        // ADAPTACIÓN DE ZOOM A LA RUTA:
+        // Si tenemos una ruta activa y el zoom solicitado es mayor o igual a la longitud total,
+        // limitamos la ventana a la ruta completa empezando en el km 0 para no mostrar tramos planos.
+        if (totalRouteLength > 0.0 && (lookaheadDist >= totalRouteLength || lookaheadDist >= 100000.0)) {
             windowStartDist = 0.0 + manualPanOffsetMeters.coerceAtLeast(0.0)
-            // Si estamos en zoom panorámico, escalar la gráfica a la longitud total de la ruta
-            // para que no quede aplastada con una línea plana si la ruta es más corta que el zoom.
-            val totalLength = routeElevationProfile.lastOrNull()?.distance ?: (routePoints.lastOrNull()?.distance ?: 0.0)
-            if (totalLength > 0 && totalLength < lookaheadDist) {
-                actualLookahead = totalLength
+            actualLookahead = totalRouteLength.coerceAtMost(lookaheadDist)
+        } else if (lookaheadDist >= 100000.0) {
+            windowStartDist = 0.0 + manualPanOffsetMeters.coerceAtLeast(0.0)
+            if (totalRouteLength > 0.0 && totalRouteLength < lookaheadDist) {
+                actualLookahead = totalRouteLength
             }
         }
         
@@ -1509,7 +1510,7 @@ class AltimetriaStrategyCalculator {
             stravaSegmentDistance = stravaRelDist,
             stravaPrGhostDistance = stravaGhostRelDist,
             windEffectIntensity = windEffect,
-            routeCoords = getVisibleRouteCoords(windowStartIndex, routePoints, lookaheadDist.toInt())
+            routeCoords = getVisibleRouteCoords(windowStartIndex, routePoints, actualLookahead.toInt())
         )
     }
 

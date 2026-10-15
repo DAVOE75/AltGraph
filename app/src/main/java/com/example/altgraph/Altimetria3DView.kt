@@ -430,6 +430,7 @@ class Altimetria3DView @JvmOverloads constructor(
     private var lastTouchX: Float = 0.0f
     private var routeName: String? = null
     private var routeCoords: List<Pair<Double, Double>> = emptyList()
+    var routeTotalLength: Double = 0.0
     var oasisDistanceToNextCrucible: Double? = null
     var virtualPacerRelativeDistance: Double? = null
     var energyBatteryLevel: Double = 100.0
@@ -505,8 +506,12 @@ class Altimetria3DView @JvmOverloads constructor(
         routeCoords: List<Pair<Double, Double>> = emptyList(),
         mapRotationAngle: Double = 0.0,
         isHeadingUp: Boolean = false,
-        showSurfaceTextures: Boolean = false
+        showSurfaceTextures: Boolean = false,
+        routeTotalLength: Double = 0.0
     ) {
+        if (routeTotalLength > 0.0) {
+            this.routeTotalLength = routeTotalLength
+        }
         if (blocks.isNotEmpty()) {
             this.nextBlocks = blocks
         }
@@ -652,19 +657,26 @@ class Altimetria3DView @JvmOverloads constructor(
 
     private fun zoomOut() {
         val curr = lookaheadMeters
-        val nextVal = when {
-            curr < 500 -> curr + 50
-            curr == 500 -> 1000
-            curr < 2000 -> 2000
-            curr < 5000 -> 5000
-            curr < 10000 -> 10000
-            curr < 20000 -> 20000
-            curr < 50000 -> 50000
-            curr < 100000 -> 100000
-            else -> 100000
+        val maxAllowed = if (routeTotalLength > 500.0) routeTotalLength.toInt() else 200000
+        if (curr >= maxAllowed) return
+
+        var nextVal = when {
+            curr >= 200000 -> 200000
+            curr >= 100000 -> curr + 50000
+            curr >= 50000 -> curr + 10000
+            curr >= 20000 -> curr + 5000
+            curr >= 5000 -> curr + 1000
+            curr >= 1000 -> curr + 500
+            curr >= 500 -> curr + 100
+            curr >= 50 -> curr + 50
+            else -> 50
         }
-        lookaheadMeters = nextVal
-        AppPreferences.getInstance(context).lookaheadMeters3d = nextVal
+        if (routeTotalLength > 500.0 && (nextVal > maxAllowed || (curr < maxAllowed && nextVal >= maxAllowed))) {
+            nextVal = maxAllowed
+        }
+        val finalVal = nextVal.coerceAtMost(maxAllowed)
+        lookaheadMeters = finalVal
+        AppPreferences.getInstance(context).lookaheadMeters3d = finalVal
         postInvalidate()
     }
 

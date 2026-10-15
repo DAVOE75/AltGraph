@@ -86,6 +86,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
         zoomReceiverRef.acquire(emitter) {
             val zoomReceiver = object : BroadcastReceiver() {
                 override fun onReceive(ctx: Context?, intent: Intent?) {
+                    val routeMaxMeters = AltgraphRepository.snapshot.value?.routeTotalLength?.takeIf { it > 500.0 }?.toInt()
                     if (intent?.action == ACTION_ZOOM_IN && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
                         val curr = prefs.lookaheadMeters3d
@@ -105,7 +106,12 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                     } else if (intent?.action == ACTION_ZOOM_OUT && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
                         val curr = prefs.lookaheadMeters3d
-                        val nextVal = when {
+                        val maxAllowed = routeMaxMeters ?: 200000
+                        if (curr >= maxAllowed) {
+                            // Ya estamos al zoom máximo permitido (ruta completa o 200km)
+                            return
+                        }
+                        var nextVal = when {
                             curr >= 200000 -> 200000
                             curr >= 100000 -> curr + 50000
                             curr >= 50000 -> curr + 10000
@@ -116,7 +122,10 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             curr >= 50 -> curr + 50
                             else -> 50
                         }
-                        prefs.lookaheadMeters3d = nextVal
+                        if (routeMaxMeters != null && (nextVal > routeMaxMeters || (curr < routeMaxMeters && nextVal >= routeMaxMeters))) {
+                            nextVal = routeMaxMeters
+                        }
+                        prefs.lookaheadMeters3d = nextVal.coerceAtMost(maxAllowed)
                         prefs.smartZoomEnabled = false
                     } else if (intent?.action == ACTION_TOGGLE_COMPASS && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
@@ -230,7 +239,8 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             routeCoords = strategy.routeCoords,
                             mapRotationAngle = mapRotAngle,
                             isHeadingUp = isHeadingUp,
-                            showSurfaceTextures = prefs.showSurfaceTextures
+                            showSurfaceTextures = prefs.showSurfaceTextures,
+                            routeTotalLength = snap.routeTotalLength
                         )
 
                         if (cachedBitmap == null || cachedBitmap?.width != w || cachedBitmap?.height != h) {
