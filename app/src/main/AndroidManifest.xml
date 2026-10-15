@@ -23,7 +23,7 @@
 
         <meta-data
             android:name="io.hammerhead.karooext.MANIFEST_URL"
-            android:value="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/manifest.json" />
+            android:value="https://raw.githubusercontent.com/DAVOE75/AltGraph/main/manifest.json" />
 
         <activity
             android:name=".MainActivity"
