@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ExtensionInfo
     id="altgraph"
-    version="1.0.9-rc"
+    version="1.0.83"
     displayName="@string/app_name"
-    icon="@mipmap/ic_altgraph"
+    icon="@drawable/ic_altgraph"
     configurable="true"
     mapLayer="true"
     fitFile="false">
@@ -13,62 +13,62 @@
         displayName="@string/data_type_altimetria_title"
         description="@string/data_type_altimetria_desc"
         graphical="true"
-        icon="@mipmap/ic_altgraph" />
+        icon="@drawable/ic_altgraph" />
 
     <DataType
         typeId="altimetria_3d"
         displayName="@string/data_type_altimetria_3d_title"
         description="@string/data_type_altimetria_3d_desc"
         graphical="true"
-        icon="@mipmap/ic_altgraph" />
+        icon="@drawable/ic_altgraph" />
 
     <DataType
         typeId="fatigue_grade"
         displayName="@string/data_type_fatigue_grade_title"
         description="@string/data_type_fatigue_grade_desc"
         graphical="false"
-        icon="@mipmap/ic_altgraph" />
+        icon="@drawable/ic_altgraph" />
 
     <DataType
         typeId="climb_pacing"
         displayName="@string/data_type_climb_pacing_title"
         description="@string/data_type_climb_pacing_desc"
         graphical="true"
-        icon="@mipmap/ic_altgraph" />
+        icon="@drawable/ic_altgraph" />
 
     <DataType
         typeId="gradient_trend"
         displayName="@string/data_type_gradient_trend_title"
         description="@string/data_type_gradient_trend_desc"
         graphical="true"
-        icon="@mipmap/ic_altgraph" />
+        icon="@drawable/ic_altgraph" />
 
     <DataType
         typeId="climb_3d"
         displayName="@string/data_type_climb_3d_title"
         description="@string/data_type_climb_3d_desc"
         graphical="true"
-        icon="@mipmap/ic_altgraph" />
+        icon="@drawable/ic_altgraph" />
 
     <DataType
         typeId="route_bar"
         displayName="@string/data_type_route_bar_title"
         description="@string/data_type_route_bar_desc"
         graphical="true"
-        icon="@mipmap/ic_altgraph" />
+        icon="@drawable/ic_altgraph" />
 
     <DataType
         typeId="grade_zones"
         displayName="@string/data_type_grade_zones_title"
         description="@string/data_type_grade_zones_desc"
         graphical="true"
-        icon="@mipmap/ic_altgraph" />
+        icon="@drawable/ic_altgraph" />
 
     <DataType
         typeId="profile_tv_2d"
         displayName="@string/data_type_profile_tv_2d_title"
         description="@string/data_type_profile_tv_2d_desc"
         graphical="true"
-        icon="@mipmap/ic_altgraph" />
+        icon="@drawable/ic_altgraph" />
 
 </ExtensionInfo>
