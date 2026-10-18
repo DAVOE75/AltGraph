@@ -96,7 +96,7 @@ class GradeZonesDataField(extension: String) : DataTypeImpl(extension, "grade_zo
                                 val fontPrefs = AppPreferences.getInstance(context)
                                 FontHelper.applyFontToPaint(this, fontPrefs.fontFamilyKey, android.graphics.Typeface.BOLD)
                             }
-                            canvas.drawText("🔒 ELITE", w / 2f, h / 2f, p)
+                            canvas.drawText("ELITE", w / 2f, h / 2f, p)
                             
                             val remoteViews = RemoteViews(context.packageName, R.layout.view_remote_graphic)
                             remoteViews.setImageViewBitmap(R.id.img_graphic, bitmap)

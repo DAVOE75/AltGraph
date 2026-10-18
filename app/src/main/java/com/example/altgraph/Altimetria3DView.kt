@@ -782,9 +782,9 @@ class Altimetria3DView @JvmOverloads constructor(
         val centerX = left + (pillW / 2f)
 
         val zoomLabel = when {
-            lookaheadMeters < 1000 -> "🔍 ${lookaheadMeters}m"
-            lookaheadMeters % 1000 == 0 -> "🔍 ${lookaheadMeters / 1000}km"
-            else -> "🔍 ${lookaheadMeters / 1000}.${(lookaheadMeters % 1000) / 100}km"
+            lookaheadMeters < 1000 -> "${lookaheadMeters}m"
+            lookaheadMeters % 1000 == 0 -> "${lookaheadMeters / 1000}km"
+            else -> "${lookaheadMeters / 1000}.${(lookaheadMeters % 1000) / 100}km"
         }
         canvas.drawText(zoomLabel, centerX, centerY, zoomBtnPaint)
     }
@@ -1674,7 +1674,7 @@ class Altimetria3DView @JvmOverloads constructor(
         val shelfW = abs(x2 - x1)
         if (shelfW >= 36f) {
             val distMeters = ((endIdx - startIdx) * subBlockSize).toInt()
-            val label = if (shelfW >= 60f) "❄️ OASIS ${distMeters}m" else "❄️ OASIS"
+            val label = if (shelfW >= 60f) "OASIS ${distMeters}m" else "OASIS"
             percentTextPaint.textSize = (shelfW * 0.22f * fontScale).coerceIn(11f, 15f)
             val textW = percentTextPaint.measureText(label)
             val badgeRect = RectF(
@@ -1736,7 +1736,7 @@ class Altimetria3DView @JvmOverloads constructor(
             for (k in startIdx until endIdx) {
                 if (k < microGrades.size && microGrades[k] > maxG) maxG = microGrades[k]
             }
-            val label = if (crucibleW >= 60f) "🔥 MURO ${distMeters}m" else "🔥 ${maxG.roundToInt()}%"
+            val label = if (crucibleW >= 60f) "MURO ${distMeters}m" else "${maxG.roundToInt()}%"
             percentTextPaint.textSize = (crucibleW * 0.22f * fontScale).coerceIn(11f, 15f)
             val textW = percentTextPaint.measureText(label)
             val badgeRect = RectF(

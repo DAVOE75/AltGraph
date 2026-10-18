@@ -42,6 +42,10 @@ private fun distText(d: Double): String {
     }
 }
 
+fun timeGapText(s: Double): String = timeText(s)
+
+fun distGapText(d: Double): String = distText(d)
+
 fun formatGhostGap(gap: GhostGap, maxWidth: Float, measure: (String) -> Float): String {
     val t = gap.timeS?.let(::timeText)
     val d = gap.distM?.let(::distText)

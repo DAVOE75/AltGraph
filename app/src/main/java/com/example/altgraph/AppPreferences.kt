@@ -321,37 +321,37 @@ class AppPreferences(context: Context) {
 enum class AltimetriaStyle(val key: String, val icon: String, val titleRes: Int, val descRes: Int) {
     CLASSIC(
         key = "classic",
-        icon = "🏔️",
+        icon = "",
         titleRes = R.string.style_classic_title,
         descRes = R.string.style_classic_desc
     ),
     HORIZON_ISOMETRIC(
         key = "horizon_iso",
-        icon = "✈️",
+        icon = "",
         titleRes = R.string.style_horizon_title,
         descRes = R.string.style_horizon_desc
     ),
     TACTICAL_OASES(
         key = "tactical_oases",
-        icon = "❄️",
+        icon = "",
         titleRes = R.string.style_oasis_title,
         descRes = R.string.style_oasis_desc
     ),
     DYNAMIC_FORCE_FIELD(
         key = "force_field",
-        icon = "⚡",
+        icon = "",
         titleRes = R.string.style_force_title,
         descRes = R.string.style_force_desc
     ),
     MONOLITHIC_OBSIDIAN(
         key = "monolithic",
-        icon = "💎",
+        icon = "",
         titleRes = R.string.style_monolith_title,
         descRes = R.string.style_monolith_desc
     ),
     GLOBAL_ISOMETRIC(
         key = "global_iso",
-        icon = "🗺️",
+        icon = "",
         titleRes = R.string.style_global_title,
         descRes = R.string.style_global_desc
     );

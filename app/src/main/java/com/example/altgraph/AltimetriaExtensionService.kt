@@ -5,7 +5,7 @@ import io.hammerhead.karooext.extension.DataTypeImpl
 import io.hammerhead.karooext.extension.KarooExtension
 import kotlinx.coroutines.cancel
 
-class AltimetriaExtensionService : KarooExtension("altgraph", "1.0.83") {
+class AltimetriaExtensionService : KarooExtension("altgraph", "1.0.84") {
 
     override val types: List<DataTypeImpl> by lazy {
         listOf(
@@ -27,6 +27,7 @@ class AltimetriaExtensionService : KarooExtension("altgraph", "1.0.83") {
 
     override fun onCreate() {
         super.onCreate()
+        FontHelper.init(applicationContext)
         AltgraphRepository.start(applicationContext)
         karooSystem = KarooSystemService(applicationContext)
         karooSystem?.connect { }

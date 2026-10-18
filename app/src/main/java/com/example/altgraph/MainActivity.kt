@@ -28,6 +28,7 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        FontHelper.init(this)
         prefs = AppPreferences.getInstance(this)
 
         val scrollView = ScrollView(this).apply {
@@ -142,14 +143,14 @@ class MainActivity : Activity() {
         }
 
         // ==========================================
-        // PESTAÑA 1: 🎨 ESTILO Y APARIENCIA
+        // PESTAÑA 1: ESTILO Y APARIENCIA
         // ==========================================
 
         // Opción: Modelo de Altimetría (Selector de las 5 Vistas Revolucionarias)
         val styleCard = createCardContainer()
         val styleLabel = createSectionLabel(getString(R.string.label_vista_global))
         val initialStyle = prefs.altimetriaStyle
-        val styleValueText = createValueText("${initialStyle.icon} ${getString(initialStyle.titleRes)}")
+        val styleValueText = createValueText(getString(initialStyle.titleRes))
         val styleDescText = TextView(this).apply {
             text = getString(initialStyle.descRes)
             textSize = 12f
@@ -161,14 +162,14 @@ class MainActivity : Activity() {
         val styleOptions = AltimetriaStyle.entries
 
         val styleSpinner = Spinner(this).apply {
-            val adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, styleOptions.map { "${it.icon} ${getString(it.titleRes)}" })
+            val adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, styleOptions.map { getString(it.titleRes) })
             this.adapter = adapter
             setSelection(styleOptions.indexOf(initialStyle))
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                     val selected = styleOptions[position]
                     prefs.altimetriaStyle = selected
-                    styleValueText.text = "${selected.icon} ${getString(selected.titleRes)}"
+                    styleValueText.text = getString(selected.titleRes)
                     styleDescText.text = getString(selected.descRes)
                     Toast.makeText(this@MainActivity, getString(R.string.toast_vista, getString(selected.titleRes)), Toast.LENGTH_SHORT).show()
                 }
@@ -189,7 +190,7 @@ class MainActivity : Activity() {
         val climbStyleCard = createCardContainer()
         val climbStyleLabel = createSectionLabel(getString(R.string.label_vista_puertos))
         val climbInitialStyle = prefs.climbAltimetriaStyle
-        val climbStyleValueText = createValueText("${climbInitialStyle.icon} ${getString(climbInitialStyle.titleRes)}")
+        val climbStyleValueText = createValueText(getString(climbInitialStyle.titleRes))
         val climbStyleDescText = TextView(this).apply {
             text = getString(climbInitialStyle.descRes)
             textSize = 12f
@@ -199,14 +200,14 @@ class MainActivity : Activity() {
         }
 
         val climbStyleSpinner = Spinner(this).apply {
-            val adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, styleOptions.map { "${it.icon} ${getString(it.titleRes)}" })
+            val adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, styleOptions.map { getString(it.titleRes) })
             this.adapter = adapter
             setSelection(styleOptions.indexOf(climbInitialStyle))
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                     val selected = styleOptions[position]
                     prefs.climbAltimetriaStyle = selected
-                    climbStyleValueText.text = "${selected.icon} ${getString(selected.titleRes)}"
+                    climbStyleValueText.text = getString(selected.titleRes)
                     climbStyleDescText.text = getString(selected.descRes)
                     Toast.makeText(this@MainActivity, getString(R.string.toast_visor_puertos, getString(selected.titleRes)), Toast.LENGTH_SHORT).show()
                 }
@@ -314,7 +315,7 @@ class MainActivity : Activity() {
         font3dCard.addView(font3dValueText)
         font3dCard.addView(font3dRow)
 
-        // Opción: Controles de Zoom Táctil (🔍)
+        // Opción: Controles de Zoom Táctil
         val showZoomCard = createCardContainer()
         val switchShowZoom = Switch(this).apply {
             text = getString(R.string.setting_show_3d_zoom)
@@ -336,7 +337,7 @@ class MainActivity : Activity() {
         tabEstiloContainer.addView(showZoomCard)
 
         // ==========================================
-        // PESTAÑA 2: 🏔️ ALTIMETRÍA 3D
+        // PESTAÑA 2: ALTIMETRÍA 3D
         // ==========================================
 
         fun formatLookaheadText(meters: Int): String {
@@ -597,7 +598,7 @@ class MainActivity : Activity() {
         tab3dContainer.addView(showMaxGradCard)
 
         // ==========================================
-        // PESTAÑA 3: 📊 ESTRATEGA 2D
+        // PESTAÑA 3: ESTRATEGA 2D
         // ==========================================
 
         // Opción: Tamaño de Bloque (50m, 100m, 250m, 500m, 1km)
@@ -718,7 +719,7 @@ class MainActivity : Activity() {
         tab2dContainer.addView(attackCard)
 
         // ==========================================
-        // PESTAÑA 4: 🚴 RENDIMIENTO Y VAM
+        // PESTAÑA 4: RENDIMIENTO Y VAM
         // ==========================================
 
         // Opción: VAM Objetivo
@@ -786,7 +787,7 @@ class MainActivity : Activity() {
         // Botón de Guardar y Salir Fijado al Final
 
         // ==========================================
-        // PESTAÑA 5: 🚀 PRO (MÁXIMO NIVEL SDK)
+        // PESTAÑA 5: PRO (MÁXIMO NIVEL SDK)
         // ==========================================
 
         val proLabel = createSectionLabel(getString(R.string.label_pro_features))
@@ -853,7 +854,7 @@ class MainActivity : Activity() {
         tabProContainer.addView(energyCard)
 
         // ==========================================
-        // PESTAÑA 6: 👑 ELITE (PAYWALL)
+        // PESTAÑA 6: ELITE (PAYWALL)
         // ==========================================
         val eliteLabel = createSectionLabel(getString(R.string.label_elite_header))
         tabEliteContainer.addView(eliteLabel)
@@ -1317,7 +1318,7 @@ class MainActivity : Activity() {
         powerBarCard.orientation = LinearLayout.VERTICAL
 
         val switchPowerBar = Switch(this).apply {
-            text = "⚡ Barra de Zona de Entrenamiento"
+            text = "Barra de Zona de Entrenamiento"
             textSize = 14f
             setTextColor(Color.WHITE)
             isChecked = prefs.elitePowerBarEnabled
@@ -1433,7 +1434,7 @@ class MainActivity : Activity() {
 
         // Final Button Layout
         val saveExitButton = Button(this).apply {
-            text = "💾 " + getString(R.string.btn_save_and_exit)
+            text = getString(R.string.btn_save_and_exit)
             textSize = 16f
             typeface = Typeface.DEFAULT_BOLD
             setTextColor(Color.BLACK)
