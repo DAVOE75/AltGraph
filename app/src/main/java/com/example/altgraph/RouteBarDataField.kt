@@ -109,6 +109,7 @@ class RouteBarDataType(extension: String) : DataTypeImpl(extension, "route_bar")
                         if (isElite) {
                             routeBarView.strategyData = strategy
                             routeBarView.ghostGap = gap
+                            routeBarView.ghostStyle = prefs.eliteGhostStyle
                             routeBarView.showEnergyBar = prefs.eliteEnergyBarEnabled
                             routeBarView.showPoiRuler = prefs.elitePoiRulerEnabled
                             routeBarView.showHistogram = prefs.eliteHistogramEnabled

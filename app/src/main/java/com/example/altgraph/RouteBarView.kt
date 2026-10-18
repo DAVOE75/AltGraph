@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.RectF
 import android.graphics.Typeface
 import android.view.View
 import kotlin.math.roundToInt
@@ -101,6 +102,7 @@ class RouteBarView(context: Context) : View(context) {
 
     // ── ELITE feature state (set by RouteBarDataField each frame) ────────────
     var ghostGap: GhostGap? = null   // hueco con KGhost (+ por delante / - por detrás)
+    var ghostStyle: String = "classic" // "classic", "velon", "pursuit", "tissot"
     var showEnergyBar: Boolean = false
     var showPowerBar: Boolean = false
     var showRadarAlerts: Boolean = true
@@ -138,91 +140,136 @@ class RouteBarView(context: Context) : View(context) {
         setShadowLayer(2f, 0f, 1f, Color.BLACK)
     }
 
-    // KGhost Widget Paints
+    // KGhost Widget Paints (sin sombras)
     private val ghostWidgetStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
-        setShadowLayer(2.5f, 0.8f, 1.2f, Color.argb(110, 0, 0, 0))
     }
     private val ghostWidgetFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        setShadowLayer(2.5f, 0.8f, 1.2f, Color.argb(110, 0, 0, 0))
     }
     private val ghostWidgetTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.BLACK
         typeface = Typeface.DEFAULT_BOLD
         textAlign = Paint.Align.CENTER
-        setShadowLayer(1.5f, 0.5f, 0.8f, Color.argb(60, 0, 0, 0))
     }
 
     /**
-     * Dibuja un icono vectorial estilizado y profesional de un ciclista de carretera mirando a la derecha.
+     * Dibuja un ciclista de carretera aerodinámico, profesional y nítido (sin sombras).
+     * Proporciones reales de postura ciclista: ruedas, cuadro diamante limpio, postura acoplada, casco aero.
      */
     private fun drawCyclistVector(canvas: Canvas, cx: Float, cy: Float, size: Float, color: Int) {
-        val s = size / 24f // Coordenadas canónicas en cuadrícula 24x24 (-12..+12)
+        val s = size / 24f // Escala normalizada en cuadrícula 24x24
         ghostWidgetStrokePaint.color = color
-        ghostWidgetStrokePaint.strokeWidth = (1.75f * s).coerceAtLeast(1.2f)
+        ghostWidgetFillPaint.color = color
 
-        // Ruedas (diámetro ~7.5 unidades canónicas)
-        val rWheel = 3.6f * s
-        val rearWheelX = cx - 6.5f * s
-        val frontWheelX = cx + 6.5f * s
+        // 1. Ruedas limpias y proporcionadas
+        val rWheel = 4.2f * s
+        val rearWheelX = cx - 7.0f * s
+        val frontWheelX = cx + 7.0f * s
         val wheelY = cy + 5.5f * s
+
+        ghostWidgetStrokePaint.strokeWidth = 1.9f * s
         canvas.drawCircle(rearWheelX, wheelY, rWheel, ghostWidgetStrokePaint)
         canvas.drawCircle(frontWheelX, wheelY, rWheel, ghostWidgetStrokePaint)
 
-        // Puntos clave del cuadro (geometría de carretera)
-        val bbX = cx - 1.2f * s   // pedalier
+        // 2. Geometría del cuadro de carretera
+        val bbX = cx - 1.2f * s   // eje pedalier
         val bbY = cy + 4.8f * s
-        val seatX = cx - 3.2f * s // anclaje sillín
-        val seatY = cy - 0.2f * s
-        val headX = cx + 3.8f * s // pipa de dirección
-        val headY = cy - 1.8f * s
+        val seatJunctionX = cx - 3.2f * s // unión tubo sillín / tirantes / tubo horizontal
+        val seatJunctionY = cy - 0.2f * s
+        val headJunctionX = cx + 3.8f * s // pipa de dirección
+        val headJunctionY = cy - 2.0f * s
 
-        // Triángulo trasero y delantero
-        canvas.drawLine(rearWheelX, wheelY, bbX, bbY, ghostWidgetStrokePaint)       // chainstay
-        canvas.drawLine(rearWheelX, wheelY, seatX, seatY, ghostWidgetStrokePaint)   // seatstay
-        canvas.drawLine(seatX, seatY, bbX, bbY, ghostWidgetStrokePaint)             // seattube
-        canvas.drawLine(bbX, bbY, headX, headY, ghostWidgetStrokePaint)             // downtube
-        canvas.drawLine(seatX, seatY, headX, headY, ghostWidgetStrokePaint)         // toptube
-        canvas.drawLine(headX, headY, frontWheelX, wheelY, ghostWidgetStrokePaint)  // horquilla delantera
+        ghostWidgetStrokePaint.strokeWidth = 2.0f * s
+        // Triángulo trasero
+        canvas.drawLine(rearWheelX, wheelY, bbX, bbY, ghostWidgetStrokePaint)            // vaina
+        canvas.drawLine(rearWheelX, wheelY, seatJunctionX, seatJunctionY, ghostWidgetStrokePaint) // tirante
+        // Triángulo principal
+        canvas.drawLine(seatJunctionX, seatJunctionY, bbX, bbY, ghostWidgetStrokePaint)  // tubo sillín
+        canvas.drawLine(bbX, bbY, headJunctionX, headJunctionY, ghostWidgetStrokePaint)  // tubo diagonal
+        canvas.drawLine(seatJunctionX, seatJunctionY, headJunctionX, headJunctionY, ghostWidgetStrokePaint) // tubo horizontal
+        // Horquilla delantera
+        canvas.drawLine(headJunctionX, headJunctionY, frontWheelX, wheelY, ghostWidgetStrokePaint)
 
-        // Tija y sillín
-        canvas.drawLine(seatX, seatY, seatX - 0.6f * s, seatY - 2.0f * s, ghostWidgetStrokePaint)
-        canvas.drawLine(seatX - 2.2f * s, seatY - 2.2f * s, seatX + 1.2f * s, seatY - 2.2f * s, ghostWidgetStrokePaint)
-
-        // Potencia y manillar drop bar curvado
-        canvas.drawLine(headX, headY, headX + 1.2f * s, headY - 2.8f * s, ghostWidgetStrokePaint)
-        canvas.drawLine(headX + 1.2f * s, headY - 2.8f * s, headX + 3.2f * s, headY - 2.0f * s, ghostWidgetStrokePaint)
-
-        // Ciclista: Torso, brazo y pierna flexionada
-        val hipX = seatX - 0.4f * s
-        val hipY = seatY - 2.8f * s
-        val shoulderX = cx + 1.5f * s
-        val shoulderY = cy - 5.5f * s
-        val handX = headX + 2.4f * s
-        val handY = headY - 2.0f * s
-
-        canvas.drawLine(hipX, hipY, shoulderX, shoulderY, ghostWidgetStrokePaint)   // espalda inclinada
-        canvas.drawLine(shoulderX, shoulderY, handX, handY, ghostWidgetStrokePaint) // brazo al manillar
-
-        // Pierna hacia el pedalier (cadera -> rodilla -> pie)
-        val kneeX = cx + 1.0f * s
-        val kneeY = cy + 1.0f * s
-        canvas.drawLine(hipX, hipY, kneeX, kneeY, ghostWidgetStrokePaint)
-        canvas.drawLine(kneeX, kneeY, bbX, bbY, ghostWidgetStrokePaint)
-
-        // Cabeza con casco aerodinámico (rellena)
-        ghostWidgetFillPaint.color = color
-        canvas.drawCircle(shoulderX + 1.2f * s, shoulderY - 3.2f * s, 2.1f * s, ghostWidgetFillPaint)
-        val helmetTail = Path().apply {
-            moveTo(shoulderX - 0.8f * s, shoulderY - 3.2f * s)
-            lineTo(shoulderX + 3.0f * s, shoulderY - 4.4f * s)
-            lineTo(shoulderX + 1.2f * s, shoulderY - 1.4f * s)
+        // Tija y sillín estilizado
+        ghostWidgetStrokePaint.strokeWidth = 2.1f * s
+        canvas.drawLine(seatJunctionX, seatJunctionY, seatJunctionX - 0.5f * s, seatJunctionY - 2.0f * s, ghostWidgetStrokePaint)
+        val saddlePath = Path().apply {
+            moveTo(seatJunctionX - 2.4f * s, seatJunctionY - 2.3f * s)
+            lineTo(seatJunctionX + 1.6f * s, seatJunctionY - 2.1f * s)
+            lineTo(seatJunctionX - 2.4f * s, seatJunctionY - 1.8f * s)
             close()
         }
-        canvas.drawPath(helmetTail, ghostWidgetFillPaint)
+        canvas.drawPath(saddlePath, ghostWidgetFillPaint)
+
+        // Potencia y manillar aerodinámico (drop bar moderno)
+        ghostWidgetStrokePaint.strokeWidth = 1.8f * s
+        val stemEndX = headJunctionX + 1.2f * s
+        val stemEndY = headJunctionY - 2.6f * s
+        canvas.drawLine(headJunctionX, headJunctionY, stemEndX, stemEndY, ghostWidgetStrokePaint)
+        // Caída de manillar de competición
+        val dropBarPath = Path().apply {
+            moveTo(stemEndX, stemEndY)
+            lineTo(stemEndX + 2.4f * s, stemEndY + 0.1f * s)
+            cubicTo(stemEndX + 3.6f * s, stemEndY + 0.1f * s, stemEndX + 3.4f * s, stemEndY + 2.0f * s, stemEndX + 1.6f * s, stemEndY + 2.2f * s)
+        }
+        ghostWidgetStrokePaint.strokeWidth = 1.7f * s
+        canvas.drawPath(dropBarPath, ghostWidgetStrokePaint)
+
+        // 3. Ciclista profesional en posición aero
+        // Cuerpo sólido estilizado (espalda acoplada hacia el manillar)
+        val hipX = seatJunctionX - 0.2f * s
+        val hipY = seatJunctionY - 2.6f * s
+        val shoulderX = cx + 1.2f * s
+        val shoulderY = cy - 4.4f * s
+        val elbowX = cx + 3.3f * s
+        val elbowY = cy - 2.8f * s
+        val handX = stemEndX + 1.8f * s
+        val handY = stemEndY + 1.0f * s
+
+        // Torso potente
+        val torsoPath = Path().apply {
+            moveTo(hipX - 0.8f * s, hipY - 0.5f * s)
+            cubicTo(cx - 1.2f * s, cy - 4.6f * s, cx + 0.2f * s, cy - 5.4f * s, shoulderX + 0.8f * s, shoulderY - 0.8f * s)
+            lineTo(shoulderX + 0.2f * s, shoulderY + 1.6f * s)
+            cubicTo(cx - 0.4f * s, cy - 2.2f * s, cx - 1.6f * s, cy - 1.4f * s, hipX, hipY + 1.0f * s)
+            close()
+        }
+        canvas.drawPath(torsoPath, ghostWidgetFillPaint)
+
+        // Brazo en flexión hacia la curva del manillar
+        ghostWidgetStrokePaint.strokeWidth = 2.4f * s
+        val armPath = Path().apply {
+            moveTo(shoulderX, shoulderY)
+            lineTo(elbowX, elbowY)
+            lineTo(handX, handY)
+        }
+        canvas.drawPath(armPath, ghostWidgetStrokePaint)
+
+        // Pierna atlética pedaleando (cadera -> rodilla adelantada -> pedalier/biela)
+        val kneeX = cx + 1.4f * s
+        val kneeY = cy + 1.6f * s
+        ghostWidgetStrokePaint.strokeWidth = 2.6f * s
+        canvas.drawLine(hipX, hipY, kneeX, kneeY, ghostWidgetStrokePaint) // Muslo
+        ghostWidgetStrokePaint.strokeWidth = 2.2f * s
+        canvas.drawLine(kneeX, kneeY, bbX, bbY, ghostWidgetStrokePaint)   // Gemelo/pie
+
+        // 4. Casco y cabeza aero mirando al frente
+        val headCx = shoulderX + 1.3f * s
+        val headCy = shoulderY - 2.8f * s
+
+        // Casco aerodinámico con visera/cola trasera
+        val helmetPath = Path().apply {
+            moveTo(headCx - 2.6f * s, headCy + 0.2f * s)  // cola trasera
+            cubicTo(headCx - 1.8f * s, headCy - 2.3f * s, headCx + 1.2f * s, headCy - 2.5f * s, headCx + 2.8f * s, headCy - 0.4f * s) // cúpula del casco
+            lineTo(headCx + 2.9f * s, headCy + 0.8f * s)  // visera delantera
+            lineTo(headCx + 0.8f * s, headCy + 1.3f * s)  // barbilla/mentón
+            cubicTo(headCx - 0.4f * s, headCy + 1.2f * s, headCx - 1.8f * s, headCy + 0.8f * s, headCx - 2.6f * s, headCy + 0.2f * s)
+            close()
+        }
+        canvas.drawPath(helmetPath, ghostWidgetFillPaint)
     }
 
     private fun drawThemedBand(
@@ -1130,46 +1177,203 @@ class RouteBarView(context: Context) : View(context) {
                 val timeStr = timeGapText(diffTime)
                 val gapLabel = "$timeStr / $distStr"
 
-                val cyclistSize = (barH * 0.70f).coerceIn(24f, 44f)
-                val realColor = Color.parseColor("#B91C1C") // Rojo burdeos profesional
-                val ghostColor = Color.parseColor("#94A3B8") // Gris claro metalizado
+                when (ghostStyle) {
+                    "velon" -> {
+                        // ── ESTILO VELON LIVE TV (Cápsulas gemelas de retransmisión televisiva) ──
+                        val pillH = barH * 0.72f
+                        val pillTop = cy - pillH / 2f
+                        val pillBottom = cy + pillH / 2f
+                        val pillW = barW * 0.30f
+                        val cornerR = pillH * 0.28f
 
-                // Ciclistas un poco más centrados y juntos hacia el centro
-                val leftCyclistX = left + barW * 0.14f + cyclistSize * 0.5f
-                val rightCyclistX = right - barW * 0.14f - cyclistSize * 0.5f
+                        val leftPillL = left + barW * 0.04f
+                        val leftPillR = leftPillL + pillW
+                        val rightPillR = right - barW * 0.04f
+                        val rightPillL = rightPillR - pillW
 
-                // Asignar colores según quién va por delante (delante = derecha)
-                val leftColor = if (realAhead) ghostColor else realColor
-                val rightColor = if (realAhead) realColor else ghostColor
+                        // Colores de cápsulas según quién va por delante
+                        val leadBg = Color.parseColor("#0F172A") // Navy oscuro premium
+                        val chaseBg = Color.parseColor("#1E293B")
+                        val accentAhead = Color.parseColor("#10B981") // Verde esmeralda WT
+                        val accentBehind = Color.parseColor("#EF4444") // Rojo WT
 
-                drawCyclistVector(canvas, leftCyclistX, cy + barH * 0.06f, cyclistSize, leftColor)
-                drawCyclistVector(canvas, rightCyclistX, cy + barH * 0.06f, cyclistSize, rightColor)
+                        // 1. Cápsula Izquierda
+                        val leftIsReal = !realAhead
+                        val leftBgColor = if (leftIsReal) leadBg else chaseBg
+                        val leftAccentColor = if (leftIsReal) (if (realAhead) accentAhead else accentBehind) else Color.parseColor("#94A3B8")
+                        val leftTitle = if (leftIsReal) "YOU" else "GHOST"
+                        
+                        ghostWidgetFillPaint.color = leftBgColor
+                        canvas.drawRoundRect(RectF(leftPillL, pillTop, leftPillR, pillBottom), cornerR, cornerR, ghostWidgetFillPaint)
+                        // Borde acentuado
+                        ghostWidgetStrokePaint.color = leftAccentColor
+                        ghostWidgetStrokePaint.strokeWidth = 2.0f
+                        canvas.drawRoundRect(RectF(leftPillL, pillTop, leftPillR, pillBottom), cornerR, cornerR, ghostWidgetStrokePaint)
 
-                // Flecha superior que conecta a ambos ciclistas
-                val arrowY = top + barH * 0.28f
-                val arrowStartX = leftCyclistX + cyclistSize * 0.65f
-                val arrowEndX = rightCyclistX - cyclistSize * 0.65f
+                        // Icono y texto en cápsula izquierda
+                        val iconSizeLeft = pillH * 0.58f
+                        drawCyclistVector(canvas, leftPillL + iconSizeLeft * 0.75f, cy, iconSizeLeft, leftAccentColor)
+                        ghostWidgetTextPaint.textSize = (pillH * 0.38f * fontScale).coerceIn(11f, 20f)
+                        ghostWidgetTextPaint.color = Color.WHITE
+                        ghostWidgetTextPaint.textAlign = Paint.Align.CENTER
+                        canvas.drawText(leftTitle, (leftPillL + iconSizeLeft * 1.3f + leftPillR) / 2f, cy + ghostWidgetTextPaint.textSize * 0.35f, ghostWidgetTextPaint)
 
-                if (arrowEndX > arrowStartX + 20f) {
-                    ghostWidgetStrokePaint.color = Color.BLACK
-                    ghostWidgetStrokePaint.strokeWidth = 2.5f
-                    canvas.drawLine(arrowStartX, arrowY, arrowEndX, arrowY, ghostWidgetStrokePaint)
+                        // 2. Cápsula Derecha (delante si realAhead)
+                        val rightIsReal = realAhead
+                        val rightBgColor = if (rightIsReal) leadBg else chaseBg
+                        val rightAccentColor = if (rightIsReal) (if (realAhead) accentAhead else accentBehind) else Color.parseColor("#94A3B8")
+                        val rightTitle = if (rightIsReal) "YOU" else "GHOST"
 
-                    val arrowHeadSize = (barH * 0.16f).coerceIn(6f, 12f)
-                    val arrowHead = Path().apply {
-                        moveTo(arrowEndX, arrowY)
-                        lineTo(arrowEndX - arrowHeadSize, arrowY - arrowHeadSize * 0.6f)
-                        lineTo(arrowEndX - arrowHeadSize, arrowY + arrowHeadSize * 0.6f)
-                        close()
+                        ghostWidgetFillPaint.color = rightBgColor
+                        canvas.drawRoundRect(RectF(rightPillL, pillTop, rightPillR, pillBottom), cornerR, cornerR, ghostWidgetFillPaint)
+                        ghostWidgetStrokePaint.color = rightAccentColor
+                        ghostWidgetStrokePaint.strokeWidth = 2.0f
+                        canvas.drawRoundRect(RectF(rightPillL, pillTop, rightPillR, pillBottom), cornerR, cornerR, ghostWidgetStrokePaint)
+
+                        val iconSizeRight = pillH * 0.58f
+                        drawCyclistVector(canvas, rightPillL + iconSizeRight * 0.75f, cy, iconSizeRight, rightAccentColor)
+                        ghostWidgetTextPaint.textSize = (pillH * 0.38f * fontScale).coerceIn(11f, 20f)
+                        ghostWidgetTextPaint.color = Color.WHITE
+                        canvas.drawText(rightTitle, (rightPillL + iconSizeRight * 1.3f + rightPillR) / 2f, cy + ghostWidgetTextPaint.textSize * 0.35f, ghostWidgetTextPaint)
+
+                        // 3. Pastilla central flotante de GAP (Amarillo Tour / Blanco con alto contraste)
+                        val gapW = rightPillL - leftPillR - 12f
+                        if (gapW > 30f) {
+                            val gapL = (left + right) / 2f - gapW / 2f
+                            val gapR = gapL + gapW
+                            val gapH = pillH * 0.88f
+                            val gapTop = cy - gapH / 2f
+                            val gapBottom = cy + gapH / 2f
+
+                            val badgeBg = if (realAhead) Color.parseColor("#FACC15") else Color.parseColor("#DC2626") // Amarillo Tour líder / Rojo persecución
+                            ghostWidgetFillPaint.color = badgeBg
+                            canvas.drawRoundRect(RectF(gapL, gapTop, gapR, gapBottom), 6f, 6f, ghostWidgetFillPaint)
+
+                            val badgeTextColor = if (realAhead) Color.BLACK else Color.WHITE
+                            ghostWidgetTextPaint.color = badgeTextColor
+                            ghostWidgetTextPaint.textSize = (gapH * 0.42f * fontScale).coerceIn(12f, 22f)
+                            canvas.drawText(timeStr, (left + right) / 2f, cy - 2f, ghostWidgetTextPaint)
+                            ghostWidgetTextPaint.textSize = (gapH * 0.30f * fontScale).coerceIn(9f, 16f)
+                            canvas.drawText(distStr, (left + right) / 2f, cy + ghostWidgetTextPaint.textSize + 2f, ghostWidgetTextPaint)
+                        }
                     }
-                    ghostWidgetFillPaint.color = Color.BLACK
-                    canvas.drawPath(arrowHead, ghostWidgetFillPaint)
-                }
+                    "pursuit" -> {
+                        // ── ESTILO PURSUIT TRACKER (Pista interactiva relativa en tiempo real) ──
+                        val trackH = 4f
+                        val trackL = left + barW * 0.08f
+                        val trackR = right - barW * 0.08f
+                        val trackW = trackR - trackL
 
-                // Texto métrico centrado (+0:12s / +135m)
-                ghostWidgetTextPaint.textSize = (barH * 0.38f * fontScale).coerceIn(14f, 30f)
-                val textY = top + barH * 0.78f
-                canvas.drawText(gapLabel, left + barW / 2f, textY, ghostWidgetTextPaint)
+                        // Carril de asfalto y línea discontinua
+                        ghostWidgetFillPaint.color = Color.parseColor("#475569")
+                        canvas.drawRoundRect(RectF(trackL, cy - trackH / 2f, trackR, cy + trackH / 2f), 2f, 2f, ghostWidgetFillPaint)
+
+                        // Distancia visual: mapear la diferencia en la pista
+                        val maxGapM = 300.0 // +/- 300 metros rango dinámico visual
+                        val normDiff = (diffDist / maxGapM).coerceIn(-0.40, 0.40).toFloat()
+                        
+                        val realCyclistX = trackL + trackW * (0.50f + normDiff)
+                        val ghostCyclistX = trackL + trackW * 0.50f // Ghost en punto de referencia central
+
+                        // Rayo de vector relativo entre ambos
+                        val beamColor = if (realAhead) Color.parseColor("#10B981") else Color.parseColor("#EF4444")
+                        ghostWidgetStrokePaint.color = beamColor
+                        ghostWidgetStrokePaint.strokeWidth = 3.5f
+                        val minX = Math.min(realCyclistX, ghostCyclistX)
+                        val maxX = Math.max(realCyclistX, ghostCyclistX)
+                        if (maxX - minX > 8f) {
+                            canvas.drawLine(minX, cy, maxX, cy, ghostWidgetStrokePaint)
+                        }
+
+                        // Dibujar ambos ciclistas
+                        val cSize = (barH * 0.76f).coerceIn(28f, 50f)
+                        val realC = Color.parseColor("#E11D48") // Tú (magenta / carmesí potente)
+                        val ghostC = Color.parseColor("#64748B") // Ghost (gris acero)
+
+                        drawCyclistVector(canvas, ghostCyclistX, cy + barH * 0.02f, cSize * 0.88f, ghostC)
+                        drawCyclistVector(canvas, realCyclistX, cy + barH * 0.02f, cSize, realC)
+
+                        // Badge superior con el Gap
+                        ghostWidgetTextPaint.color = Color.BLACK
+                        ghostWidgetTextPaint.textSize = (barH * 0.34f * fontScale).coerceIn(12f, 24f)
+                        ghostWidgetTextPaint.textAlign = Paint.Align.CENTER
+                        canvas.drawText(gapLabel, left + barW / 2f, top + barH * 0.30f, ghostWidgetTextPaint)
+                    }
+                    "tissot" -> {
+                        // ── ESTILO TISSOT SPLIT (Parcial de crono oficial WT) ──
+                        val splitBg = if (realAhead) Color.parseColor("#065F46") else Color.parseColor("#991B1B") // Verde oscuro / Rojo oscuro
+                        val splitAccent = if (realAhead) Color.parseColor("#10B981") else Color.parseColor("#EF4444")
+                        
+                        val splitRect = RectF(left + barW * 0.03f, top + barH * 0.12f, right - barW * 0.03f, bottom - barH * 0.12f)
+                        ghostWidgetFillPaint.color = splitBg
+                        canvas.drawRoundRect(splitRect, 8f, 8f, ghostWidgetFillPaint)
+
+                        // Borde de competición
+                        ghostWidgetStrokePaint.color = splitAccent
+                        ghostWidgetStrokePaint.strokeWidth = 2.5f
+                        canvas.drawRoundRect(splitRect, 8f, 8f, ghostWidgetStrokePaint)
+
+                        // Mini bandera de estado a la izquierda
+                        val bannerW = barW * 0.22f
+                        val bannerRect = RectF(splitRect.left, splitRect.top, splitRect.left + bannerW, splitRect.bottom)
+                        ghostWidgetFillPaint.color = splitAccent
+                        canvas.drawRoundRect(bannerRect, 6f, 6f, ghostWidgetFillPaint)
+
+                        ghostWidgetTextPaint.color = Color.WHITE
+                        ghostWidgetTextPaint.textSize = (barH * 0.30f * fontScale).coerceIn(10f, 18f)
+                        ghostWidgetTextPaint.textAlign = Paint.Align.CENTER
+                        val statusText = if (realAhead) "LEADER" else "CHASE"
+                        canvas.drawText(statusText, bannerRect.centerX(), cy + ghostWidgetTextPaint.textSize * 0.35f, ghostWidgetTextPaint)
+
+                        // Tiempo digital grande monoespaciado en el centro
+                        ghostWidgetTextPaint.color = Color.WHITE
+                        ghostWidgetTextPaint.textSize = (barH * 0.48f * fontScale).coerceIn(16f, 32f)
+                        val centerDisplay = "$timeStr  ($distStr)"
+                        val textCenterX = (bannerRect.right + splitRect.right) * 0.5f
+                        canvas.drawText(centerDisplay, textCenterX, cy + ghostWidgetTextPaint.textSize * 0.36f, ghostWidgetTextPaint)
+                    }
+                    else -> {
+                        // ── ESTILO CLÁSICO VECTORIAL (Ciclistas vectoriales estilizados + vector de flecha) ──
+                        val cyclistSize = (barH * 0.82f).coerceIn(30f, 54f)
+                        val realColor = Color.parseColor("#B91C1C") // Rojo burdeos profesional
+                        val ghostColor = Color.parseColor("#94A3B8") // Gris claro metalizado
+
+                        val leftCyclistX = left + barW * 0.12f + cyclistSize * 0.5f
+                        val rightCyclistX = right - barW * 0.12f - cyclistSize * 0.5f
+
+                        val leftColor = if (realAhead) ghostColor else realColor
+                        val rightColor = if (realAhead) realColor else ghostColor
+
+                        drawCyclistVector(canvas, leftCyclistX, cy + barH * 0.05f, cyclistSize, leftColor)
+                        drawCyclistVector(canvas, rightCyclistX, cy + barH * 0.05f, cyclistSize, rightColor)
+
+                        // Flecha superior que conecta a ambos ciclistas
+                        val arrowY = top + barH * 0.26f
+                        val arrowStartX = leftCyclistX + cyclistSize * 0.60f
+                        val arrowEndX = rightCyclistX - cyclistSize * 0.60f
+
+                        if (arrowEndX > arrowStartX + 20f) {
+                            ghostWidgetStrokePaint.color = Color.BLACK
+                            ghostWidgetStrokePaint.strokeWidth = 2.5f
+                            canvas.drawLine(arrowStartX, arrowY, arrowEndX, arrowY, ghostWidgetStrokePaint)
+
+                            val arrowHeadSize = (barH * 0.16f).coerceIn(6f, 12f)
+                            val arrowHead = Path().apply {
+                                moveTo(arrowEndX, arrowY)
+                                lineTo(arrowEndX - arrowHeadSize, arrowY - arrowHeadSize * 0.6f)
+                                lineTo(arrowEndX - arrowHeadSize, arrowY + arrowHeadSize * 0.6f)
+                                close()
+                            }
+                            ghostWidgetFillPaint.color = Color.BLACK
+                            canvas.drawPath(arrowHead, ghostWidgetFillPaint)
+                        }
+
+                        // Texto métrico centrado (+0:12s / +135m)
+                        ghostWidgetTextPaint.textSize = (barH * 0.38f * fontScale).coerceIn(14f, 30f)
+                        val textY = top + barH * 0.78f
+                        canvas.drawText(gapLabel, left + barW / 2f, textY, ghostWidgetTextPaint)
+                    }
+                }
 
                 // Si alterna con aviso, refrescar pantalla para el cambio de ciclo
                 if (hasAlert) {
@@ -1235,45 +1439,80 @@ class RouteBarView(context: Context) : View(context) {
                 val distStr = distGapText(diffDist)
                 val timeStr = timeGapText(diffTime)
 
-                val cyclistSize = (barW * 0.65f).coerceIn(24f, 40f)
-                val realColor = Color.parseColor("#B91C1C")
-                val ghostColor = Color.parseColor("#94A3B8")
+                when (ghostStyle) {
+                    "tissot" -> {
+                        val splitBg = if (realAhead) Color.parseColor("#065F46") else Color.parseColor("#991B1B")
+                        val splitAccent = if (realAhead) Color.parseColor("#10B981") else Color.parseColor("#EF4444")
+                        val splitRect = RectF(left + barW * 0.05f, top + barH * 0.08f, right - barW * 0.05f, bottom - barH * 0.08f)
+                        ghostWidgetFillPaint.color = splitBg
+                        canvas.drawRoundRect(splitRect, 6f, 6f, ghostWidgetFillPaint)
 
-                // En vertical: el que va por delante aparece arriba, ligeramente más juntos
-                val topCyclistY = top + barH * 0.12f + cyclistSize * 0.6f
-                val bottomCyclistY = bottom - barH * 0.12f - cyclistSize * 0.6f
+                        ghostWidgetStrokePaint.color = splitAccent
+                        ghostWidgetStrokePaint.strokeWidth = 2.0f
+                        canvas.drawRoundRect(splitRect, 6f, 6f, ghostWidgetStrokePaint)
 
-                val topColor = if (realAhead) realColor else ghostColor
-                val bottomColor = if (realAhead) ghostColor else realColor
+                        // Cabecera status
+                        val statusH = barH * 0.22f
+                        val statusRect = RectF(splitRect.left, splitRect.top, splitRect.right, splitRect.top + statusH)
+                        ghostWidgetFillPaint.color = splitAccent
+                        canvas.drawRoundRect(statusRect, 5f, 5f, ghostWidgetFillPaint)
 
-                drawCyclistVector(canvas, cx, bottomCyclistY, cyclistSize, bottomColor)
-                drawCyclistVector(canvas, cx, topCyclistY, cyclistSize, topColor)
+                        ghostWidgetTextPaint.color = Color.WHITE
+                        ghostWidgetTextPaint.textSize = (barW * 0.26f * fontScale).coerceIn(10f, 18f)
+                        ghostWidgetTextPaint.textAlign = Paint.Align.CENTER
+                        canvas.drawText(if (realAhead) "LEAD" else "CHASE", cx, statusRect.centerY() + ghostWidgetTextPaint.textSize * 0.35f, ghostWidgetTextPaint)
 
-                // Flecha vertical ascendente
-                val arrowStartY = bottomCyclistY - cyclistSize * 0.7f
-                val arrowEndY = topCyclistY + cyclistSize * 0.7f
-
-                if (arrowStartY > arrowEndY + 20f) {
-                    ghostWidgetStrokePaint.color = Color.BLACK
-                    ghostWidgetStrokePaint.strokeWidth = 2.5f
-                    canvas.drawLine(cx, arrowStartY, cx, arrowEndY, ghostWidgetStrokePaint)
-
-                    val arrowHeadSize = (barW * 0.16f).coerceIn(6f, 10f)
-                    val arrowHead = Path().apply {
-                        moveTo(cx, arrowEndY)
-                        lineTo(cx - arrowHeadSize * 0.6f, arrowEndY + arrowHeadSize)
-                        lineTo(cx + arrowHeadSize * 0.6f, arrowEndY + arrowHeadSize)
-                        close()
+                        // Textos en vertical
+                        val midY = top + barH / 2f + statusH * 0.3f
+                        ghostWidgetTextPaint.textSize = (barW * 0.28f * fontScale).coerceIn(12f, 22f)
+                        canvas.drawText(timeStr, cx, midY - 2f, ghostWidgetTextPaint)
+                        ghostWidgetTextPaint.textSize = (barW * 0.20f * fontScale).coerceIn(9f, 15f)
+                        canvas.drawText(distStr, cx, midY + ghostWidgetTextPaint.textSize + 4f, ghostWidgetTextPaint)
                     }
-                    ghostWidgetFillPaint.color = Color.BLACK
-                    canvas.drawPath(arrowHead, ghostWidgetFillPaint)
-                }
+                    else -> {
+                        // Modo clásico / velon / pursuit en vertical con ciclistas nítidos
+                        val cyclistSize = (barW * 0.78f).coerceIn(28f, 50f)
+                        val realColor = if (realAhead) Color.parseColor("#10B981") else Color.parseColor("#B91C1C")
+                        val ghostColor = Color.parseColor("#94A3B8")
 
-                // Textos métricos en el centro
-                val midY = top + barH / 2f
-                ghostWidgetTextPaint.textSize = (barW * 0.22f * fontScale).coerceIn(12f, 20f)
-                canvas.drawText(timeStr, cx, midY - 4f, ghostWidgetTextPaint)
-                canvas.drawText(distStr, cx, midY + ghostWidgetTextPaint.textSize + 2f, ghostWidgetTextPaint)
+                        // En vertical: el que va por delante aparece arriba
+                        val topCyclistY = top + barH * 0.12f + cyclistSize * 0.5f
+                        val bottomCyclistY = bottom - barH * 0.12f - cyclistSize * 0.5f
+
+                        val topColor = if (realAhead) realColor else ghostColor
+                        val bottomColor = if (realAhead) ghostColor else realColor
+
+                        drawCyclistVector(canvas, cx, bottomCyclistY, cyclistSize, bottomColor)
+                        drawCyclistVector(canvas, cx, topCyclistY, cyclistSize, topColor)
+
+                        // Flecha vertical ascendente
+                        val arrowStartY = bottomCyclistY - cyclistSize * 0.65f
+                        val arrowEndY = topCyclistY + cyclistSize * 0.65f
+
+                        if (arrowStartY > arrowEndY + 20f) {
+                            ghostWidgetStrokePaint.color = Color.BLACK
+                            ghostWidgetStrokePaint.strokeWidth = 2.5f
+                            canvas.drawLine(cx, arrowStartY, cx, arrowEndY, ghostWidgetStrokePaint)
+
+                            val arrowHeadSize = (barW * 0.16f).coerceIn(6f, 10f)
+                            val arrowHead = Path().apply {
+                                moveTo(cx, arrowEndY)
+                                lineTo(cx - arrowHeadSize * 0.6f, arrowEndY + arrowHeadSize)
+                                lineTo(cx + arrowHeadSize * 0.6f, arrowEndY + arrowHeadSize)
+                                close()
+                            }
+                            ghostWidgetFillPaint.color = Color.BLACK
+                            canvas.drawPath(arrowHead, ghostWidgetFillPaint)
+                        }
+
+                        // Textos métricos en el centro
+                        val midY = top + barH / 2f
+                        ghostWidgetTextPaint.color = Color.BLACK
+                        ghostWidgetTextPaint.textSize = (barW * 0.22f * fontScale).coerceIn(12f, 20f)
+                        canvas.drawText(timeStr, cx, midY - 4f, ghostWidgetTextPaint)
+                        canvas.drawText(distStr, cx, midY + ghostWidgetTextPaint.textSize + 2f, ghostWidgetTextPaint)
+                    }
+                }
 
                 if (hasAlert) {
                     postInvalidateDelayed(500)

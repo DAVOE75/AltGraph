@@ -170,6 +170,10 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_ELITE_GHOST_ENABLED, true) && isEliteUnlocked
         set(value) = prefs.edit().putBoolean(KEY_ELITE_GHOST_ENABLED, value).apply()
 
+    var eliteGhostStyle: String
+        get() = prefs.getString(KEY_ELITE_GHOST_STYLE, "classic") ?: "classic"
+        set(value) = prefs.edit().putString(KEY_ELITE_GHOST_STYLE, value).apply()
+
     var eliteEnergyBarEnabled: Boolean
         get() = prefs.getBoolean(KEY_ELITE_ENERGY_BAR_ENABLED, true) && isEliteUnlocked
         set(value) = prefs.edit().putBoolean(KEY_ELITE_ENERGY_BAR_ENABLED, value).apply()
@@ -290,6 +294,7 @@ class AppPreferences(context: Context) {
         private const val KEY_STRAVA_SEGMENTS_ENABLED = "strava_segments_enabled"
         private const val KEY_ELITE_RADAR_ENABLED = "elite_radar_enabled"
         private const val KEY_ELITE_GHOST_ENABLED = "elite_ghost_enabled"
+        private const val KEY_ELITE_GHOST_STYLE = "elite_ghost_style"
         private const val KEY_ELITE_ENERGY_BAR_ENABLED = "elite_energy_bar_enabled"
         private const val KEY_ELITE_POI_RULER_ENABLED = "elite_poi_ruler_enabled"
         private const val KEY_ELITE_HISTOGRAM_ENABLED = "elite_histogram_enabled"

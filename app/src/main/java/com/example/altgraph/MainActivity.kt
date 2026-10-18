@@ -1087,15 +1087,67 @@ class MainActivity : Activity() {
 
         // Ghost / Virtual Pacer
         val ghostCard = createCardContainer()
+        val ghostLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+        }
         val switchGhost = Switch(this).apply {
             text = getString(R.string.label_ghost)
             textSize = 14f
             setTextColor(Color.WHITE)
             isChecked = prefs.eliteGhostEnabled
             isEnabled = prefs.isEliteUnlocked
-            setOnCheckedChangeListener { _, v -> prefs.eliteGhostEnabled = v }
         }
-        ghostCard.addView(switchGhost)
+        ghostLayout.addView(switchGhost)
+
+        // Contenedor desplegable del estilo de visualización de KGhost
+        val ghostStyleLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, 10, 0, 0)
+            visibility = if (prefs.eliteGhostEnabled) View.VISIBLE else View.GONE
+        }
+        val ghostStyleTitle = TextView(this).apply {
+            text = getString(R.string.label_ghost_style)
+            textSize = 12f
+            setTextColor(Color.parseColor("#94A3B8"))
+            setPadding(0, 0, 0, 4)
+            alpha = if (prefs.isEliteUnlocked) 1.0f else 0.5f
+        }
+        ghostStyleLayout.addView(ghostStyleTitle)
+
+        val ghostStyleOptions = listOf(
+            Pair("classic", getString(R.string.ghost_style_classic)),
+            Pair("velon", getString(R.string.ghost_style_velon)),
+            Pair("pursuit", getString(R.string.ghost_style_pursuit)),
+            Pair("tissot", getString(R.string.ghost_style_tissot))
+        )
+        val ghostStyleSpinner = Spinner(this).apply {
+            isEnabled = prefs.isEliteUnlocked
+            val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, ghostStyleOptions.map { it.second })
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            this.adapter = adapter
+
+            val currentIdx = ghostStyleOptions.indexOfFirst { it.first == prefs.eliteGhostStyle }.coerceAtLeast(0)
+            setSelection(currentIdx)
+
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    if (position in ghostStyleOptions.indices) {
+                        prefs.eliteGhostStyle = ghostStyleOptions[position].first
+                        (view as? TextView)?.setTextColor(Color.parseColor("#38BDF8"))
+                    }
+                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+        }
+        ghostStyleLayout.addView(ghostStyleSpinner)
+        ghostLayout.addView(ghostStyleLayout)
+
+        switchGhost.setOnCheckedChangeListener { _, isChecked ->
+            prefs.eliteGhostEnabled = isChecked
+            ghostStyleLayout.visibility = if (isChecked) View.VISIBLE else View.GONE
+        }
+
+        ghostCard.addView(ghostLayout)
         tabEliteContainer.addView(ghostCard)
 
         // Energy Bar
@@ -1386,6 +1438,9 @@ class MainActivity : Activity() {
             switchWeather.isEnabled = unlocked
             switchRadar.isEnabled = unlocked
             switchGhost.isEnabled = unlocked
+            ghostStyleSpinner.isEnabled = unlocked
+            ghostStyleTitle.alpha = if (unlocked) 1.0f else 0.5f
+            ghostStyleLayout.visibility = if (switchGhost.isChecked) View.VISIBLE else View.GONE
             switchEnergyBar.isEnabled = unlocked
             switchPoiRuler.isEnabled = unlocked
             switchHist.isEnabled = unlocked

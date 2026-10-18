@@ -160,6 +160,11 @@
     <string name="label_elite_header">ALTGRAPH ELITE</string>
     <string name="label_elite_features">Funciones Radar ELITE</string>
     <string name="label_ghost">Gap de KGhost (requiere la app KGhost)</string>
+    <string name="label_ghost_style">Estilo de visualización KGhost:</string>
+    <string name="ghost_style_classic">Ciclistas Pro y Vector Gap</string>
+    <string name="ghost_style_velon">Cápsula Doble Velon Live TV</string>
+    <string name="ghost_style_pursuit">Pista de Persecución Dinámica</string>
+    <string name="ghost_style_tissot">Crono Parcial Tissot Split</string>
     <string name="label_energy_bar">Barra de energía restante</string>
     <string name="label_poi_icons">Iconos POI en la regla</string>
     <string name="label_histogram">Histograma de pendientes</string>
