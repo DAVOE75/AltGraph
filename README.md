@@ -19,6 +19,19 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
+## 👻 NUEVA INTEGRACIÓN: WIDGET KGHOST EN RADAR ALTIMÉTRICO (v1.0.85 ELITE) 👻
+
+En las Funciones Radar Elite ahora puedes activar el **Gap de KGhost**, permitiéndote visualizar en tiempo real en la barra de avisos del Radar Altimétrico la comparativa frente al ciclista virtual (Ghost):
+- **Visualización Dual Profesional**: Ciclista real en rojo burdeos y ciclista Ghost en gris claro con sombreado sutil, conectados mediante una flecha dinámica que apunta hacia el líder de la carrera.
+- **Posicionamiento Táctico en Tiempo Real**: Si vas por delante, tu ciclista aparecerá a la cabeza (a la derecha en modo horizontal o arriba en vertical). Si el Ghost va liderando, él tomará la delantera visual.
+- **Métricas de Rendimiento**: Diferencia precisa en tiempo y distancia en vivo (ej. `+4:46 / +3.7 km`).
+- **Alternancia Inteligente**: Cicla suavemente cada 4 segundos entre el widget del Ghost y los avisos tácticos de puertos y muros para no perder información crítica.
+- **Agradecimiento y Colaboración Especial**: Esta funcionalidad es posible gracias a la estrecha colaboración entre **AltGraph** y la aplicación **KGhost** desarrollada para Hammerhead Karoo. Para disfrutar de esta característica se requiere tener instalada la app **KGhost**, a cuyos desarrolladores les agradecemos enormemente su trabajo y cooperación para llevar el rendimiento ciclista al siguiente nivel.
+
+<p align="center">
+  <img src="art/screenshot_kghost_radar.png" width="360" alt="KGhost Widget en Radar Altimétrico" />
+</p>
+
 ## 🔥 VERSIÓN 1.0.80: DIFUMINADO DE RUTA EN MAPA BASE E ICONOS OPTIMIZADOS 🔥
 
 - **Difuminado de pendientes en Mapa Base**: Al igual que en la vista de radar clásico, se añade la opción de difuminar y suavizar las transiciones de color a lo largo de la traza de la ruta coloreada en el mapa base.

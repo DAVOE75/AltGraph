@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v1.0.78 ELITE)
+# ALTGRAPH (v1.0.85 ELITE)
 <p>Lesen auf: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md">🇪🇸 Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md">🇬🇧 English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md">🇫🇷 Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md">🇮🇹 Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md">🇩🇪 Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md">🇵🇹 Português</a></p>
 
 **ALTGRAPH** ist eine professionelle Höhen- und Leistungserweiterung der nächsten Generation für **Hammerhead Karoo** Fahrradcomputer (Karoo 2 und Karoo 3), entwickelt von **hesiOX** unter Verwendung des offiziellen `karoo-ext` SDKs.
@@ -9,6 +9,19 @@ Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 6 3D-Höhenv
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
+</p>
+
+## 👻 NEUE INTEGRATION: KGHOST-WIDGET IM HÖHENPROFIL-RADAR (v1.0.85 ELITE) 👻
+
+In den Radar-Elite-Funktionen kann jetzt der **KGhost-Abstand** aktiviert werden, wodurch ein Echtzeit-Duell gegen den virtuellen Ghost-Fahrer direkt in der Alarmleiste des Radars angezeigt wird:
+- **Professionelle Doppel-Fahrer-Darstellung**: Echter Fahrer in Bordeaux-Rot und Ghost-Fahrer in metallischem Hellgrau mit dezentem Schatten, verbunden durch einen dynamischen Pfeil, der auf den Führenden zeigt.
+- **Taktische Echtzeit-Positionierung**: Wer führt, fährt optisch vorne (rechts im Querformat, oben im Hochformat).
+- **Live-Leistungsmetriken**: Präziser Abstand in Zeit und Distanz in Echtzeit (z. B. `+4:46 / +3.7 km`).
+- **Intelligente Alternanz**: Sanfter 4-Sekunden-Wechsel zwischen dem Ghost-Widget und den taktischen Steigungswarnungen.
+- **Besonderer Dank & Zusammenarbeit**: Dieses Feature entstand durch die enge Zusammenarbeit zwischen **AltGraph** und der **KGhost**-App für Hammerhead Karoo. Die Nutzung erfordert die installierte **KGhost**-App, deren Entwicklerteam wir herzlich für die Kooperation danken.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="360" alt="KGhost Widget im Höhenprofil-Radar" />
 </p>
 
 ## 🔥 VERSION 1.0.78: TV-PROFIL 2D (ELITE) 🔥

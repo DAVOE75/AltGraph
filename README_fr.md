@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="Logo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v1.0.78 ELITE)
+# ALTGRAPH (v1.0.85 ELITE)
 <p>Lire en : <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md">🇪🇸 Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md">🇬🇧 English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md">🇫🇷 Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md">🇮🇹 Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md">🇩🇪 Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md">🇵🇹 Português</a></p>
 
 **ALTGRAPH** est une extension professionnelle d'altimétrie et de performance cycliste de nouvelle génération pour les compteurs GPS **Hammerhead Karoo** (Karoo 2 et Karoo 3), développée par **hesiOX** à l'aide du SDK officiel `karoo-ext`.
@@ -9,6 +9,19 @@ Elle révolutionne le concept traditionnel de l'altimétrie cycliste en intégra
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />
+</p>
+
+## 👻 NOUVELLE INTÉGRATION : WIDGET KGHOST DANS LE RADAR ALTIMÉTRIQUE (v1.0.85 ELITE) 👻
+
+Dans les Fonctions Radar Elite, vous pouvez désormais activer l'**Écart KGhost**, affichant en temps réel sur la barre d'alertes du Radar Altimétrique le duel face au coureur virtuel (Ghost) :
+- **Rendu Visuel Double Professionnel** : Cycliste réel en rouge bordeaux et cycliste Ghost en gris clair métallisé avec ombrage subtil, reliés par une flèche dynamique pointant vers le leader.
+- **Positionnement Tactique en Temps Réel** : Si vous menez, votre cycliste s'affiche en tête (à droite en horizontal ou en haut en vertical). Si le Ghost est devant, il prend la tête visuelle.
+- **Métriques en Direct** : Écart précis en temps et distance en temps réel (ex. `+4:46 / +3.7 km`).
+- **Alternance Intelligente** : Cycle fluide de 4 secondes entre le widget du Ghost et les alertes de cols/murs.
+- **Remerciements et Collaboration Spéciale** : Cette fonctionnalité est le fruit de la collaboration étroite entre **AltGraph** et l'application **KGhost** pour Hammerhead Karoo. Nécessite l'application **KGhost** installée, dont nous remercions chaleureusement l'équipe pour leur coopération.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="360" alt="Widget KGhost sur Radar Altimétrique" />
 </p>
 
 ## 🔥 VERSION 1.0.78: PROFIL TV 2D (ELITE) 🔥

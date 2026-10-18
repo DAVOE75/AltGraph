@@ -19,6 +19,19 @@ It revolutionizes traditional cycling elevation profiles by featuring a **Suite 
   <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
+## 👻 NEW INTEGRATION: KGHOST WIDGET IN ALTIMETRY RADAR (v1.0.85 ELITE) 👻
+
+In Radar Elite Features, you can now enable the **KGhost Gap**, giving you a live head-to-head tactical widget against your virtual Ghost rider directly on the Altimetry Radar alert bar:
+- **Professional Dual Cyclist Rendering**: Real rider in burgundy red and Ghost rider in metallic light grey with subtle drop shadows, linked by a dynamic arrow pointing directly at the current leader.
+- **Real-Time Tactical Positioning**: If you lead, your cyclist appears ahead (on the right in horizontal mode, or on top in vertical mode). If the Ghost leads, it visually takes the front.
+- **Live Performance Metrics**: High-precision real-time gap in time and distance (e.g., `+4:46 / +3.7 km`).
+- **Smart Alternation**: Smoothly cycles every 4 seconds between the Ghost widget and tactical climb/wall alerts to ensure you never miss upcoming gradient challenges.
+- **Special Thanks & Collaboration**: This feature is made possible thanks to the extension and close collaboration with the **KGhost** application developed for Hammerhead Karoo. Using this feature requires having the **KGhost** app installed, and we extend our sincere gratitude to their development team for their collaboration in advancing cycling performance tracking.
+
+<p align="center">
+  <img src="art/screenshot_kghost_radar.png" width="360" alt="KGhost Widget on Altimetry Radar" />
+</p>
+
 ## 🔥 VERSION 1.0.80: BASE MAP ROUTE COLOR SMOOTHING & OPTIMIZED ICONS 🔥
 
 - **Smooth Grade Transitions on Base Map**: Just like in classic radar view, added the option to blend and smooth color transitions along the colored route polyline on the base map.
