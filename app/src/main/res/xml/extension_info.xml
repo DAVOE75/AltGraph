@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ExtensionInfo
     id="altgraph"
-    version="1.0.84"
+    version="1.0.85"
     displayName="@string/app_name"
     icon="@drawable/ic_altgraph"
     configurable="true"

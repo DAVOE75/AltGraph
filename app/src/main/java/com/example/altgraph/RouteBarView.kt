@@ -143,14 +143,17 @@ class RouteBarView(context: Context) : View(context) {
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
+        setShadowLayer(2.5f, 0.8f, 1.2f, Color.argb(110, 0, 0, 0))
     }
     private val ghostWidgetFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
+        setShadowLayer(2.5f, 0.8f, 1.2f, Color.argb(110, 0, 0, 0))
     }
     private val ghostWidgetTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.BLACK
         typeface = Typeface.DEFAULT_BOLD
         textAlign = Paint.Align.CENTER
+        setShadowLayer(1.5f, 0.5f, 0.8f, Color.argb(60, 0, 0, 0))
     }
 
     /**
@@ -1131,8 +1134,9 @@ class RouteBarView(context: Context) : View(context) {
                 val realColor = Color.parseColor("#B91C1C") // Rojo burdeos profesional
                 val ghostColor = Color.parseColor("#94A3B8") // Gris claro metalizado
 
-                val leftCyclistX = left + cyclistSize * 0.9f
-                val rightCyclistX = right - cyclistSize * 0.9f
+                // Ciclistas un poco más centrados y juntos hacia el centro
+                val leftCyclistX = left + barW * 0.14f + cyclistSize * 0.5f
+                val rightCyclistX = right - barW * 0.14f - cyclistSize * 0.5f
 
                 // Asignar colores según quién va por delante (delante = derecha)
                 val leftColor = if (realAhead) ghostColor else realColor
@@ -1235,9 +1239,9 @@ class RouteBarView(context: Context) : View(context) {
                 val realColor = Color.parseColor("#B91C1C")
                 val ghostColor = Color.parseColor("#94A3B8")
 
-                // En vertical: el que va por delante aparece arriba
-                val topCyclistY = top + cyclistSize * 1.0f
-                val bottomCyclistY = bottom - cyclistSize * 1.0f
+                // En vertical: el que va por delante aparece arriba, ligeramente más juntos
+                val topCyclistY = top + barH * 0.12f + cyclistSize * 0.6f
+                val bottomCyclistY = bottom - barH * 0.12f - cyclistSize * 0.6f
 
                 val topColor = if (realAhead) realColor else ghostColor
                 val bottomColor = if (realAhead) ghostColor else realColor
