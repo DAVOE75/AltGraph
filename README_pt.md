@@ -21,7 +21,8 @@ Nas Funções Radar Elite, pode agora ativar o **Gap [KGhost](https://github.com
 - **Agradecimento e Colaboração Especial**: Esta funcionalidade resulta da colaboração próxima entre a **AltGraph** e a aplicação [**KGhost**](https://github.com/lockevod/KGhost) desenvolvida para Hammerhead Karoo. Requer a instalação da app [**KGhost**](https://github.com/lockevod/KGhost), a cujos desenvolvedores agradecemos sinceramente pela cooperação para elevar o desempenho no ciclismo.
 
 <p align="center">
- <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="360" alt="Widget KGhost no Radar Altimétrico" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_settings.png" width="230" alt="Definição Gap KGhost no Radar Elite" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="230" alt="Widget KGhost no Radar Altimétrico" />
 </p>
 
 ## VERSÃO 1.0.78: PERFIL TV 2D (ELITE)

@@ -29,7 +29,8 @@ En las Funciones Radar Elite ahora puedes activar el **Gap de [KGhost](https://g
 - **Agradecimiento y Colaboración Especial**: Esta funcionalidad es posible gracias a la estrecha colaboración entre **AltGraph** y la aplicación [**KGhost**](https://github.com/lockevod/KGhost) desarrollada para Hammerhead Karoo. Para disfrutar de esta característica se requiere tener instalada la app [**KGhost**](https://github.com/lockevod/KGhost), a cuyos desarrolladores les agradecemos enormemente su trabajo y cooperación para llevar el rendimiento ciclista al siguiente nivel.
 
 <p align="center">
- <img src="art/screenshot_kghost_radar.png" width="360" alt="KGhost Widget en Radar Altimétrico" />
+  <img src="art/screenshot_kghost_settings.png" width="230" alt="Ajuste Gap KGhost en Radar Elite" />
+  <img src="art/screenshot_kghost_radar.png" width="230" alt="KGhost Widget en Radar Altimétrico" />
 </p>
 
 ## VERSIÓN 1.0.80: DIFUMINADO DE RUTA EN MAPA BASE E ICONOS OPTIMIZADOS

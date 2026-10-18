@@ -21,7 +21,8 @@ In den Radar-Elite-Funktionen kann jetzt der **[KGhost](https://github.com/locke
 - **Besonderer Dank & Zusammenarbeit**: Dieses Feature entstand durch die enge Zusammenarbeit zwischen **AltGraph** und der [**KGhost**](https://github.com/lockevod/KGhost)-App für Hammerhead Karoo. Die Nutzung erfordert die installierte [**KGhost**](https://github.com/lockevod/KGhost)-App, deren Entwicklerteam wir herzlich für die Kooperation danken.
 
 <p align="center">
- <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="360" alt="KGhost Widget im Höhenprofil-Radar" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_settings.png" width="230" alt="KGhost Gap Einstellung in Radar Elite" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="230" alt="KGhost Widget im Höhenprofil-Radar" />
 </p>
 
 ## VERSION 1.0.78: TV-PROFIL 2D (ELITE)

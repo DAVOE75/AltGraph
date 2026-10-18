@@ -21,7 +21,8 @@ Dans les Fonctions Radar Elite, vous pouvez désormais activer l'**Écart [KGhos
 - **Remerciements et Collaboration Spéciale** : Cette fonctionnalité est le fruit de la collaboration étroite entre **AltGraph** et l'application [**KGhost**](https://github.com/lockevod/KGhost) pour Hammerhead Karoo. Nécessite l'application [**KGhost**](https://github.com/lockevod/KGhost) installée, dont nous remercions chaleureusement l'équipe pour leur coopération.
 
 <p align="center">
- <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="360" alt="Widget KGhost sur Radar Altimétrique" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_settings.png" width="230" alt="Réglage Écart KGhost dans Radar Elite" />
+  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="230" alt="Widget KGhost sur Radar Altimétrique" />
 </p>
 
 ## VERSION 1.0.78: PROFIL TV 2D (ELITE)

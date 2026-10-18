@@ -29,7 +29,8 @@ In Radar Elite Features, you can now enable the **[KGhost](https://github.com/lo
 - **Special Thanks & Collaboration**: This feature is made possible thanks to the extension and close collaboration with the [**KGhost**](https://github.com/lockevod/KGhost) application developed for Hammerhead Karoo. Using this feature requires having the [**KGhost**](https://github.com/lockevod/KGhost) app installed, and we extend our sincere gratitude to their development team for their collaboration in advancing cycling performance tracking.
 
 <p align="center">
- <img src="art/screenshot_kghost_radar.png" width="360" alt="KGhost Widget on Altimetry Radar" />
+  <img src="art/screenshot_kghost_settings.png" width="230" alt="KGhost Gap Setting in Radar Elite" />
+  <img src="art/screenshot_kghost_radar.png" width="230" alt="KGhost Widget on Altimetry Radar" />
 </p>
 
 ## VERSION 1.0.80: BASE MAP ROUTE COLOR SMOOTHING & OPTIMIZED ICONS
