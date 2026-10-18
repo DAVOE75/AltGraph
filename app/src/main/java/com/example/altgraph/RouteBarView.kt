@@ -718,16 +718,6 @@ class RouteBarView(context: Context) : View(context) {
                 drawGradeHistogram(canvas, strat, headerHeight, radarH, w)
             }
 
-            // 9. Hueco con KGhost (ELITE), a la izquierda de la franja de la regla
-            ghostGap?.let { gap ->
-                ghostTextPaint.textSize = Math.min(28f * fontScale, (radarH - headerHeight) * 0.6f).coerceAtLeast(10f)
-                ghostTextPaint.textAlign = Paint.Align.LEFT
-                ghostTextPaint.color = ghostGapColor(gap)
-                val text = formatGhostGap(gap, w * 0.45f) { ghostTextPaint.measureText(it) }
-                val cy = headerHeight + (radarH - headerHeight) / 2f + ghostTextPaint.textSize / 3f
-                canvas.drawText(text, 6f, cy, ghostTextPaint)
-            }
-
         } else {
             // VERTICAL MODE
             val sideBarW = 12f
@@ -909,15 +899,6 @@ class RouteBarView(context: Context) : View(context) {
             path.close()
             canvas.drawPath(path, cyclistPaint)
             canvas.drawPath(path, cyclistOutline)
-
-            // Hueco con KGhost (ELITE): abajo, centrado en la franja de la regla
-            ghostGap?.let { gap ->
-                ghostTextPaint.textSize = Math.min(28f * fontScale, (radarW - headerWidth) * 0.6f).coerceAtLeast(10f)
-                ghostTextPaint.textAlign = Paint.Align.CENTER
-                ghostTextPaint.color = ghostGapColor(gap)
-                val text = formatGhostGap(gap, radarW - headerWidth - 8f) { ghostTextPaint.measureText(it) }
-                canvas.drawText(text, (headerWidth + radarW) / 2f, h - 6f, ghostTextPaint)
-            }
 
             // 7. Energy / Power Bars (ELITE) — thin vertical bars to the right of the radar
             var leftOffset = radarW
@@ -1120,7 +1101,17 @@ class RouteBarView(context: Context) : View(context) {
             canvas.drawRect(android.graphics.RectF(left, top, right, bottom), bgPaint)
 
             val currentGap = ghostGap
-            if (currentGap != null && (currentGap.timeS != null || currentGap.distM != null)) {
+            val hasGhost = currentGap != null && (currentGap.timeS != null || currentGap.distM != null)
+            val hasAlert = alertText.isNotEmpty()
+
+            // Alternancia: si ambos están disponibles, cicla cada 4 segundos (4000ms Ghost / 4000ms Aviso)
+            val showGhostNow = when {
+                hasGhost && hasAlert -> ((System.currentTimeMillis() / 4000L) % 2L) == 0L
+                hasGhost -> true
+                else -> false
+            }
+
+            if (showGhostNow && currentGap != null) {
                 // Widget KGhost visual profesional: ciclista real vs ciclista ghost
                 val barW = right - left
                 val barH = bottom - top
@@ -1175,6 +1166,11 @@ class RouteBarView(context: Context) : View(context) {
                 ghostWidgetTextPaint.textSize = (barH * 0.38f * fontScale).coerceIn(14f, 30f)
                 val textY = top + barH * 0.78f
                 canvas.drawText(gapLabel, left + barW / 2f, textY, ghostWidgetTextPaint)
+
+                // Si alterna con aviso, refrescar pantalla para el cambio de ciclo
+                if (hasAlert) {
+                    postInvalidateDelayed(500)
+                }
             } else if (alertText.isNotEmpty()) {
                 // En horizontal aprovechamos todo el alto (40%)
                 alertPaint.textSize = Math.min(38f * fontScale, (bottom - top) * 0.6f).coerceAtLeast(16f)
@@ -1203,6 +1199,9 @@ class RouteBarView(context: Context) : View(context) {
                 } else {
                     alertPaint.textAlign = Paint.Align.CENTER
                     canvas.drawText(alertText, left + viewW / 2f, cy, alertPaint)
+                    if (hasGhost) {
+                        postInvalidateDelayed(500)
+                    }
                 }
             }
         } else {
@@ -1210,7 +1209,17 @@ class RouteBarView(context: Context) : View(context) {
             canvas.drawRect(android.graphics.RectF(left, top, right, bottom), bgPaint)
 
             val currentGap = ghostGap
-            if (currentGap != null && (currentGap.timeS != null || currentGap.distM != null)) {
+            val hasGhost = currentGap != null && (currentGap.timeS != null || currentGap.distM != null)
+            val hasAlert = alertText.isNotEmpty()
+
+            // Alternancia: si ambos están disponibles, cicla cada 4 segundos
+            val showGhostNow = when {
+                hasGhost && hasAlert -> ((System.currentTimeMillis() / 4000L) % 2L) == 0L
+                hasGhost -> true
+                else -> false
+            }
+
+            if (showGhostNow && currentGap != null) {
                 val barW = right - left
                 val barH = bottom - top
                 val cx = left + barW / 2f
@@ -1261,6 +1270,10 @@ class RouteBarView(context: Context) : View(context) {
                 ghostWidgetTextPaint.textSize = (barW * 0.22f * fontScale).coerceIn(12f, 20f)
                 canvas.drawText(timeStr, cx, midY - 4f, ghostWidgetTextPaint)
                 canvas.drawText(distStr, cx, midY + ghostWidgetTextPaint.textSize + 2f, ghostWidgetTextPaint)
+
+                if (hasAlert) {
+                    postInvalidateDelayed(500)
+                }
             } else if (alertText.isNotEmpty()) {
                 // En vertical el texto necesita caber o rotar
                 alertPaint.textSize = Math.min(35f * fontScale, (bottom - top) * 0.8f).coerceAtLeast(16f)
@@ -1288,6 +1301,9 @@ class RouteBarView(context: Context) : View(context) {
                 } else {
                     alertPaint.textAlign = Paint.Align.CENTER
                     canvas.drawText(alertText, left + viewW / 2f, cy, alertPaint)
+                    if (hasGhost) {
+                        postInvalidateDelayed(500)
+                    }
                 }
             }
         }
