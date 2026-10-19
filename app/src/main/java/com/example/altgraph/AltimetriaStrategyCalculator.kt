@@ -1055,15 +1055,21 @@ class AltimetriaStrategyCalculator {
         
         var actualLookahead = lookaheadDist
         val totalRouteLength = routeElevationProfile.lastOrNull()?.distance ?: (routePoints.lastOrNull()?.distance ?: 0.0)
-        
+
+        // Limitar desplazamiento manual (pan) para no arrastrar más allá del final de la ruta (evitar bloques al 0% irreales)
+        if (totalRouteLength > 0.0 && manualPanOffsetMeters > 0.0) {
+            val maxWindowStart = (totalRouteLength - actualLookahead).coerceAtLeast(0.0)
+            windowStartDist = windowStartDist.coerceAtMost(maxWindowStart)
+        }
+
         // ADAPTACIÓN DE ZOOM A LA RUTA:
         // Si tenemos una ruta activa y el zoom solicitado es mayor o igual a la longitud total,
         // limitamos la ventana a la ruta completa empezando en el km 0 para no mostrar tramos planos.
         if (totalRouteLength > 0.0 && (lookaheadDist >= totalRouteLength || lookaheadDist >= 100000.0)) {
-            windowStartDist = 0.0 + manualPanOffsetMeters.coerceAtLeast(0.0)
+            windowStartDist = 0.0
             actualLookahead = totalRouteLength.coerceAtMost(lookaheadDist)
         } else if (lookaheadDist >= 100000.0) {
-            windowStartDist = 0.0 + manualPanOffsetMeters.coerceAtLeast(0.0)
+            windowStartDist = 0.0
             if (totalRouteLength > 0.0 && totalRouteLength < lookaheadDist) {
                 actualLookahead = totalRouteLength
             }

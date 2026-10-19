@@ -907,8 +907,8 @@ class Altimetria3DView @JvmOverloads constructor(
 
         val startX = (w * 0.10f)
         val baseEndX = (w * 0.98f)
-        val baseGroundY = if (showHeaderStats) (h * 0.82f) else (h * 0.88f)
-        val maxPeakHeight = if (showHeaderStats) (h * 0.48f) else (h * 0.72f)
+        val baseGroundY = if (showHeaderStats) (h * 0.82f) else (h * 0.77f)
+        val maxPeakHeight = if (showHeaderStats) (h * 0.48f) else (h * 0.60f)
 
         // Desplazamiento oblicuo 3D sutil y elegante (profundidad reducida a petición del usuario)
         val depth3dX = (w * 0.012f).coerceIn(4f, 8f)
@@ -1380,11 +1380,78 @@ class Altimetria3DView @JvmOverloads constructor(
                     val gX = startX + ((relDist + windowStartMeters - windowStartMeters) / lookaheadMeters * totalMicroSamples * (totalMicroSamples/w)).toFloat() - panOffsetX
                     val gIdx = ((relDist + windowStartMeters - windowStartMeters) / lookaheadMeters * totalMicroSamples).toInt().coerceIn(0, totalMicroSamples - 1)
                     val gY = yFront[gIdx] - 15f
-                    canvas.drawCircle(gX, gY, 8f, stravaPaint)
-                    canvas.drawLine(gX, gY, gX, gY - 40f, stravaPaint)
                     val prTextPaint = Paint(stravaPaint).apply { textSize = 12f; textAlign = Paint.Align.CENTER; color = Color.WHITE }
                     canvas.drawText("KOM", gX, gY - 45f, prTextPaint)
                 }
+            }
+        }
+
+        // Meta / Final de ruta: Bandera de cuadros / Línea de meta en el último bloque
+        if (routeTotalLength > 0.0) {
+            val finishDistInWindow = routeTotalLength - windowStartMeters
+            if (finishDistInWindow in 0.0..totalMetersAhead) {
+                val frac = (finishDistInWindow / totalMetersAhead).toFloat()
+                val exactIndexF = frac * (totalMicroSamples - 1)
+                val fIdx = exactIndexF.toInt().coerceIn(0, totalMicroSamples - 2)
+                val rem = exactIndexF - fIdx
+                val fxFront = xFront[fIdx] + rem * (xFront[fIdx + 1] - xFront[fIdx])
+                val fyFront = yFront[fIdx] + rem * (yFront[fIdx + 1] - yFront[fIdx])
+                val fxBack = xBack[fIdx] + rem * (xBack[fIdx + 1] - xBack[fIdx])
+                val fyBack = yBack[fIdx] + rem * (yBack[fIdx + 1] - yBack[fIdx])
+                val fyBase = yBase[fIdx] + rem * (yBase[fIdx + 1] - yBase[fIdx])
+
+                // Línea vertical brillante en la pared
+                val finishWallPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.WHITE
+                    strokeWidth = 3f
+                    style = Paint.Style.STROKE
+                }
+                canvas.drawLine(fxFront, fyFront, fxFront, fyBase, finishWallPaint)
+
+                // Cinta de meta ajedrezada (checkered pattern) sobre el asfalto 3D
+                val steps = 6
+                for (s in 0 until steps) {
+                    val t1 = s / steps.toFloat()
+                    val t2 = (s + 1) / steps.toFloat()
+                    val p1x = fxFront + t1 * (fxBack - fxFront)
+                    val p1y = fyFront + t1 * (fyBack - fyFront)
+                    val p2x = fxFront + t2 * (fxBack - fxFront)
+                    val p2y = fyFront + t2 * (fyBack - fyFront)
+
+                    val checkPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                        color = if (s % 2 == 0) Color.WHITE else Color.BLACK
+                        strokeWidth = 4f
+                        style = Paint.Style.STROKE
+                    }
+                    canvas.drawLine(p1x, p1y, p2x, p2y, checkPaint)
+                }
+
+                // Pequeño banderín / icono de meta o texto FIN sobre la cinta
+                val flagPolePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.WHITE
+                    strokeWidth = 2f
+                }
+                val flagPoleTopY = fyBack - 22f
+                canvas.drawLine(fxBack, fyBack, fxBack, flagPoleTopY, flagPolePaint)
+
+                val flagPath = Path().apply {
+                    moveTo(fxBack, flagPoleTopY)
+                    lineTo(fxBack + 14f, flagPoleTopY + 5f)
+                    lineTo(fxBack, flagPoleTopY + 10f)
+                    close()
+                }
+                val flagPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.parseColor("#F59E0B") // Amarillo dorado
+                    style = Paint.Style.FILL
+                }
+                canvas.drawPath(flagPath, flagPaint)
+
+                val flagBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.WHITE
+                    strokeWidth = 1f
+                    style = Paint.Style.STROKE
+                }
+                canvas.drawPath(flagPath, flagBorderPaint)
             }
         }
     }

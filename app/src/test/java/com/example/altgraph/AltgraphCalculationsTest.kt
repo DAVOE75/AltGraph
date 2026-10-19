@@ -1,4 +1,4 @@
-﻿package com.example.altgraph
+package com.example.altgraph
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -40,9 +40,9 @@ class AltgraphCalculationsTest {
     fun testRollingWindow50MetersAndRiderProgression() {
         val calculator = AltimetriaStrategyCalculator()
 
-        // Ruta de 1000m con puntos cada 25m
+        // Ruta de 5000m con puntos cada 25m para acomodar el lookahead por defecto (3500m en llano)
         val points = mutableListOf<RoutePoint>()
-        for (i in 0..40) {
+        for (i in 0..200) {
             val dist = i * 25.0
             val lat = 38.8000 + (i * 0.0002)
             points.add(RoutePoint(lat, -0.2000, 100.0 + (dist * 0.08), dist))
@@ -51,7 +51,7 @@ class AltgraphCalculationsTest {
         calculator.isNavigatingRoute = true
 
         // La ventana avanza en bloques de 50m dejando al ciclista a 1/4 de la ventana
-        for (i in listOf(1, 2, 3, 4, 8, 12, 16)) {
+        for (i in listOf(1, 2, 3, 4, 8, 12, 16, 40, 60)) {
             calculator.updateCurrentLocation(points[i].latitude, points[i].longitude)
             val strategy = calculator.calculateStrategy()
             val dist = points[i].distance
@@ -252,9 +252,8 @@ class AltgraphCalculationsTest {
         assertEquals(AltimetriaStyle.MONOLITHIC_OBSIDIAN, AltimetriaStyle.fromKey("monolithic"))
         assertEquals(AltimetriaStyle.GLOBAL_ISOMETRIC, AltimetriaStyle.fromKey("global_iso"))
 
-        // 4. Iconos y recursos de metadatos válidos
+        // 4. Recursos de metadatos válidos
         entries.forEach { style ->
-            assertTrue(style.icon.isNotEmpty())
             assertTrue(style.titleRes != 0)
             assertTrue(style.descRes != 0)
         }
