@@ -907,8 +907,16 @@ class Altimetria3DView @JvmOverloads constructor(
 
         val startX = (w * 0.10f)
         val baseEndX = (w * 0.98f)
-        val baseGroundY = if (showHeaderStats) (h * 0.82f) else (h * 0.77f)
-        val maxPeakHeight = if (showHeaderStats) (h * 0.48f) else (h * 0.60f)
+        val baseGroundY = when {
+            showHeaderStats -> h * 0.82f
+            isClimbMode && !rotate90 -> h * 0.81f
+            else -> h * 0.77f
+        }
+        val maxPeakHeight = when {
+            showHeaderStats -> h * 0.48f
+            isClimbMode && !rotate90 -> h * 0.48f
+            else -> h * 0.60f
+        }
 
         // Desplazamiento oblicuo 3D sutil y elegante (profundidad reducida a petición del usuario)
         val depth3dX = (w * 0.012f).coerceIn(4f, 8f)

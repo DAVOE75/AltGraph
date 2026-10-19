@@ -43,13 +43,16 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
     }
 
     private var currentClimbIndex = 0
-    private var currentZoomQuarter: Int = 0
+    private var climbLookaheadMeters: Double = 0.0 // 0.0 = full climb
+    private var climbPanOffsetMeters: Double = 0.0
 
     companion object {
         const val ACTION_CLIMB_NEXT = "com.example.altgraph.ACTION_CLIMB_NEXT"
         const val ACTION_CLIMB_PREV = "com.example.altgraph.ACTION_CLIMB_PREV"
         const val ACTION_ZOOM_IN = "com.example.altgraph.ACTION_ZOOM_IN"
         const val ACTION_ZOOM_OUT = "com.example.altgraph.ACTION_ZOOM_OUT"
+        const val ACTION_PAN_LEFT = "com.example.altgraph.ACTION_CLIMB_PAN_LEFT"
+        const val ACTION_PAN_RIGHT = "com.example.altgraph.ACTION_CLIMB_PAN_RIGHT"
     }
 
     override fun startStream(emitter: Emitter<StreamState>) {
@@ -86,24 +89,63 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                         ACTION_CLIMB_NEXT -> {
                             if (climbs.isNotEmpty()) {
                                 currentClimbIndex = (currentClimbIndex + 1) % climbs.size
-                                currentZoomQuarter = 0
+                                climbLookaheadMeters = 0.0
+                                climbPanOffsetMeters = 0.0
                             }
                         }
                         ACTION_CLIMB_PREV -> {
                             if (climbs.isNotEmpty()) {
                                 currentClimbIndex = if (currentClimbIndex - 1 < 0) climbs.size - 1 else currentClimbIndex - 1
-                                currentZoomQuarter = 0
+                                climbLookaheadMeters = 0.0
+                                climbPanOffsetMeters = 0.0
                             }
                         }
                         ACTION_ZOOM_IN -> {
-                            if (currentZoomQuarter < 4) {
-                                currentZoomQuarter++
-                            } else {
-                                currentZoomQuarter = 0
+                            val climbLen = currentClimb?.length ?: 2000.0
+                            val effectiveWindow = if (climbLookaheadMeters <= 0.0) climbLen else climbLookaheadMeters
+                            val next = when {
+                                effectiveWindow > 20000.0 -> 20000.0
+                                effectiveWindow > 10000.0 -> 10000.0
+                                effectiveWindow > 5000.0 -> 5000.0
+                                effectiveWindow > 2000.0 -> 2000.0
+                                effectiveWindow > 1000.0 -> 1000.0
+                                effectiveWindow > 500.0 -> 500.0
+                                effectiveWindow > 200.0 -> 200.0
+                                else -> 200.0
                             }
+                            climbLookaheadMeters = next.coerceAtMost(climbLen)
                         }
                         ACTION_ZOOM_OUT -> {
-                            if (currentZoomQuarter > 0) currentZoomQuarter--
+                            val climbLen = currentClimb?.length ?: 2000.0
+                            val effectiveWindow = if (climbLookaheadMeters <= 0.0) climbLen else climbLookaheadMeters
+                            val next = when {
+                                effectiveWindow < 200.0 -> 500.0
+                                effectiveWindow < 500.0 -> 1000.0
+                                effectiveWindow < 1000.0 -> 2000.0
+                                effectiveWindow < 2000.0 -> 5000.0
+                                effectiveWindow < 5000.0 -> 10000.0
+                                effectiveWindow < 10000.0 -> 20000.0
+                                else -> climbLen
+                            }
+                            if (next >= climbLen) {
+                                climbLookaheadMeters = 0.0 // volver a ver puerto completo
+                                climbPanOffsetMeters = 0.0
+                            } else {
+                                climbLookaheadMeters = next
+                            }
+                        }
+                        ACTION_PAN_LEFT -> {
+                            val climbLen = currentClimb?.length ?: 2000.0
+                            val win = if (climbLookaheadMeters > 0.0) climbLookaheadMeters else climbLen
+                            val step = (win / 3.0).coerceAtLeast(100.0)
+                            climbPanOffsetMeters = (climbPanOffsetMeters - step).coerceAtLeast(0.0)
+                        }
+                        ACTION_PAN_RIGHT -> {
+                            val climbLen = currentClimb?.length ?: 2000.0
+                            val win = if (climbLookaheadMeters > 0.0) climbLookaheadMeters else climbLen
+                            val maxOffset = (climbLen - win).coerceAtLeast(0.0)
+                            val step = (win / 3.0).coerceAtLeast(100.0)
+                            climbPanOffsetMeters = (climbPanOffsetMeters + step).coerceAtMost(maxOffset)
                         }
                     }
                 }
@@ -113,6 +155,8 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 addAction(ACTION_CLIMB_PREV)
                 addAction(ACTION_ZOOM_IN)
                 addAction(ACTION_ZOOM_OUT)
+                addAction(ACTION_PAN_LEFT)
+                addAction(ACTION_PAN_RIGHT)
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 context.applicationContext.registerReceiver(interactionReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
@@ -166,9 +210,15 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 val climbs = snap.routeClimbs
                 if (currentClimbIndex >= climbs.size) currentClimbIndex = 0
                 val climb = climbs.getOrNull(currentClimbIndex)
-                val quarterLength = (climb?.length ?: 0.0) / 4.0
-                val customStartDist = if (climb == null) 0.0 else if (currentZoomQuarter > 0) climb.startDistance + (currentZoomQuarter - 1) * quarterLength else climb.startDistance
-                val customLength = if (climb == null) 0.0 else if (currentZoomQuarter > 0) quarterLength else climb.length
+                val climbLen = climb?.length ?: 0.0
+                val customLength = if (climb == null || climbLookaheadMeters <= 0.0 || climbLookaheadMeters >= climbLen) {
+                    climbLen
+                } else {
+                    climbLookaheadMeters
+                }
+                val maxPan = (climbLen - customLength).coerceAtLeast(0.0)
+                val effectivePan = climbPanOffsetMeters.coerceIn(0.0, maxPan)
+                val customStartDist = if (climb == null) 0.0 else climb.startDistance + effectivePan
                 safeUpdate(onDead = { cancel(); AltgraphRepository.release(emitter); AltgraphRepository.removeNavListener(navListener) }) {
                 // Suspend (calcula en el hilo del calculador); dentro de safeUpdate para que un fallo no mate el bucle
                 val strategy = if (climb != null) AltgraphRepository.climbStrategy(climb, customStartDist, customLength) else null
@@ -345,17 +395,25 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 val pIntentPrev = PendingIntent.getBroadcast(context, 3, intentPrev, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 remoteViews.setOnClickPendingIntent(R.id.btn_prev, pIntentPrev)
                 
-                // Zoom Intents
+                // Zoom Intents (+ y -)
                 val intentZIn = Intent(ACTION_ZOOM_IN).apply { setPackage(context.packageName) }
                 val pIntentZIn = PendingIntent.getBroadcast(context, 1, intentZIn, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 remoteViews.setOnClickPendingIntent(R.id.btn_zoom_in, pIntentZIn)
-                
-                val btnText = if (currentZoomQuarter > 0) "+$currentZoomQuarter" else "+"
-                remoteViews.setTextViewText(R.id.btn_zoom_in, btnText)
-                
+                remoteViews.setTextViewText(R.id.btn_zoom_in, "+")
+
                 val intentZOut = Intent(ACTION_ZOOM_OUT).apply { setPackage(context.packageName) }
                 val pIntentZOut = PendingIntent.getBroadcast(context, 2, intentZOut, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 remoteViews.setOnClickPendingIntent(R.id.btn_zoom_out, pIntentZOut)
+                remoteViews.setTextViewText(R.id.btn_zoom_out, "-")
+
+                // Pan Intents (< y >)
+                val intentPanLeft = Intent(ACTION_PAN_LEFT).apply { setPackage(context.packageName) }
+                val pIntentPanLeft = PendingIntent.getBroadcast(context, 4, intentPanLeft, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                remoteViews.setOnClickPendingIntent(R.id.btn_pan_left, pIntentPanLeft)
+
+                val intentPanRight = Intent(ACTION_PAN_RIGHT).apply { setPackage(context.packageName) }
+                val pIntentPanRight = PendingIntent.getBroadcast(context, 5, intentPanRight, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                remoteViews.setOnClickPendingIntent(R.id.btn_pan_right, pIntentPanRight)
 
                 emitter.onNext(UpdateGraphicConfig(showHeader = false))
                 emitter.updateView(remoteViews)
