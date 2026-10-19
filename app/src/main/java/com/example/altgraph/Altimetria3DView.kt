@@ -710,20 +710,22 @@ class Altimetria3DView @JvmOverloads constructor(
         titlePaint.textSize = ((h * 0.080f) * fontScale).coerceIn(16f, 28f)
         canvas.drawText(titleText, 18f, h * 0.07f, titlePaint)
 
-        val col1X = 18f
-        val col2X = w * 0.35f
-        val col3X = w * 0.68f
+        val numCols = if (showMaxGrade) 3 else 2
+        val colW = (w - 32f) / numCols
+        val col1X = 16f
+        val col2X = 16f + colW
+        val col3X = 16f + colW * 2f
 
-        subTitleLabelPaint.textSize = ((h * 0.055f) * fontScale).coerceIn(12f, 18f) // Subtítulos ligeramente más grandes
+        subTitleLabelPaint.textSize = ((h * 0.050f) * fontScale).coerceIn(10f, 15f)
 
         // COLUMNA 1: PENDIENTE ACTUAL
         val labelCurrentGrade = context.getString(R.string.label_current_gradient)
         canvas.drawText(labelCurrentGrade, col1X, h * 0.14f, subTitleLabelPaint)
 
         val liveGradeText = "%.1f%%".format(currentGrade)
-        liveGradePaint.textSize = ((h * 0.26f) * fontScale).coerceIn(44f, 82f) // Tamaño intermedio grande
+        liveGradePaint.textSize = ((h * 0.22f) * fontScale).coerceIn(36f, 62f)
         liveGradePaint.color = GradeColorScale.getTelemetryColor(currentGrade)
-        canvas.drawText(liveGradeText, col1X, h * 0.28f, liveGradePaint) // Pegado MÁS arriba
+        canvas.drawText(liveGradeText, col1X, h * 0.27f, liveGradePaint)
 
         // COLUMNA 2: PENDIENTE MEDIA DEL TRAMO VISIBLE
         val tramoAvgGrade = if (visibleAvgGrade > 0.0) visibleAvgGrade else (if (subBlocks.isNotEmpty()) subBlocks.average() else (if (nextBlocks.isNotEmpty()) nextBlocks.average() else currentGrade))
@@ -731,9 +733,9 @@ class Altimetria3DView @JvmOverloads constructor(
         canvas.drawText(labelAvgGrade, col2X, h * 0.14f, subTitleLabelPaint)
 
         val avgGradeText = "%.1f%%".format(tramoAvgGrade)
-        liveGradePaint.textSize = ((h * 0.18f) * fontScale).coerceIn(30f, 56f) // Tamaño intermedio grande
+        liveGradePaint.textSize = ((h * 0.18f) * fontScale).coerceIn(28f, 50f)
         liveGradePaint.color = GradeColorScale.getTelemetryColor(tramoAvgGrade)
-        canvas.drawText(avgGradeText, col2X, h * 0.26f, liveGradePaint) // Pegado MÁS arriba
+        canvas.drawText(avgGradeText, col2X, h * 0.26f, liveGradePaint)
 
         // COLUMNA 3: PENDIENTE MÁXIMA DEL TRAMO VISIBLE
         if (showMaxGrade) {
@@ -742,9 +744,9 @@ class Altimetria3DView @JvmOverloads constructor(
             canvas.drawText(labelMaxGrade, col3X, h * 0.14f, subTitleLabelPaint)
 
             val maxGradeText = "%.1f%%".format(tramoMaxGrade)
-            maxGradePaint.textSize = ((h * 0.18f) * fontScale).coerceIn(30f, 56f) // Tamaño intermedio grande
+            maxGradePaint.textSize = ((h * 0.18f) * fontScale).coerceIn(28f, 50f)
             maxGradePaint.color = GradeColorScale.getTelemetryColor(tramoMaxGrade)
-            canvas.drawText(maxGradeText, col3X, h * 0.26f, maxGradePaint) // Pegado MÁS arriba
+            canvas.drawText(maxGradeText, col3X, h * 0.26f, maxGradePaint)
         }
         } // Fin de if (showHeaderStats)
 
@@ -1290,18 +1292,18 @@ class Altimetria3DView @JvmOverloads constructor(
             typeface = Typeface.DEFAULT_BOLD
         }
         
-        val radius = 22f
-        val cy = h - 25f
-        val cxLeft = 60f
-        val cxRight = w - 60f
+        val radius = 28f // Flechas más grandes y fáciles de pulsar (antes 22f)
+        val cy = h - 38f // Subidas ligeramente para evitar el marco inferior del Karoo (antes h - 25f)
+        val cxLeft = 50f
+        val cxRight = w - 50f
         
         canvas.drawCircle(cxLeft, cy, radius, btnPaint)
         canvas.drawCircle(cxLeft, cy, radius, btnStrokePaint)
-        canvas.drawText("<", cxLeft, cy + (arrowPaint.textSize/3f), arrowPaint)
+        canvas.drawText("<", cxLeft, cy + (arrowPaint.textSize * 0.36f), arrowPaint)
         
         canvas.drawCircle(cxRight, cy, radius, btnPaint)
         canvas.drawCircle(cxRight, cy, radius, btnStrokePaint)
-        canvas.drawText(">", cxRight, cy + (arrowPaint.textSize/3f), arrowPaint)
+        canvas.drawText(">", cxRight, cy + (arrowPaint.textSize * 0.36f), arrowPaint)
 
         // 10. Baliza del ciclista en 3D: avanza limpiamente por la cresta frontal de la pendiente
         if (riderProgress >= 0f && riderProgress <= 1f) {
