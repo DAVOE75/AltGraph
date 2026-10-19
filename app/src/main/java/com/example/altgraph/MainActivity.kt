@@ -1470,6 +1470,7 @@ class MainActivity : Activity() {
             ftpInput.isEnabled = unlocked
             radarResSpinner.isEnabled = unlocked
             mapOverlaySpinner.isEnabled = unlocked
+            switchSmoothMap.isEnabled = unlocked
             radarResTitle.alpha = if (unlocked) 1.0f else 0.5f
             mapOverlayTitle.alpha = if (unlocked) 1.0f else 0.5f
 
@@ -1490,6 +1491,13 @@ class MainActivity : Activity() {
                 switchShowSurfaceTextures.isChecked = prefs.showSurfaceTextures
                 switchProfileTvRotate.isChecked = prefs.eliteProfileTv2dRotate
                 switchHighlightClimbs.isChecked = prefs.eliteHighlightClimbs
+                switchSmoothMap.isChecked = prefs.eliteSmoothMapOverlayEnabled
+                val currentMode = prefs.eliteMapOverlayMode
+                mapOverlaySpinner.setSelection(when(currentMode) {
+                    "all" -> 2
+                    "climbs" -> 1
+                    else -> 0
+                })
                 val activeColorIdx = neonColors.indexOfFirst { it.first == prefs.eliteProfileTvColor }
                 if (activeColorIdx >= 0) updateSegmentActiveStates(colorButtons, activeColorIdx)
             }
