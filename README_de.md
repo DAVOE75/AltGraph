@@ -11,25 +11,25 @@ Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 6 3D-Höhenv
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
-## 🚀 VERSION 1.1.0 ELITE: BENUTZERDEFINIERTE BERGPÄSSE (POIs)
+## VERSION 1.1.0 ELITE: BENUTZERDEFINIERTE BERGPÄSSE (POIs)
 
 Das meisterwartete Feature für Radsport und Granfondos: **präzise festlegen, welche Anstiege echte Pässe sind, und verhindern, dass automatische Algorithmen Pässe durch Flachstücke oder Wellen in zwei Teile zerlegen**.
 
-### 🏔️ Wie funktioniert es?
+### Wie funktioniert es?
 1. **Erkennung über POIs auf der Route (Komoot, Strava, RideWithGPS oder Karoo Dashboard)**:
-   - Startpunkt: `START: PassName` oder `INICIO: PassName` (z. B. `START: Grossglockner`).
-   - Gipfelpunkt: `SUMMIT: PassName` oder `CIMA: PassName` (z. B. `SUMMIT: Grossglockner`).
-   - *Oder nur Gipfel*: Wird nur `SUMMIT: Stilfser Joch` markiert, ermittelt AltGraph automatisch den natürlichen Talbeginn.
+ - Startpunkt: `START: PassName` oder `INICIO: PassName` (z. B. `START: Grossglockner`).
+ - Gipfelpunkt: `SUMMIT: PassName` oder `CIMA: PassName` (z. B. `SUMMIT: Grossglockner`).
+ - *Oder nur Gipfel*: Wird nur `SUMMIT: Stilfser Joch` markiert, ermittelt AltGraph automatisch den natürlichen Talbeginn.
 2. **Offizielle & Überschriebene Einstufung**:
-   - **Automatisch nach Vuelta / APM**: AltGraph ermittelt Distanz, Höhenmeter, Durchschnittssteigung und vergibt die offizielle Kategorie (4., 3., 2., 1. Kategorie oder HC).
-   - **Manuelle Zwangskategorie**: Hänge die Kategorie in eckigen Klammern an (z. B. `SUMMIT: Grossglockner [HC]`, `[1C]` oder `[2C]`) und das System übernimmt sie direkt.
+ - **Automatisch nach Vuelta / APM**: AltGraph ermittelt Distanz, Höhenmeter, Durchschnittssteigung und vergibt die offizielle Kategorie (4., 3., 2., 1. Kategorie oder HC).
+ - **Manuelle Zwangskategorie**: Hänge die Kategorie in eckigen Klammern an (z. B. `SUMMIT: Grossglockner [HC]`, `[1C]` oder `[2C]`) und das System übernimmt sie direkt.
 3. **Voller Vorrang**:
-   - Benutzerdefinierte Pässe **ersetzen und überschreiben automatisch erkannte Steigungen**, schließen Flachstücke ein und zeigen den echten Namen im **Pass-Viewer**, im **TV-Profil 2D** und in der **Routenleiste**.
+ - Benutzerdefinierte Pässe **ersetzen und überschreiben automatisch erkannte Steigungen**, schließen Flachstücke ein und zeigen den echten Namen im **Pass-Viewer**, im **TV-Profil 2D** und in der **Routenleiste**.
 4. **Routenspeicher & Globaler GPS-Passkatalog (Dashboard-Stil)**:
-   - **Auf Routenebene**: Der Pass wird für die aktive Route gespeichert und bei zukünftigen Fahrten sofort wiederhergestellt, selbst wenn die ursprünglichen POIs nicht mehr in der Datei enthalten sind.
-   - **Im globalen GPS-Katalog**: Gespeichert mit exakten GPS-Koordinaten von Start und Gipfel. Jede andere Route, die dieselben Koordinaten durchfährt, erkennt und aktiviert den Pass automatisch!
+ - **Auf Routenebene**: Der Pass wird für die aktive Route gespeichert und bei zukünftigen Fahrten sofort wiederhergestellt, selbst wenn die ursprünglichen POIs nicht mehr in der Datei enthalten sind.
+ - **Im globalen GPS-Katalog**: Gespeichert mit exakten GPS-Koordinaten von Start und Gipfel. Jede andere Route, die dieselben Koordinaten durchfährt, erkennt und aktiviert den Pass automatisch!
 5. **Überarbeitete Fahrer-Icons**:
-   - Neue aerodynamische Zeitfahr- / Triathlon-Vektorfahrer, vergrößert für maximale Lesbarkeit in der Warnleiste.
+ - Neue aerodynamische Zeitfahr- / Triathlon-Vektorfahrer, vergrößert für maximale Lesbarkeit in der Warnleiste.
 
 ## NEUE INTEGRATION: KGHOST-WIDGET IM HÖHENPROFIL-RADAR (v1.0.85 ELITE)
 
@@ -41,8 +41,8 @@ In den Radar-Elite-Funktionen kann jetzt der **[KGhost](https://github.com/locke
 - **Besonderer Dank & Zusammenarbeit**: Dieses Feature entstand durch die enge Zusammenarbeit zwischen **AltGraph** und der [**KGhost**](https://github.com/lockevod/KGhost)-App für Hammerhead Karoo. Die Nutzung erfordert die installierte [**KGhost**](https://github.com/lockevod/KGhost)-App, deren Entwicklerteam wir herzlich für die Kooperation danken.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_settings.png" width="230" alt="KGhost Gap Einstellung in Radar Elite" />
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="230" alt="KGhost Widget im Höhenprofil-Radar" />
+ <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_settings.png" width="230" alt="KGhost Gap Einstellung in Radar Elite" />
+ <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="230" alt="KGhost Widget im Höhenprofil-Radar" />
 </p>
 
 ## VERSION 1.0.78: TV-PROFIL 2D (ELITE)

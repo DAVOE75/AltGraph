@@ -19,25 +19,25 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
-## 🚀 VERSIÓN 1.1.0 ELITE: PUERTOS DE MONTAÑA DEFINIDOS POR USUARIO (POIs)
+## VERSIÓN 1.1.0 ELITE: PUERTOS DE MONTAÑA DEFINIDOS POR USUARIO (POIs)
 
 La novedad más esperada para el cicloturismo y competición de élite: **definir con exactitud milimétrica qué subidas son realmente puertos de montaña y evitar que los algoritmos automáticos rompan o dividan un puerto en dos por tener llanos o descansillos intermedios**.
 
-### 🏔️ ¿Cómo funciona?
+### ¿Cómo funciona?
 1. **Detección por POIs en tu ruta (Komoot, Strava, RideWithGPS o Karoo Dashboard)**:
-   - Marca un punto de inicio: `INICIO: NombreDelPuerto` (ej: `INICIO: Puerto de Navacerrada`).
-   - Marca el punto de coronación: `CIMA: NombreDelPuerto` (ej: `CIMA: Puerto de Navacerrada`).
-   - *O Cima única*: Si solo marcas `CIMA: Morcuera` o `PUERTO: Tourmalet`, el algoritmo de AltGraph retrocede de forma inteligente por el relieve hasta encontrar el pie de puerto natural.
+ - Marca un punto de inicio: `INICIO: NombreDelPuerto` (ej: `INICIO: Puerto de Navacerrada`).
+ - Marca el punto de coronación: `CIMA: NombreDelPuerto` (ej: `CIMA: Puerto de Navacerrada`).
+ - *O Cima única*: Si solo marcas `CIMA: Morcuera` o `PUERTO: Tourmalet`, el algoritmo de AltGraph retrocede de forma inteligente por el relieve hasta encontrar el pie de puerto natural.
 2. **Categorización Oficial y Forzada**:
-   - **Automática según Vuelta a España / APM**: AltGraph calcula la distancia total, desnivel acumulado, pendiente media y le asigna su categoría oficial (4ª, 3ª, 2ª, 1ª o Especial/HC).
-   - **Categoría Manual Forzada**: Si añades la categoría entre corchetes (ej: `CIMA: Morcuera [1C]`, `[2C]`, `[ESP]` o `[HC]`), el sistema la respeta directamente.
+ - **Automática según Vuelta a España / APM**: AltGraph calcula la distancia total, desnivel acumulado, pendiente media y le asigna su categoría oficial (4ª, 3ª, 2ª, 1ª o Especial/HC).
+ - **Categoría Manual Forzada**: Si añades la categoría entre corchetes (ej: `CIMA: Morcuera [1C]`, `[2C]`, `[ESP]` o `[HC]`), el sistema la respeta directamente.
 3. **Prevalencia Total**:
-   - Tus puertos de usuario **prevalecen sobre cualquier puerto detectado automáticamente** por el ciclocomputador, fusionando descansillos y mostrando el nombre real en el **Visor de Puertos**, en el **Perfil TV 2D** y en la **Barra de Ruta**.
+ - Tus puertos de usuario **prevalecen sobre cualquier puerto detectado automáticamente** por el ciclocomputador, fusionando descansillos y mostrando el nombre real en el **Visor de Puertos**, en el **Perfil TV 2D** y en la **Barra de Ruta**.
 4. **Persistencia por Ruta y Catálogo Global GPS (Estilo Dashboard)**:
-   - **A nivel de Ruta**: El puerto queda guardado para la ruta activa. Aunque vuelvas a cargarla en otra sesión sin los POIs originales, AltGraph recuerda y reactiva tus puertos personalizados de inmediato.
-   - **A nivel Global (GPS)**: Cada puerto se almacena con sus coordenadas geográficas exactas de inicio y cima en una biblioteca global del dispositivo. ¡Cualquier otra ruta que pase por ese mismo inicio y cima reconocerá y activará automáticamente el puerto!
+ - **A nivel de Ruta**: El puerto queda guardado para la ruta activa. Aunque vuelvas a cargarla en otra sesión sin los POIs originales, AltGraph recuerda y reactiva tus puertos personalizados de inmediato.
+ - **A nivel Global (GPS)**: Cada puerto se almacena con sus coordenadas geográficas exactas de inicio y cima en una biblioteca global del dispositivo. ¡Cualquier otra ruta que pase por ese mismo inicio y cima reconocerá y activará automáticamente el puerto!
 5. **Iconos de Ciclistas Rediseñados**:
-   - Nuevos iconos vectoriales de ciclista en posición aerodinámica de contrarreloj / triatlón (postura acoplada, casco aero de gota y bicicleta de competición), ampliados para máxima legibilidad en la barra de avisos.
+ - Nuevos iconos vectoriales de ciclista en posición aerodinámica de contrarreloj / triatlón (postura acoplada, casco aero de gota y bicicleta de competición), ampliados para máxima legibilidad en la barra de avisos.
 
 ## NUEVA INTEGRACIÓN: WIDGET KGHOST EN RADAR ALTIMÉTRICO (v1.0.85 ELITE)
 
@@ -49,8 +49,8 @@ En las Funciones Radar Elite ahora puedes activar el **Gap de [KGhost](https://g
 - **Agradecimiento y Colaboración Especial**: Esta funcionalidad es posible gracias a la estrecha colaboración entre **AltGraph** y la aplicación [**KGhost**](https://github.com/lockevod/KGhost) desarrollada para Hammerhead Karoo. Para disfrutar de esta característica se requiere tener instalada la app [**KGhost**](https://github.com/lockevod/KGhost), a cuyos desarrolladores les agradecemos enormemente su trabajo y cooperación para llevar el rendimiento ciclista al siguiente nivel.
 
 <p align="center">
-  <img src="art/screenshot_kghost_settings.png" width="230" alt="Ajuste Gap KGhost en Radar Elite" />
-  <img src="art/screenshot_kghost_radar.png" width="230" alt="KGhost Widget en Radar Altimétrico" />
+ <img src="art/screenshot_kghost_settings.png" width="230" alt="Ajuste Gap KGhost en Radar Elite" />
+ <img src="art/screenshot_kghost_radar.png" width="230" alt="KGhost Widget en Radar Altimétrico" />
 </p>
 
 ## VERSIÓN 1.0.80: DIFUMINADO DE RUTA EN MAPA BASE E ICONOS OPTIMIZADOS
@@ -251,11 +251,11 @@ ALTGRAPH no sustituye el Climber nativo, sino que lo complementa ofreciendo una 
 ## Características y Funciones en Detalle
 ### Campos de Datos Exclusivos (Dashboard Táctico)
 Además del motor gráfico, ALTGRAPH expone métricas avanzadas como campos individuales para que diseñes tu pantalla perfecta:
-- ** Estratega de Altimetría**: Muestra un bloque visual inteligente con el resumen de los próximos kilómetros. Divide el horizonte en tramos de color para que sepas de un vistazo rápido si lo que viene es puerto duro (rojo), descanso (verde) o terreno rompepiernas.
-- ** Visor de Puertos 3D**: Explora de forma independiente cada puerto de montaña detectado en tu ruta. Se renderiza a pantalla completa con navegación táctil, mostrando longitud, desnivel, kilómetros restantes, pendiente media y máxima, y categorización oficial tipo **La Vuelta a España** (3ª, 2ª, 1ª Cat o Especial C.E.) calculada matemáticamente. Incluye perfil 3D completo con cotas topográficas, leyenda de escala y baliza del ciclista inteligente.
-- ** Grado de Fatiga (GF)**: Motor científico basado en el coeficiente APM que evalúa la dureza real del puerto en vivo, mostrándote un coeficiente numérico de desgaste.
-- ** Ritmo VAM Objetivo**: Define tu VAM (Velocidad Ascensional Media) ideal en la configuración. Este campo calcula la pendiente exacta bajo tus ruedas y te dicta a qué **velocidad (km/h)** debes rodar en ese instante para cumplir tu objetivo en la cima.
-- ** Tendencia 3D y Rampa Máxima**: Te avisa de si la pendiente se está endureciendo o suavizando antes de que tus piernas lo noten.
+- **Estratega de Altimetría**: Muestra un bloque visual inteligente con el resumen de los próximos kilómetros. Divide el horizonte en tramos de color para que sepas de un vistazo rápido si lo que viene es puerto duro (rojo), descanso (verde) o terreno rompepiernas.
+- **Visor de Puertos 3D**: Explora de forma independiente cada puerto de montaña detectado en tu ruta. Se renderiza a pantalla completa con navegación táctil, mostrando longitud, desnivel, kilómetros restantes, pendiente media y máxima, y categorización oficial tipo **La Vuelta a España** (3ª, 2ª, 1ª Cat o Especial C.E.) calculada matemáticamente. Incluye perfil 3D completo con cotas topográficas, leyenda de escala y baliza del ciclista inteligente.
+- **Grado de Fatiga (GF)**: Motor científico basado en el coeficiente APM que evalúa la dureza real del puerto en vivo, mostrándote un coeficiente numérico de desgaste.
+- **Ritmo VAM Objetivo**: Define tu VAM (Velocidad Ascensional Media) ideal en la configuración. Este campo calcula la pendiente exacta bajo tus ruedas y te dicta a qué **velocidad (km/h)** debes rodar en ese instante para cumplir tu objetivo en la cima.
+- **Tendencia 3D y Rampa Máxima**: Te avisa de si la pendiente se está endureciendo o suavizando antes de que tus piernas lo noten.
 ### Navegación y Topografía Avanzada
 - **Iconos Topográficos Oficiales**: Identificación de Cimas, Puertos de Montaña (Map-Pin), Pueblos y Fuentes extraídos directamente de la ruta o del relieve.
 - **Detección Matemática de Curvas**: El algoritmo detecta giros cerrados (tornanti/herraduras) y te avisa gráficamente.

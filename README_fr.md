@@ -11,25 +11,25 @@ Elle révolutionne le concept traditionnel de l'altimétrie cycliste en intégra
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />
 </p>
 
-## 🚀 VERSION 1.1.0 ELITE : COLS DE MONTAGNE DÉFINIS PAR L'UTILISATEUR (POIs)
+## VERSION 1.1.0 ELITE : COLS DE MONTAGNE DÉFINIS PAR L'UTILISATEUR (POIs)
 
 L'innovation tant attendue pour le cyclotourisme et la haute compétition : **définir avec une précision métrique les vrais cols de montagne et empêcher les algorithmes automatiques de diviser un col en deux à cause de faux-plats ou de replats intermédiaires**.
 
-### 🏔️ Comment ça marche ?
+### Comment ça marche ?
 1. **Détection par POIs sur votre tracé (Komoot, Strava, RideWithGPS ou Karoo Dashboard)** :
-   - Point de départ : `DEBUT: NomDuCol` ou `INICIO: NomDuCol` (ex: `DEBUT: Col du Galibier`).
-   - Point sommital : `SOMMET: NomDuCol` ou `CIMA: NomDuCol` (ex: `SOMMET: Col du Galibier`).
-   - *Ou Sommet unique* : Si vous placez uniquement `SOMMET: Alpe d'Huez`, AltGraph retrouve automatiquement le pied naturel du col dans la vallée.
+ - Point de départ : `DEBUT: NomDuCol` ou `INICIO: NomDuCol` (ex: `DEBUT: Col du Galibier`).
+ - Point sommital : `SOMMET: NomDuCol` ou `CIMA: NomDuCol` (ex: `SOMMET: Col du Galibier`).
+ - *Ou Sommet unique* : Si vous placez uniquement `SOMMET: Alpe d'Huez`, AltGraph retrouve automatiquement le pied naturel du col dans la vallée.
 2. **Catégorisation Officielle et Forcée** :
-   - **Automatique selon barème Vuelta / APM** : AltGraph calcule la distance, le dénivelé positif, la pente moyenne et attribue la catégorie officielle (4e, 3e, 2e, 1re ou Hors Catégorie / HC).
-   - **Catégorie Forcée Manuelle** : Indiquez la catégorie entre crochets (ex: `SOMMET: Galibier [HC]`, `[1C]`, ou `[2C]`) et le système l'applique directement.
+ - **Automatique selon barème Vuelta / APM** : AltGraph calcule la distance, le dénivelé positif, la pente moyenne et attribue la catégorie officielle (4e, 3e, 2e, 1re ou Hors Catégorie / HC).
+ - **Catégorie Forcée Manuelle** : Indiquez la catégorie entre crochets (ex: `SOMMET: Galibier [HC]`, `[1C]`, ou `[2C]`) et le système l'applique directement.
 3. **Prévalence Absolue** :
-   - Vos cols personnalisés **remplacent et annulent les cols détectés automatiquement**, unifiant les replats et affichant le vrai nom sur la **Vue Cols**, le **Profil TV 2D** et la **Barre de Route**.
+ - Vos cols personnalisés **remplacent et annulent les cols détectés automatiquement**, unifiant les replats et affichant le vrai nom sur la **Vue Cols**, le **Profil TV 2D** et la **Barre de Route**.
 4. **Persistance par Parcours et Catalogue Global GPS (Style Dashboard)** :
-   - **Au niveau du parcours** : Le col reste sauvegardé pour l'itinéraire actif, rechargé immédiatement lors des prochaines sorties même sans POIs d'origine.
-   - **Au niveau du catalogue Global GPS** : Enregistré avec ses coordonnées géographiques précises de départ et sommet, activant automatiquement le col sur tout autre parcours empruntant les mêmes routes !
+ - **Au niveau du parcours** : Le col reste sauvegardé pour l'itinéraire actif, rechargé immédiatement lors des prochaines sorties même sans POIs d'origine.
+ - **Au niveau du catalogue Global GPS** : Enregistré avec ses coordonnées géographiques précises de départ et sommet, activant automatiquement le col sur tout autre parcours empruntant les mêmes routes !
 5. **Icônes Cyclistes Redessinées** :
-   - Nouvelles icônes vectorielles aérodynamiques typées contre-la-montre / triathlon, agrandies pour une lisibilité parfaite dans la barre d'alertes.
+ - Nouvelles icônes vectorielles aérodynamiques typées contre-la-montre / triathlon, agrandies pour une lisibilité parfaite dans la barre d'alertes.
 
 ## NOUVELLE INTÉGRATION : WIDGET KGHOST DANS LE RADAR ALTIMÉTRIQUE (v1.0.85 ELITE)
 
@@ -41,8 +41,8 @@ Dans les Fonctions Radar Elite, vous pouvez désormais activer l'**Écart [KGhos
 - **Remerciements et Collaboration Spéciale** : Cette fonctionnalité est le fruit de la collaboration étroite entre **AltGraph** et l'application [**KGhost**](https://github.com/lockevod/KGhost) pour Hammerhead Karoo. Nécessite l'application [**KGhost**](https://github.com/lockevod/KGhost) installée, dont nous remercions chaleureusement l'équipe pour leur coopération.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_settings.png" width="230" alt="Réglage Écart KGhost dans Radar Elite" />
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="230" alt="Widget KGhost sur Radar Altimétrique" />
+ <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_settings.png" width="230" alt="Réglage Écart KGhost dans Radar Elite" />
+ <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="230" alt="Widget KGhost sur Radar Altimétrique" />
 </p>
 
 ## VERSION 1.0.78: PROFIL TV 2D (ELITE)

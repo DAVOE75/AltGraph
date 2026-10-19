@@ -19,25 +19,25 @@ It revolutionizes traditional cycling elevation profiles by featuring a **Suite 
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
-## 🚀 VERSION 1.1.0 ELITE: USER-DEFINED MOUNTAIN PASSES (POIs)
+## VERSION 1.1.0 ELITE: USER-DEFINED MOUNTAIN PASSES (POIs)
 
 The most anticipated feature for elite cycling and gran fondos: **define with pinpoint accuracy which climbs are true mountain passes, preventing automatic algorithms from splitting climbs in two due to intermediate flats or false flats**.
 
-### 🏔️ How it works:
+### How it works:
 1. **Detection via POIs in your route (Komoot, Strava, RideWithGPS, or Karoo Dashboard)**:
-   - Mark a start point: `START: ClimbName` or `INICIO: ClimbName` (e.g., `START: Col du Tourmalet`).
-   - Mark a summit point: `SUMMIT: ClimbName` or `CIMA: ClimbName` (e.g., `SUMMIT: Col du Tourmalet`).
-   - *Or Summit only*: If you only mark `SUMMIT: Alpe d'Huez`, AltGraph intelligently traces backward along the terrain to find the natural valley climb start.
+ - Mark a start point: `START: ClimbName` or `INICIO: ClimbName` (e.g., `START: Col du Tourmalet`).
+ - Mark a summit point: `SUMMIT: ClimbName` or `CIMA: ClimbName` (e.g., `SUMMIT: Col du Tourmalet`).
+ - *Or Summit only*: If you only mark `SUMMIT: Alpe d'Huez`, AltGraph intelligently traces backward along the terrain to find the natural valley climb start.
 2. **Official & Overridden Categorization**:
-   - **Automatic Vuelta a España / APM Standard**: AltGraph computes exact distance, cumulative elevation gain, average gradient, and awards the official category (4th, 3rd, 2nd, 1st, or Hors Catégorie / HC).
-   - **Manual Forced Category**: Append your chosen category in brackets (e.g., `SUMMIT: Stelvio [HC]`, `[1C]`, or `[2C]`) and the system honors it directly.
+ - **Automatic Vuelta a España / APM Standard**: AltGraph computes exact distance, cumulative elevation gain, average gradient, and awards the official category (4th, 3rd, 2nd, 1st, or Hors Catégorie / HC).
+ - **Manual Forced Category**: Append your chosen category in brackets (e.g., `SUMMIT: Stelvio [HC]`, `[1C]`, or `[2C]`) and the system honors it directly.
 3. **Total Precedence**:
-   - User climbs **override and replace any automatically detected climb** that overlaps, unifying broken climbs and displaying the real name in the **Climb Viewer**, **TV Profile 2D**, and **Route Bar**.
+ - User climbs **override and replace any automatically detected climb** that overlaps, unifying broken climbs and displaying the real name in the **Climb Viewer**, **TV Profile 2D**, and **Route Bar**.
 4. **Route-Level & Global GPS Persistence (Dashboard-Style)**:
-   - **Route-Level**: Climbs are saved for the active route. When re-loading the route in future rides without original POIs, AltGraph remembers and restores your climbs instantly.
-   - **Global GPS Catalog**: Each climb is cataloged with its precise start and summit GPS coordinates. Any route traversing those same coordinates automatically recognizes and activates the climb!
+ - **Route-Level**: Climbs are saved for the active route. When re-loading the route in future rides without original POIs, AltGraph remembers and restores your climbs instantly.
+ - **Global GPS Catalog**: Each climb is cataloged with its precise start and summit GPS coordinates. Any route traversing those same coordinates automatically recognizes and activates the climb!
 5. **Redesigned Cyclist Icons**:
-   - New aerodynamic time-trial / triathlon vector cyclists (tucked aero posture, teardrop helmet, pro race bike), enlarged for optimal legibility inside the alert bar.
+ - New aerodynamic time-trial / triathlon vector cyclists (tucked aero posture, teardrop helmet, pro race bike), enlarged for optimal legibility inside the alert bar.
 
 ## NEW INTEGRATION: KGHOST WIDGET IN ALTIMETRY RADAR (v1.0.85 ELITE)
 
@@ -49,8 +49,8 @@ In Radar Elite Features, you can now enable the **[KGhost](https://github.com/lo
 - **Special Thanks & Collaboration**: This feature is made possible thanks to the extension and close collaboration with the [**KGhost**](https://github.com/lockevod/KGhost) application developed for Hammerhead Karoo. Using this feature requires having the [**KGhost**](https://github.com/lockevod/KGhost) app installed, and we extend our sincere gratitude to their development team for their collaboration in advancing cycling performance tracking.
 
 <p align="center">
-  <img src="art/screenshot_kghost_settings.png" width="230" alt="KGhost Gap Setting in Radar Elite" />
-  <img src="art/screenshot_kghost_radar.png" width="230" alt="KGhost Widget on Altimetry Radar" />
+ <img src="art/screenshot_kghost_settings.png" width="230" alt="KGhost Gap Setting in Radar Elite" />
+ <img src="art/screenshot_kghost_radar.png" width="230" alt="KGhost Widget on Altimetry Radar" />
 </p>
 
 ## VERSION 1.0.80: BASE MAP ROUTE COLOR SMOOTHING & OPTIMIZED ICONS

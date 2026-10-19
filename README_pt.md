@@ -11,25 +11,25 @@ Revoluciona o conceito tradicional de altimetria de ciclismo incorporando um **C
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logotipo ALTGRAPH" width="350" />
 </p>
 
-## 🚀 VERSÃO 1.1.0 ELITE: PASSOS DE MONTANHA DEFINIDOS PELO UTILIZADOR (POIs)
+## VERSÃO 1.1.0 ELITE: PASSOS DE MONTANHA DEFINIDOS PELO UTILIZADOR (POIs)
 
 A funcionalidade mais aguardada para cicloturismo e competição de topo: **definir com exatidão métrica quais as subidas que são verdadeiros passos de montanha, impedindo que algoritmos automáticos dividam a subida em duas devido a zonas planas ou falsos planos intermédios**.
 
-### 🏔️ Como funciona?
+### Como funciona?
 1. **Deteção por POIs na rota (Komoot, Strava, RideWithGPS ou Karoo Dashboard)**:
-   - Ponto de início: `INICIO: NomeSubida` ou `START: NomeSubida` (ex: `INICIO: Alto da Torre`).
-   - Cume da subida: `CIMA: NomeSubida` ou `SUMMIT: NomeSubida` (ex: `CIMA: Alto da Torre`).
-   - *Ou apenas Cume*: Se marcar apenas `CIMA: Serra da Estrela`, o AltGraph calcula de forma inteligente o início natural da subida no vale.
+ - Ponto de início: `INICIO: NomeSubida` ou `START: NomeSubida` (ex: `INICIO: Alto da Torre`).
+ - Cume da subida: `CIMA: NomeSubida` ou `SUMMIT: NomeSubida` (ex: `CIMA: Alto da Torre`).
+ - *Ou apenas Cume*: Se marcar apenas `CIMA: Serra da Estrela`, o AltGraph calcula de forma inteligente o início natural da subida no vale.
 2. **Categorização Oficial e Forçada**:
-   - **Automática segundo Vuelta / APM**: O AltGraph calcula distância, ganho de elevação, inclinação média e atribui a categoria oficial (4ª, 3ª, 2ª, 1ª ou Especial/HC).
-   - **Categoria Forçada Manual**: Adicionando a categoria entre parênteses retos (ex: `CIMA: Torre [HC]`, `[1C]` ou `[2C]`), o sistema assume-a de imediato.
+ - **Automática segundo Vuelta / APM**: O AltGraph calcula distância, ganho de elevação, inclinação média e atribui a categoria oficial (4ª, 3ª, 2ª, 1ª ou Especial/HC).
+ - **Categoria Forçada Manual**: Adicionando a categoria entre parênteses retos (ex: `CIMA: Torre [HC]`, `[1C]` ou `[2C]`), o sistema assume-a de imediato.
 3. **Prevalência Total**:
-   - As suas subidas personalizadas **substituem e anulam qualquer subida detetada automaticamente**, unindo os descansos e exibindo o nome real no **Visualizador de Subidas**, no **Perfil TV 2D** e na **Barra de Rota**.
+ - As suas subidas personalizadas **substituem e anulam qualquer subida detetada automaticamente**, unindo os descansos e exibindo o nome real no **Visualizador de Subidas**, no **Perfil TV 2D** e na **Barra de Rota**.
 4. **Persistência por Rota e Catálogo Global GPS (Estilo Dashboard)**:
-   - **Ao nível da Rota**: A subida fica gravada para o itinerário ativo, sendo restaurada imediatamente em sessões futuras mesmo sem os POIs originais.
-   - **Ao nível Global GPS**: Guardada com coordenadas GPS exatas de início e cume; qualquer outro percurso que passe pelas mesmas coordenadas reconhece e ativa a subida automaticamente!
+ - **Ao nível da Rota**: A subida fica gravada para o itinerário ativo, sendo restaurada imediatamente em sessões futuras mesmo sem os POIs originais.
+ - **Ao nível Global GPS**: Guardada com coordenadas GPS exatas de início e cume; qualquer outro percurso que passe pelas mesmas coordenadas reconhece e ativa a subida automaticamente!
 5. **Ícones de Ciclistas Redesenhados**:
-   - Novos ícones vetoriais aerodinâmicos de contrarrelógio / triatlo, aumentados para máxima legibilidade na barra de alertas.
+ - Novos ícones vetoriais aerodinâmicos de contrarrelógio / triatlo, aumentados para máxima legibilidade na barra de alertas.
 
 ## NOVA INTEGRAÇÃO: WIDGET KGHOST NO RADAR ALTIMÉTRICO (v1.0.85 ELITE)
 
@@ -41,8 +41,8 @@ Nas Funções Radar Elite, pode agora ativar o **Gap [KGhost](https://github.com
 - **Agradecimento e Colaboração Especial**: Esta funcionalidade resulta da colaboração próxima entre a **AltGraph** e a aplicação [**KGhost**](https://github.com/lockevod/KGhost) desenvolvida para Hammerhead Karoo. Requer a instalação da app [**KGhost**](https://github.com/lockevod/KGhost), a cujos desenvolvedores agradecemos sinceramente pela cooperação para elevar o desempenho no ciclismo.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_settings.png" width="230" alt="Definição Gap KGhost no Radar Elite" />
-  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="230" alt="Widget KGhost no Radar Altimétrico" />
+ <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_settings.png" width="230" alt="Definição Gap KGhost no Radar Elite" />
+ <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/screenshot_kghost_radar.png" width="230" alt="Widget KGhost no Radar Altimétrico" />
 </p>
 
 ## VERSÃO 1.0.78: PERFIL TV 2D (ELITE)

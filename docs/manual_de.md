@@ -1,6 +1,6 @@
 # AltGraph Pro v0.6.0-PRO Manual (de)
 ## Novedades / What's New
-- 🚀 **World Tour Pro Features**:
+-  **World Tour Pro Features**:
   - Smart Zoom Táctico (Auto-Scale)
   - Oasis Tracking (Zonas de Recuperación)
   - Virtual Pacer Biomecánico
