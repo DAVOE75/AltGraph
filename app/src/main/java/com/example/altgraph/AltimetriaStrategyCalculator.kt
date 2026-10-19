@@ -510,8 +510,8 @@ class AltimetriaStrategyCalculator {
         val detectedClimbs = mutableListOf<RouteClimb>()
 
         // 2. Patrones de Inicio y Fin / Cima
-        val startKeywords = listOf("INICIO:", "START:", "COMIENZO:", "PIED DE PUERTO:", "PIE:", "DEBUT:")
-        val endKeywords = listOf("CIMA:", "FIN:", "END:", "SUMMIT:", "SOMMET:", "PASSO:", "COLLADO:", "CORONA:", "PUERTO:", "ALTO:", "COL:")
+        val startKeywords = listOf("INICIO:", "START:", "COMIENZO:", "PIED DE PUERTO:", "PIE:", "DEBUT:", "INIZIO:")
+        val endKeywords = listOf("CIMA:", "FIN:", "END:", "SUMMIT:", "SOMMET:", "PASSO:", "PASO:", "COLLADO:", "CORONA:", "PUERTO:", "PTO:", "PTO.:", "PT.:", "ALTO:", "COL:")
 
         fun normalizeKey(name: String, prefixList: List<String>): String {
             var n = name.trim()
@@ -531,7 +531,10 @@ class AltimetriaStrategyCalculator {
             endKeywords.any { p.name.startsWith(it, ignoreCase = true) } ||
             p.name.contains("cima", ignoreCase = true) ||
             p.name.contains("puerto", ignoreCase = true) ||
+            p.name.contains("pto", ignoreCase = true) ||
             p.name.contains("alto", ignoreCase = true) ||
+            p.name.contains("paso", ignoreCase = true) ||
+            p.name.contains("passo", ignoreCase = true) ||
             p.name.contains("col ", ignoreCase = true)
         }
 
@@ -579,11 +582,20 @@ class AltimetriaStrategyCalculator {
             }
         }
 
-        // B) Si una CIMA no tenía INICIO explícito pero tiene formato de puerto ("CIMA: Morcuera" o "PUERTO: ...")
+        // B) Si una CIMA no tenía INICIO explícito pero tiene formato de puerto ("CIMA: Morcuera", "PUERTO: ...", "Pto de Busot", etc.)
         for (end in endPois) {
             if (end in pairedEnds) continue
             val hasExplicitPrefix = endKeywords.any { end.name.startsWith(it, ignoreCase = true) }
-            if (hasExplicitPrefix && end.distance > 500.0) {
+            val hasClimbIndicator = hasExplicitPrefix ||
+                end.name.contains("puerto", ignoreCase = true) ||
+                end.name.contains("pto", ignoreCase = true) ||
+                end.name.contains("cima", ignoreCase = true) ||
+                end.name.contains("passo", ignoreCase = true) ||
+                end.name.contains("alto de", ignoreCase = true) ||
+                end.name.contains("col de", ignoreCase = true) ||
+                end.name.contains("col du", ignoreCase = true)
+
+            if (hasClimbIndicator && end.distance > 500.0) {
                 // Retroceder en el perfil de elevación para encontrar el pie de puerto natural
                 var bestStartDist = end.distance - 1000.0
                 var minElevSeen = end.elevation
