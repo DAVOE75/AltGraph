@@ -497,14 +497,17 @@ class AltimetriaStrategyCalculator {
         "FIN PUERTO:", "FIN PUERTO", "FIN PTO:", "FIN PTO", "FIN:", "FIN -", "FIN",
         "END OF CLIMB:", "END CLIMB:", "END:", "END -", "END",
         "CIMA DE PUERTO:", "CIMA DE PUERTO", "CIMA DEL PUERTO:", "CIMA DEL PUERTO",
-        "CIMA:", "CIMA -",
-        "SUMMIT OF CLIMB:", "SUMMIT:", "SUMMIT -",
+        "CIMA PUERTO:", "CIMA PUERTO", "CIMA PTO:", "CIMA PTO", "CIMA:", "CIMA -", "CIMA",
+        "SUMMIT OF CLIMB:", "SUMMIT:", "SUMMIT -", "SUMMIT",
         "CUMBRE DE PUERTO:", "CUMBRE DE PUERTO", "CUMBRE DEL PUERTO:", "CUMBRE DEL PUERTO",
-        "CUMBRE:", "CUMBRE -"
+        "CUMBRE PUERTO:", "CUMBRE PUERTO", "CUMBRE PTO:", "CUMBRE PTO", "CUMBRE:", "CUMBRE -", "CUMBRE"
     ).sortedByDescending { it.length }
 
     fun cleanClimbName(raw: String): String {
-        var n = raw.replace(Regex("\\[.*?\\]"), "").replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "").trim()
+        var n = raw.replace(Regex("\\[.*?\\]"), "")
+            .replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "")
+            .replace(Regex("[☕📡💧📸]"), "")
+            .trim()
         for (pfx in technicalPrefixes) {
             if (n.startsWith(pfx, ignoreCase = true)) {
                 val candidate = n.substring(pfx.length).trim()
@@ -582,8 +585,14 @@ class AltimetriaStrategyCalculator {
                    s.startsWith("ARRANQUE") || s.contains(" ARRANQUE")
         }
 
+        fun isWaterOrFood(name: String): Boolean {
+            val s = removeDiacritics(name).uppercase()
+            return s.contains("AGUA") || s.contains("WATER") || s.contains("FUENTE") || s.contains("FONT") ||
+                   s.contains("CAFE") || s.contains("COFFEE") || s.contains("COMIDA") || s.contains("FOOD")
+        }
+
         fun isEndPoi(name: String): Boolean {
-            if (isStartPoi(name)) return false // Un inicio de puerto nunca es una cima
+            if (isStartPoi(name) || isWaterOrFood(name)) return false // Un inicio de puerto nunca es una cima
             val s = removeDiacritics(name).uppercase()
             return s.startsWith("FIN") || s.contains(" FIN") ||
                    s.startsWith("FINAL") || s.contains(" FINAL") ||
@@ -608,9 +617,7 @@ class AltimetriaStrategyCalculator {
             val startKey = normalizeKey(start.name)
 
             // Buscar la cima correspondiente:
-            // 1) Si startKey no es vacía, buscar coincidencia por nombre
-            // 2) Si no, buscar la primera cima libre que esté por delante (> start.dist + 200m)
-            //    y antes del siguiente inicio de puerto (si lo hay)
+            // 1) Si startKey no es vacía, buscar coincidencia por nombre en cimas explícitas
             var matchEnd = if (startKey.isNotEmpty()) {
                 sortedEnds.firstOrNull { end ->
                     if (end in pairedEnds || end.distance <= start.distance + 200.0) return@firstOrNull false
@@ -619,10 +626,21 @@ class AltimetriaStrategyCalculator {
                 }
             } else null
 
+            // 2) Buscar la primera cima libre antes del siguiente inicio
             if (matchEnd == null) {
                 matchEnd = sortedEnds.firstOrNull { end ->
                     if (end in pairedEnds || end.distance <= start.distance + 200.0) return@firstOrNull false
                     nextStart == null || end.distance < nextStart.distance
+                }
+            }
+
+            // 3) Si no se marcó una cima explícita con palabras clave (ej: el usuario llamó al POI de la cima
+            // simplemente "Busot", "Tudons", etc.), tomar cualquier POI posterior antes del siguiente inicio
+            if (matchEnd == null) {
+                matchEnd = poisWithDist.firstOrNull { poi ->
+                    poi !in pairedEnds && poi.distance > start.distance + 400.0 &&
+                    (nextStart == null || poi.distance < nextStart.distance) &&
+                    !isStartPoi(poi.name) && !isWaterOrFood(poi.name)
                 }
             }
 
@@ -633,11 +651,21 @@ class AltimetriaStrategyCalculator {
                 val avgGrade = if (len > 0) (elevGain / len) * 100.0 else 0.0
 
                 var displayName = cleanClimbName(matchEnd.name)
-                if (displayName.isBlank() || displayName.equals("Puerto", ignoreCase = true) || displayName.equals("Cima", ignoreCase = true)) {
+                val isGenericEndName = displayName.isBlank() ||
+                    displayName.equals("Puerto", ignoreCase = true) ||
+                    displayName.equals("Cima", ignoreCase = true) ||
+                    displayName.equals("Cumbre", ignoreCase = true) ||
+                    displayName.equals("Fin", ignoreCase = true) ||
+                    displayName.equals("Final", ignoreCase = true) ||
+                    displayName.equals("End", ignoreCase = true)
+
+                if (isGenericEndName) {
                     val sName = cleanClimbName(start.name)
-                    if (sName.isNotBlank()) displayName = sName
+                    if (sName.isNotBlank() && !sName.equals("Inicio", ignoreCase = true) && !sName.equals("Start", ignoreCase = true)) {
+                        displayName = sName
+                    }
                 }
-                if (displayName.isBlank()) {
+                if (displayName.isBlank() || isGenericEndName && displayName.equals("Puerto", ignoreCase = true)) {
                     displayName = "Puerto ${detectedClimbs.size + 1}"
                 }
 
@@ -850,9 +878,14 @@ class AltimetriaStrategyCalculator {
                 // Asignar nombres de cimas POI si existen en la ruta
                 val named = categorized.map { climb ->
                     if (climb.name.isNullOrBlank()) {
-                        val summitPoi = routePois.find { poi ->
-                            poi.type == PoiType.SUMMIT && Math.abs(poi.relativeDistance - climb.endDistance) < 1500.0
-                        }
+                        val summitPoi = routePois.filter { poi ->
+                            val s = poi.name.uppercase()
+                            !s.contains("AGUA") && !s.contains("WATER") && !s.contains("FUENTE") && !s.contains("FONT") &&
+                            !s.contains("CAFE") && !s.contains("COFFEE") && !s.contains("COMIDA") && !s.contains("FOOD") &&
+                            !s.startsWith("INICIO") && !s.contains(" INICIO") &&
+                            poi.relativeDistance in (climb.startDistance + climb.length * 0.4)..(climb.endDistance + 2500.0)
+                        }.minByOrNull { Math.abs(it.relativeDistance - climb.endDistance) }
+
                         if (summitPoi != null) {
                             climb.copy(name = cleanClimbName(summitPoi.name))
                         } else climb
@@ -868,9 +901,14 @@ class AltimetriaStrategyCalculator {
             val categorizedIncoming = validIncoming.map { calculateClimbCategory(it) }.filter { it.category.isNotBlank() }
             val named = categorizedIncoming.map { climb ->
                 if (climb.name.isNullOrBlank()) {
-                    val summitPoi = routePois.find { poi ->
-                        poi.type == PoiType.SUMMIT && Math.abs(poi.relativeDistance - climb.endDistance) < 1500.0
-                    }
+                    val summitPoi = routePois.filter { poi ->
+                        val s = poi.name.uppercase()
+                        !s.contains("AGUA") && !s.contains("WATER") && !s.contains("FUENTE") && !s.contains("FONT") &&
+                        !s.contains("CAFE") && !s.contains("COFFEE") && !s.contains("COMIDA") && !s.contains("FOOD") &&
+                        !s.startsWith("INICIO") && !s.contains(" INICIO") &&
+                        poi.relativeDistance in (climb.startDistance + climb.length * 0.4)..(climb.endDistance + 2500.0)
+                    }.minByOrNull { Math.abs(it.relativeDistance - climb.endDistance) }
+
                     if (summitPoi != null) {
                         climb.copy(name = cleanClimbName(summitPoi.name))
                     } else climb
@@ -889,47 +927,89 @@ class AltimetriaStrategyCalculator {
 
     private fun calculateClimbCategory(climb: RouteClimb): RouteClimb {
         var accumulatedHardness = 0.0
-        var maxGrade = climb.avgGrade
+        var maxRamp100m = climb.avgGrade
+        var maxGrade500m = climb.avgGrade
+        var maxGrade1000m = climb.avgGrade
+        var metersOver8Pct = 0.0
+        var metersOver10Pct = 0.0
         val defaultAsphaltFactor = 0.5 // Standard TA
         val climbLen = climb.length.coerceAtLeast(100.0)
 
-        if (routeElevationProfile.isNotEmpty()) {
-            val step = 200.0 // Tramos de 200m para filtrar ruido de alta frecuencia en el cálculo de dureza
+        val hasProfile = routeElevationProfile.isNotEmpty() || routePoints.isNotEmpty()
+        if (hasProfile) {
+            val step = 100.0 // Tramos de 100m para medir dureza acumulada con máxima precisión
             var curDist = climb.startDistance
             while (curDist < climb.endDistance) {
                 val nextDist = minOf(curDist + step, climb.endDistance)
                 val dDist = nextDist - curDist
-                if (dDist >= 50.0) {
+                if (dDist >= 30.0) {
                     val e1 = getTrueElevationAtDistance(curDist)
                     val e2 = getTrueElevationAtDistance(nextDist)
                     val rawGrade = ((e2 - e1) / dDist) * 100.0
                     val segGrade = rawGrade.coerceIn(0.0, 30.0)
                     accumulatedHardness += FatigueGradeCalculator.calculateSegmentHardness(segGrade, dDist / 1000.0)
+                    if (segGrade >= 8.0) metersOver8Pct += dDist
+                    if (segGrade >= 10.0) metersOver10Pct += dDist
+                    if (rawGrade > maxRamp100m) {
+                        maxRamp100m = rawGrade.coerceAtMost(32.0)
+                    }
                 }
                 curDist = nextDist
             }
 
-            // Pendiente máxima sostenida en ventana móvil de 100m (evita picos irreales por ruido de 5m)
+            // Ventanas móviles de 500m y 1000m para detectar tramos duros continuados
             var testDist = climb.startDistance
-            while (testDist + 100.0 <= climb.endDistance) {
+            while (testDist + 500.0 <= climb.endDistance) {
                 val e1 = getTrueElevationAtDistance(testDist)
-                val e2 = getTrueElevationAtDistance(testDist + 100.0)
-                val rampGrade = ((e2 - e1) / 100.0) * 100.0
-                if (rampGrade > maxGrade) maxGrade = rampGrade.coerceAtMost(32.0)
-                testDist += 50.0
+                val e2 = getTrueElevationAtDistance(testDist + 500.0)
+                val g500 = ((e2 - e1) / 500.0) * 100.0
+                if (g500 > maxGrade500m) maxGrade500m = g500.coerceAtMost(30.0)
+                testDist += 100.0
+            }
+
+            testDist = climb.startDistance
+            while (testDist + 1000.0 <= climb.endDistance) {
+                val e1 = getTrueElevationAtDistance(testDist)
+                val e2 = getTrueElevationAtDistance(testDist + 1000.0)
+                val g1000 = ((e2 - e1) / 1000.0) * 100.0
+                if (g1000 > maxGrade1000m) maxGrade1000m = g1000.coerceAtMost(28.0)
+                testDist += 100.0
             }
         } else {
             accumulatedHardness = FatigueGradeCalculator.calculateSegmentHardness(climb.avgGrade.coerceAtLeast(0.0), climbLen / 1000.0)
-            maxGrade = (climb.avgGrade * 1.3).coerceAtLeast(climb.avgGrade)
+            maxRamp100m = (climb.avgGrade * 1.3).coerceAtLeast(climb.avgGrade)
+            maxGrade500m = (climb.avgGrade * 1.15).coerceAtLeast(climb.avgGrade)
+            maxGrade1000m = climb.avgGrade
         }
 
-        val apm = FatigueGradeCalculator.calculateTotalFatigueGrade(accumulatedHardness, defaultAsphaltFactor, maxGrade)
+        // Concentración de dureza y rampas sostenidas (criterio oficial Vuelta a España / UCI / APM):
+        // En puertos como 6.7 km al 5.8% con 1 km al 9% y 500m al 9%, la fatiga fisiológica real
+        // es notablemente superior a una subida regular continua.
+        var sustainedSteepBonus = 0.0
+        if (maxGrade1000m >= 7.5) {
+            sustainedSteepBonus += (maxGrade1000m - 7.0) * 4.0
+        }
+        if (maxGrade500m >= 8.5) {
+            sustainedSteepBonus += (maxGrade500m - 8.0) * 3.0
+        }
+        if (metersOver8Pct >= 500.0) {
+            sustainedSteepBonus += (metersOver8Pct / 1000.0) * 3.5
+        }
+        if (metersOver10Pct >= 300.0) {
+            sustainedSteepBonus += (metersOver10Pct / 1000.0) * 5.0
+        }
 
-        // Criterios oficiales de puntuabilidad:
+        val apm = FatigueGradeCalculator.calculateTotalFatigueGrade(
+            accumulatedHardness + sustainedSteepBonus,
+            defaultAsphaltFactor,
+            maxRamp100m
+        )
+
+        // Criterios de puntuabilidad:
         // Repechos breves con desnivel < 50m y pendientes moderadas NO son puertos puntuables
-        val isNonCategorized = (climb.totalElevation < 50.0 && climb.avgGrade < 8.0) ||
-                               (climbLen < 1000.0 && climb.totalElevation < 50.0) ||
-                               apm < 20.0
+        val isNonCategorized = (climb.totalElevation < 50.0 && climb.avgGrade < 8.0 && maxGrade500m < 9.0) ||
+                               (climbLen < 800.0 && climb.totalElevation < 50.0) ||
+                               apm < 18.0
 
         val category = if (isNonCategorized && !climb.isCustom) {
             ""
@@ -937,11 +1017,21 @@ class AltimetriaStrategyCalculator {
             climb.category
         } else {
             val baseCat = FatigueGradeCalculator.getClimbCategoryName(apm)
-            // Ajuste ciclista para puertos largos de pendiente tendida:
-            // Ej: 11.9 km al 3.1% (+400m desnivel) es un 3ª Categoría (nunca 2ª).
-            if (baseCat == "4ª Cat" && climbLen >= 8000.0 && climb.totalElevation >= 300.0 && climb.avgGrade >= 2.5) {
+            val hasHardSustainedRamps = (maxGrade1000m >= 8.5 || maxGrade500m >= 9.0 || (maxRamp100m >= 9.0 && metersOver8Pct >= 800.0))
+
+            // A) Si un puerto tiene longitud >= 5 km y tramos duros sostenidos (ej. 6.7 km al 5.8% con 1km al 9% y 500m al 9%):
+            // Clasificado como 2ª Categoría
+            if (baseCat == "3ª Cat" && climbLen >= 5000.0 && climb.totalElevation >= 320.0 && hasHardSustainedRamps) {
+                "2ª Cat"
+            }
+            // B) Puerto largo tendido (ej: 11.9 km al 3.1%, desnivel ~370m, sin rampas duras continuadas):
+            // Clasificado como 3ª Categoría (nunca 2ª Cat)
+            else if (baseCat == "2ª Cat" && (climb.avgGrade < 4.2 && !hasHardSustainedRamps && climb.totalElevation < 500.0)) {
                 "3ª Cat"
-            } else if (baseCat == "2ª Cat" && (climb.totalElevation < 450.0 || climb.avgGrade < 5.0) && maxGrade < 12.0) {
+            }
+            // C) Subida larga de pendiente tendida con desnivel considerable (ej: 8-12 km al 3% con +350m):
+            // Pasa de 4ª a 3ª Categoría
+            else if (baseCat == "4ª Cat" && climbLen >= 7000.0 && climb.totalElevation >= 280.0) {
                 "3ª Cat"
             } else {
                 baseCat

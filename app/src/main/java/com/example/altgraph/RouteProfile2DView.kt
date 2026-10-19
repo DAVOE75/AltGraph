@@ -273,19 +273,36 @@ class RouteProfile2DView(context: Context) : View(context) {
             if (mappedCat != null || !climb.name.isNullOrBlank()) {
                 val endPct = (climb.endDistance / totalDistance).toFloat().coerceIn(0f, 1f)
                 val peakIdx = (endPct * (ptsCount - 1)).toInt().coerceIn(0, ptsCount - 1)
-                val px = startX + endPct * drawW
-                val py = bottomY - ((profileElevations[peakIdx] - minElev) / elevRange) * (bottomY - topY)
 
-                val label = if (!climb.name.isNullOrBlank()) {
+                // Buscar la cresta real más alta en un entorno de +/- 500m para clavar el banderín en la cima exacta
+                val searchWindow = (500.0 / totalDistance * (ptsCount - 1)).toInt().coerceAtLeast(3)
+                val winStart = (peakIdx - searchWindow).coerceAtLeast(0)
+                val winEnd = (peakIdx + searchWindow).coerceAtMost(ptsCount - 1)
+                var bestPeakIdx = peakIdx
+                var maxSeenElev = profileElevations[peakIdx]
+                for (k in winStart..winEnd) {
+                    if (profileElevations[k] > maxSeenElev) {
+                        maxSeenElev = profileElevations[k]
+                        bestPeakIdx = k
+                    }
+                }
+                val trueEndPct = bestPeakIdx.toFloat() / (ptsCount - 1)
+                val px = startX + trueEndPct * drawW
+                val py = bottomY - ((profileElevations[bestPeakIdx] - minElev) / elevRange) * (bottomY - topY)
+
+                val showName = showClimbNames && !climb.name.isNullOrBlank()
+                val label = if (showName) {
                     if (mappedCat != null) "${climb.name} ($mappedCat)" else climb.name!!
                 } else {
-                    mappedCat ?: ""
+                    mappedCat ?: climb.name ?: ""
                 }
                 if (label.isNotBlank()) {
-                    // Dibujar banderín pequeño o hito en la cima del puerto
+                    // Dibujar banderín en la cima del puerto
                     drawFlag(canvas, px, py, "#F59E0B", 0.7f)
+                    val textW = peakTextPaint.measureText(label)
+                    val safePx = px.coerceIn(textW / 2f + 10f, drawW - textW / 2f - 10f)
                     val textY = (py - 26f).coerceAtLeast(35f)
-                    canvas.drawText(label, px, textY, peakTextPaint)
+                    canvas.drawText(label, safePx, textY, peakTextPaint)
                 }
             }
         }
@@ -393,7 +410,8 @@ class RouteProfile2DView(context: Context) : View(context) {
                 }
 
                 // Line 1: Pto 1 [Nombre] (3ª) km 3.5 | 0.5 km al 6.5%
-                val ptoStr = if (!climb.name.isNullOrBlank()) "${climb.name} " else "$ptoPrefix ${i + 1} "
+                val showName = showClimbNames && !climb.name.isNullOrBlank()
+                val ptoStr = if (showName) "${climb.name} " else "$ptoPrefix ${i + 1} "
                 canvas.drawText(ptoStr, listStartX, climbY, climbListPaint)
                 val ptoWidth = climbListPaint.measureText(ptoStr)
 

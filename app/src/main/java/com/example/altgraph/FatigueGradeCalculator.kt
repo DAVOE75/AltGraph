@@ -71,17 +71,17 @@ object FatigueGradeCalculator {
     }
 
     /**
-     * Clasifica el puerto según su Grado de Fatiga (GF) siguiendo la lógica de La Vuelta a España / UCI.
-     * Si GF < 20.0, no es un puerto puntuable (repecho no categorizado).
+     * Clasifica el puerto según su Grado de Fatiga (GF) siguiendo la lógica oficial de La Vuelta a España / UCI / APM.
+     * Si GF < 18.0, no es un puerto puntuable (repecho no categorizado).
      */
     fun getClimbCategoryName(gf: Double): String {
         val lang = Locale.getDefault().language.lowercase()
         return when {
-            gf < 20.0 -> "" // No puntuable / Repecho no categorizado
-            gf <= 45.0 -> "4ª Cat"
-            gf <= 85.0 -> "3ª Cat"
-            gf <= 150.0 -> "2ª Cat"
-            gf <= 250.0 -> "1ª Cat"
+            gf < 18.0 -> "" // No puntuable / Repecho no categorizado
+            gf <= 39.9 -> "4ª Cat"
+            gf <= 74.9 -> "3ª Cat"
+            gf <= 144.9 -> "2ª Cat"
+            gf <= 239.9 -> "1ª Cat"
             else -> when {
                 lang.startsWith("es") -> "Especial (C.E.)"
                 lang.startsWith("fr") -> "Hors Catégorie (HC)"

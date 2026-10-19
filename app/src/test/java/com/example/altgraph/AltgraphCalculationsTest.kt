@@ -332,6 +332,26 @@ class AltgraphCalculationsTest {
         )
         val categorized3 = method.invoke(calc, climb3) as RouteClimb
         assertEquals("", categorized3.category)
+
+        // Subida de 6.7 km al 5.8% (+388m) con 1 km al 9% y 500m al 9% -> DEBE SER 2ª CATEGORÍA
+        calc.routeElevationProfile = (0..67).map { i ->
+            val dist = i * 100.0
+            val elev = when {
+                dist in 0.0..1000.0 -> dist * 0.09 // 1 km al 9%
+                dist in 1000.0..1500.0 -> 90.0 + (dist - 1000.0) * 0.09 // 500m al 9%
+                else -> 135.0 + (dist - 1500.0) * 0.0488 // resto al ~4.9% hasta completar 388m
+            }
+            ElevationPolylineDecoder.ElevationPoint(dist, elev)
+        }
+        val climbHard = RouteClimb(
+            startDistance = 0.0,
+            endDistance = 6700.0,
+            length = 6700.0,
+            totalElevation = 388.6,
+            avgGrade = 5.8
+        )
+        val categorizedHard = method.invoke(calc, climbHard) as RouteClimb
+        assertEquals("2ª Cat", categorizedHard.category)
     }
 
     @Test
@@ -351,17 +371,17 @@ class AltgraphCalculationsTest {
 
         val symbols = listOf(
             io.hammerhead.karooext.models.Symbol.POI("1", 38.4 + 100 * 0.001, -0.4, "flag", "Inicio", emptyList()),
-            io.hammerhead.karooext.models.Symbol.POI("2", 38.4 + 219 * 0.001, -0.4, "summit", "Puerto de Busot", emptyList()),
+            io.hammerhead.karooext.models.Symbol.POI("2", 38.4 + 219 * 0.001, -0.4, "summit", "Busot", emptyList()),
             io.hammerhead.karooext.models.Symbol.POI("3", 38.4 + 339 * 0.001, -0.4, "flag", "Inicio", emptyList()),
-            io.hammerhead.karooext.models.Symbol.POI("4", 38.4 + 407 * 0.001, -0.4, "summit", "Puerto de Jijona", emptyList())
+            io.hammerhead.karooext.models.Symbol.POI("4", 38.4 + 407 * 0.001, -0.4, "summit", "Tudons", emptyList())
         )
 
         calc.detectUserDefinedClimbsFromPois(symbols)
 
-        // Deben haberse detectado EXACTAMENTE los 2 puertos manuales
+        // Deben haberse detectado EXACTAMENTE los 2 puertos manuales con sus nombres limpios
         assertEquals(2, calc.routeClimbs.size)
-        assertEquals("Puerto de Busot", calc.routeClimbs[0].name)
-        assertEquals("Puerto de Jijona", calc.routeClimbs[1].name)
+        assertEquals("Busot", calc.routeClimbs[0].name)
+        assertEquals("Tudons", calc.routeClimbs[1].name)
         assertTrue(calc.routeClimbs[0].isCustom)
         assertTrue(calc.routeClimbs[1].isCustom)
 
@@ -380,7 +400,7 @@ class AltgraphCalculationsTest {
 
         // La ruta DEBE MANTENERSE EXCLUSIVAMENTE CON LOS 2 PUERTOS MANUALES
         assertEquals(2, calc.routeClimbs.size)
-        assertEquals("Puerto de Busot", calc.routeClimbs[0].name)
-        assertEquals("Puerto de Jijona", calc.routeClimbs[1].name)
+        assertEquals("Busot", calc.routeClimbs[0].name)
+        assertEquals("Tudons", calc.routeClimbs[1].name)
     }
 }
