@@ -224,4 +224,10 @@
     <string name="profile_tv_climb_item_prefix">Climb</string>
     <string name="setting_show_climb_name_title">Show Climb Name in Viewer</string>
     <string name="setting_show_climb_name_desc">Displays the pass name above the 3D climb chart instead of just the icon</string>
+    <string name="pref_elite_profile_tv_show_climb_names_title">Show Climb Names in TV Profile</string>
+    <string name="pref_elite_profile_tv_show_climb_names_desc">Shows the full mountain pass name on the 2D stage profile and climb list</string>
+    <string name="setting_pan_buttons_position_title">Navigation Arrows Position (&lt; / &gt;)</string>
+    <string name="setting_pan_buttons_position_desc">Places pan scroll arrows at the top or bottom of the 3D elevation profile</string>
+    <string name="pan_position_bottom">Bottom (Default)</string>
+    <string name="pan_position_top">Top</string>
 </resources>

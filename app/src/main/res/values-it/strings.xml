@@ -197,4 +197,10 @@
     <string name="profile_tv_climb_item_prefix">Salita</string>
     <string name="setting_show_climb_name_title">Mostra nome della salita nel visualizzatore</string>
     <string name="setting_show_climb_name_desc">Mostra il nome del colle sopra il grafico 3D invece della semplice icona</string>
+    <string name="pref_elite_profile_tv_show_climb_names_title">Mostra i nomi delle salite nel Profilo TV</string>
+    <string name="pref_elite_profile_tv_show_climb_names_desc">Mostra il nome completo del passo sul profilo 2D e nell\'elenco delle salite</string>
+    <string name="setting_pan_buttons_position_title">Posizione Frecce di Scorrimento (&lt; / &gt;)</string>
+    <string name="setting_pan_buttons_position_desc">Posiziona le frecce di scorrimento in alto o in basso nel profilo altimetrico 3D</string>
+    <string name="pan_position_bottom">In basso (Predefinito)</string>
+    <string name="pan_position_top">In alto</string>
 </resources>

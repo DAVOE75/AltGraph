@@ -131,6 +131,7 @@ class RouteProfile2DDataField(extension: String) : DataTypeImpl(extension, "prof
                             routeProfileView.activeClimbs = snap.routeClimbs
                             routeProfileView.tvColor = prefs.eliteProfileTvColor
                             routeProfileView.highlightClimbs = prefs.eliteHighlightClimbs
+                            routeProfileView.showClimbNames = prefs.eliteProfileTvShowClimbNames
 
                             // Draw view
                             routeProfileView.draw(currentCanvas)

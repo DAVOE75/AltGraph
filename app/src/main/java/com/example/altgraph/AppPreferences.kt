@@ -110,6 +110,10 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_SHOW_3D_ZOOM, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_ZOOM, value).apply()
 
+    var panButtonsPosition: String
+        get() = prefs.getString(KEY_PAN_BUTTONS_POSITION, "bottom") ?: "bottom"
+        set(value) = prefs.edit().putString(KEY_PAN_BUTTONS_POSITION, value).apply()
+
     var customMapProvider: String
         get() = prefs.getString(KEY_CUSTOM_MAP_PROVIDER, "") ?: ""
         set(value) = prefs.edit().putString(KEY_CUSTOM_MAP_PROVIDER, value).apply()
@@ -225,6 +229,10 @@ class AppPreferences(context: Context) {
     var eliteHighlightClimbs: Boolean
         get() = prefs.getBoolean(KEY_ELITE_HIGHLIGHT_CLIMBS, false) && isEliteUnlocked
         set(value) = prefs.edit().putBoolean(KEY_ELITE_HIGHLIGHT_CLIMBS, value).apply()
+
+    var eliteProfileTvShowClimbNames: Boolean
+        get() = prefs.getBoolean(KEY_ELITE_PROFILE_TV_SHOW_CLIMB_NAMES, true) && isEliteUnlocked
+        set(value) = prefs.edit().putBoolean(KEY_ELITE_PROFILE_TV_SHOW_CLIMB_NAMES, value).apply()
         
     var eliteMapOverlayMode: String
         get() = if (isEliteUnlocked) prefs.getString(KEY_ELITE_MAP_OVERLAY_MODE, "climbs") ?: "climbs" else "off"
@@ -292,6 +300,7 @@ class AppPreferences(context: Context) {
         private const val KEY_SHOW_POI_VIEWPOINTS = "show_poi_viewpoints"
         private const val KEY_SHOW_POI_SUMMITS = "show_poi_summits"
         private const val KEY_SHOW_3D_ZOOM = "show_3d_zoom_controls"
+        private const val KEY_PAN_BUTTONS_POSITION = "pan_buttons_position"
         private const val KEY_SHOW_SURFACE_TEXTURES = "show_surface_textures"
         private const val KEY_CUSTOM_MAP_PROVIDER = "custom_map_provider_key"
         private const val KEY_ALTIMETRIA_STYLE = "altimetria_style_key"
@@ -321,6 +330,7 @@ class AppPreferences(context: Context) {
         private const val KEY_ELITE_PROFILE_TV_2D_ROTATE = "elite_profile_tv_2d_rotate"
         private const val KEY_ELITE_PROFILE_TV_COLOR = "elite_profile_tv_color"
         private const val KEY_ELITE_HIGHLIGHT_CLIMBS = "elite_highlight_climbs"
+        private const val KEY_ELITE_PROFILE_TV_SHOW_CLIMB_NAMES = "elite_profile_tv_show_climb_names"
         private const val KEY_ELITE_MAP_OVERLAY_MODE = "elite_map_overlay_mode"
         private const val KEY_ELITE_SMOOTH_MAP_OVERLAY = "elite_smooth_map_overlay"
         private const val KEY_ELITE_CUSTOM_CLIMBS_ENABLED = "elite_custom_climbs_enabled"

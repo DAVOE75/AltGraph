@@ -231,8 +231,9 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 val currentCanvas = cachedCanvas!!
                 currentCanvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), bgPaint)
 
+                val prefs = AppPreferences.getInstance(context)
                 if (climb == null || strategy == null) {
-                    val isRotated = AppPreferences.getInstance(context).climbRotate90Clockwise
+                    val isRotated = prefs.climbRotate90Clockwise
                     var drawW = w.toFloat()
                     var drawH = h.toFloat()
                     if (isRotated) {
@@ -247,7 +248,6 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                         currentCanvas.restore()
                     }
                 } else {
-                    val prefs = AppPreferences.getInstance(context)
                     
                     val lookahead = customLength.toInt().coerceAtLeast(100)
                     
@@ -283,9 +283,9 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                         rotateMinus90 = false,
                         rampMinSlope = prefs.rampMinSlopePct,
                         rampMaxSlope = prefs.rampMaxSlopePct,
-                        showHairpins = false,
+                        showHairpins = prefs.showHairpins,
                         showPois = false,
-                        hairpins = emptyList(),
+                        hairpins = strategy.hairpins,
                         pois = emptyList(),
                         showZoomControls = false, // We use screen tap to cycle climbs
                         curvatureOffsets = emptyList(),
@@ -305,7 +305,8 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                         customTitle = "",
                         showHeaderStats = false,
                         routeCoords = strategy.routeCoords,
-                        showSurfaceTextures = prefs.showSurfaceTextures
+                        showSurfaceTextures = prefs.showSurfaceTextures,
+                        panButtonsPosition = prefs.panButtonsPosition
                     )
                     
                     altimetria3DView.draw(currentCanvas)
@@ -339,7 +340,7 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                     val climbTitle = if (showName) {
                         "◀   ${climb.name} (${climb.category})   ▶"
                     } else {
-                        "◀   ⛰️ Puerto ${currentClimbIndex + 1}/${climbs.size} - ${climb.category}   ▶"
+                        "◀   Puerto ${currentClimbIndex + 1}/${climbs.size} (${climb.category})   ▶"
                     }
                     currentCanvas.drawText(climbTitle, drawW / 2f, drawH * 0.10f, overlayPaint)
                     
@@ -414,11 +415,26 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 // Pan Intents (< y >)
                 val intentPanLeft = Intent(ACTION_PAN_LEFT).apply { setPackage(context.packageName) }
                 val pIntentPanLeft = PendingIntent.getBroadcast(context, 4, intentPanLeft, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                remoteViews.setOnClickPendingIntent(R.id.btn_pan_left, pIntentPanLeft)
 
                 val intentPanRight = Intent(ACTION_PAN_RIGHT).apply { setPackage(context.packageName) }
                 val pIntentPanRight = PendingIntent.getBroadcast(context, 5, intentPanRight, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                remoteViews.setOnClickPendingIntent(R.id.btn_pan_right, pIntentPanRight)
+
+                val isPanTop = prefs.panButtonsPosition == "top"
+                if (isPanTop) {
+                    remoteViews.setViewVisibility(R.id.btn_pan_left, android.view.View.GONE)
+                    remoteViews.setViewVisibility(R.id.btn_pan_right, android.view.View.GONE)
+                    remoteViews.setViewVisibility(R.id.btn_pan_left_top, android.view.View.VISIBLE)
+                    remoteViews.setViewVisibility(R.id.btn_pan_right_top, android.view.View.VISIBLE)
+                    remoteViews.setOnClickPendingIntent(R.id.btn_pan_left_top, pIntentPanLeft)
+                    remoteViews.setOnClickPendingIntent(R.id.btn_pan_right_top, pIntentPanRight)
+                } else {
+                    remoteViews.setViewVisibility(R.id.btn_pan_left, android.view.View.VISIBLE)
+                    remoteViews.setViewVisibility(R.id.btn_pan_right, android.view.View.VISIBLE)
+                    remoteViews.setViewVisibility(R.id.btn_pan_left_top, android.view.View.GONE)
+                    remoteViews.setViewVisibility(R.id.btn_pan_right_top, android.view.View.GONE)
+                    remoteViews.setOnClickPendingIntent(R.id.btn_pan_left, pIntentPanLeft)
+                    remoteViews.setOnClickPendingIntent(R.id.btn_pan_right, pIntentPanRight)
+                }
 
                 emitter.onNext(UpdateGraphicConfig(showHeader = false))
                 emitter.updateView(remoteViews)

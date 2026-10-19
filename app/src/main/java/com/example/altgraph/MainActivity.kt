@@ -617,9 +617,42 @@ class MainActivity : Activity() {
                 prefs.showRouteCompass = isChecked
             }
         }
-        showCompassCard.addView(switchShowCompass)
+        // Opción: Posición de Flechas de Avance (< / >)
+        val panPositionCard = createCardContainer()
+        val panPositionLabel = createSectionLabel(getString(R.string.setting_pan_buttons_position_title))
+        val panPositionDesc = TextView(this).apply {
+            text = getString(R.string.setting_pan_buttons_position_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 8)
+        }
+        val panPositions = listOf(
+            "bottom" to getString(R.string.pan_position_bottom),
+            "top" to getString(R.string.pan_position_top)
+        )
+        val currentPanPosLabel = panPositions.find { it.first == prefs.panButtonsPosition }?.second ?: getString(R.string.pan_position_bottom)
+        val panPosValueText = createValueText(currentPanPosLabel)
+        val panPosRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        }
+        val panPosButtons = mutableListOf<Button>()
+        panPositions.forEach { (posKey, posLabel) ->
+            val btn = createSegmentButton(posLabel, prefs.panButtonsPosition == posKey) {
+                prefs.panButtonsPosition = posKey
+                panPosValueText.text = posLabel
+                updateSegmentActiveStates(panPosButtons, panPositions.indexOfFirst { it.first == posKey })
+            }
+            panPosButtons.add(btn)
+            panPosRow.addView(btn)
+        }
+        panPositionCard.addView(panPositionLabel)
+        panPositionCard.addView(panPositionDesc)
+        panPositionCard.addView(panPosValueText)
+        panPositionCard.addView(panPosRow)
 
         tab3dContainer.addView(lookaheadCard)
+        tab3dContainer.addView(panPositionCard)
         tab3dContainer.addView(showCompassCard)
         tab3dContainer.addView(showCotasCard)
         tab3dContainer.addView(showRampsCard)
@@ -1399,6 +1432,28 @@ class MainActivity : Activity() {
         highlightClimbsCard.addView(textHighlightClimbsDesc)
         tabEliteContainer.addView(highlightClimbsCard)
 
+        // Show Climb Names in TV Profile
+        val profileTvClimbNamesCard = createCardContainer()
+        val switchProfileTvClimbNames = Switch(this).apply {
+            text = getString(R.string.pref_elite_profile_tv_show_climb_names_title)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.eliteProfileTvShowClimbNames
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, isChecked ->
+                prefs.eliteProfileTvShowClimbNames = isChecked
+            }
+        }
+        val textProfileTvClimbNamesDesc = TextView(this).apply {
+            text = getString(R.string.pref_elite_profile_tv_show_climb_names_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 0)
+        }
+        profileTvClimbNamesCard.addView(switchProfileTvClimbNames)
+        profileTvClimbNamesCard.addView(textProfileTvClimbNamesDesc)
+        tabEliteContainer.addView(profileTvClimbNamesCard)
+
         // Custom POI Climbs (Puertos Definidos por Usuario)
         val customClimbsCard = createCardContainer()
         customClimbsCard.orientation = LinearLayout.VERTICAL
@@ -1509,6 +1564,8 @@ class MainActivity : Activity() {
             switchShowSurfaceTextures.isEnabled = unlocked
             switchProfileTvRotate.isEnabled = unlocked
             switchHighlightClimbs.isEnabled = unlocked
+            switchProfileTvClimbNames.isEnabled = unlocked
+            switchCustomClimbs.isEnabled = unlocked
             colorButtons.forEach { it.isEnabled = unlocked }
             ftpInput.isEnabled = unlocked
             radarResSpinner.isEnabled = unlocked
@@ -1534,6 +1591,7 @@ class MainActivity : Activity() {
                 switchShowSurfaceTextures.isChecked = prefs.showSurfaceTextures
                 switchProfileTvRotate.isChecked = prefs.eliteProfileTv2dRotate
                 switchHighlightClimbs.isChecked = prefs.eliteHighlightClimbs
+                switchProfileTvClimbNames.isChecked = prefs.eliteProfileTvShowClimbNames
                 switchCustomClimbs.isChecked = prefs.eliteCustomClimbsEnabled
                 switchSmoothMap.isChecked = prefs.eliteSmoothMapOverlayEnabled
                 val currentMode = prefs.eliteMapOverlayMode

@@ -19,6 +19,7 @@ class RouteProfile2DView(context: Context) : View(context) {
     var activeClimbs: List<RouteClimb> = emptyList()
     var tvColor: String = "green"
     var highlightClimbs: Boolean = false
+    var showClimbNames: Boolean = true
     
     private val pathLine = Path()
     private val pathFill = Path()
@@ -272,7 +273,13 @@ class RouteProfile2DView(context: Context) : View(context) {
                 val peakIdx = (endPct * (ptsCount - 1)).toInt().coerceIn(0, ptsCount - 1)
                 val px = startX + endPct * drawW
                 val py = bottomY - ((profileElevations[peakIdx] - minElev) / elevRange) * (bottomY - topY)
-                canvas.drawText(mappedCat, px, py - 10f, peakTextPaint)
+
+                val label = if (showClimbNames && !climb.name.isNullOrBlank()) {
+                    "${climb.name} ($mappedCat)"
+                } else {
+                    mappedCat
+                }
+                canvas.drawText(label, px, py - 10f, peakTextPaint)
             }
         }
         
@@ -334,11 +341,13 @@ class RouteProfile2DView(context: Context) : View(context) {
             }
 
             val maxItemWidth = catClimbs.maxOfOrNull { item ->
-                val ptoStr = "$ptoPrefix 9 "
-                val catStr = "(${item.second})"
-                val startKm = item.first.startDistance / 1000.0
-                val lenKm = item.first.length / 1000.0
-                val avg = item.first.avgGrade
+                val climb = item.first
+                val cat = item.second
+                val ptoStr = if (showClimbNames && !climb.name.isNullOrBlank()) "${climb.name} " else "$ptoPrefix 9 "
+                val catStr = "($cat)"
+                val startKm = climb.startDistance / 1000.0
+                val lenKm = climb.length / 1000.0
+                val avg = climb.avgGrade
                 val startStr = String.format(" km %.1f | %.1f km al %.1f%%", startKm, lenKm, avg)
                 climbListPaint.measureText(ptoStr) + climbListCatPaint.measureText(catStr) + climbListPaint.measureText(startStr)
             } ?: (drawW - listStartX - 10f)
@@ -373,7 +382,7 @@ class RouteProfile2DView(context: Context) : View(context) {
                 }
 
                 // Line 1: Pto 1 [Nombre] (3ª) km 3.5 | 0.5 km al 6.5%
-                val ptoStr = if (!climb.name.isNullOrBlank()) "${climb.name} " else "$ptoPrefix ${i + 1} "
+                val ptoStr = if (showClimbNames && !climb.name.isNullOrBlank()) "${climb.name} " else "$ptoPrefix ${i + 1} "
                 canvas.drawText(ptoStr, listStartX, climbY, climbListPaint)
                 val ptoWidth = climbListPaint.measureText(ptoStr)
 

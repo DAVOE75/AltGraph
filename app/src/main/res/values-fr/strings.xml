@@ -197,4 +197,10 @@
     <string name="profile_tv_climb_item_prefix">Col</string>
     <string name="setting_show_climb_name_title">Afficher le nom du col dans le viseur</string>
     <string name="setting_show_climb_name_desc">Affiche le nom du col au-dessus du graphique 3D au lieu de la simple icône</string>
+    <string name="pref_elite_profile_tv_show_climb_names_title">Afficher les noms des cols sur le Profil TV</string>
+    <string name="pref_elite_profile_tv_show_climb_names_desc">Affiche le nom complet du col sur le profil 2D et dans la liste des cols</string>
+    <string name="setting_pan_buttons_position_title">Position des Flèches de Défilement (&lt; / &gt;)</string>
+    <string name="setting_pan_buttons_position_desc">Place les flèches de défilement en haut ou en bas du profil 3D</string>
+    <string name="pan_position_bottom">En bas (Par défaut)</string>
+    <string name="pan_position_top">En haut</string>
 </resources>

@@ -224,4 +224,10 @@
     <string name="profile_tv_climb_item_prefix">Pto.</string>
     <string name="setting_show_climb_name_title">Mostrar nombre del puerto en visor</string>
     <string name="setting_show_climb_name_desc">Muestra el nombre del puerto arriba de la gráfica 3D en lugar de solo el icono</string>
+    <string name="pref_elite_profile_tv_show_climb_names_title">Mostrar nombre de puertos en Perfil TV</string>
+    <string name="pref_elite_profile_tv_show_climb_names_desc">Muestra el nombre completo del puerto sobre el perfil 2D y en la lista de puertos</string>
+    <string name="setting_pan_buttons_position_title">Posición de Flechas de Avance (&lt; / &gt;)</string>
+    <string name="setting_pan_buttons_position_desc">Coloca las flechas de desplazamiento en la parte inferior o superior del gráfico 3D</string>
+    <string name="pan_position_bottom">Abajo (Por defecto)</string>
+    <string name="pan_position_top">Arriba</string>
 </resources>

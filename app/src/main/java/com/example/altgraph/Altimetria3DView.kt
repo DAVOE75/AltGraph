@@ -241,6 +241,18 @@ class Altimetria3DView @JvmOverloads constructor(
         style = Paint.Style.STROKE
     }
 
+    // Curvas de herradura (líneas transversales sobre el asfalto 3D)
+    private val hairpinLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.BLACK
+        strokeWidth = 5f
+        style = Paint.Style.STROKE
+    }
+    private val hairpinLineBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
+        strokeWidth = 1.5f
+        style = Paint.Style.STROKE
+    }
+
     // Barra de distancia inferior 3D
     private val baseBarPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#050811")
@@ -422,6 +434,7 @@ class Altimetria3DView @JvmOverloads constructor(
     private var targetVam: Int = 900
     private var visibleAvgGrade: Double = 0.0
     private var visibleMaxGrade: Double = 0.0
+    private var panButtonsPosition: String = "bottom"
 
     // Interactive Zoom & Pan
     private var zoomScale: Float = 1.0f
@@ -507,8 +520,10 @@ class Altimetria3DView @JvmOverloads constructor(
         mapRotationAngle: Double = 0.0,
         isHeadingUp: Boolean = false,
         showSurfaceTextures: Boolean = false,
-        routeTotalLength: Double = 0.0
+        routeTotalLength: Double = 0.0,
+        panButtonsPosition: String = "bottom"
     ) {
+        this.panButtonsPosition = panButtonsPosition
         if (routeTotalLength > 0.0) {
             this.routeTotalLength = routeTotalLength
         }
@@ -1191,6 +1206,27 @@ class Altimetria3DView @JvmOverloads constructor(
             }
         }
 
+        // 7.b. Curvas de herradura (Líneas transversales negras con borde blanco sobre la calzada 3D)
+        if (showHairpins && hairpins.isNotEmpty()) {
+            for (hp in hairpins) {
+                if (hp !in 0.0..totalMetersAhead) continue
+
+                val progress = (hp / totalMetersAhead).toFloat()
+                val exactIndexF = progress * (totalMicroSamples - 1)
+                val idx = exactIndexF.toInt().coerceIn(0, totalMicroSamples - 2)
+                val rem = exactIndexF - idx
+
+                val xF = xFront[idx] + rem * (xFront[idx + 1] - xFront[idx])
+                val yF = yFront[idx] + rem * (yFront[idx + 1] - yFront[idx])
+                val xB = xBack[idx] + rem * (xBack[idx + 1] - xBack[idx])
+                val yB = yBack[idx] + rem * (yBack[idx + 1] - yBack[idx])
+
+                // Dibujar línea transversal sobre la calzada (asfalto 3D)
+                canvas.drawLine(xF, yF, xB, yB, hairpinLineBorderPaint)
+                canvas.drawLine(xF, yF, xB, yB, hairpinLinePaint)
+            }
+        }
+
         // 8. Puntos de Interés (Insignias circulares)
         if (showPois) {
             for (poi in pois) {
@@ -1301,7 +1337,7 @@ class Altimetria3DView @JvmOverloads constructor(
         }
         
         val radius = 28f // Flechas más grandes y fáciles de pulsar (antes 22f)
-        val cy = h - 38f // Subidas ligeramente para evitar el marco inferior del Karoo (antes h - 25f)
+        val cy = if (panButtonsPosition == "top") 45f else (h - 38f)
         val cxLeft = 50f
         val cxRight = w - 50f
         

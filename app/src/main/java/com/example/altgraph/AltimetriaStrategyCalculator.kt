@@ -37,7 +37,7 @@ fun List<RouteClimb>.deduplicateOverlappingClimbs(): List<RouteClimb> {
     if (this.size <= 1) return this
 
     // Si hay puertos personalizados definidos por el usuario, estos tienen PREVALENCIA TOTAL
-    // sobre los puertos automáticos que se solapen con ellos.
+    // sobre los puertos automáticos que se solapen con ellos o que formen parte de su ascensión.
     val sortedClimbs = this.sortedWith(
         compareByDescending<RouteClimb> { it.isCustom }
             .thenByDescending { it.length }
@@ -46,6 +46,22 @@ fun List<RouteClimb>.deduplicateOverlappingClimbs(): List<RouteClimb> {
 
     for (climb in sortedClimbs) {
         val overlaps = result.any { existing ->
+            // Caso 1: Si existing es un puerto personalizado (isCustom = true) y climb es automático,
+            // cualquier puerto automático que toque, esté contenido o solape con el puerto personalizado queda eliminado.
+            if (existing.isCustom && !climb.isCustom) {
+                val expandedStart = existing.startDistance - 300.0
+                val expandedEnd = existing.endDistance + 300.0
+                val overlapStart = maxOf(existing.startDistance, climb.startDistance)
+                val overlapEnd = minOf(existing.endDistance, climb.endDistance)
+                val overlap = overlapEnd - overlapStart
+
+                // Si solapa en cualquier tramo (> 10m) o sus extremos caen dentro de la zona de subida del puerto personalizado
+                if (overlap > 10.0 || (climb.startDistance in expandedStart..expandedEnd) || (climb.endDistance in expandedStart..expandedEnd)) {
+                    return@any true
+                }
+            }
+
+            // Caso 2: Solapamiento estándar entre dos puertos del mismo tipo
             val overlapStart = maxOf(existing.startDistance, climb.startDistance)
             val overlapEnd = minOf(existing.endDistance, climb.endDistance)
             val overlap = overlapEnd - overlapStart
@@ -556,7 +572,7 @@ class AltimetriaStrategyCalculator {
                 val avgGrade = if (len > 0) (elevGain / len) * 100.0 else 0.0
 
                 var displayName = matchEnd.name.replace(Regex("\\[.*?\\]"), "").trim()
-                for (kw in endKeywords + startKeywords) {
+                for (kw in listOf("CIMA:", "FIN:", "END:", "SUMMIT:", "SOMMET:", "INICIO:", "START:", "COMIENZO:", "PIE:")) {
                     if (displayName.startsWith(kw, ignoreCase = true)) {
                         displayName = displayName.substring(kw.length).trim()
                     }
@@ -596,22 +612,58 @@ class AltimetriaStrategyCalculator {
                 end.name.contains("col du", ignoreCase = true)
 
             if (hasClimbIndicator && end.distance > 500.0) {
-                // Retroceder en el perfil de elevación para encontrar el pie de puerto natural
-                var bestStartDist = end.distance - 1000.0
+                // Retroceder en el perfil de elevación o ruta para encontrar el pie de puerto natural
+                var bestStartDist = (end.distance - 1000.0).coerceAtLeast(0.0)
                 var minElevSeen = end.elevation
-                var distBack = 0.0
-                val maxLookback = 30000.0 // Hasta 30 km atrás
+                val maxLookback = 35000.0 // Hasta 35 km atrás
 
+                // 1) Si ya tenemos climbs calculados/proporcionados por Karoo que culminan cerca de esta cima,
+                // tomamos el inicio del primer tramo continuo que asciende a esta cima para unificarlo por completo.
+                val existingClimbsLeadingToSummit = this.routeClimbs.filter {
+                    it.endDistance in (end.distance - 800.0)..(end.distance + 800.0) ||
+                    (it.startDistance < end.distance && it.endDistance >= end.distance - 200.0)
+                }
+                if (existingClimbsLeadingToSummit.isNotEmpty()) {
+                    val earliestStart = existingClimbsLeadingToSummit.minOf { it.startDistance }
+                    if (earliestStart < end.distance - 500.0) {
+                        bestStartDist = earliestStart
+                        minElevSeen = getTrueElevationAtDistance(bestStartDist)
+                    }
+                }
+
+                // 2) Si hay perfil de elevación detallado, buscar el valle / pie de puerto real
                 if (routeElevationProfile.isNotEmpty()) {
                     val pts = routeElevationProfile.filter { it.distance in (end.distance - maxLookback)..end.distance }.sortedByDescending { it.distance }
+                    var profileMinElev = end.elevation
+                    var profileBestDist = bestStartDist
                     for (pt in pts) {
-                        if (pt.elevation < minElevSeen) {
-                            minElevSeen = pt.elevation
-                            bestStartDist = pt.distance
-                        } else if (pt.elevation > minElevSeen + 35.0) {
+                        if (pt.elevation < profileMinElev) {
+                            profileMinElev = pt.elevation
+                            profileBestDist = pt.distance
+                        } else if (pt.elevation > profileMinElev + 35.0) {
                             // Subió más de 35m antes de empezar: hemos llegado al valle anterior
                             break
                         }
+                    }
+                    if (end.distance - profileBestDist >= 500.0 && profileBestDist <= bestStartDist) {
+                        bestStartDist = profileBestDist
+                        minElevSeen = profileMinElev
+                    }
+                } else if (routePoints.isNotEmpty() && existingClimbsLeadingToSummit.isEmpty()) {
+                    val pts = routePoints.filter { it.distance in (end.distance - maxLookback)..end.distance }.sortedByDescending { it.distance }
+                    var routeMinElev = end.elevation
+                    var routeBestDist = bestStartDist
+                    for (pt in pts) {
+                        if (pt.elevation < routeMinElev) {
+                            routeMinElev = pt.elevation
+                            routeBestDist = pt.distance
+                        } else if (pt.elevation > routeMinElev + 35.0) {
+                            break
+                        }
+                    }
+                    if (end.distance - routeBestDist >= 500.0) {
+                        bestStartDist = routeBestDist
+                        minElevSeen = routeMinElev
                     }
                 }
 
@@ -621,11 +673,13 @@ class AltimetriaStrategyCalculator {
                     val avgGrade = if (len > 0) (elevGain / len) * 100.0 else 0.0
 
                     var displayName = end.name.replace(Regex("\\[.*?\\]"), "").trim()
-                    for (kw in endKeywords) {
+                    // Quitar solo prefijos de control de POI ("CIMA:", "FIN:", etc.)
+                    for (kw in listOf("CIMA:", "FIN:", "END:", "SUMMIT:", "SOMMET:")) {
                         if (displayName.startsWith(kw, ignoreCase = true)) {
                             displayName = displayName.substring(kw.length).trim()
                         }
                     }
+                    // Quitar sufijos de metros tipo "540m"
                     displayName = displayName.replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "").trim()
 
                     val forcedCategory = parseCategoryFromName(end.name)
@@ -731,6 +785,12 @@ class AltimetriaStrategyCalculator {
             val merged = (existingCustom + routeClimbs + categorizedIncoming).deduplicateOverlappingClimbs()
             routeClimbs = merged
             Log.d("AltiCalc", "syncRouteClimbs: Actualizados ${routeClimbs.size} puertos en '$routeKey' (${existingCustom.size} personalizados).")
+        }
+
+        // Si tenemos POIs de usuario presentes, re-evaluamos para garantizar que absorban y sustituyan
+        // cualquier puerto automático de Karoo que se haya recibido posteriormente
+        if (routePois.isNotEmpty()) {
+            detectUserDefinedClimbsFromPois()
         }
     }
 
@@ -1915,6 +1975,10 @@ class AltimetriaStrategyCalculator {
         val actualRiderDist = currentRouteDistance
         val progress = if (windowLength > 0.0) ((actualRiderDist - startDist) / windowLength).toFloat().coerceIn(0f, 1f) else 0f
 
+        val visibleHairpins = absoluteHairpins.toList()
+            .filter { it in startDist..endDist }
+            .map { it - startDist }
+
         return StrategyData(
             remainingDistance = climb.length,
             timeToSummit = 0L,
@@ -1923,7 +1987,7 @@ class AltimetriaStrategyCalculator {
             attackAlert = trueMaxGrade >= 12.0,
             blockSizeMeters = majorBlock,
             totalFatigueGrade = climb.apm.roundToInt(),
-            hairpins = emptyList(), // Can be added later if needed
+            hairpins = visibleHairpins,
             pois = emptyList(),
             curvatureOffsets = emptyList(),
             riderProgress = progress,

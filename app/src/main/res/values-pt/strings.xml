@@ -197,4 +197,10 @@
     <string name="profile_tv_climb_item_prefix">Subida</string>
     <string name="setting_show_climb_name_title">Mostrar nome da subida no visualizador</string>
     <string name="setting_show_climb_name_desc">Apresenta o nome do passo de montanha no topo do gráfico 3D em vez de apenas o ícone</string>
+    <string name="pref_elite_profile_tv_show_climb_names_title">Mostrar nomes das subidas no Perfil TV</string>
+    <string name="pref_elite_profile_tv_show_climb_names_desc">Mostra o nome completo do passo no perfil 2D e na lista de subidas</string>
+    <string name="setting_pan_buttons_position_title">Posição das Setas de Navegação (&lt; / &gt;)</string>
+    <string name="setting_pan_buttons_position_desc">Coloca as setas de deslocamento no topo ou na base do perfil 3D</string>
+    <string name="pan_position_bottom">Abaixo (Padrão)</string>
+    <string name="pan_position_top">Acima</string>
 </resources>

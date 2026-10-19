@@ -241,7 +241,8 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             mapRotationAngle = mapRotAngle,
                             isHeadingUp = isHeadingUp,
                             showSurfaceTextures = prefs.showSurfaceTextures,
-                            routeTotalLength = snap.routeTotalLength
+                            routeTotalLength = snap.routeTotalLength,
+                            panButtonsPosition = prefs.panButtonsPosition
                         )
 
                         if (cachedBitmap == null || cachedBitmap?.width != w || cachedBitmap?.height != h) {
@@ -376,11 +377,26 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
 
                           val intentPanLeft = Intent(ACTION_PAN_LEFT).apply { setPackage(context.packageName) }
                           val pendingPanLeft = PendingIntent.getBroadcast(context, 2, intentPanLeft, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                          remoteViews.setOnClickPendingIntent(R.id.btn_pan_left, pendingPanLeft)
 
                           val intentPanRight = Intent(ACTION_PAN_RIGHT).apply { setPackage(context.packageName) }
                           val pendingPanRight = PendingIntent.getBroadcast(context, 3, intentPanRight, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                          remoteViews.setOnClickPendingIntent(R.id.btn_pan_right, pendingPanRight)
+
+                          val isPanTop = prefs.panButtonsPosition == "top"
+                          if (isPanTop) {
+                              remoteViews.setViewVisibility(R.id.btn_pan_left, android.view.View.GONE)
+                              remoteViews.setViewVisibility(R.id.btn_pan_right, android.view.View.GONE)
+                              remoteViews.setViewVisibility(R.id.btn_pan_left_top, android.view.View.VISIBLE)
+                              remoteViews.setViewVisibility(R.id.btn_pan_right_top, android.view.View.VISIBLE)
+                              remoteViews.setOnClickPendingIntent(R.id.btn_pan_left_top, pendingPanLeft)
+                              remoteViews.setOnClickPendingIntent(R.id.btn_pan_right_top, pendingPanRight)
+                          } else {
+                              remoteViews.setViewVisibility(R.id.btn_pan_left, android.view.View.VISIBLE)
+                              remoteViews.setViewVisibility(R.id.btn_pan_right, android.view.View.VISIBLE)
+                              remoteViews.setViewVisibility(R.id.btn_pan_left_top, android.view.View.GONE)
+                              remoteViews.setViewVisibility(R.id.btn_pan_right_top, android.view.View.GONE)
+                              remoteViews.setOnClickPendingIntent(R.id.btn_pan_left, pendingPanLeft)
+                              remoteViews.setOnClickPendingIntent(R.id.btn_pan_right, pendingPanRight)
+                          }
 
                         emitter.updateView(remoteViews)
 

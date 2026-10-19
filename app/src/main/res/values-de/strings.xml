@@ -197,4 +197,10 @@
     <string name="profile_tv_climb_item_prefix">Pass</string>
     <string name="setting_show_climb_name_title">Passnamen im Viewer anzeigen</string>
     <string name="setting_show_climb_name_desc">Zeigt den Passnamen über dem 3D-Höhenprofil anstelle nur des Icons</string>
+    <string name="pref_elite_profile_tv_show_climb_names_title">Passnamen im TV-Profil anzeigen</string>
+    <string name="pref_elite_profile_tv_show_climb_names_desc">Zeigt den vollständigen Passnamen im 2D-Profil und in der Pässeliste an</string>
+    <string name="setting_pan_buttons_position_title">Position der Navigationspfeile (&lt; / &gt;)</string>
+    <string name="setting_pan_buttons_position_desc">Platziert die Pfeile zum Vor-/Zurückscrollen oben oder unten im 3D-Profil</string>
+    <string name="pan_position_bottom">Unten (Standard)</string>
+    <string name="pan_position_top">Oben</string>
 </resources>

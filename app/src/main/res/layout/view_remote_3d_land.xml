@@ -47,6 +47,26 @@
         android:layout_marginStart="0dp"
         android:background="#01000000" />
 
+    <!-- Pan Left (<) at visual top-left -> physical top-end -->
+    <Button
+        android:id="@+id/btn_pan_left_top"
+        android:layout_width="90dp"
+        android:layout_height="140dp"
+        android:layout_gravity="top|end"
+        android:layout_marginEnd="0dp"
+        android:visibility="gone"
+        android:background="#01000000" />
+
+    <!-- Pan Right (>) at visual top-right -> physical bottom-end -->
+    <Button
+        android:id="@+id/btn_pan_right_top"
+        android:layout_width="90dp"
+        android:layout_height="140dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="0dp"
+        android:visibility="gone"
+        android:background="#01000000" />
+
     <!-- Zoom buttons at visual right -> physical bottom -->
     <LinearLayout
         android:layout_width="match_parent"
