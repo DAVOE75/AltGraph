@@ -1,6 +1,20 @@
-# 📖 Manual de Usuario - ALTGRAPH (v0.5.0 STABLE)
+# 📖 Manual de Usuario - ALTGRAPH (v1.1.0 ELITE)
 
 **ALTGRAPH** es una extensión avanzada de altimetría y análisis de rendimiento para ciclocomputadores **Hammerhead Karoo** (Karoo 2 y Karoo 3), desarrollada por **David García Pascual**.
+
+---
+
+### 🌟 Novedad Destacada v1.1.0: Puertos Definidos por Usuario (POIs)
+Permite delimitar exactamente el inicio y final de los puertos en tus rutas para que **prevalezcan sobre los algoritmos automáticos**:
+1. **Inicio y Cima por POIs**:
+   - `INICIO: NombreDelPuerto` (o `START:`) al pie de la subida.
+   - `CIMA: NombreDelPuerto` (o `SUMMIT:`) en la coronación.
+   - O solo `CIMA: NombreDelPuerto`: AltGraph calcula de forma inteligente el inicio natural del puerto.
+2. **Categorización Oficial Vuelta a España / APM**:
+   - Cálculo automático de distancia, desnivel, pendiente media y categoría oficial (4ª, 3ª, 2ª, 1ª o Especial/HC).
+   - O forzar categoría deseada entre corchetes: `CIMA: NombreDelPuerto [1C]`, `[2C]`, `[ESP]` o `[HC]`.
+3. **Prevalencia Absoluta**:
+   - Reemplaza puertos partidos por descansillos y muestra el nombre real en **Visor de Puertos**, **Perfil TV 2D** y **Barra de Ruta**.
 
 ---
 

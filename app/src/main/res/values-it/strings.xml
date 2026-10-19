@@ -191,6 +191,10 @@
     <string name="color_neon_purple">Rosa / Viola</string>
     <string name="pref_elite_highlight_climbs_title">Evidenzia salite sul percorso</string>
     <string name="pref_elite_highlight_climbs_desc">Colora i passi di montagna sul profilo della tappa</string>
+    <string name="pref_elite_custom_climbs_title">Salite Definite dall\'Utente (POI)</string>
+    <string name="pref_elite_custom_climbs_desc">I passi contrassegnati dai POI prevalgono su quelli rilevati automaticamente con categorizzazione ufficiale</string>
     <string name="profile_tv_climb_list_title">Elenco salite</string>
     <string name="profile_tv_climb_item_prefix">Salita</string>
+    <string name="setting_show_climb_name_title">Mostra nome della salita nel visualizzatore</string>
+    <string name="setting_show_climb_name_desc">Mostra il nome del colle sopra il grafico 3D invece della semplice icona</string>
 </resources>

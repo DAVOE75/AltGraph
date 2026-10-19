@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="Logo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v1.0.85 ELITE)
+# ALTGRAPH (v1.1.0 ELITE)
 <p>Leggi in: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** è un'estensione professionale per l'altimetria e le prestazioni ciclistiche di ultima generazione per i ciclocomputer **Hammerhead Karoo** (Karoo 2 e Karoo 3), sviluppata da **hesiOX** utilizzando l'SDK ufficiale `karoo-ext`.
@@ -10,6 +10,23 @@ Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **S
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />
 </p>
+
+## 🚀 VERSIONE 1.1.0 ELITE: PASSI DI MONTAGNA DEFINITI DALL'UTENTE (POI)
+
+La novità più attesa per il cicloturismo e le granfondo: **definire con precisione millimetrica le vere salite di montagna ed evitare che gli algoritmi automatici spezzino in due un colle a causa di tratti pianeggianti o falsipiani intermedi**.
+
+### 🏔️ Come funziona?
+1. **Rilevamento tramite POI nel percorso (Komoot, Strava, RideWithGPS o Karoo Dashboard)**:
+   - Punto iniziale: `INIZIO: NomeSalita` o `INICIO: NomeSalita` (es: `INIZIO: Passo dello Stelvio`).
+   - Cima del passo: `CIMA: NomeSalita` o `PASSO: NomeSalita` (es: `CIMA: Passo dello Stelvio`).
+   - *Oppure solo Cima*: Indicando solo `CIMA: Mortirolo`, AltGraph risale a ritroso lungo il rilievo fino a localizzare il fondovalle naturale.
+2. **Categorizzazione Ufficiale e Forzata**:
+   - **Automatica secondo Vuelta a España / APM**: AltGraph calcola distanza, dislivello accumulato, pendenza media e assegna la categoria ufficiale (4ª, 3ª, 2ª, 1ª o Fuori Categoria / HC).
+   - **Categoria Forzata Manuale**: Aggiungendo la categoria tra parentesi quadre (es: `CIMA: Stelvio [HC]`, `[1C]`, o `[2C]`), il sistema la rispetta all'istante.
+3. **Prevalenza Assoluta**:
+   - Le salite personalizzate **sostituiscono e annullano le salite automatiche**, unendo i falsipiani e mostrando il nome reale nel **Visualizzatore Salite**, nel **Profilo TV 2D** e nella **Barra Percorso**.
+4. **Icone Ciclisti Ridisegnate**:
+   - Nuove icone vettoriali aerodinamiche da cronometro / triathlon, ingrandite per una leggibilità perfetta nella barra degli avvisi.
 
 ## NUOVA INTEGRAZIONE: WIDGET KGHOST NEL RADAR ALTIMETRICO (v1.0.85 ELITE)
 

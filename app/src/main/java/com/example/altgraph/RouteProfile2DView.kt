@@ -372,8 +372,8 @@ class RouteProfile2DView(context: Context) : View(context) {
                     climbListCatPaint.color = Color.parseColor("#F59E0B")
                 }
 
-                // Line 1: Pto 1 (3ª) km 3.5 | 0.5 km al 6.5%
-                val ptoStr = "$ptoPrefix ${i + 1} "
+                // Line 1: Pto 1 [Nombre] (3ª) km 3.5 | 0.5 km al 6.5%
+                val ptoStr = if (!climb.name.isNullOrBlank()) "${climb.name} " else "$ptoPrefix ${i + 1} "
                 canvas.drawText(ptoStr, listStartX, climbY, climbListPaint)
                 val ptoWidth = climbListPaint.measureText(ptoStr)
 

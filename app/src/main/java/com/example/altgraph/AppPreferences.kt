@@ -234,6 +234,10 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_ELITE_SMOOTH_MAP_OVERLAY, false) && isEliteUnlocked
         set(value) = prefs.edit().putBoolean(KEY_ELITE_SMOOTH_MAP_OVERLAY, value).apply()
 
+    var eliteCustomClimbsEnabled: Boolean
+        get() = prefs.getBoolean(KEY_ELITE_CUSTOM_CLIMBS_ENABLED, true) && isEliteUnlocked
+        set(value) = prefs.edit().putBoolean(KEY_ELITE_CUSTOM_CLIMBS_ENABLED, value).apply()
+
     var userFtp: Int
         get() = prefs.getInt(KEY_USER_FTP, 250)
         set(value) = prefs.edit().putInt(KEY_USER_FTP, value).apply()
@@ -245,6 +249,10 @@ class AppPreferences(context: Context) {
     var climbRotate90Clockwise: Boolean
         get() = prefs.getBoolean(KEY_CLIMB_ROTATE_90_CW, false)
         set(value) = prefs.edit().putBoolean(KEY_CLIMB_ROTATE_90_CW, value).apply()
+
+    var showClimbNameInViewer: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_CLIMB_NAME_IN_VIEWER, true)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_CLIMB_NAME_IN_VIEWER, value).apply()
         
     var routeMapHeadingUp: Boolean
         get() = prefs.getBoolean(KEY_ROUTE_MAP_HEADING_UP, false)
@@ -272,6 +280,7 @@ class AppPreferences(context: Context) {
         private const val KEY_SHOW_ROUTE_COMPASS = "show_route_compass"
         private const val KEY_ROTATE_90_CW = "rotate_90_clockwise"
         private const val KEY_CLIMB_ROTATE_90_CW = "climb_rotate_90_clockwise"
+        private const val KEY_SHOW_CLIMB_NAME_IN_VIEWER = "show_climb_name_in_viewer"
         private const val KEY_ROUTE_MAP_HEADING_UP = "route_map_heading_up"
         private const val KEY_VISIBLE_BLOCKS_COUNT = "visible_blocks_count"
         private const val KEY_RAMP_MIN_SLOPE = "ramp_min_slope_pct"
@@ -314,6 +323,7 @@ class AppPreferences(context: Context) {
         private const val KEY_ELITE_HIGHLIGHT_CLIMBS = "elite_highlight_climbs"
         private const val KEY_ELITE_MAP_OVERLAY_MODE = "elite_map_overlay_mode"
         private const val KEY_ELITE_SMOOTH_MAP_OVERLAY = "elite_smooth_map_overlay"
+        private const val KEY_ELITE_CUSTOM_CLIMBS_ENABLED = "elite_custom_climbs_enabled"
         private const val KEY_USER_FTP = "user_ftp"
         private const val KEY_ELITE_RADAR_RESOLUTION = "elite_radar_resolution"
 

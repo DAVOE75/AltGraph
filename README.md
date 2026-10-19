@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v1.0.85 ELITE)
+# ALTGRAPH (v1.1.0 ELITE)
 <p>Leer en: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 <p align="center">
@@ -18,6 +18,23 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## 🚀 VERSIÓN 1.1.0 ELITE: PUERTOS DE MONTAÑA DEFINIDOS POR USUARIO (POIs)
+
+La novedad más esperada para el cicloturismo y competición de élite: **definir con exactitud milimétrica qué subidas son realmente puertos de montaña y evitar que los algoritmos automáticos rompan o dividan un puerto en dos por tener llanos o descansillos intermedios**.
+
+### 🏔️ ¿Cómo funciona?
+1. **Detección por POIs en tu ruta (Komoot, Strava, RideWithGPS o Karoo Dashboard)**:
+   - Marca un punto de inicio: `INICIO: NombreDelPuerto` (ej: `INICIO: Puerto de Navacerrada`).
+   - Marca el punto de coronación: `CIMA: NombreDelPuerto` (ej: `CIMA: Puerto de Navacerrada`).
+   - *O Cima única*: Si solo marcas `CIMA: Morcuera` o `PUERTO: Tourmalet`, el algoritmo de AltGraph retrocede de forma inteligente por el relieve hasta encontrar el pie de puerto natural.
+2. **Categorización Oficial y Forzada**:
+   - **Automática según Vuelta a España / APM**: AltGraph calcula la distancia total, desnivel acumulado, pendiente media y le asigna su categoría oficial (4ª, 3ª, 2ª, 1ª o Especial/HC).
+   - **Categoría Manual Forzada**: Si añades la categoría entre corchetes (ej: `CIMA: Morcuera [1C]`, `[2C]`, `[ESP]` o `[HC]`), el sistema la respeta directamente.
+3. **Prevalencia Total**:
+   - Tus puertos de usuario **prevalecen sobre cualquier puerto detectado automáticamente** por el ciclocomputador, fusionando descansillos y mostrando el nombre real en el **Visor de Puertos**, en el **Perfil TV 2D** y en la **Barra de Ruta**.
+4. **Iconos de Ciclistas Rediseñados**:
+   - Nuevos iconos vectoriales de ciclista en posición aerodinámica de contrarreloj / triatlón (postura acoplada, casco aero de gota y bicicleta de competición), ampliados para máxima legibilidad en la barra de avisos.
 
 ## NUEVA INTEGRACIÓN: WIDGET KGHOST EN RADAR ALTIMÉTRICO (v1.0.85 ELITE)
 

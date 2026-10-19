@@ -191,6 +191,10 @@
     <string name="color_neon_purple">Rosa / Violett</string>
     <string name="pref_elite_highlight_climbs_title">Pässe auf der Strecke markieren</string>
     <string name="pref_elite_highlight_climbs_desc">Hebt die Bergpässe auf dem Etappenprofil farbig hervor</string>
+    <string name="pref_elite_custom_climbs_title">Benutzerdefinierte Pässe (POIs)</string>
+    <string name="pref_elite_custom_climbs_desc">Von POIs definierte Pässe haben Vorrang vor der automatischen Erkennung mit offizieller Kategorisierung</string>
     <string name="profile_tv_climb_list_title">Pässeliste</string>
     <string name="profile_tv_climb_item_prefix">Pass</string>
+    <string name="setting_show_climb_name_title">Passnamen im Viewer anzeigen</string>
+    <string name="setting_show_climb_name_desc">Zeigt den Passnamen über dem 3D-Höhenprofil anstelle nur des Icons</string>
 </resources>

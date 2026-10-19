@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v1.0.85 ELITE)
+# ALTGRAPH (v1.1.0 ELITE)
 <p>Lesen auf: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** ist eine professionelle Höhen- und Leistungserweiterung der nächsten Generation für **Hammerhead Karoo** Fahrradcomputer (Karoo 2 und Karoo 3), entwickelt von **hesiOX** unter Verwendung des offiziellen `karoo-ext` SDKs.
@@ -10,6 +10,23 @@ Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 6 3D-Höhenv
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## 🚀 VERSION 1.1.0 ELITE: BENUTZERDEFINIERTE BERGPÄSSE (POIs)
+
+Das meisterwartete Feature für Radsport und Granfondos: **präzise festlegen, welche Anstiege echte Pässe sind, und verhindern, dass automatische Algorithmen Pässe durch Flachstücke oder Wellen in zwei Teile zerlegen**.
+
+### 🏔️ Wie funktioniert es?
+1. **Erkennung über POIs auf der Route (Komoot, Strava, RideWithGPS oder Karoo Dashboard)**:
+   - Startpunkt: `START: PassName` oder `INICIO: PassName` (z. B. `START: Grossglockner`).
+   - Gipfelpunkt: `SUMMIT: PassName` oder `CIMA: PassName` (z. B. `SUMMIT: Grossglockner`).
+   - *Oder nur Gipfel*: Wird nur `SUMMIT: Stilfser Joch` markiert, ermittelt AltGraph automatisch den natürlichen Talbeginn.
+2. **Offizielle & Überschriebene Einstufung**:
+   - **Automatisch nach Vuelta / APM**: AltGraph ermittelt Distanz, Höhenmeter, Durchschnittssteigung und vergibt die offizielle Kategorie (4., 3., 2., 1. Kategorie oder HC).
+   - **Manuelle Zwangskategorie**: Hänge die Kategorie in eckigen Klammern an (z. B. `SUMMIT: Grossglockner [HC]`, `[1C]` oder `[2C]`) und das System übernimmt sie direkt.
+3. **Voller Vorrang**:
+   - Benutzerdefinierte Pässe **ersetzen und überschreiben automatisch erkannte Steigungen**, schließen Flachstücke ein und zeigen den echten Namen im **Pass-Viewer**, im **TV-Profil 2D** und in der **Routenleiste**.
+4. **Überarbeitete Fahrer-Icons**:
+   - Neue aerodynamische Zeitfahr- / Triathlon-Vektorfahrer, vergrößert für maximale Lesbarkeit in der Warnleiste.
 
 ## NEUE INTEGRATION: KGHOST-WIDGET IM HÖHENPROFIL-RADAR (v1.0.85 ELITE)
 

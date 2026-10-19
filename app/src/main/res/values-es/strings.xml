@@ -218,6 +218,10 @@
     <string name="color_neon_purple">Rosa / Violeta</string>
     <string name="pref_elite_highlight_climbs_title">Marcar puertos en la ruta</string>
     <string name="pref_elite_highlight_climbs_desc">Sombrea los puertos de montaña en color sobre el perfil de la etapa</string>
+    <string name="pref_elite_custom_climbs_title">Puertos Definidos por Usuario (POIs)</string>
+    <string name="pref_elite_custom_climbs_desc">Los puertos marcados por POIs (Inicio/Cima) prevalecen sobre los detectados automáticamente con categorización oficial</string>
     <string name="profile_tv_climb_list_title">Lista de puertos</string>
     <string name="profile_tv_climb_item_prefix">Pto.</string>
+    <string name="setting_show_climb_name_title">Mostrar nombre del puerto en visor</string>
+    <string name="setting_show_climb_name_desc">Muestra el nombre del puerto arriba de la gráfica 3D en lugar de solo el icono</string>
 </resources>

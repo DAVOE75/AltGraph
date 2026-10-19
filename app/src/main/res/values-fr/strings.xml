@@ -191,6 +191,10 @@
     <string name="color_neon_purple">Rose / Violet</string>
     <string name="pref_elite_highlight_climbs_title">Marquer cols sur l\'itinéraire</string>
     <string name="pref_elite_highlight_climbs_desc">Ombre les cols de montagne en couleur sur le profil d\'étape</string>
+    <string name="pref_elite_custom_climbs_title">Cols Définis par l\'Utilisateur (POIs)</string>
+    <string name="pref_elite_custom_climbs_desc">Les cols définis par POIs prévalent sur la détection automatique avec catégorisation officielle</string>
     <string name="profile_tv_climb_list_title">Liste des cols</string>
     <string name="profile_tv_climb_item_prefix">Col</string>
+    <string name="setting_show_climb_name_title">Afficher le nom du col dans le viseur</string>
+    <string name="setting_show_climb_name_desc">Affiche le nom du col au-dessus du graphique 3D au lieu de la simple icône</string>
 </resources>

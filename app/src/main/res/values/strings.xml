@@ -218,6 +218,10 @@
     <string name="color_neon_purple">Pink / Purple</string>
     <string name="pref_elite_highlight_climbs_title">Highlight climbs on route</string>
     <string name="pref_elite_highlight_climbs_desc">Shades mountain passes in color on the stage profile</string>
+    <string name="pref_elite_custom_climbs_title">User-Defined Mountain Passes (POIs)</string>
+    <string name="pref_elite_custom_climbs_desc">Overrides automatic climb detection with user start/summit POIs and official categorization</string>
     <string name="profile_tv_climb_list_title">Climb List</string>
     <string name="profile_tv_climb_item_prefix">Climb</string>
+    <string name="setting_show_climb_name_title">Show Climb Name in Viewer</string>
+    <string name="setting_show_climb_name_desc">Displays the pass name above the 3D climb chart instead of just the icon</string>
 </resources>

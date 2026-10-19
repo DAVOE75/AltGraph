@@ -28,17 +28,23 @@ data class RouteClimb(
     val totalElevation: Double,
     val avgGrade: Double,
     var apm: Double = 0.0,
-    var category: String = ""
+    var category: String = "",
+    val name: String? = null,
+    val isCustom: Boolean = false
 )
 
 fun List<RouteClimb>.deduplicateOverlappingClimbs(): List<RouteClimb> {
     if (this.size <= 1) return this
 
-    // Procesa primero los puertos más largos para descartar cualquier puerto más corto que solape
-    val sortedByLength = this.sortedByDescending { it.length }
+    // Si hay puertos personalizados definidos por el usuario, estos tienen PREVALENCIA TOTAL
+    // sobre los puertos automáticos que se solapen con ellos.
+    val sortedClimbs = this.sortedWith(
+        compareByDescending<RouteClimb> { it.isCustom }
+            .thenByDescending { it.length }
+    )
     val result = mutableListOf<RouteClimb>()
 
-    for (climb in sortedByLength) {
+    for (climb in sortedClimbs) {
         val overlaps = result.any { existing ->
             val overlapStart = maxOf(existing.startDistance, climb.startDistance)
             val overlapEnd = minOf(existing.endDistance, climb.endDistance)
@@ -214,6 +220,7 @@ class AltimetriaStrategyCalculator {
     var currentHeading: Double = 0.0
     var mapZoomLevel: Double? = null
     var manualPanOffsetMeters: Double = 0.0
+    var appContext: Context? = null
 
     fun updateLiveGrade(grade: Double) {
         this.instantBarometricGrade = grade
@@ -435,26 +442,230 @@ class AltimetriaStrategyCalculator {
             }
             routePois.add(Poi(nearestDist, icon, name, type))
         }
+
+        // ELITE: Detectar puertos de montaña definidos manualmente mediante POIs por el usuario
+        detectUserDefinedClimbsFromPois(symbols)
+    }
+
+    /**
+     * Extrae una categoría explícita si el usuario la incluyó en el nombre o descripción del POI.
+     * Soporta: [ESP], [HC], [1C], [2C], [3C], [4C], [1ª], [2ª], etc.
+     */
+    private fun parseCategoryFromName(text: String): String? {
+        val upper = text.uppercase()
+        val bracketMatch = Regex("\\[(ESP|HC|H\\.C\\.?|1C|2C|3C|4C|1ª|2ª|3ª|4ª|CAT\\s*[1-4]|CAT\\s*ESP)]").find(upper)
+        if (bracketMatch != null) {
+            val token = bracketMatch.groupValues[1].replace(" ", "").replace(".", "")
+            return when {
+                token.contains("ESP") || token.contains("HC") -> FatigueGradeCalculator.getClimbCategoryName(250.0)
+                token.contains("1") -> "1ª Cat"
+                token.contains("2") -> "2ª Cat"
+                token.contains("3") -> "3ª Cat"
+                token.contains("4") -> "4ª Cat"
+                else -> null
+            }
+        }
+        return null
+    }
+
+    /**
+     * Detecta puertos de montaña definidos por el usuario mediante pares de POIs (Inicio y Cima)
+     * o POIs individuales de Cima.
+     * Si la preferencia eliteCustomClimbsEnabled está activa (por defecto true en ELITE),
+     * estos puertos prevalecen sobre cualquier puerto detectado automáticamente.
+     */
+    fun detectUserDefinedClimbsFromPois(symbols: List<io.hammerhead.karooext.models.Symbol.POI>? = null) {
+        val prefs = appContext?.let { AppPreferences.getInstance(it) }
+        val isEnabled = prefs?.eliteCustomClimbsEnabled ?: true
+        if (!isEnabled || routePoints.isEmpty()) return
+
+        // 1. Extraer POIs con distancia real a lo largo de la ruta
+        data class PoiWithDist(val name: String, val distance: Double, val elevation: Double)
+        val poisWithDist = mutableListOf<PoiWithDist>()
+
+        if (symbols != null && symbols.isNotEmpty()) {
+            for (sym in symbols) {
+                val sName = sym.name ?: continue
+                var minDist = Double.MAX_VALUE
+                var nearestDist = 0.0
+                for (pt in routePoints) {
+                    val d = hypot(pt.latitude - sym.lat, pt.longitude - sym.lng)
+                    if (d < minDist) {
+                        minDist = d
+                        nearestDist = pt.distance
+                    }
+                }
+                val elev = getTrueElevationAtDistance(nearestDist)
+                poisWithDist.add(PoiWithDist(sName.trim(), nearestDist, elev))
+            }
+        } else {
+            for (poi in routePois) {
+                val cleanName = poi.name.replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "").trim()
+                poisWithDist.add(PoiWithDist(cleanName, poi.relativeDistance, getTrueElevationAtDistance(poi.relativeDistance)))
+            }
+        }
+
+        if (poisWithDist.isEmpty()) return
+
+        val detectedClimbs = mutableListOf<RouteClimb>()
+
+        // 2. Patrones de Inicio y Fin / Cima
+        val startKeywords = listOf("INICIO:", "START:", "COMIENZO:", "PIED DE PUERTO:", "PIE:", "DEBUT:")
+        val endKeywords = listOf("CIMA:", "FIN:", "END:", "SUMMIT:", "SOMMET:", "PASSO:", "COLLADO:", "CORONA:", "PUERTO:", "ALTO:", "COL:")
+
+        fun normalizeKey(name: String, prefixList: List<String>): String {
+            var n = name.trim()
+            for (kw in prefixList) {
+                if (n.startsWith(kw, ignoreCase = true)) {
+                    n = n.substring(kw.length).trim()
+                    break
+                }
+            }
+            // Quitar marcas de categoría tipo [1C] o altitud
+            n = n.replace(Regex("\\[.*?\\]"), "").replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "").trim()
+            return n.lowercase()
+        }
+
+        val startPois = poisWithDist.filter { p -> startKeywords.any { p.name.startsWith(it, ignoreCase = true) } }
+        val endPois = poisWithDist.filter { p ->
+            endKeywords.any { p.name.startsWith(it, ignoreCase = true) } ||
+            p.name.contains("cima", ignoreCase = true) ||
+            p.name.contains("puerto", ignoreCase = true) ||
+            p.name.contains("alto", ignoreCase = true) ||
+            p.name.contains("col ", ignoreCase = true)
+        }
+
+        val pairedEnds = mutableSetOf<PoiWithDist>()
+
+        // A) Emparejar INICIO: X con CIMA: X
+        for (start in startPois) {
+            val key = normalizeKey(start.name, startKeywords)
+            // Buscar la cima correspondiente que esté por delante
+            val matchEnd = endPois.firstOrNull { end ->
+                end.distance > start.distance + 200.0 &&
+                (normalizeKey(end.name, endKeywords) == key || key.isEmpty() || normalizeKey(end.name, endKeywords).contains(key) || key.contains(normalizeKey(end.name, endKeywords)))
+            }
+
+            if (matchEnd != null) {
+                pairedEnds.add(matchEnd)
+                val len = matchEnd.distance - start.distance
+                val elevGain = (matchEnd.elevation - start.elevation).coerceAtLeast(0.0)
+                val avgGrade = if (len > 0) (elevGain / len) * 100.0 else 0.0
+
+                var displayName = matchEnd.name.replace(Regex("\\[.*?\\]"), "").trim()
+                for (kw in endKeywords + startKeywords) {
+                    if (displayName.startsWith(kw, ignoreCase = true)) {
+                        displayName = displayName.substring(kw.length).trim()
+                    }
+                }
+                displayName = displayName.replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "").trim()
+
+                val forcedCategory = parseCategoryFromName(matchEnd.name) ?: parseCategoryFromName(start.name)
+
+                var climb = RouteClimb(
+                    startDistance = start.distance,
+                    endDistance = matchEnd.distance,
+                    length = len,
+                    totalElevation = elevGain,
+                    avgGrade = avgGrade,
+                    name = if (displayName.isNotBlank()) displayName else null,
+                    isCustom = true
+                )
+                climb = calculateClimbCategory(climb)
+                if (forcedCategory != null) {
+                    climb.category = forcedCategory
+                }
+                detectedClimbs.add(climb)
+            }
+        }
+
+        // B) Si una CIMA no tenía INICIO explícito pero tiene formato de puerto ("CIMA: Morcuera" o "PUERTO: ...")
+        for (end in endPois) {
+            if (end in pairedEnds) continue
+            val hasExplicitPrefix = endKeywords.any { end.name.startsWith(it, ignoreCase = true) }
+            if (hasExplicitPrefix && end.distance > 500.0) {
+                // Retroceder en el perfil de elevación para encontrar el pie de puerto natural
+                var bestStartDist = end.distance - 1000.0
+                var minElevSeen = end.elevation
+                var distBack = 0.0
+                val maxLookback = 30000.0 // Hasta 30 km atrás
+
+                if (routeElevationProfile.isNotEmpty()) {
+                    val pts = routeElevationProfile.filter { it.distance in (end.distance - maxLookback)..end.distance }.sortedByDescending { it.distance }
+                    for (pt in pts) {
+                        if (pt.elevation < minElevSeen) {
+                            minElevSeen = pt.elevation
+                            bestStartDist = pt.distance
+                        } else if (pt.elevation > minElevSeen + 35.0) {
+                            // Subió más de 35m antes de empezar: hemos llegado al valle anterior
+                            break
+                        }
+                    }
+                }
+
+                val len = end.distance - bestStartDist
+                if (len >= 500.0) {
+                    val elevGain = (end.elevation - minElevSeen).coerceAtLeast(0.0)
+                    val avgGrade = if (len > 0) (elevGain / len) * 100.0 else 0.0
+
+                    var displayName = end.name.replace(Regex("\\[.*?\\]"), "").trim()
+                    for (kw in endKeywords) {
+                        if (displayName.startsWith(kw, ignoreCase = true)) {
+                            displayName = displayName.substring(kw.length).trim()
+                        }
+                    }
+                    displayName = displayName.replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "").trim()
+
+                    val forcedCategory = parseCategoryFromName(end.name)
+
+                    var climb = RouteClimb(
+                        startDistance = bestStartDist,
+                        endDistance = end.distance,
+                        length = len,
+                        totalElevation = elevGain,
+                        avgGrade = avgGrade,
+                        name = if (displayName.isNotBlank()) displayName else null,
+                        isCustom = true
+                    )
+                    climb = calculateClimbCategory(climb)
+                    if (forcedCategory != null) {
+                        climb.category = forcedCategory
+                    }
+                    detectedClimbs.add(climb)
+                }
+            }
+        }
+
+        if (detectedClimbs.isNotEmpty()) {
+            val nonCustom = this.routeClimbs.filter { !it.isCustom }
+            val combined = (detectedClimbs + nonCustom).deduplicateOverlappingClimbs()
+            this.routeClimbs = combined
+            Log.d("AltiCalc", "ELITE: Aplicados ${detectedClimbs.size} puertos definidos por POIs de usuario. Total activos: ${this.routeClimbs.size}")
+        }
     }
 
     /**
      * Sincroniza la lista de climbs. Como Karoo puede borrar los climbs superados de la lista,
      * hacemos un merge para mantenerlos (y poder verlos al hacer re-ride).
      * Además, cataloga los puertos calculando su APM.
+     * Los puertos definidos por el usuario (isCustom = true) prevalecen sobre los incoming de Karoo.
      */
     fun syncRouteClimbs(routeKey: String, incoming: List<RouteClimb>) {
+        val existingCustom = routeClimbs.filter { it.isCustom }
+
         if (routeKeyForClimbs != routeKey) {
             routeKeyForClimbs = routeKey
             if (incoming.isNotEmpty()) {
                 val categorized = incoming.map { calculateClimbCategory(it) }
-                routeClimbs = categorized.deduplicateOverlappingClimbs()
-                Log.d("AltiCalc", "syncRouteClimbs: Nueva ruta '$routeKey'. Inicializados ${routeClimbs.size} puertos.")
+                val merged = (existingCustom + categorized).deduplicateOverlappingClimbs()
+                routeClimbs = merged
+                Log.d("AltiCalc", "syncRouteClimbs: Nueva ruta '$routeKey'. Inicializados ${routeClimbs.size} puertos (${existingCustom.size} personalizados).")
             }
         } else if (incoming.isNotEmpty()) {
             val categorizedIncoming = incoming.map { calculateClimbCategory(it) }
-            val merged = routeClimbs + categorizedIncoming
-            routeClimbs = merged.deduplicateOverlappingClimbs()
-            Log.d("AltiCalc", "syncRouteClimbs: Actualizados ${routeClimbs.size} puertos en '$routeKey'.")
+            val merged = (existingCustom + routeClimbs + categorizedIncoming).deduplicateOverlappingClimbs()
+            routeClimbs = merged
+            Log.d("AltiCalc", "syncRouteClimbs: Actualizados ${routeClimbs.size} puertos en '$routeKey' (${existingCustom.size} personalizados).")
         }
     }
 
@@ -485,7 +696,7 @@ class AltimetriaStrategyCalculator {
         }
         
         val apm = FatigueGradeCalculator.calculateTotalFatigueGrade(accumulatedHardness, defaultAsphaltFactor, maxGrade)
-        val category = FatigueGradeCalculator.getClimbCategoryName(apm)
+        val category = if (climb.category.isNotBlank() && climb.isCustom) climb.category else FatigueGradeCalculator.getClimbCategoryName(apm)
         
         return climb.copy(apm = apm, category = category)
     }
@@ -602,10 +813,17 @@ class AltimetriaStrategyCalculator {
             i++
         }
         
-        if (customClimbs.isNotEmpty() && this.routeClimbs.isEmpty()) {
-            this.routeClimbs = customClimbs.deduplicateOverlappingClimbs()
-            Log.e("AltiCalc", "Detected ${this.routeClimbs.size} custom climbs!")
+        if (customClimbs.isNotEmpty()) {
+            val existingCustom = this.routeClimbs.filter { it.isCustom }
+            if (existingCustom.isNotEmpty()) {
+                this.routeClimbs = (existingCustom + customClimbs).deduplicateOverlappingClimbs()
+            } else if (this.routeClimbs.isEmpty()) {
+                this.routeClimbs = customClimbs.deduplicateOverlappingClimbs()
+                Log.e("AltiCalc", "Detected ${this.routeClimbs.size} custom climbs!")
+            }
         }
+        // Re-evaluar puertos definidos por POIs ahora que tenemos el perfil de elevación real
+        detectUserDefinedClimbsFromPois()
     }
 
     private fun applyTrueElevationsToRoutePoints() {
@@ -896,7 +1114,11 @@ class AltimetriaStrategyCalculator {
 
     // advance=false: calcula la estrategia con el estado actual SIN mutarlo (EMA, integración, clima, Strava, APM)
     fun calculateStrategy(context: Context? = null, advance: Boolean = true): StrategyData {
-        val prefs = context?.let { AppPreferences.getInstance(it) }
+        if (context != null && appContext == null) {
+            appContext = context.applicationContext
+        }
+        val effectiveCtx = context ?: appContext
+        val prefs = effectiveCtx?.let { AppPreferences.getInstance(it) }
 
         val blockSize = prefs?.blockSizeMeters ?: 100.0
         val baseLookahead = (prefs?.lookaheadMeters3d ?: 350).toDouble()

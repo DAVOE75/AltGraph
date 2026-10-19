@@ -289,6 +289,26 @@ class MainActivity : Activity() {
         }
         climbRotate90Card.addView(climbSwitchRotate90)
 
+        // Opción: Mostrar Nombre del Puerto en el Visor
+        val climbNameCard = createCardContainer()
+        val climbSwitchName = Switch(this).apply {
+            text = getString(R.string.setting_show_climb_name_title)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.showClimbNameInViewer
+            setOnCheckedChangeListener { _, isChecked ->
+                prefs.showClimbNameInViewer = isChecked
+            }
+        }
+        val climbNameDesc = TextView(this).apply {
+            text = getString(R.string.setting_show_climb_name_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 0)
+        }
+        climbNameCard.addView(climbSwitchName)
+        climbNameCard.addView(climbNameDesc)
+
         // Opción: Tamaño de Letra 3D
         val font3dCard = createCardContainer()
         val font3dLabel = createSectionLabel(getString(R.string.setting_font_size_3d))
@@ -1379,6 +1399,29 @@ class MainActivity : Activity() {
         highlightClimbsCard.addView(textHighlightClimbsDesc)
         tabEliteContainer.addView(highlightClimbsCard)
 
+        // Custom POI Climbs (Puertos Definidos por Usuario)
+        val customClimbsCard = createCardContainer()
+        customClimbsCard.orientation = LinearLayout.VERTICAL
+        val switchCustomClimbs = Switch(this).apply {
+            text = getString(R.string.pref_elite_custom_climbs_title)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.eliteCustomClimbsEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, isChecked ->
+                prefs.eliteCustomClimbsEnabled = isChecked
+            }
+        }
+        val textCustomClimbsDesc = TextView(this).apply {
+            text = getString(R.string.pref_elite_custom_climbs_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 0)
+        }
+        customClimbsCard.addView(switchCustomClimbs)
+        customClimbsCard.addView(textCustomClimbsDesc)
+        tabEliteContainer.addView(customClimbsCard)
+
         // Power Zone Bar
         val powerBarCard = createCardContainer()
         powerBarCard.orientation = LinearLayout.VERTICAL
@@ -1491,6 +1534,7 @@ class MainActivity : Activity() {
                 switchShowSurfaceTextures.isChecked = prefs.showSurfaceTextures
                 switchProfileTvRotate.isChecked = prefs.eliteProfileTv2dRotate
                 switchHighlightClimbs.isChecked = prefs.eliteHighlightClimbs
+                switchCustomClimbs.isChecked = prefs.eliteCustomClimbsEnabled
                 switchSmoothMap.isChecked = prefs.eliteSmoothMapOverlayEnabled
                 val currentMode = prefs.eliteMapOverlayMode
                 mapOverlaySpinner.setSelection(when(currentMode) {

@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="Logotipo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v1.0.85 ELITE)
+# ALTGRAPH (v1.1.0 ELITE)
 <p>Ler em: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** é uma extensão profissional de altimetria e desempenho de ciclismo de última geração para os ciclocomputadores **Hammerhead Karoo** (Karoo 2 e Karoo 3), desenvolvida por **hesiOX** utilizando o SDK oficial `karoo-ext`.
@@ -10,6 +10,23 @@ Revoluciona o conceito tradicional de altimetria de ciclismo incorporando um **C
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logotipo ALTGRAPH" width="350" />
 </p>
+
+## 🚀 VERSÃO 1.1.0 ELITE: PASSOS DE MONTANHA DEFINIDOS PELO UTILIZADOR (POIs)
+
+A funcionalidade mais aguardada para cicloturismo e competição de topo: **definir com exatidão métrica quais as subidas que são verdadeiros passos de montanha, impedindo que algoritmos automáticos dividam a subida em duas devido a zonas planas ou falsos planos intermédios**.
+
+### 🏔️ Como funciona?
+1. **Deteção por POIs na rota (Komoot, Strava, RideWithGPS ou Karoo Dashboard)**:
+   - Ponto de início: `INICIO: NomeSubida` ou `START: NomeSubida` (ex: `INICIO: Alto da Torre`).
+   - Cume da subida: `CIMA: NomeSubida` ou `SUMMIT: NomeSubida` (ex: `CIMA: Alto da Torre`).
+   - *Ou apenas Cume*: Se marcar apenas `CIMA: Serra da Estrela`, o AltGraph calcula de forma inteligente o início natural da subida no vale.
+2. **Categorização Oficial e Forçada**:
+   - **Automática segundo Vuelta / APM**: O AltGraph calcula distância, ganho de elevação, inclinação média e atribui a categoria oficial (4ª, 3ª, 2ª, 1ª ou Especial/HC).
+   - **Categoria Forçada Manual**: Adicionando a categoria entre parênteses retos (ex: `CIMA: Torre [HC]`, `[1C]` ou `[2C]`), o sistema assume-a de imediato.
+3. **Prevalência Total**:
+   - As suas subidas personalizadas **substituem e anulam qualquer subida detetada automaticamente**, unindo os descansos e exibindo o nome real no **Visualizador de Subidas**, no **Perfil TV 2D** e na **Barra de Rota**.
+4. **Ícones de Ciclistas Redesenhados**:
+   - Novos ícones vetoriais aerodinâmicos de contrarrelógio / triatlo, aumentados para máxima legibilidade na barra de alertas.
 
 ## NOVA INTEGRAÇÃO: WIDGET KGHOST NO RADAR ALTIMÉTRICO (v1.0.85 ELITE)
 

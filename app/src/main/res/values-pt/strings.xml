@@ -191,6 +191,10 @@
     <string name="color_neon_purple">Rosa / Violeta</string>
     <string name="pref_elite_highlight_climbs_title">Marcar subidas na rota</string>
     <string name="pref_elite_highlight_climbs_desc">Destaca os passos de montanha coloridos sobre o perfil da etapa</string>
+    <string name="pref_elite_custom_climbs_title">Subidas Definidas pelo Utilizador (POIs)</string>
+    <string name="pref_elite_custom_climbs_desc">Os passos marcados por POIs prevalecem sobre os detetados automaticamente com categorização oficial</string>
     <string name="profile_tv_climb_list_title">Lista de subidas</string>
     <string name="profile_tv_climb_item_prefix">Subida</string>
+    <string name="setting_show_climb_name_title">Mostrar nome da subida no visualizador</string>
+    <string name="setting_show_climb_name_desc">Apresenta o nome do passo de montanha no topo do gráfico 3D em vez de apenas o ícone</string>
 </resources>
