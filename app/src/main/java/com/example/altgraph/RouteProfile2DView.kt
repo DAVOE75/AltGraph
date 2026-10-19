@@ -276,10 +276,10 @@ class RouteProfile2DView(context: Context) : View(context) {
                 val px = startX + endPct * drawW
                 val py = bottomY - ((profileElevations[peakIdx] - minElev) / elevRange) * (bottomY - topY)
 
-                val label = if (showClimbNames && !climb.name.isNullOrBlank()) {
+                val label = if (!climb.name.isNullOrBlank()) {
                     if (mappedCat != null) "${climb.name} ($mappedCat)" else climb.name!!
                 } else {
-                    mappedCat ?: climb.name ?: ""
+                    mappedCat ?: ""
                 }
                 if (label.isNotBlank()) {
                     // Dibujar banderín pequeño o hito en la cima del puerto
@@ -354,7 +354,7 @@ class RouteProfile2DView(context: Context) : View(context) {
             val maxItemWidth = catClimbs.maxOfOrNull { item ->
                 val climb = item.first
                 val cat = item.second
-                val ptoStr = if (showClimbNames && !climb.name.isNullOrBlank()) "${climb.name} " else "$ptoPrefix 9 "
+                val ptoStr = if (!climb.name.isNullOrBlank()) "${climb.name} " else "$ptoPrefix 9 "
                 val catStr = "($cat)"
                 val startKm = climb.startDistance / 1000.0
                 val lenKm = climb.length / 1000.0
@@ -393,7 +393,7 @@ class RouteProfile2DView(context: Context) : View(context) {
                 }
 
                 // Line 1: Pto 1 [Nombre] (3ª) km 3.5 | 0.5 km al 6.5%
-                val ptoStr = if (showClimbNames && !climb.name.isNullOrBlank()) "${climb.name} " else "$ptoPrefix ${i + 1} "
+                val ptoStr = if (!climb.name.isNullOrBlank()) "${climb.name} " else "$ptoPrefix ${i + 1} "
                 canvas.drawText(ptoStr, listStartX, climbY, climbListPaint)
                 val ptoWidth = climbListPaint.measureText(ptoStr)
 

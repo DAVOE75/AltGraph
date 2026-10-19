@@ -29,6 +29,8 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.roundToInt
 
 private const val TAG = "ALTGRAPH_VIEWER"
@@ -45,6 +47,7 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
     private var currentClimbIndex = 0
     private var climbLookaheadMeters: Double = 0.0 // 0.0 = full climb
     private var climbPanOffsetMeters: Double = 0.0
+    private val refreshChannel = Channel<Unit>(Channel.CONFLATED)
 
     companion object {
         const val ACTION_CLIMB_NEXT = "com.example.altgraph.ACTION_CLIMB_NEXT"
@@ -148,6 +151,7 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                             climbPanOffsetMeters = (climbPanOffsetMeters + step).coerceAtMost(maxOffset)
                         }
                     }
+                    refreshChannel.trySend(Unit)
                 }
             }
             val filter = IntentFilter().apply {
@@ -336,11 +340,12 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                     }
                     FontHelper.applyFontToPaint(maxGradePaint, prefs.fontFamilyKey)
                     
-                    val showName = prefs.showClimbNameInViewer && !climb.name.isNullOrBlank()
+                    val showName = !climb.name.isNullOrBlank()
+                    val catPart = if (climb.category.isNotBlank()) " (${climb.category})" else ""
                     val climbTitle = if (showName) {
-                        "◀   ${climb.name} (${climb.category})   ▶"
+                        "◀   ${climb.name}$catPart   ▶"
                     } else {
-                        "◀   Puerto ${currentClimbIndex + 1}/${climbs.size} (${climb.category})   ▶"
+                        "◀   Puerto ${currentClimbIndex + 1}/${climbs.size}$catPart   ▶"
                     }
                     currentCanvas.drawText(climbTitle, drawW / 2f, drawH * 0.10f, overlayPaint)
                     
@@ -429,7 +434,9 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 emitter.updateView(remoteViews)
                 }
                 }
-                delay(1000)
+                withTimeoutOrNull(1000) {
+                    refreshChannel.receive()
+                }
             }
         }
         // Siempre libera el token al terminar el bucle (excepción, parada del repositorio...); es idempotente

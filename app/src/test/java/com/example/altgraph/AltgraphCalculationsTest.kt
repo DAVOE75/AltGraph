@@ -294,4 +294,93 @@ class AltgraphCalculationsTest {
         calculator.updateCurrentLocation(40.0 + 14 * 0.0045, -3.0)
         assertEquals(7210.0, calculator.currentRouteDistance, 0.1)
     }
+
+    @Test
+    fun testClimbCategoryOfficialThresholds() {
+        val calc = AltimetriaStrategyCalculator()
+        val climb1 = RouteClimb(
+            startDistance = 10000.0,
+            endDistance = 21900.0,
+            length = 11900.0,
+            totalElevation = 399.0,
+            avgGrade = 3.1
+        )
+        val method = AltimetriaStrategyCalculator::class.java.getDeclaredMethod("calculateClimbCategory", RouteClimb::class.java).apply {
+            isAccessible = true
+        }
+        val categorized1 = method.invoke(calc, climb1) as RouteClimb
+        assertEquals("3ª Cat", categorized1.category)
+
+        // Subida de 0.8 km al 4.1% con 32m de desnivel -> NO puntuable (categoría vacía)
+        val climb2 = RouteClimb(
+            startDistance = 24700.0,
+            endDistance = 25500.0,
+            length = 800.0,
+            totalElevation = 32.0,
+            avgGrade = 4.1
+        )
+        val categorized2 = method.invoke(calc, climb2) as RouteClimb
+        assertEquals("", categorized2.category)
+
+        // Subida de 0.6 km al 4.4% con 26m de desnivel -> NO puntuable (categoría vacía)
+        val climb3 = RouteClimb(
+            startDistance = 49800.0,
+            endDistance = 50400.0,
+            length = 600.0,
+            totalElevation = 26.0,
+            avgGrade = 4.4
+        )
+        val categorized3 = method.invoke(calc, climb3) as RouteClimb
+        assertEquals("", categorized3.category)
+    }
+
+    @Test
+    fun testCustomClimbsSequentialPairingAndOverrideOverAutomaticClimbs() {
+        val calc = AltimetriaStrategyCalculator()
+        // Ruta de 60 km
+        calc.routePoints = (0..600).map { i ->
+            val dist = i * 100.0
+            val elev = when {
+                dist in 10000.0..21900.0 -> 100.0 + (dist - 10000.0) * 0.0335
+                dist in 33900.0..40700.0 -> 200.0 + (dist - 33900.0) * 0.058
+                else -> 100.0
+            }
+            RoutePoint(38.4 + i * 0.001, -0.4, elev, dist)
+        }
+        calc.isNavigatingRoute = true
+
+        val symbols = listOf(
+            io.hammerhead.karooext.models.Symbol.POI("1", 38.4 + 100 * 0.001, -0.4, "flag", "Inicio", emptyList()),
+            io.hammerhead.karooext.models.Symbol.POI("2", 38.4 + 219 * 0.001, -0.4, "summit", "Puerto de Busot", emptyList()),
+            io.hammerhead.karooext.models.Symbol.POI("3", 38.4 + 339 * 0.001, -0.4, "flag", "Inicio", emptyList()),
+            io.hammerhead.karooext.models.Symbol.POI("4", 38.4 + 407 * 0.001, -0.4, "summit", "Puerto de Jijona", emptyList())
+        )
+
+        calc.detectUserDefinedClimbsFromPois(symbols)
+
+        // Deben haberse detectado EXACTAMENTE los 2 puertos manuales
+        assertEquals(2, calc.routeClimbs.size)
+        assertEquals("Puerto de Busot", calc.routeClimbs[0].name)
+        assertEquals("Puerto de Jijona", calc.routeClimbs[1].name)
+        assertTrue(calc.routeClimbs[0].isCustom)
+        assertTrue(calc.routeClimbs[1].isCustom)
+
+        // Ahora simulamos que Karoo envía sus 7 climbs automáticos
+        val karooClimbs = listOf(
+            RouteClimb(10000.0, 21900.0, 11900.0, 399.0, 3.1),
+            RouteClimb(24700.0, 25500.0, 800.0, 32.0, 4.1),
+            RouteClimb(31600.0, 32600.0, 1000.0, 39.0, 3.9),
+            RouteClimb(33900.0, 40700.0, 6800.0, 395.0, 5.8),
+            RouteClimb(48800.0, 49200.0, 400.0, 33.0, 8.3),
+            RouteClimb(49800.0, 50400.0, 600.0, 26.0, 4.4),
+            RouteClimb(52500.0, 53200.0, 700.0, 36.0, 5.2)
+        )
+
+        calc.syncRouteClimbs("route:MUTXAMEL", karooClimbs)
+
+        // La ruta DEBE MANTENERSE EXCLUSIVAMENTE CON LOS 2 PUERTOS MANUALES
+        assertEquals(2, calc.routeClimbs.size)
+        assertEquals("Puerto de Busot", calc.routeClimbs[0].name)
+        assertEquals("Puerto de Jijona", calc.routeClimbs[1].name)
+    }
 }

@@ -231,7 +231,7 @@ class AppPreferences(context: Context) {
         set(value) = prefs.edit().putBoolean(KEY_ELITE_HIGHLIGHT_CLIMBS, value).apply()
 
     var eliteProfileTvShowClimbNames: Boolean
-        get() = prefs.getBoolean(KEY_ELITE_PROFILE_TV_SHOW_CLIMB_NAMES, true) && isEliteUnlocked
+        get() = prefs.getBoolean(KEY_ELITE_PROFILE_TV_SHOW_CLIMB_NAMES, true)
         set(value) = prefs.edit().putBoolean(KEY_ELITE_PROFILE_TV_SHOW_CLIMB_NAMES, value).apply()
         
     var eliteMapOverlayMode: String
@@ -243,7 +243,7 @@ class AppPreferences(context: Context) {
         set(value) = prefs.edit().putBoolean(KEY_ELITE_SMOOTH_MAP_OVERLAY, value).apply()
 
     var eliteCustomClimbsEnabled: Boolean
-        get() = prefs.getBoolean(KEY_ELITE_CUSTOM_CLIMBS_ENABLED, true) && isEliteUnlocked
+        get() = prefs.getBoolean(KEY_ELITE_CUSTOM_CLIMBS_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_ELITE_CUSTOM_CLIMBS_ENABLED, value).apply()
 
     var userFtp: Int
