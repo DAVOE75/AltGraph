@@ -96,7 +96,17 @@ class RouteProfile2DDataField(extension: String) : DataTypeImpl(extension, "prof
                         val strategy = snap.strategy
 
                         val isRotated = prefs.eliteProfileTv2dRotate
-                        val frame = listOf(snap.routeTotalLength, strategy.remainingDistance, isRotated, isElite)
+                        val frame = listOf(
+                            snap.routeTotalLength,
+                            strategy.remainingDistance,
+                            isRotated,
+                            isElite,
+                            snap.routeClimbs.size,
+                            snap.routeClimbs.map { it.name to it.startDistance },
+                            prefs.eliteProfileTvShowClimbNames,
+                            prefs.eliteProfileTvColor,
+                            prefs.eliteHighlightClimbs
+                        )
                         if (frame == lastFrame) return@safeUpdate
 
                         // Fetch new full profile if route changed

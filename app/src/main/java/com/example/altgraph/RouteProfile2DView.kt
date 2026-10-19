@@ -282,7 +282,10 @@ class RouteProfile2DView(context: Context) : View(context) {
                     mappedCat ?: climb.name ?: ""
                 }
                 if (label.isNotBlank()) {
-                    canvas.drawText(label, px, py - 10f, peakTextPaint)
+                    // Dibujar banderín pequeño o hito en la cima del puerto
+                    drawFlag(canvas, px, py, "#F59E0B", 0.7f)
+                    val textY = (py - 26f).coerceAtLeast(35f)
+                    canvas.drawText(label, px, textY, peakTextPaint)
                 }
             }
         }
@@ -324,9 +327,13 @@ class RouteProfile2DView(context: Context) : View(context) {
                 catUp.contains("3") -> "3ª"
                 catUp.contains("4") -> "4ª"
                 catUp.contains("ESPECIAL") || catUp.contains("H.C") || catUp.contains("HC") -> "H.C."
+                climb.category.isNotBlank() -> climb.category
+                climb.isCustom -> "Puerto"
                 else -> null
             }
-            if (mappedCat != null) Pair(climb, mappedCat) else null
+            if (mappedCat != null || !climb.name.isNullOrBlank()) {
+                Pair(climb, mappedCat ?: "Puerto")
+            } else null
         }.sortedBy { it.first.startDistance }
 
         if (catClimbs.isNotEmpty()) {

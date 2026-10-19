@@ -49,8 +49,8 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
     companion object {
         const val ACTION_CLIMB_NEXT = "com.example.altgraph.ACTION_CLIMB_NEXT"
         const val ACTION_CLIMB_PREV = "com.example.altgraph.ACTION_CLIMB_PREV"
-        const val ACTION_ZOOM_IN = "com.example.altgraph.ACTION_ZOOM_IN"
-        const val ACTION_ZOOM_OUT = "com.example.altgraph.ACTION_ZOOM_OUT"
+        const val ACTION_ZOOM_IN = "com.example.altgraph.ACTION_CLIMB_ZOOM_IN"
+        const val ACTION_ZOOM_OUT = "com.example.altgraph.ACTION_CLIMB_ZOOM_OUT"
         const val ACTION_PAN_LEFT = "com.example.altgraph.ACTION_CLIMB_PAN_LEFT"
         const val ACTION_PAN_RIGHT = "com.example.altgraph.ACTION_CLIMB_PAN_RIGHT"
     }

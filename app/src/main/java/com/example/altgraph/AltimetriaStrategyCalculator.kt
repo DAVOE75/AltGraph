@@ -610,6 +610,9 @@ class AltimetriaStrategyCalculator {
                     displayName = cleanClimbName(start.name)
                 }
                 if (displayName.isBlank()) {
+                    displayName = matchEnd.name.replace(Regex("\\[.*?\\]"), "").replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "").trim()
+                }
+                if (displayName.isBlank()) {
                     displayName = "Puerto"
                 }
 
@@ -640,6 +643,7 @@ class AltimetriaStrategyCalculator {
                 end.name.contains("puerto", ignoreCase = true) ||
                 end.name.contains("pto", ignoreCase = true) ||
                 end.name.contains("cima", ignoreCase = true) ||
+                end.name.contains("cumbre", ignoreCase = true) ||
                 end.name.contains("passo", ignoreCase = true) ||
                 end.name.contains("alto de", ignoreCase = true) ||
                 end.name.contains("col de", ignoreCase = true) ||
@@ -708,6 +712,9 @@ class AltimetriaStrategyCalculator {
 
                     var displayName = cleanClimbName(end.name)
                     if (displayName.isBlank()) {
+                        displayName = end.name.replace(Regex("\\[.*?\\]"), "").replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "").trim()
+                    }
+                    if (displayName.isBlank()) {
                         displayName = "Puerto"
                     }
 
@@ -732,10 +739,10 @@ class AltimetriaStrategyCalculator {
         }
 
         if (detectedClimbs.isNotEmpty()) {
-            val nonCustom = this.routeClimbs.filter { !it.isCustom }
-            val combined = (detectedClimbs + nonCustom).deduplicateOverlappingClimbs()
-            this.routeClimbs = combined
-            Log.d("AltiCalc", "ELITE: Aplicados ${detectedClimbs.size} puertos definidos por POIs de usuario. Total activos: ${this.routeClimbs.size}")
+            // Si el usuario ha definido puertos propios por POIs, éstos tienen preferencia absoluta.
+            // No dejamos que los automáticos vuelvan a poblar la ruta si el usuario ha simplificado a sus propios puertos.
+            this.routeClimbs = detectedClimbs.sortedBy { it.startDistance }
+            Log.d("AltiCalc", "ELITE: Aplicados exclusivamente ${detectedClimbs.size} puertos definidos por POIs de usuario.")
 
             // Guardar de forma persistente en almacenamiento de Ruta y Catálogo Global (GPS)
             appContext?.let { ctx ->
@@ -805,15 +812,21 @@ class AltimetriaStrategyCalculator {
             routeKeyForClimbs = routeKey
             if (incoming.isNotEmpty()) {
                 val categorized = incoming.map { calculateClimbCategory(it) }
-                val merged = (existingCustom + categorized).deduplicateOverlappingClimbs()
+                val merged = if (existingCustom.isNotEmpty()) {
+                    existingCustom.sortedBy { it.startDistance }
+                } else {
+                    categorized.deduplicateOverlappingClimbs()
+                }
                 routeClimbs = merged
                 Log.d("AltiCalc", "syncRouteClimbs: Nueva ruta '$routeKey'. Inicializados ${routeClimbs.size} puertos (${existingCustom.size} personalizados).")
             }
         } else if (incoming.isNotEmpty()) {
-            val categorizedIncoming = incoming.map { calculateClimbCategory(it) }
-            val merged = (existingCustom + routeClimbs + categorizedIncoming).deduplicateOverlappingClimbs()
-            routeClimbs = merged
-            Log.d("AltiCalc", "syncRouteClimbs: Actualizados ${routeClimbs.size} puertos en '$routeKey' (${existingCustom.size} personalizados).")
+            if (existingCustom.isEmpty()) {
+                val categorizedIncoming = incoming.map { calculateClimbCategory(it) }
+                val merged = (routeClimbs + categorizedIncoming).deduplicateOverlappingClimbs()
+                routeClimbs = merged
+                Log.d("AltiCalc", "syncRouteClimbs: Actualizados ${routeClimbs.size} puertos en '$routeKey'.")
+            }
         }
 
         // Si tenemos POIs de usuario presentes, re-evaluamos para garantizar que absorban y sustituyan
