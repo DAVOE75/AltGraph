@@ -306,7 +306,7 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                         showHeaderStats = false,
                         routeCoords = strategy.routeCoords,
                         showSurfaceTextures = prefs.showSurfaceTextures,
-                        panButtonsPosition = prefs.panButtonsPosition
+                        panButtonsPosition = "bottom"
                     )
                     
                     altimetria3DView.draw(currentCanvas)
@@ -419,22 +419,11 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 val intentPanRight = Intent(ACTION_PAN_RIGHT).apply { setPackage(context.packageName) }
                 val pIntentPanRight = PendingIntent.getBroadcast(context, 5, intentPanRight, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
-                val isPanTop = prefs.panButtonsPosition == "top"
-                if (isPanTop) {
-                    remoteViews.setViewVisibility(R.id.btn_pan_left, android.view.View.GONE)
-                    remoteViews.setViewVisibility(R.id.btn_pan_right, android.view.View.GONE)
-                    remoteViews.setViewVisibility(R.id.btn_pan_left_top, android.view.View.VISIBLE)
-                    remoteViews.setViewVisibility(R.id.btn_pan_right_top, android.view.View.VISIBLE)
-                    remoteViews.setOnClickPendingIntent(R.id.btn_pan_left_top, pIntentPanLeft)
-                    remoteViews.setOnClickPendingIntent(R.id.btn_pan_right_top, pIntentPanRight)
-                } else {
-                    remoteViews.setViewVisibility(R.id.btn_pan_left, android.view.View.VISIBLE)
-                    remoteViews.setViewVisibility(R.id.btn_pan_right, android.view.View.VISIBLE)
-                    remoteViews.setViewVisibility(R.id.btn_pan_left_top, android.view.View.GONE)
-                    remoteViews.setViewVisibility(R.id.btn_pan_right_top, android.view.View.GONE)
-                    remoteViews.setOnClickPendingIntent(R.id.btn_pan_left, pIntentPanLeft)
-                    remoteViews.setOnClickPendingIntent(R.id.btn_pan_right, pIntentPanRight)
-                }
+                // Pan buttons are always at bottom in ClimbViewer
+                remoteViews.setViewVisibility(R.id.btn_pan_left, android.view.View.VISIBLE)
+                remoteViews.setViewVisibility(R.id.btn_pan_right, android.view.View.VISIBLE)
+                remoteViews.setOnClickPendingIntent(R.id.btn_pan_left, pIntentPanLeft)
+                remoteViews.setOnClickPendingIntent(R.id.btn_pan_right, pIntentPanRight)
 
                 emitter.onNext(UpdateGraphicConfig(showHeader = false))
                 emitter.updateView(remoteViews)

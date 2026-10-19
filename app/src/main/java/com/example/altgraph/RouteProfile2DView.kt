@@ -266,20 +266,24 @@ class RouteProfile2DView(context: Context) : View(context) {
                 catUp.contains("3") -> "3ª"
                 catUp.contains("4") -> "4ª"
                 catUp.contains("ESPECIAL") || catUp.contains("H.C") || catUp.contains("HC") -> "H.C."
+                climb.category.isNotBlank() -> climb.category
+                climb.isCustom -> "Puerto"
                 else -> null
             }
-            if (mappedCat != null) {
+            if (mappedCat != null || !climb.name.isNullOrBlank()) {
                 val endPct = (climb.endDistance / totalDistance).toFloat().coerceIn(0f, 1f)
                 val peakIdx = (endPct * (ptsCount - 1)).toInt().coerceIn(0, ptsCount - 1)
                 val px = startX + endPct * drawW
                 val py = bottomY - ((profileElevations[peakIdx] - minElev) / elevRange) * (bottomY - topY)
 
                 val label = if (showClimbNames && !climb.name.isNullOrBlank()) {
-                    "${climb.name} ($mappedCat)"
+                    if (mappedCat != null) "${climb.name} ($mappedCat)" else climb.name!!
                 } else {
-                    mappedCat
+                    mappedCat ?: climb.name ?: ""
                 }
-                canvas.drawText(label, px, py - 10f, peakTextPaint)
+                if (label.isNotBlank()) {
+                    canvas.drawText(label, px, py - 10f, peakTextPaint)
+                }
             }
         }
         

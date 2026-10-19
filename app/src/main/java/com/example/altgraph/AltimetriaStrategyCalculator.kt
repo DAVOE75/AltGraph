@@ -525,44 +525,78 @@ class AltimetriaStrategyCalculator {
 
         val detectedClimbs = mutableListOf<RouteClimb>()
 
-        // 2. Patrones de Inicio y Fin / Cima
-        val startKeywords = listOf("INICIO:", "START:", "COMIENZO:", "PIED DE PUERTO:", "PIE:", "DEBUT:", "INIZIO:")
-        val endKeywords = listOf("CIMA:", "FIN:", "END:", "SUMMIT:", "SOMMET:", "PASSO:", "PASO:", "COLLADO:", "CORONA:", "PUERTO:", "PTO:", "PTO.:", "PT.:", "ALTO:", "COL:")
+        // 2. Patrones de Inicio y Fin / Cima (con y sin dos puntos, con "de puerto", etc.)
+        val startPrefixes = listOf(
+            "INICIO DE PUERTO", "INICIO DEL PUERTO", "INICIO PUERTO", "INICIO PTO", "INICIO:", "INICIO",
+            "START CLIMB", "START OF CLIMB", "START:", "START",
+            "COMIENZO DE PUERTO", "COMIENZO DEL PUERTO", "COMIENZO PUERTO", "COMIENZO:", "COMIENZO",
+            "PIED DE PUERTO:", "PIED DE PUERTO", "PIE DE PUERTO:", "PIE DE PUERTO", "PIE:", "PIE",
+            "DEBUT:", "DEBUT", "INIZIO:", "INIZIO"
+        )
+        val endPrefixes = listOf(
+            "FINAL DE PUERTO", "FINAL DEL PUERTO", "FINAL PUERTO", "FINAL PTO", "FINAL:", "FINAL",
+            "FIN DE PUERTO", "FIN DEL PUERTO", "FIN PUERTO", "FIN PTO", "FIN:", "FIN",
+            "END OF CLIMB", "END CLIMB", "END:", "END",
+            "CIMA DE PUERTO", "CIMA DEL PUERTO", "CIMA:", "CIMA",
+            "SUMMIT OF CLIMB", "SUMMIT:", "SUMMIT", "SOMMET:", "SOMMET",
+            "CUMBRE DE PUERTO", "CUMBRE DEL PUERTO", "CUMBRE:", "CUMBRE",
+            "PASSO:", "PASO:", "COLLADO:", "CORONA:", "PUERTO:", "PTO.:", "PTO:", "PT.:", "ALTO:", "COL:"
+        )
 
-        fun normalizeKey(name: String, prefixList: List<String>): String {
-            var n = name.trim()
-            for (kw in prefixList) {
-                if (n.startsWith(kw, ignoreCase = true)) {
-                    n = n.substring(kw.length).trim()
+        fun cleanClimbName(raw: String): String {
+            var n = raw.replace(Regex("\\[.*?\\]"), "").replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "").trim()
+            val allPrefixes = (startPrefixes + endPrefixes).sortedByDescending { it.length }
+            for (pfx in allPrefixes) {
+                if (n.startsWith(pfx, ignoreCase = true)) {
+                    n = n.substring(pfx.length).trim()
+                    if (n.startsWith(":") || n.startsWith("-") || n.startsWith("de") || n.startsWith("del")) {
+                        n = n.replaceFirst(Regex("^[:\\-]|^(de\\s+|del\\s+)", RegexOption.IGNORE_CASE), "").trim()
+                    }
                     break
                 }
             }
-            // Quitar marcas de categoría tipo [1C] o altitud
-            n = n.replace(Regex("\\[.*?\\]"), "").replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "").trim()
-            return n.lowercase()
+            return n.trim()
         }
 
-        val startPois = poisWithDist.filter { p -> startKeywords.any { p.name.startsWith(it, ignoreCase = true) } }
-        val endPois = poisWithDist.filter { p ->
-            endKeywords.any { p.name.startsWith(it, ignoreCase = true) } ||
-            p.name.contains("cima", ignoreCase = true) ||
-            p.name.contains("puerto", ignoreCase = true) ||
-            p.name.contains("pto", ignoreCase = true) ||
-            p.name.contains("alto", ignoreCase = true) ||
-            p.name.contains("paso", ignoreCase = true) ||
-            p.name.contains("passo", ignoreCase = true) ||
-            p.name.contains("col ", ignoreCase = true)
+        fun normalizeKey(name: String): String {
+            return cleanClimbName(name).lowercase().replace(Regex("[^a-z0-9]"), "")
         }
+
+        fun isStartPoi(name: String): Boolean {
+            val upper = name.uppercase()
+            return startPrefixes.any { upper.startsWith(it) || upper.contains(" $it") }
+        }
+
+        fun isEndPoi(name: String): Boolean {
+            val upper = name.uppercase()
+            return endPrefixes.any { upper.startsWith(it) || upper.contains(" $it") } ||
+                upper.contains("CIMA") ||
+                upper.contains("CUMBRE") ||
+                upper.contains("FINAL") ||
+                upper.contains("PUERTO") ||
+                upper.contains("PTO") ||
+                upper.contains("ALTO") ||
+                upper.contains("PASO") ||
+                upper.contains("PASSO") ||
+                upper.contains("COL ")
+        }
+
+        val startPois = poisWithDist.filter { isStartPoi(it.name) }
+        val endPois = poisWithDist.filter { isEndPoi(it.name) }
 
         val pairedEnds = mutableSetOf<PoiWithDist>()
 
-        // A) Emparejar INICIO: X con CIMA: X
+        // A) Emparejar INICIO con CIMA / FINAL
         for (start in startPois) {
-            val key = normalizeKey(start.name, startKeywords)
-            // Buscar la cima correspondiente que esté por delante
+            val startKey = normalizeKey(start.name)
+            // Buscar la cima/final correspondiente que esté por delante
             val matchEnd = endPois.firstOrNull { end ->
-                end.distance > start.distance + 200.0 &&
-                (normalizeKey(end.name, endKeywords) == key || key.isEmpty() || normalizeKey(end.name, endKeywords).contains(key) || key.contains(normalizeKey(end.name, endKeywords)))
+                if (end.distance <= start.distance + 150.0) return@firstOrNull false
+                val endKey = normalizeKey(end.name)
+                // Coinciden por clave o bien hay un solo inicio y un solo fin, o la clave está contenida
+                (startKey.isNotEmpty() && endKey.isNotEmpty() && (startKey == endKey || startKey.contains(endKey) || endKey.contains(startKey))) ||
+                (startKey.isEmpty() && endKey.isEmpty()) ||
+                (startPois.size == 1 && endPois.size == 1)
             }
 
             if (matchEnd != null) {
@@ -571,13 +605,13 @@ class AltimetriaStrategyCalculator {
                 val elevGain = (matchEnd.elevation - start.elevation).coerceAtLeast(0.0)
                 val avgGrade = if (len > 0) (elevGain / len) * 100.0 else 0.0
 
-                var displayName = matchEnd.name.replace(Regex("\\[.*?\\]"), "").trim()
-                for (kw in listOf("CIMA:", "FIN:", "END:", "SUMMIT:", "SOMMET:", "INICIO:", "START:", "COMIENZO:", "PIE:")) {
-                    if (displayName.startsWith(kw, ignoreCase = true)) {
-                        displayName = displayName.substring(kw.length).trim()
-                    }
+                var displayName = cleanClimbName(matchEnd.name)
+                if (displayName.isBlank()) {
+                    displayName = cleanClimbName(start.name)
                 }
-                displayName = displayName.replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "").trim()
+                if (displayName.isBlank()) {
+                    displayName = "Puerto"
+                }
 
                 val forcedCategory = parseCategoryFromName(matchEnd.name) ?: parseCategoryFromName(start.name)
 
@@ -587,7 +621,7 @@ class AltimetriaStrategyCalculator {
                     length = len,
                     totalElevation = elevGain,
                     avgGrade = avgGrade,
-                    name = if (displayName.isNotBlank()) displayName else null,
+                    name = displayName,
                     isCustom = true
                 )
                 climb = calculateClimbCategory(climb)
@@ -601,7 +635,7 @@ class AltimetriaStrategyCalculator {
         // B) Si una CIMA no tenía INICIO explícito pero tiene formato de puerto ("CIMA: Morcuera", "PUERTO: ...", "Pto de Busot", etc.)
         for (end in endPois) {
             if (end in pairedEnds) continue
-            val hasExplicitPrefix = endKeywords.any { end.name.startsWith(it, ignoreCase = true) }
+            val hasExplicitPrefix = endPrefixes.any { end.name.startsWith(it, ignoreCase = true) }
             val hasClimbIndicator = hasExplicitPrefix ||
                 end.name.contains("puerto", ignoreCase = true) ||
                 end.name.contains("pto", ignoreCase = true) ||
@@ -672,15 +706,10 @@ class AltimetriaStrategyCalculator {
                     val elevGain = (end.elevation - minElevSeen).coerceAtLeast(0.0)
                     val avgGrade = if (len > 0) (elevGain / len) * 100.0 else 0.0
 
-                    var displayName = end.name.replace(Regex("\\[.*?\\]"), "").trim()
-                    // Quitar solo prefijos de control de POI ("CIMA:", "FIN:", etc.)
-                    for (kw in listOf("CIMA:", "FIN:", "END:", "SUMMIT:", "SOMMET:")) {
-                        if (displayName.startsWith(kw, ignoreCase = true)) {
-                            displayName = displayName.substring(kw.length).trim()
-                        }
+                    var displayName = cleanClimbName(end.name)
+                    if (displayName.isBlank()) {
+                        displayName = "Puerto"
                     }
-                    // Quitar sufijos de metros tipo "540m"
-                    displayName = displayName.replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "").trim()
 
                     val forcedCategory = parseCategoryFromName(end.name)
 
