@@ -68,6 +68,7 @@
     <string name="setting_ramp_min_slope">Ramp Minimum Slope Alert (%)</string>
     <string name="setting_ramp_max_slope">Ramp Maximum Slope Alert (%)</string>
     <string name="setting_show_max_gradient">Show Section Max Gradient in 3D Header</string>
+    <string name="setting_show_3d_header_stats">Show 3D Header Statistics (Route Name, Gradients)</string>
     <string name="setting_rotate_90_cw">Rotate Graph 90° Clockwise (Landscape Mode)</string>
     <string name="setting_use_topographic">Use Topographic Slope Calculation Method</string>
     <string name="setting_show_hairpins">Show Hairpin Bends (Black Lines)</string>

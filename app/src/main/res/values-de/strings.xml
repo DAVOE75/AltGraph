@@ -53,6 +53,7 @@
     <string name="setting_ramp_min_slope">Mindeststeigung für Rampenpfeil (%)</string>
     <string name="setting_ramp_max_slope">Maximalsteigung für Rampenpfeil (%)</string>
     <string name="setting_show_max_gradient">Maximale Steigung im 3D-Kopf anzeigen</string>
+    <string name="setting_show_3d_header_stats">3D-Kopfdaten anzeigen (Routenname, Steigungen)</string>
     <string name="setting_rotate_90_cw">Diagramm um 90° drehen (Querformat)</string>
     <string name="setting_use_topographic">Topografische Steigungsberechnung (horizontale Projektion)</string>
     <string name="setting_show_hairpins">Serpentinen / Haarnadelkurven anzeigen</string>

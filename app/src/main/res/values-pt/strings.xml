@@ -53,6 +53,7 @@
     <string name="setting_ramp_min_slope">Inclinação Mínima para Seta de Rampa (%)</string>
     <string name="setting_ramp_max_slope">Inclinação Máxima para Seta de Rampa (%)</string>
     <string name="setting_show_max_gradient">Mostrar Inclinação Máxima no Cabeçalho 3D</string>
+    <string name="setting_show_3d_header_stats">Mostrar Dados no Cabeçalho 3D (Nome da Rota, Inclinações)</string>
     <string name="setting_rotate_90_cw">Girar Gráfico 90° (Modo Paisagem)</string>
     <string name="setting_use_topographic">Usar Método de Cálculo de Inclinação Topográfica (Projeção Horizontal)</string>
     <string name="setting_show_hairpins">Mostrar Curvas em Ferradura e Cotovelos</string>

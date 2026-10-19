@@ -67,6 +67,7 @@
     <string name="setting_ramp_min_slope">Pendiente Mínima para Flecha de Rampa (%)</string>
     <string name="setting_ramp_max_slope">Pendiente Máxima para Flecha de Rampa (%)</string>
     <string name="setting_show_max_gradient">Mostrar Pendiente Máxima en Encabezado 3D</string>
+    <string name="setting_show_3d_header_stats">Mostrar Datos en Encabezado 3D (Nombre de Ruta, Pendientes)</string>
     <string name="setting_rotate_90_cw">Girar Gráfico 90° (Modo Horizontal / Apaisado)</string>
     <string name="setting_use_topographic">Usar Método de Cálculo de Pendiente Topográfico (Proyección Horizontal)</string>
     <string name="setting_show_hairpins">Mostrar Curvas de Herradura (Líneas Negras)</string>

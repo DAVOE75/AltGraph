@@ -53,6 +53,7 @@
     <string name="setting_ramp_min_slope">Pendenza Minima per Freccia Rampa (%)</string>
     <string name="setting_ramp_max_slope">Pendenza Massima per Freccia Rampa (%)</string>
     <string name="setting_show_max_gradient">Mostra Pendenza Massima nell\'Intestazione 3D</string>
+    <string name="setting_show_3d_header_stats">Mostra dati nell\'intestazione 3D (Nome percorso, pendenze)</string>
     <string name="setting_rotate_90_cw">Ruota Grafico di 90° (Modalità Orizzontale)</string>
     <string name="setting_use_topographic">Usa il metodo topografico di calcolo della pendenza (Proiezione orizzontale)</string>
     <string name="setting_show_hairpins">Mostra Tornanti e Curve a Gomito</string>

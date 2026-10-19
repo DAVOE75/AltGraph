@@ -236,6 +236,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             visibleAvgGrade = strategy.visibleAvgGrade,
                             visibleMaxGrade = strategy.visibleMaxGrade,
                             routeName = strategy.routeName,
+                            showHeaderStats = prefs.show3dHeaderStats,
                             routeCoords = strategy.routeCoords,
                             mapRotationAngle = mapRotAngle,
                             isHeadingUp = isHeadingUp,

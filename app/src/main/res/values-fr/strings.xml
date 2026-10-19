@@ -53,6 +53,7 @@
     <string name="setting_ramp_min_slope">Pente minimale pour flèche de rampe (%)</string>
     <string name="setting_ramp_max_slope">Pente maximale pour flèche de rampe (%)</string>
     <string name="setting_show_max_gradient">Afficher pente max dans l\'en-tête 3D</string>
+    <string name="setting_show_3d_header_stats">Afficher données d\'en-tête 3D (Nom d\'itinéraire, pentes)</string>
     <string name="setting_rotate_90_cw">Pivoter graphique de 90° (Mode paysage)</string>
     <string name="setting_use_topographic">Méthode de calcul topographique (projection horizontale)</string>
     <string name="setting_show_hairpins">Afficher lacets et virages en épingle</string>

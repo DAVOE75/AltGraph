@@ -573,6 +573,19 @@ class MainActivity : Activity() {
         }
         showMaxGradCard.addView(switchShowMaxGrad)
 
+        // Opción: Mostrar Encabezado con Datos y Pendientes en 3D
+        val showHeaderStatsCard = createCardContainer()
+        val switchShowHeaderStats = Switch(this).apply {
+            text = getString(R.string.setting_show_3d_header_stats)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.show3dHeaderStats
+            setOnCheckedChangeListener { _, isChecked ->
+                prefs.show3dHeaderStats = isChecked
+            }
+        }
+        showHeaderStatsCard.addView(switchShowHeaderStats)
+
         // Opción: Mostrar Brujula en Ruta
         val showCompassCard = createCardContainer()
         val switchShowCompass = Switch(this).apply {
@@ -596,6 +609,7 @@ class MainActivity : Activity() {
         tab3dContainer.addView(poiFilterCard)
         tab3dContainer.addView(topographicCard)
         tab3dContainer.addView(showMaxGradCard)
+        tab3dContainer.addView(showHeaderStatsCard)
 
         // ==========================================
         // PESTAÑA 3: ESTRATEGA 2D
