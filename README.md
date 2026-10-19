@@ -33,7 +33,10 @@ La novedad más esperada para el cicloturismo y competición de élite: **defini
    - **Categoría Manual Forzada**: Si añades la categoría entre corchetes (ej: `CIMA: Morcuera [1C]`, `[2C]`, `[ESP]` o `[HC]`), el sistema la respeta directamente.
 3. **Prevalencia Total**:
    - Tus puertos de usuario **prevalecen sobre cualquier puerto detectado automáticamente** por el ciclocomputador, fusionando descansillos y mostrando el nombre real en el **Visor de Puertos**, en el **Perfil TV 2D** y en la **Barra de Ruta**.
-4. **Iconos de Ciclistas Rediseñados**:
+4. **Persistencia por Ruta y Catálogo Global GPS (Estilo Dashboard)**:
+   - **A nivel de Ruta**: El puerto queda guardado para la ruta activa. Aunque vuelvas a cargarla en otra sesión sin los POIs originales, AltGraph recuerda y reactiva tus puertos personalizados de inmediato.
+   - **A nivel Global (GPS)**: Cada puerto se almacena con sus coordenadas geográficas exactas de inicio y cima en una biblioteca global del dispositivo. ¡Cualquier otra ruta que pase por ese mismo inicio y cima reconocerá y activará automáticamente el puerto!
+5. **Iconos de Ciclistas Rediseñados**:
    - Nuevos iconos vectoriales de ciclista en posición aerodinámica de contrarreloj / triatlón (postura acoplada, casco aero de gota y bicicleta de competición), ampliados para máxima legibilidad en la barra de avisos.
 
 ## NUEVA INTEGRACIÓN: WIDGET KGHOST EN RADAR ALTIMÉTRICO (v1.0.85 ELITE)

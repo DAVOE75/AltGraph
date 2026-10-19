@@ -641,6 +641,59 @@ class AltimetriaStrategyCalculator {
             val combined = (detectedClimbs + nonCustom).deduplicateOverlappingClimbs()
             this.routeClimbs = combined
             Log.d("AltiCalc", "ELITE: Aplicados ${detectedClimbs.size} puertos definidos por POIs de usuario. Total activos: ${this.routeClimbs.size}")
+
+            // Guardar de forma persistente en almacenamiento de Ruta y Catálogo Global (GPS)
+            appContext?.let { ctx ->
+                val currentRouteKey = activeRouteName ?: routeKeyForClimbs
+                val storedList = detectedClimbs.mapNotNull { climb ->
+                    val startPt = routePoints.minByOrNull { Math.abs(it.distance - climb.startDistance) }
+                    val endPt = routePoints.minByOrNull { Math.abs(it.distance - climb.endDistance) }
+                    if (startPt != null && endPt != null && (startPt.latitude != 0.0 || startPt.longitude != 0.0)) {
+                        val climbName = climb.name ?: "Puerto"
+                        val climbId = "${climbName.lowercase().replace(" ", "_")}_${String.format("%.4f", startPt.latitude)}_${String.format("%.4f", endPt.latitude)}"
+                        StoredClimb(
+                            id = climbId,
+                            name = climbName,
+                            category = climb.category,
+                            startLat = startPt.latitude,
+                            startLng = startPt.longitude,
+                            startElev = startPt.elevation,
+                            endLat = endPt.latitude,
+                            endLng = endPt.longitude,
+                            endElev = endPt.elevation,
+                            lengthMeters = climb.length,
+                            avgGrade = climb.avgGrade,
+                            routeKey = currentRouteKey
+                        )
+                    } else null
+                }
+                if (storedList.isNotEmpty()) {
+                    if (!currentRouteKey.isNullOrBlank()) {
+                        CustomClimbStorage.saveRouteClimbs(ctx, currentRouteKey, storedList)
+                    }
+                    CustomClimbStorage.saveGlobalClimbs(ctx, storedList)
+                }
+            }
+        }
+    }
+
+    /**
+     * Comprueba si hay puertos de montaña personalizados guardados (por ruta o en el catálogo global GPS)
+     * y los aplica a la ruta actual.
+     */
+    fun restoreSavedClimbsForRoute() {
+        val ctx = appContext ?: return
+        val prefs = AppPreferences.getInstance(ctx)
+        if (!prefs.eliteCustomClimbsEnabled || routePoints.isEmpty()) return
+
+        val currentRouteKey = activeRouteName ?: routeKeyForClimbs
+        val matchedClimbs = CustomClimbStorage.matchClimbsForRoute(ctx, currentRouteKey, routePoints)
+        if (matchedClimbs.isNotEmpty()) {
+            val categorized = matchedClimbs.map { calculateClimbCategory(it) }
+            val existingNonCustom = this.routeClimbs.filter { !it.isCustom }
+            val existingCustom = this.routeClimbs.filter { it.isCustom }
+            this.routeClimbs = (categorized + existingCustom + existingNonCustom).deduplicateOverlappingClimbs()
+            Log.d("AltiCalc", "Restaurados ${matchedClimbs.size} puertos guardados (Ruta/Global GPS). Total activos: ${this.routeClimbs.size}")
         }
     }
 
@@ -824,6 +877,8 @@ class AltimetriaStrategyCalculator {
         }
         // Re-evaluar puertos definidos por POIs ahora que tenemos el perfil de elevación real
         detectUserDefinedClimbsFromPois()
+        // Restaurar puertos guardados persistentes (Ruta y Global GPS)
+        restoreSavedClimbsForRoute()
     }
 
     private fun applyTrueElevationsToRoutePoints() {
@@ -1020,6 +1075,7 @@ class AltimetriaStrategyCalculator {
         }
 
         detectHairpins()
+        restoreSavedClimbsForRoute()
     }
 
     /**

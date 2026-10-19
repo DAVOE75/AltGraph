@@ -25,7 +25,10 @@ La novità più attesa per il cicloturismo e le granfondo: **definire con precis
    - **Categoria Forzata Manuale**: Aggiungendo la categoria tra parentesi quadre (es: `CIMA: Stelvio [HC]`, `[1C]`, o `[2C]`), il sistema la rispetta all'istante.
 3. **Prevalenza Assoluta**:
    - Le salite personalizzate **sostituiscono e annullano le salite automatiche**, unendo i falsipiani e mostrando il nome reale nel **Visualizzatore Salite**, nel **Profilo TV 2D** e nella **Barra Percorso**.
-4. **Icone Ciclisti Ridisegnate**:
+4. **Persistenza per Percorso e Catalogo Globale GPS (Stile Dashboard)**:
+   - **A livello di Percorso**: La salita resta memorizzata per l'itinerario attivo e viene ricaricata istantaneamente nelle uscite successive anche senza POI originari.
+   - **A livello Globale GPS**: Salvata con coordinate GPS di inizio e cima esatte; qualunque altro percorso che transiti per gli stessi punti riconosce e attiva automaticamente la salita!
+5. **Icone Ciclisti Ridisegnate**:
    - Nuove icone vettoriali aerodinamiche da cronometro / triathlon, ingrandite per una leggibilità perfetta nella barra degli avvisi.
 
 ## NUOVA INTEGRAZIONE: WIDGET KGHOST NEL RADAR ALTIMETRICO (v1.0.85 ELITE)

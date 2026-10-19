@@ -25,7 +25,10 @@ L'innovation tant attendue pour le cyclotourisme et la haute compétition : **d�
    - **Catégorie Forcée Manuelle** : Indiquez la catégorie entre crochets (ex: `SOMMET: Galibier [HC]`, `[1C]`, ou `[2C]`) et le système l'applique directement.
 3. **Prévalence Absolue** :
    - Vos cols personnalisés **remplacent et annulent les cols détectés automatiquement**, unifiant les replats et affichant le vrai nom sur la **Vue Cols**, le **Profil TV 2D** et la **Barre de Route**.
-4. **Icônes Cyclistes Redessinées** :
+4. **Persistance par Parcours et Catalogue Global GPS (Style Dashboard)** :
+   - **Au niveau du parcours** : Le col reste sauvegardé pour l'itinéraire actif, rechargé immédiatement lors des prochaines sorties même sans POIs d'origine.
+   - **Au niveau du catalogue Global GPS** : Enregistré avec ses coordonnées géographiques précises de départ et sommet, activant automatiquement le col sur tout autre parcours empruntant les mêmes routes !
+5. **Icônes Cyclistes Redessinées** :
    - Nouvelles icônes vectorielles aérodynamiques typées contre-la-montre / triathlon, agrandies pour une lisibilité parfaite dans la barre d'alertes.
 
 ## NOUVELLE INTÉGRATION : WIDGET KGHOST DANS LE RADAR ALTIMÉTRIQUE (v1.0.85 ELITE)

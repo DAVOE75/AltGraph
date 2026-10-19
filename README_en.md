@@ -33,7 +33,10 @@ The most anticipated feature for elite cycling and gran fondos: **define with pi
    - **Manual Forced Category**: Append your chosen category in brackets (e.g., `SUMMIT: Stelvio [HC]`, `[1C]`, or `[2C]`) and the system honors it directly.
 3. **Total Precedence**:
    - User climbs **override and replace any automatically detected climb** that overlaps, unifying broken climbs and displaying the real name in the **Climb Viewer**, **TV Profile 2D**, and **Route Bar**.
-4. **Redesigned Cyclist Icons**:
+4. **Route-Level & Global GPS Persistence (Dashboard-Style)**:
+   - **Route-Level**: Climbs are saved for the active route. When re-loading the route in future rides without original POIs, AltGraph remembers and restores your climbs instantly.
+   - **Global GPS Catalog**: Each climb is cataloged with its precise start and summit GPS coordinates. Any route traversing those same coordinates automatically recognizes and activates the climb!
+5. **Redesigned Cyclist Icons**:
    - New aerodynamic time-trial / triathlon vector cyclists (tucked aero posture, teardrop helmet, pro race bike), enlarged for optimal legibility inside the alert bar.
 
 ## NEW INTEGRATION: KGHOST WIDGET IN ALTIMETRY RADAR (v1.0.85 ELITE)

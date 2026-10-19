@@ -25,7 +25,10 @@ Das meisterwartete Feature für Radsport und Granfondos: **präzise festlegen, w
    - **Manuelle Zwangskategorie**: Hänge die Kategorie in eckigen Klammern an (z. B. `SUMMIT: Grossglockner [HC]`, `[1C]` oder `[2C]`) und das System übernimmt sie direkt.
 3. **Voller Vorrang**:
    - Benutzerdefinierte Pässe **ersetzen und überschreiben automatisch erkannte Steigungen**, schließen Flachstücke ein und zeigen den echten Namen im **Pass-Viewer**, im **TV-Profil 2D** und in der **Routenleiste**.
-4. **Überarbeitete Fahrer-Icons**:
+4. **Routenspeicher & Globaler GPS-Passkatalog (Dashboard-Stil)**:
+   - **Auf Routenebene**: Der Pass wird für die aktive Route gespeichert und bei zukünftigen Fahrten sofort wiederhergestellt, selbst wenn die ursprünglichen POIs nicht mehr in der Datei enthalten sind.
+   - **Im globalen GPS-Katalog**: Gespeichert mit exakten GPS-Koordinaten von Start und Gipfel. Jede andere Route, die dieselben Koordinaten durchfährt, erkennt und aktiviert den Pass automatisch!
+5. **Überarbeitete Fahrer-Icons**:
    - Neue aerodynamische Zeitfahr- / Triathlon-Vektorfahrer, vergrößert für maximale Lesbarkeit in der Warnleiste.
 
 ## NEUE INTEGRATION: KGHOST-WIDGET IM HÖHENPROFIL-RADAR (v1.0.85 ELITE)

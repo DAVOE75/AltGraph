@@ -25,7 +25,10 @@ A funcionalidade mais aguardada para cicloturismo e competição de topo: **defi
    - **Categoria Forçada Manual**: Adicionando a categoria entre parênteses retos (ex: `CIMA: Torre [HC]`, `[1C]` ou `[2C]`), o sistema assume-a de imediato.
 3. **Prevalência Total**:
    - As suas subidas personalizadas **substituem e anulam qualquer subida detetada automaticamente**, unindo os descansos e exibindo o nome real no **Visualizador de Subidas**, no **Perfil TV 2D** e na **Barra de Rota**.
-4. **Ícones de Ciclistas Redesenhados**:
+4. **Persistência por Rota e Catálogo Global GPS (Estilo Dashboard)**:
+   - **Ao nível da Rota**: A subida fica gravada para o itinerário ativo, sendo restaurada imediatamente em sessões futuras mesmo sem os POIs originais.
+   - **Ao nível Global GPS**: Guardada com coordenadas GPS exatas de início e cume; qualquer outro percurso que passe pelas mesmas coordenadas reconhece e ativa a subida automaticamente!
+5. **Ícones de Ciclistas Redesenhados**:
    - Novos ícones vetoriais aerodinâmicos de contrarrelógio / triatlo, aumentados para máxima legibilidade na barra de alertas.
 
 ## NOVA INTEGRAÇÃO: WIDGET KGHOST NO RADAR ALTIMÉTRICO (v1.0.85 ELITE)

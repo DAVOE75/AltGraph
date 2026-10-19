@@ -206,3 +206,43 @@ Open **ALTGRAPH** from your Karoo app launcher to navigate 4 structured tabs:
 - **Virtual Pacer**: Physische VAM-Berechnung hinzugefügt, die eine `Cyan` Geisterkugel projiziert, die entlang des Höhenprofils voranschreitet.
 - **3D-Kehren-Dynamik (Switchbacks)**: Die Straßengeometrie macht einen lateralen 3D-Zickzack, wenn man sich einer echten Haarnadelkurve nähert.
 - **Human Battery (Energy Management)**: Taktisches HUD, das deinen VAM-Verbrauch bewertet, deine Reserven bei harter Anstrengung senkt und sie in der Ebene wieder auflädt.
+
+---
+## 👑 What's new in v1.1.0 ELITE (User-Defined Passes & Global Climb Library)
+
+### 🇪🇸 ESPAÑOL
+- **Puertos de Montaña Definidos por Usuario (POIs)**: Define con exactitud milimétrica el inicio (`INICIO: Nombre`) y la cima (`CIMA: Nombre [Cat]`) de tus puertos favoritos mediante POIs en Komoot, Strava, RideWithGPS o Karoo Dashboard. Prevalecen sobre cualquier puerto detectado automáticamente evitando divisiones erróneas por descansillos.
+- **Persistencia por Ruta y Catálogo Global GPS**: Los puertos quedan guardados automáticamente tanto en la ruta activa como en una biblioteca global por coordenadas GPS de inicio y cima (estilo Hammerhead Dashboard / CLIMBER). Al cargar cualquier ruta que pase por ellos, se activan al instante.
+- **Iconos Ciclistas Aerodinámicos Rediseñados**: Silueta vectorizada de ciclista contrarreloj / triatlón optimizada y ampliada en la barra de avisos.
+- **Nombre de Puerto Configurable**: Opción en Ajustes de Estilo para mostrar el nombre del puerto o solo el icono sobre el gráfico del Visor de Puertos.
+
+### 🇬🇧 ENGLISH
+- **User-Defined Mountain Passes (POIs)**: Pinpoint start (`START: Name`) and summit (`SUMMIT: Name [Cat]`) of true climbs via POIs. Prevents algorithms from breaking climbs on false flats and overrides automatic detections.
+- **Route & Global GPS Persistence**: Climbs are saved per route and into a global GPS library (start/summit coordinates). Any route traversing those coordinates automatically activates the climb.
+- **Aero TT Cyclist Icons**: Enlarged aerodynamic time-trial vector icons for high legibility in the alert bar.
+- **Configurable Climb Name**: Toggle between showing the climb name or just the icon above the Climb Viewer chart.
+
+### 🇫🇷 FRANÇAIS
+- **Cols Définis par l'Utilisateur (POIs)** : Marquez le début (`DEBUT: Nom`) et le sommet (`SOMMET: Nom [Cat]`) de vos cols réels via POIs. Prévalence totale sur les détections automatiques.
+- **Persistance Itinéraire & Catalogue Global GPS** : Enregistrement par parcours et dans une bibliothèque GPS globale. Tout parcours passant par ces coordonnées active le col instantanément.
+- **Icônes Cyclistes Aéro Rénovées** : Silhouette aérodynamique de contre-la-montre agrandie dans la barre d'alertes.
+- **Nom du Col Configurable** : Option pour afficher le nom du col ou uniquement l'icône dans la Vue Cols.
+
+### 🇮🇹 ITALIANO
+- **Salite Definite dall'Utente (POI)** : Definisci inizio (`INIZIO: Nome`) e cima (`CIMA: Nome [Cat]`) con precisione assoluta. Prevalgono sui rilevamenti automatici evitando divisioni inopportune.
+- **Persistenza per Percorso e Catalogo Globale GPS** : Salvataggio sul percorso e nella libreria GPS globale per il rilevamento automatico su qualsiasi rotta.
+- **Icone Ciclisti Aero Riprogettate** : Sagoma cronometro / triathlon ingrandita nella barra avvisi.
+- **Nome Salita Configurabile** : Scelta tra nome della salita o solo icona sul grafico del Visualizzatore Salite.
+
+### 🇩🇪 DEUTSCH
+- **Benutzerdefinierte Pässe (POIs)** : Bestimme Start (`START: Name`) und Gipfel (`SUMMIT: Name [Cat]`) exakt per POI. Vorrang vor automatischen Steigungen ohne Unterbrechungen durch Flachstücke.
+- **Routenspeicher & Globaler GPS-Katalog** : Speicherung für die Route und im weltweiten GPS-Passkatalog des Geräts.
+- **Aerodynamische Fahrer-Icons** : Vergrößerte Zeitfahr-Vektorsilhouette in der Hinweisleiste.
+- **Passname konfigurierbar** : Schalter zur Anzeige des Passnamens oder nur des Icons über dem Pass-Viewer.
+
+### 🇵🇹 PORTUGUÊS
+- **Subidas Definidas pelo Utilizador (POIs)** : Defina início (`INICIO: Nome`) e cume (`CIMA: Nome [Cat]`) por POIs. Prevalecem sobre subidas automáticas mantendo a subida unificada.
+- **Persistência por Rota e Catálogo Global GPS** : Gravação na rota e catálogo GPS global para ativação automática em qualquer traçado.
+- **Ícones de Ciclistas Aerodinâmicos** : Silhueta de contrarrelógio ampliada na barra de alertas.
+- **Nome da Subida Configurável** : Opção para exibir o nome da subida ou apenas o ícone no Visualizador de Subidas.
+
