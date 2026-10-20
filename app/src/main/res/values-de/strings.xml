@@ -203,4 +203,6 @@
     <string name="setting_pan_buttons_position_desc">Platziert die Pfeile zum Vor-/Zurückscrollen oben oder unten im 3D-Profil</string>
     <string name="pan_position_bottom">Unten (Standard)</string>
     <string name="pan_position_top">Oben</string>
+    <string name="setting_climb_zoom_top_title">Zoom-Steuerung oben (Steigungsanzeige)</string>
+    <string name="setting_climb_zoom_top_desc">Platziert die Zoom-Tasten in der oberen Leiste, um das Steigungsprofil nicht zu verdecken</string>
 </resources>

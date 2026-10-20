@@ -203,4 +203,6 @@
     <string name="setting_pan_buttons_position_desc">Coloca as setas de deslocamento no topo ou na base do perfil 3D</string>
     <string name="pan_position_bottom">Abaixo (Padrão)</string>
     <string name="pan_position_top">Acima</string>
+    <string name="setting_climb_zoom_top_title">Controles de zoom no topo (Visualizador de subidas)</string>
+    <string name="setting_climb_zoom_top_desc">Posiciona os botões de zoom no cabeçalho superior para não tapar o perfil da subida</string>
 </resources>

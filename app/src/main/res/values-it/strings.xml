@@ -203,4 +203,6 @@
     <string name="setting_pan_buttons_position_desc">Posiziona le frecce di scorrimento in alto o in basso nel profilo altimetrico 3D</string>
     <string name="pan_position_bottom">In basso (Predefinito)</string>
     <string name="pan_position_top">In alto</string>
+    <string name="setting_climb_zoom_top_title">Comandi zoom in alto (Visualizzatore salite)</string>
+    <string name="setting_climb_zoom_top_desc">Posiziona i pulsanti zoom nell\'intestazione superiore per non coprire il profilo della salita</string>
 </resources>

@@ -230,4 +230,6 @@
     <string name="setting_pan_buttons_position_desc">Places pan scroll arrows at the top or bottom of the 3D elevation profile</string>
     <string name="pan_position_bottom">Bottom (Default)</string>
     <string name="pan_position_top">Top</string>
+    <string name="setting_climb_zoom_top_title">Zoom Controls at Top (Climb Viewer)</string>
+    <string name="setting_climb_zoom_top_desc">Positions zoom in and out buttons in the top header to avoid covering climb gradient bars</string>
 </resources>

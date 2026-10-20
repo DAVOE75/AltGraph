@@ -14,18 +14,18 @@
     <!-- Prev Button -->
     <Button
         android:id="@+id/btn_prev"
-        android:layout_width="150dp"
-        android:layout_height="80dp"
+        android:layout_width="120dp"
+        android:layout_height="70dp"
         android:layout_gravity="top|start"
-        android:background="#00000000" />
+        android:background="#01000000" />
 
     <!-- Next Button -->
     <Button
         android:id="@+id/btn_next"
-        android:layout_width="150dp"
-        android:layout_height="80dp"
+        android:layout_width="120dp"
+        android:layout_height="70dp"
         android:layout_gravity="top|end"
-        android:background="#00000000" />
+        android:background="#01000000" />
 
     <!-- Pan Left (<) at bottom-left -->
     <Button
@@ -45,36 +45,68 @@
         android:layout_marginBottom="0dp"
         android:background="#01000000" />
 
-
-
+    <!-- Zoom controls TOP (Header position) -->
     <LinearLayout
-        android:layout_width="64dp"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_gravity="start"
-        android:gravity="center_vertical|start"
-        android:layout_marginStart="16dp"
-        android:padding="8dp">
+        android:id="@+id/zoom_controls_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="12dp"
+        android:gravity="center">
 
         <Button
-            android:id="@+id/btn_zoom_in"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="+"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:background="#88333333"
-            android:layout_marginBottom="16dp" />
-
-        <Button
-            android:id="@+id/btn_zoom_out"
+            android:id="@+id/btn_zoom_out_top"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:text="-"
             android:textColor="#FFFFFF"
-            android:textSize="24sp"
+            android:textSize="26sp"
             android:textStyle="bold"
-            android:background="#88333333" />
+            android:background="#CC1E293B"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/btn_zoom_in_top"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="+"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:background="#CC1E293B" />
+    </LinearLayout>
+
+    <!-- Zoom controls BOTTOM (Side position) -->
+    <LinearLayout
+        android:id="@+id/zoom_controls_bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="start|center_vertical"
+        android:layout_marginStart="16dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btn_zoom_in"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:text="+"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:background="#CC1E293B"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btn_zoom_out"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:text="-"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:background="#CC1E293B" />
     </LinearLayout>
 </FrameLayout>

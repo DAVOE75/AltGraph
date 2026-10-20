@@ -90,17 +90,27 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
 
                     when (intent?.action) {
                         ACTION_CLIMB_NEXT -> {
-                            if (climbs.isNotEmpty()) {
+                            if (climbs.size > 1) {
                                 currentClimbIndex = (currentClimbIndex + 1) % climbs.size
                                 climbLookaheadMeters = 0.0
                                 climbPanOffsetMeters = 0.0
+                            } else if (climbs.size == 1 && climbLookaheadMeters > 0.0) {
+                                val climbLen = currentClimb?.length ?: 2000.0
+                                val win = climbLookaheadMeters
+                                val maxOffset = (climbLen - win).coerceAtLeast(0.0)
+                                val step = (win / 3.0).coerceAtLeast(100.0)
+                                climbPanOffsetMeters = (climbPanOffsetMeters + step).coerceAtMost(maxOffset)
                             }
                         }
                         ACTION_CLIMB_PREV -> {
-                            if (climbs.isNotEmpty()) {
+                            if (climbs.size > 1) {
                                 currentClimbIndex = if (currentClimbIndex - 1 < 0) climbs.size - 1 else currentClimbIndex - 1
                                 climbLookaheadMeters = 0.0
                                 climbPanOffsetMeters = 0.0
+                            } else if (climbs.size == 1 && climbLookaheadMeters > 0.0) {
+                                val win = climbLookaheadMeters
+                                val step = (win / 3.0).coerceAtLeast(100.0)
+                                climbPanOffsetMeters = (climbPanOffsetMeters - step).coerceAtLeast(0.0)
                             }
                         }
                         ACTION_ZOOM_IN -> {
@@ -340,12 +350,19 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                     }
                     FontHelper.applyFontToPaint(maxGradePaint, prefs.fontFamilyKey)
                     
-                    val showName = !climb.name.isNullOrBlank()
+                    val showName = prefs.showClimbNameInViewer && !climb.name.isNullOrBlank()
                     val catPart = if (climb.category.isNotBlank()) " (${climb.category})" else ""
-                    val climbTitle = if (showName) {
-                        "◀   ${climb.name}$catPart   ▶"
+                    val displayName = if (showName) {
+                        climb.name
                     } else {
-                        "◀   Puerto ${currentClimbIndex + 1}/${climbs.size}$catPart   ▶"
+                        "Puerto ${currentClimbIndex + 1}/${climbs.size}"
+                    }
+                    val hasMultipleClimbs = climbs.size > 1
+                    val isZoomedIn = climbLookaheadMeters > 0.0
+                    val climbTitle = if (hasMultipleClimbs || isZoomedIn) {
+                        "◀   $displayName$catPart   ▶"
+                    } else {
+                        "$displayName$catPart"
                     }
                     currentCanvas.drawText(climbTitle, drawW / 2f, drawH * 0.10f, overlayPaint)
                     
@@ -398,6 +415,8 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
 
 
                 // Navigation Intents
+                val hasMultipleClimbs = climbs.size > 1
+                val isZoomedIn = climbLookaheadMeters > 0.0
                 val intentNext = Intent(ACTION_CLIMB_NEXT).apply { setPackage(context.packageName) }
                 val pIntentNext = PendingIntent.getBroadcast(context, 0, intentNext, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 remoteViews.setOnClickPendingIntent(R.id.btn_next, pIntentNext)
@@ -405,17 +424,38 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 val intentPrev = Intent(ACTION_CLIMB_PREV).apply { setPackage(context.packageName) }
                 val pIntentPrev = PendingIntent.getBroadcast(context, 3, intentPrev, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 remoteViews.setOnClickPendingIntent(R.id.btn_prev, pIntentPrev)
+
+                if (hasMultipleClimbs || isZoomedIn) {
+                    remoteViews.setViewVisibility(R.id.btn_prev, View.VISIBLE)
+                    remoteViews.setViewVisibility(R.id.btn_next, View.VISIBLE)
+                } else {
+                    remoteViews.setViewVisibility(R.id.btn_prev, View.GONE)
+                    remoteViews.setViewVisibility(R.id.btn_next, View.GONE)
+                }
                 
                 // Zoom Intents (+ y -)
                 val intentZIn = Intent(ACTION_ZOOM_IN).apply { setPackage(context.packageName) }
                 val pIntentZIn = PendingIntent.getBroadcast(context, 1, intentZIn, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 remoteViews.setOnClickPendingIntent(R.id.btn_zoom_in, pIntentZIn)
+                remoteViews.setOnClickPendingIntent(R.id.btn_zoom_in_top, pIntentZIn)
                 remoteViews.setTextViewText(R.id.btn_zoom_in, "+")
+                remoteViews.setTextViewText(R.id.btn_zoom_in_top, "+")
 
                 val intentZOut = Intent(ACTION_ZOOM_OUT).apply { setPackage(context.packageName) }
                 val pIntentZOut = PendingIntent.getBroadcast(context, 2, intentZOut, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 remoteViews.setOnClickPendingIntent(R.id.btn_zoom_out, pIntentZOut)
+                remoteViews.setOnClickPendingIntent(R.id.btn_zoom_out_top, pIntentZOut)
                 remoteViews.setTextViewText(R.id.btn_zoom_out, "-")
+                remoteViews.setTextViewText(R.id.btn_zoom_out_top, "-")
+
+                // Alternar posicion de zoom: encabezado superior vs inferior/lateral
+                if (prefs.climbViewerZoomAtTop) {
+                    remoteViews.setViewVisibility(R.id.zoom_controls_top, View.VISIBLE)
+                    remoteViews.setViewVisibility(R.id.zoom_controls_bottom, View.GONE)
+                } else {
+                    remoteViews.setViewVisibility(R.id.zoom_controls_top, View.GONE)
+                    remoteViews.setViewVisibility(R.id.zoom_controls_bottom, View.VISIBLE)
+                }
 
                 // Pan Intents (< y >)
                 val intentPanLeft = Intent(ACTION_PAN_LEFT).apply { setPackage(context.packageName) }

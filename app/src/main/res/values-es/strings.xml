@@ -230,4 +230,6 @@
     <string name="setting_pan_buttons_position_desc">Coloca las flechas de desplazamiento en la parte inferior o superior del gráfico 3D</string>
     <string name="pan_position_bottom">Abajo (Por defecto)</string>
     <string name="pan_position_top">Arriba</string>
+    <string name="setting_climb_zoom_top_title">Controles de zoom arriba (Visor de puertos)</string>
+    <string name="setting_climb_zoom_top_desc">Coloca los botones de zoom en el encabezado superior para no tapar el perfil ni las barras de pendiente</string>
 </resources>

@@ -403,4 +403,74 @@ class AltgraphCalculationsTest {
         assertEquals("Busot", calc.routeClimbs[0].name)
         assertEquals("Tudons", calc.routeClimbs[1].name)
     }
+
+    @Test
+    fun userMarkedPtoDeJijonaWithStartAndSummitPois() {
+        val calc = AltimetriaStrategyCalculator()
+        // Ruta de 50 km: Subida a Jijona de km 18 a 26.5
+        calc.routePoints = (0..500).map { i ->
+            val dist = i * 100.0
+            val elev = when {
+                dist in 18000.0..26500.0 -> 250.0 + (dist - 18000.0) * 0.05 // 8.5 km al 5%
+                dist > 26500.0 -> 675.0 - (dist - 26500.0) * 0.04
+                else -> 250.0
+            }
+            RoutePoint(38.5 + i * 0.001, -0.45, elev, dist)
+        }
+        calc.routeElevationProfile = calc.routePoints.map { ElevationPolylineDecoder.ElevationPoint(it.distance, it.elevation) }
+        calc.isNavigatingRoute = true
+
+        val symbols = listOf(
+            io.hammerhead.karooext.models.Symbol.POI("p1", 38.5 + 180 * 0.001, -0.45, "generic", "INICIO: Pto. de Jijona", emptyList()),
+            io.hammerhead.karooext.models.Symbol.POI("p2", 38.5 + 265 * 0.001, -0.45, "summit", "CIMA: Pto. de Jijona", emptyList())
+        )
+
+        calc.detectUserDefinedClimbsFromPois(symbols)
+
+        assertEquals(1, calc.routeClimbs.size)
+        val customClimb = calc.routeClimbs[0]
+        assertEquals("Pto. de Jijona", customClimb.name)
+        assertEquals(18000.0, customClimb.startDistance, 1.0)
+        assertEquals(26500.0, customClimb.endDistance, 1.0)
+        assertTrue(customClimb.isCustom)
+
+        // Sincronización con climbs de Karoo no debe pisar el puerto personalizado
+        val incomingKaroo = listOf(
+            RouteClimb(20000.0, 26000.0, 6000.0, 300.0, 5.0)
+        )
+        calc.syncRouteClimbs("route:MUTXAMEL-MONTNEGRE-MUTXAMEL", incomingKaroo)
+        assertEquals(1, calc.routeClimbs.size)
+        assertEquals("Pto. de Jijona", calc.routeClimbs[0].name)
+    }
+
+    @Test
+    fun userMarkedOnlyInicioPtoDeJijonaUnpairedRecoversSummitAutomatically() {
+        val calc = AltimetriaStrategyCalculator()
+        // Ruta de 50 km: Subida de km 18 a 26.5 y luego bajada
+        calc.routePoints = (0..500).map { i ->
+            val dist = i * 100.0
+            val elev = when {
+                dist in 18000.0..26500.0 -> 250.0 + (dist - 18000.0) * 0.05 // 8.5 km al 5%
+                dist > 26500.0 -> 675.0 - (dist - 26500.0) * 0.04
+                else -> 250.0
+            }
+            RoutePoint(38.5 + i * 0.001, -0.45, elev, dist)
+        }
+        calc.routeElevationProfile = calc.routePoints.map { ElevationPolylineDecoder.ElevationPoint(it.distance, it.elevation) }
+        calc.isNavigatingRoute = true
+
+        // Simular que el Karoo SOLO envía el pin de INICIO (por ejemplo porque CIMA era Pin Global y no se vinculó a la ruta)
+        val symbols = listOf(
+            io.hammerhead.karooext.models.Symbol.POI("p1", 38.5 + 180 * 0.001, -0.45, "generic", "INICIO: Pto. de Jijona", emptyList())
+        )
+
+        calc.detectUserDefinedClimbsFromPois(symbols)
+
+        assertEquals(1, calc.routeClimbs.size)
+        val customClimb = calc.routeClimbs[0]
+        assertEquals("Pto. de Jijona", customClimb.name)
+        assertEquals(18000.0, customClimb.startDistance, 1.0)
+        assertEquals(26500.0, customClimb.endDistance, 50.0) // Detecta la cima antes de la bajada
+        assertTrue(customClimb.isCustom)
+    }
 }

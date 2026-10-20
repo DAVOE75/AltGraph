@@ -261,6 +261,10 @@ class AppPreferences(context: Context) {
     var showClimbNameInViewer: Boolean
         get() = prefs.getBoolean(KEY_SHOW_CLIMB_NAME_IN_VIEWER, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_CLIMB_NAME_IN_VIEWER, value).apply()
+
+    var climbViewerZoomAtTop: Boolean
+        get() = prefs.getBoolean(KEY_CLIMB_VIEWER_ZOOM_AT_TOP, true)
+        set(value) = prefs.edit().putBoolean(KEY_CLIMB_VIEWER_ZOOM_AT_TOP, value).apply()
         
     var routeMapHeadingUp: Boolean
         get() = prefs.getBoolean(KEY_ROUTE_MAP_HEADING_UP, false)
@@ -289,6 +293,7 @@ class AppPreferences(context: Context) {
         private const val KEY_ROTATE_90_CW = "rotate_90_clockwise"
         private const val KEY_CLIMB_ROTATE_90_CW = "climb_rotate_90_clockwise"
         private const val KEY_SHOW_CLIMB_NAME_IN_VIEWER = "show_climb_name_in_viewer"
+        private const val KEY_CLIMB_VIEWER_ZOOM_AT_TOP = "climb_viewer_zoom_at_top"
         private const val KEY_ROUTE_MAP_HEADING_UP = "route_map_heading_up"
         private const val KEY_VISIBLE_BLOCKS_COUNT = "visible_blocks_count"
         private const val KEY_RAMP_MIN_SLOPE = "ramp_min_slope_pct"

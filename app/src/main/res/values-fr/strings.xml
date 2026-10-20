@@ -203,4 +203,6 @@
     <string name="setting_pan_buttons_position_desc">Place les flèches de défilement en haut ou en bas du profil 3D</string>
     <string name="pan_position_bottom">En bas (Par défaut)</string>
     <string name="pan_position_top">En haut</string>
+    <string name="setting_climb_zoom_top_title">Commandes de zoom en haut (Viseur de cols)</string>
+    <string name="setting_climb_zoom_top_desc">Place les boutons de zoom dans l\'en-tête supérieur pour éviter de masquer le profil et les barres de pente</string>
 </resources>

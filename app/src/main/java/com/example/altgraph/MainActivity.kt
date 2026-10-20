@@ -309,6 +309,26 @@ class MainActivity : Activity() {
         climbNameCard.addView(climbSwitchName)
         climbNameCard.addView(climbNameDesc)
 
+        // Opción: Controles de zoom arriba en el Visor de Puertos
+        val climbZoomTopCard = createCardContainer()
+        val climbSwitchZoomTop = Switch(this).apply {
+            text = getString(R.string.setting_climb_zoom_top_title)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.climbViewerZoomAtTop
+            setOnCheckedChangeListener { _, isChecked ->
+                prefs.climbViewerZoomAtTop = isChecked
+            }
+        }
+        val climbZoomTopDesc = TextView(this).apply {
+            text = getString(R.string.setting_climb_zoom_top_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 0)
+        }
+        climbZoomTopCard.addView(climbSwitchZoomTop)
+        climbZoomTopCard.addView(climbZoomTopDesc)
+
         // Opción: Tamaño de Letra 3D
         val font3dCard = createCardContainer()
         val font3dLabel = createSectionLabel(getString(R.string.setting_font_size_3d))
@@ -353,6 +373,8 @@ class MainActivity : Activity() {
         tabEstiloContainer.addView(fontCard)
         tabEstiloContainer.addView(rotate90Card)
         tabEstiloContainer.addView(climbRotate90Card)
+        tabEstiloContainer.addView(climbNameCard)
+        tabEstiloContainer.addView(climbZoomTopCard)
         tabEstiloContainer.addView(font3dCard)
         tabEstiloContainer.addView(showZoomCard)
 

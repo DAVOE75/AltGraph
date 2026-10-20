@@ -535,8 +535,45 @@ class AltimetriaStrategyCalculator {
         if (!isEnabled || routePoints.isEmpty()) return
 
         // 1. Extraer POIs con distancia real a lo largo de la ruta
-        data class PoiWithDist(val name: String, val distance: Double, val elevation: Double)
+        data class PoiWithDist(
+            val name: String,
+            var distance: Double,
+            var elevation: Double,
+            val type: String = "",
+            val lat: Double = 0.0,
+            val lng: Double = 0.0
+        )
         val poisWithDist = mutableListOf<PoiWithDist>()
+
+        fun projectPoiToRoute(
+            lat: Double,
+            lng: Double,
+            minAllowedDist: Double = 0.0,
+            maxAllowedDist: Double = Double.MAX_VALUE
+        ): Double {
+            var bestDist = 0.0
+            var bestMetricDist = Double.MAX_VALUE
+            for (pt in routePoints) {
+                if (pt.distance < minAllowedDist || pt.distance > maxAllowedDist) continue
+                val d = hypot(pt.latitude - lat, pt.longitude - lng)
+                if (d < bestMetricDist) {
+                    bestMetricDist = d
+                    bestDist = pt.distance
+                }
+            }
+            return if (bestMetricDist < Double.MAX_VALUE) bestDist else {
+                var fallbackDist = 0.0
+                var fallbackMin = Double.MAX_VALUE
+                for (pt in routePoints) {
+                    val d = hypot(pt.latitude - lat, pt.longitude - lng)
+                    if (d < fallbackMin) {
+                        fallbackMin = d
+                        fallbackDist = pt.distance
+                    }
+                }
+                fallbackDist
+            }
+        }
 
         if (symbols != null && symbols.isNotEmpty()) {
             for (sym in symbols) {
@@ -551,7 +588,7 @@ class AltimetriaStrategyCalculator {
                     }
                 }
                 val elev = getTrueElevationAtDistance(nearestDist)
-                poisWithDist.add(PoiWithDist(sName.trim(), nearestDist, elev))
+                poisWithDist.add(PoiWithDist(sName.trim(), nearestDist, elev, sym.type ?: "", sym.lat, sym.lng))
             }
         } else {
             for (poi in routePois) {
@@ -574,7 +611,9 @@ class AltimetriaStrategyCalculator {
             return cleanClimbName(name).lowercase().replace(Regex("[^a-z0-9]"), "")
         }
 
-        fun isStartPoi(name: String): Boolean {
+        fun isStartPoi(name: String, type: String = ""): Boolean {
+            val upperType = type.uppercase()
+            if (upperType == "START" || upperType == "INICIO") return true
             val s = removeDiacritics(name).uppercase()
             return s.startsWith("INICIO") || s.contains(" INICIO") ||
                    s.startsWith("START") || s.contains(" START") ||
@@ -591,8 +630,10 @@ class AltimetriaStrategyCalculator {
                    s.contains("CAFE") || s.contains("COFFEE") || s.contains("COMIDA") || s.contains("FOOD")
         }
 
-        fun isEndPoi(name: String): Boolean {
-            if (isStartPoi(name) || isWaterOrFood(name)) return false // Un inicio de puerto nunca es una cima
+        fun isEndPoi(name: String, type: String = ""): Boolean {
+            if (isStartPoi(name, type) || isWaterOrFood(name)) return false // Un inicio de puerto nunca es una cima
+            val upperType = type.uppercase()
+            if (upperType == "SUMMIT" || upperType == "CUMBRE" || upperType == "PEAK") return true
             val s = removeDiacritics(name).uppercase()
             return s.startsWith("FIN") || s.contains(" FIN") ||
                    s.startsWith("FINAL") || s.contains(" FINAL") ||
@@ -603,11 +644,12 @@ class AltimetriaStrategyCalculator {
                    s.contains("CORONA") || s.contains("PORT ")
         }
 
-        val startPois = poisWithDist.filter { isStartPoi(it.name) }
-        val endPois = poisWithDist.filter { isEndPoi(it.name) }
+        val startPois = poisWithDist.filter { isStartPoi(it.name, it.type) }
+        val endPois = poisWithDist.filter { isEndPoi(it.name, it.type) }
 
         val sortedStarts = startPois.sortedBy { it.distance }
         val sortedEnds = endPois.sortedBy { it.distance }
+        val pairedStarts = mutableSetOf<PoiWithDist>()
         val pairedEnds = mutableSetOf<PoiWithDist>()
 
         // A) Emparejar INICIO con CIMA / FINAL secuencialmente a lo largo de la ruta
@@ -620,7 +662,23 @@ class AltimetriaStrategyCalculator {
             // 1) Si startKey no es vacía, buscar coincidencia por nombre en cimas explícitas
             var matchEnd = if (startKey.isNotEmpty()) {
                 sortedEnds.firstOrNull { end ->
-                    if (end in pairedEnds || end.distance <= start.distance + 200.0) return@firstOrNull false
+                    if (end in pairedEnds) return@firstOrNull false
+                    // Si por coincidencia de ruta circular start.distance >= end.distance, re-proyectar
+                    var effStartDist = start.distance
+                    var effEndDist = end.distance
+                    if (effEndDist <= effStartDist + 200.0 && (start.lat != 0.0 || end.lat != 0.0)) {
+                        val altStartDist = if (start.lat != 0.0) projectPoiToRoute(start.lat, start.lng, 0.0, effEndDist - 200.0) else effStartDist
+                        val altEndDist = if (end.lat != 0.0) projectPoiToRoute(end.lat, end.lng, effStartDist + 200.0, Double.MAX_VALUE) else effEndDist
+                        if (altEndDist > altStartDist + 200.0) {
+                            start.distance = altStartDist
+                            start.elevation = getTrueElevationAtDistance(altStartDist)
+                            end.distance = altEndDist
+                            end.elevation = getTrueElevationAtDistance(altEndDist)
+                            effStartDist = altStartDist
+                            effEndDist = altEndDist
+                        }
+                    }
+                    if (effEndDist <= effStartDist + 200.0) return@firstOrNull false
                     val endKey = normalizeKey(end.name)
                     endKey.isNotEmpty() && (startKey == endKey || startKey.contains(endKey) || endKey.contains(startKey))
                 }
@@ -640,11 +698,12 @@ class AltimetriaStrategyCalculator {
                 matchEnd = poisWithDist.firstOrNull { poi ->
                     poi !in pairedEnds && poi.distance > start.distance + 400.0 &&
                     (nextStart == null || poi.distance < nextStart.distance) &&
-                    !isStartPoi(poi.name) && !isWaterOrFood(poi.name)
+                    !isStartPoi(poi.name, poi.type) && !isWaterOrFood(poi.name)
                 }
             }
 
             if (matchEnd != null) {
+                pairedStarts.add(start)
                 pairedEnds.add(matchEnd)
                 val len = matchEnd.distance - start.distance
                 val elevGain = (matchEnd.elevation - start.elevation).coerceAtLeast(0.0)
@@ -791,6 +850,104 @@ class AltimetriaStrategyCalculator {
             }
         }
 
+        // C) Si un INICIO no tenía CIMA explícita emparejada (ej. el usuario solo marcó INICIO, o el pin de CIMA
+        // se guardó como Pin Global en vez de PDI de ruta y Karoo no lo envió en la lista de pois de la ruta)
+        for (start in sortedStarts) {
+            if (start in pairedStarts) continue
+            val hasExplicitPrefix = technicalPrefixes.any { start.name.startsWith(it, ignoreCase = true) }
+            val hasClimbIndicator = hasExplicitPrefix ||
+                start.name.contains("puerto", ignoreCase = true) ||
+                start.name.contains("pto", ignoreCase = true) ||
+                start.name.contains("subida", ignoreCase = true) ||
+                start.name.contains("col", ignoreCase = true) ||
+                isStartPoi(start.name, start.type)
+
+            if (hasClimbIndicator) {
+                // Avanzar en el perfil de elevación o ruta para encontrar la cima natural
+                var bestEndDist = (start.distance + 1500.0).coerceAtMost(routePoints.lastOrNull()?.distance ?: (start.distance + 1500.0))
+                var maxElevSeen = start.elevation
+                val maxLookahead = 35000.0 // Hasta 35 km adelante
+
+                // 1) Si ya tenemos climbs calculados/proporcionados por Karoo que comienzan cerca de este inicio,
+                // tomamos el final del tramo continuo que asciende desde este inicio.
+                val existingClimbsStartingNear = this.routeClimbs.filter {
+                    it.startDistance in (start.distance - 800.0)..(start.distance + 800.0) ||
+                    (it.startDistance >= start.distance - 200.0 && it.endDistance > start.distance + 500.0)
+                }
+                if (existingClimbsStartingNear.isNotEmpty()) {
+                    val latestEnd = existingClimbsStartingNear.maxOf { it.endDistance }
+                    if (latestEnd > start.distance + 500.0) {
+                        bestEndDist = latestEnd
+                        maxElevSeen = getTrueElevationAtDistance(bestEndDist)
+                    }
+                }
+
+                // 2) Si hay perfil de elevación detallado, buscar la cima real (pico más alto antes de un descenso significativo)
+                if (routeElevationProfile.isNotEmpty()) {
+                    val pts = routeElevationProfile.filter { it.distance in start.distance..(start.distance + maxLookahead) }.sortedBy { it.distance }
+                    var profileMaxElev = start.elevation
+                    var profileBestDist = bestEndDist
+                    for (pt in pts) {
+                        if (pt.elevation > profileMaxElev) {
+                            profileMaxElev = pt.elevation
+                            profileBestDist = pt.distance
+                        } else if (pt.elevation < profileMaxElev - 35.0) {
+                            // Descendió más de 35m tras coronar: hemos pasado la cima y empezado la bajada
+                            break
+                        }
+                    }
+                    if (profileBestDist - start.distance >= 500.0) {
+                        bestEndDist = profileBestDist
+                        maxElevSeen = profileMaxElev
+                    }
+                } else if (routePoints.isNotEmpty() && existingClimbsStartingNear.isEmpty()) {
+                    val pts = routePoints.filter { it.distance in start.distance..(start.distance + maxLookahead) }.sortedBy { it.distance }
+                    var routeMaxElev = start.elevation
+                    var routeBestDist = bestEndDist
+                    for (pt in pts) {
+                        if (pt.elevation > routeMaxElev) {
+                            routeMaxElev = pt.elevation
+                            routeBestDist = pt.distance
+                        } else if (pt.elevation < routeMaxElev - 35.0) {
+                            break
+                        }
+                    }
+                    if (routeBestDist - start.distance >= 500.0) {
+                        bestEndDist = routeBestDist
+                        maxElevSeen = routeMaxElev
+                    }
+                }
+
+                val len = bestEndDist - start.distance
+                if (len >= 500.0) {
+                    val elevGain = (maxElevSeen - start.elevation).coerceAtLeast(0.0)
+                    val avgGrade = if (len > 0) (elevGain / len) * 100.0 else 0.0
+
+                    var displayName = cleanClimbName(start.name)
+                    if (displayName.isBlank() || displayName.equals("Inicio", ignoreCase = true) || displayName.equals("Start", ignoreCase = true)) {
+                        displayName = "Puerto ${detectedClimbs.size + 1}"
+                    }
+
+                    val forcedCategory = parseCategoryFromName(start.name)
+
+                    var climb = RouteClimb(
+                        startDistance = start.distance,
+                        endDistance = bestEndDist,
+                        length = len,
+                        totalElevation = elevGain,
+                        avgGrade = avgGrade,
+                        name = displayName,
+                        isCustom = true
+                    )
+                    climb = calculateClimbCategory(climb)
+                    if (forcedCategory != null) {
+                        climb.category = forcedCategory
+                    }
+                    detectedClimbs.add(climb)
+                }
+            }
+        }
+
         if (detectedClimbs.isNotEmpty()) {
             // Si el usuario ha definido puertos propios por POIs, éstos tienen preferencia absoluta.
             // No dejamos que los automáticos vuelvan a poblar la ruta si el usuario ha simplificado a sus propios puertos.
@@ -875,7 +1032,7 @@ class AltimetriaStrategyCalculator {
                     (climb.totalElevation >= 50.0 || (climb.length >= 800.0 && climb.avgGrade >= 6.0)) && climb.length >= 600.0
                 }
                 val categorized = validIncoming.map { calculateClimbCategory(it) }.filter { it.category.isNotBlank() }
-                // Asignar nombres de cimas POI si existen en la ruta
+                // Asignar nombres de cimas o inicios POI si existen en la ruta
                 val named = categorized.map { climb ->
                     if (climb.name.isNullOrBlank()) {
                         val summitPoi = routePois.filter { poi ->
@@ -886,8 +1043,18 @@ class AltimetriaStrategyCalculator {
                             poi.relativeDistance in (climb.startDistance + climb.length * 0.4)..(climb.endDistance + 2500.0)
                         }.minByOrNull { Math.abs(it.relativeDistance - climb.endDistance) }
 
-                        if (summitPoi != null) {
-                            climb.copy(name = cleanClimbName(summitPoi.name))
+                        val startPoi = if (summitPoi == null) {
+                            routePois.filter { poi ->
+                                val s = poi.name.uppercase()
+                                !s.contains("AGUA") && !s.contains("WATER") && !s.contains("FUENTE") && !s.contains("FONT") &&
+                                !s.contains("CAFE") && !s.contains("COFFEE") && !s.contains("COMIDA") && !s.contains("FOOD") &&
+                                poi.relativeDistance in (climb.startDistance - 1500.0)..(climb.startDistance + climb.length * 0.5)
+                            }.minByOrNull { Math.abs(it.relativeDistance - climb.startDistance) }
+                        } else null
+
+                        val namePoi = summitPoi ?: startPoi
+                        if (namePoi != null) {
+                            climb.copy(name = cleanClimbName(namePoi.name))
                         } else climb
                     } else climb
                 }
@@ -909,8 +1076,18 @@ class AltimetriaStrategyCalculator {
                         poi.relativeDistance in (climb.startDistance + climb.length * 0.4)..(climb.endDistance + 2500.0)
                     }.minByOrNull { Math.abs(it.relativeDistance - climb.endDistance) }
 
-                    if (summitPoi != null) {
-                        climb.copy(name = cleanClimbName(summitPoi.name))
+                    val startPoi = if (summitPoi == null) {
+                        routePois.filter { poi ->
+                            val s = poi.name.uppercase()
+                            !s.contains("AGUA") && !s.contains("WATER") && !s.contains("FUENTE") && !s.contains("FONT") &&
+                            !s.contains("CAFE") && !s.contains("COFFEE") && !s.contains("COMIDA") && !s.contains("FOOD") &&
+                            poi.relativeDistance in (climb.startDistance - 1500.0)..(climb.startDistance + climb.length * 0.5)
+                        }.minByOrNull { Math.abs(it.relativeDistance - climb.startDistance) }
+                    } else null
+
+                    val namePoi = summitPoi ?: startPoi
+                    if (namePoi != null) {
+                        climb.copy(name = cleanClimbName(namePoi.name))
                     } else climb
                 } else climb
             }
