@@ -1300,24 +1300,25 @@ class Altimetria3DView @JvmOverloads constructor(
             val kmStr = if (km % 1.0 == 0.0) km.toInt().toString() else String.format("%.1f", km)
             context.getString(R.string.scale_legend_major_block_km, kmStr)
         }
+        // Leyenda de escala debajo de la gráfica (más legible y adaptada a la escala de fuente)
         val scaleLegendPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.parseColor("#94A3B8") // Gris claro
-            textSize = (h * 0.055f).coerceIn(14f, 18f)
+            color = Color.parseColor("#CBD5E1") // Gris muy claro para máximo contraste
+            textSize = ((h * 0.075f) * fontScale).coerceIn(16f, 23f)
             textAlign = Paint.Align.CENTER
-            typeface = Typeface.DEFAULT
+            typeface = Typeface.DEFAULT_BOLD
         }
         
         val subBlockMeters = subBlockSizeMeters.toInt()
         val subScaleLegendText = context.getString(R.string.scale_legend_sub_block, subBlockMeters)
         val subScaleLegendPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.parseColor("#64748B") // Gris un poco más oscuro
-            textSize = (h * 0.045f).coerceIn(10f, 15f)
+            color = Color.parseColor("#94A3B8") // Gris intermedio nítido
+            textSize = ((h * 0.065f) * fontScale).coerceIn(13f, 19f)
             textAlign = Paint.Align.CENTER
             typeface = Typeface.DEFAULT
         }
 
-        canvas.drawText(scaleLegendText, w / 2f, h - 20f, scaleLegendPaint)
-        canvas.drawText(subScaleLegendText, w / 2f, h - 2f, subScaleLegendPaint)
+        canvas.drawText(scaleLegendText, w / 2f, h - 23f, scaleLegendPaint)
+        canvas.drawText(subScaleLegendText, w / 2f, h - 4f, subScaleLegendPaint)
         
         // Dibujar círculos redondeados para pan left/right
         val btnPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {

@@ -94,12 +94,6 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                                 currentClimbIndex = (currentClimbIndex + 1) % climbs.size
                                 climbLookaheadMeters = 0.0
                                 climbPanOffsetMeters = 0.0
-                            } else if (climbs.size == 1 && climbLookaheadMeters > 0.0) {
-                                val climbLen = currentClimb?.length ?: 2000.0
-                                val win = climbLookaheadMeters
-                                val maxOffset = (climbLen - win).coerceAtLeast(0.0)
-                                val step = (win / 3.0).coerceAtLeast(100.0)
-                                climbPanOffsetMeters = (climbPanOffsetMeters + step).coerceAtMost(maxOffset)
                             }
                         }
                         ACTION_CLIMB_PREV -> {
@@ -107,10 +101,6 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                                 currentClimbIndex = if (currentClimbIndex - 1 < 0) climbs.size - 1 else currentClimbIndex - 1
                                 climbLookaheadMeters = 0.0
                                 climbPanOffsetMeters = 0.0
-                            } else if (climbs.size == 1 && climbLookaheadMeters > 0.0) {
-                                val win = climbLookaheadMeters
-                                val step = (win / 3.0).coerceAtLeast(100.0)
-                                climbPanOffsetMeters = (climbPanOffsetMeters - step).coerceAtLeast(0.0)
                             }
                         }
                         ACTION_ZOOM_IN -> {
@@ -358,8 +348,7 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                         "Puerto ${currentClimbIndex + 1}/${climbs.size}"
                     }
                     val hasMultipleClimbs = climbs.size > 1
-                    val isZoomedIn = climbLookaheadMeters > 0.0
-                    val climbTitle = if (hasMultipleClimbs || isZoomedIn) {
+                    val climbTitle = if (hasMultipleClimbs) {
                         "◀   $displayName$catPart   ▶"
                     } else {
                         "$displayName$catPart"
@@ -425,7 +414,7 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 val pIntentPrev = PendingIntent.getBroadcast(context, 3, intentPrev, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 remoteViews.setOnClickPendingIntent(R.id.btn_prev, pIntentPrev)
 
-                if (hasMultipleClimbs || isZoomedIn) {
+                if (hasMultipleClimbs) {
                     remoteViews.setViewVisibility(R.id.btn_prev, View.VISIBLE)
                     remoteViews.setViewVisibility(R.id.btn_next, View.VISIBLE)
                 } else {
