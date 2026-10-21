@@ -16,7 +16,7 @@
 Revoluciona el concepto tradicional de altimetría ciclista incorporando una **Suite de 7 Modelos de Visualización Altimétrica**, telemetría biomecánica y análisis metabólico en tiempo real.
 
 <p align="center">
- <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
+ <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
 ## VERSIÓN 2.0: LAS 3 Novedades REVOLUCIONARIAS
