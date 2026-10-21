@@ -1528,7 +1528,7 @@ class Altimetria3DView @JvmOverloads constructor(
             var inWall = false
             var wallStartIdx = 0
 
-            for (i in 0 until totalMicroSamples) {
+            for (i in 0 until microGrades.size) {
                 val grade = microGrades[i]
                 val isWall = grade >= 16.0f
 
