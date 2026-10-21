@@ -238,9 +238,16 @@ object AltgraphRepository {
             // Un tick que falla se registra y el bucle sigue (tick no es suspend: no traga cancelaciones)
             try {
                 val ctx = appContext
-                val ftp = if (ctx != null) AppPreferences.getInstance(ctx).userFtp else 250
-                val wPrime = if (ctx != null) AppPreferences.getInstance(ctx).userWPrime else 20000
-                _snapshot.value = core.tick(ctx, ftp, wPrime)
+                val prefs = if (ctx != null) AppPreferences.getInstance(ctx) else null
+                val ftp = prefs?.userFtp ?: 250
+                val wPrime = prefs?.userWPrime ?: 20000
+                val snap = core.tick(ctx, ftp, wPrime)
+                _snapshot.value = snap
+
+                // Voice Copilot (Elite)
+                if (ctx != null && prefs != null && prefs.voiceDirectorEnabled && prefs.isEliteUnlocked) {
+                    VoiceDirector.getInstance(ctx).evaluate(snap, prefs)
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "tick", e)
             }

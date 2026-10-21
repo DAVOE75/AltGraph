@@ -262,6 +262,43 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_GEAR_WALL_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_GEAR_WALL_ENABLED, value).apply()
 
+    // --- ELITE VOICE COPILOT ALERTS ---
+    var voiceDirectorEnabled: Boolean
+        get() = prefs.getBoolean(KEY_VOICE_DIRECTOR_ENABLED, false) && isEliteUnlocked
+        set(value) = prefs.edit().putBoolean(KEY_VOICE_DIRECTOR_ENABLED, value).apply()
+
+    var voiceClimbsEnabled: Boolean
+        get() = prefs.getBoolean(KEY_VOICE_CLIMBS_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_VOICE_CLIMBS_ENABLED, value).apply()
+
+    var voiceSteepEnabled: Boolean
+        get() = prefs.getBoolean(KEY_VOICE_STEEP_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_VOICE_STEEP_ENABLED, value).apply()
+
+    var voiceSteepThreshold: Double
+        get() = prefs.getFloat(KEY_VOICE_STEEP_THRESHOLD, 8.0f).toDouble()
+        set(value) = prefs.edit().putFloat(KEY_VOICE_STEEP_THRESHOLD, value.toFloat()).apply()
+
+    var voiceGearWallEnabled: Boolean
+        get() = prefs.getBoolean(KEY_VOICE_GEAR_WALL_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_VOICE_GEAR_WALL_ENABLED, value).apply()
+
+    var voiceHairpinsEnabled: Boolean
+        get() = prefs.getBoolean(KEY_VOICE_HAIRPINS_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_VOICE_HAIRPINS_ENABLED, value).apply()
+
+    var voiceKGhostEnabled: Boolean
+        get() = prefs.getBoolean(KEY_VOICE_KGHOST_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_VOICE_KGHOST_ENABLED, value).apply()
+
+    var voiceKGhostIntervalMeters: Double
+        get() = prefs.getFloat(KEY_VOICE_KGHOST_INTERVAL, 1000.0f).toDouble()
+        set(value) = prefs.edit().putFloat(KEY_VOICE_KGHOST_INTERVAL, value.toFloat()).apply()
+
+    var voicePoisEnabled: Boolean
+        get() = prefs.getBoolean(KEY_VOICE_POIS_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_VOICE_POIS_ENABLED, value).apply()
+
     var eliteRadarResolution: Int
         get() = prefs.getInt(KEY_ELITE_RADAR_RESOLUTION, 0)
         set(value) = prefs.edit().putInt(KEY_ELITE_RADAR_RESOLUTION, value).apply()
@@ -355,6 +392,15 @@ class AppPreferences(context: Context) {
         private const val KEY_USER_WPRIME = "user_wprime"
         private const val KEY_WBAL_OVERLAY_ENABLED = "wbal_overlay_enabled"
         private const val KEY_GEAR_WALL_ENABLED = "gear_wall_enabled"
+        private const val KEY_VOICE_DIRECTOR_ENABLED = "voice_director_enabled"
+        private const val KEY_VOICE_CLIMBS_ENABLED = "voice_climbs_enabled"
+        private const val KEY_VOICE_STEEP_ENABLED = "voice_steep_enabled"
+        private const val KEY_VOICE_STEEP_THRESHOLD = "voice_steep_threshold"
+        private const val KEY_VOICE_GEAR_WALL_ENABLED = "voice_gear_wall_enabled"
+        private const val KEY_VOICE_HAIRPINS_ENABLED = "voice_hairpins_enabled"
+        private const val KEY_VOICE_KGHOST_ENABLED = "voice_kghost_enabled"
+        private const val KEY_VOICE_KGHOST_INTERVAL = "voice_kghost_interval"
+        private const val KEY_VOICE_POIS_ENABLED = "voice_pois_enabled"
         private const val KEY_ELITE_RADAR_RESOLUTION = "elite_radar_resolution"
 
         @Volatile

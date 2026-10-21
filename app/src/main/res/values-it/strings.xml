@@ -213,4 +213,34 @@
     <string name="setting_wbal_title">Linea di Consumo W\'bal &amp; Punto di Cedimento</string>
     <string name="setting_wbal_desc">Mostra la riserva anaerobica residua e prevede il punto di esaurimento lungo la salita</string>
     <string name="gear_wall_badge">MURO RAPPORTO</string>
+
+    <!-- Avvisi Vocali Copilota (Elite) -->
+    <string name="elite_voice_director_title">Avvisi Vocali Copilota (Audio / Bluetooth)</string>
+    <string name="elite_voice_director_desc">Annunci vocali audio per salite, forti pendenze, tornanti e distacco da KGhost</string>
+    <string name="elite_voice_climbs_title">Salite e Cime</string>
+    <string name="elite_voice_climbs_desc">Annuncia l\'inizio della salita con distanza, dislivello, categoria e prossimità della vetta</string>
+    <string name="elite_voice_steep_title">Aumento di Pendenza</string>
+    <string name="elite_voice_steep_desc">Avverte quando il tratto successivo supera la soglia di pendenza selezionata</string>
+    <string name="elite_voice_steep_threshold_title">Soglia di aumento pendenza</string>
+    <string name="elite_voice_gear_wall_title">Muri e Rampe Estreme</string>
+    <string name="elite_voice_gear_wall_desc">Avverte in avvicinamento a rampe del 15% o superiori</string>
+    <string name="elite_voice_hairpins_title">Tornanti (Apex)</string>
+    <string name="elite_voice_hairpins_desc">Annuncia curve a gomito o tornanti stretti in salita</string>
+    <string name="elite_voice_kghost_title">Distacco da Rival KGhost</string>
+    <string name="elite_voice_kghost_desc">Annunci vocali periodici di vantaggio o ritardo e sorpassi</string>
+    <string name="elite_voice_kghost_interval_title">Frequenza annunci KGhost</string>
+    <string name="elite_voice_pois_title">Punti d\'Acqua (POI)</string>
+    <string name="elite_voice_pois_desc">Avverte in prossimità di fontane e punti di rifornimento</string>
+
+    <!-- Frasi Vocali (TTS) -->
+    <string name="voice_climb_start">Attenzione: Inizio salita %1$s. %2$s chilometri al %3$s per cento di media. %4$s.</string>
+    <string name="voice_climb_summit_near">Cima a %1$s metri.</string>
+    <string name="voice_steep_ahead">La salita si indurisce: prossimi %1$s metri al %2$s per cento di media.</string>
+    <string name="voice_wall_ahead">Attenzione: Muro del %1$s per cento tra %2$s metri.</string>
+    <string name="voice_hairpin_ahead">Tornante tra %1$s metri al %2$s per cento.</string>
+    <string name="voice_kghost_lead">In testa: il Ghost è %1$s metri dietro, distacco %2$s.</string>
+    <string name="voice_kghost_chase">Il Ghost è al comando: %1$s metri avanti, distacco %2$s.</string>
+    <string name="voice_kghost_overtake_lead">Attenzione: Hai superato il Ghost. Nuovo leader della corsa.</string>
+    <string name="voice_kghost_overtaken">Attenzione: Il Ghost ti ha appena superato.</string>
+    <string name="voice_poi_water">Punto d\'acqua tra %1$s metri.</string>
 </resources>

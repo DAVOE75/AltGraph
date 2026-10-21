@@ -1549,6 +1549,216 @@ class MainActivity : Activity() {
         powerBarCard.addView(ftpLayout)
         tabEliteContainer.addView(powerBarCard)
 
+        // ── Voice Copilot Alerts (Elite) ───────────────────────────────────────
+        val voiceSectionLabel = createSectionLabel(getString(R.string.elite_voice_director_title))
+        tabEliteContainer.addView(voiceSectionLabel)
+
+        val voiceCard = createCardContainer()
+        voiceCard.orientation = LinearLayout.VERTICAL
+
+        val switchVoiceMaster = Switch(this).apply {
+            text = getString(R.string.elite_voice_director_title)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.voiceDirectorEnabled
+            isEnabled = prefs.isEliteUnlocked
+        }
+        val textVoiceMasterDesc = TextView(this).apply {
+            text = getString(R.string.elite_voice_director_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 12)
+        }
+        voiceCard.addView(switchVoiceMaster)
+        voiceCard.addView(textVoiceMasterDesc)
+
+        // Sub-opciones de voz contenidas en un layout desplegable
+        val voiceOptionsLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            visibility = if (switchVoiceMaster.isChecked && prefs.isEliteUnlocked) View.VISIBLE else View.GONE
+        }
+
+        val switchVoiceClimbs = Switch(this).apply {
+            text = getString(R.string.elite_voice_climbs_title)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.voiceClimbsEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, v -> prefs.voiceClimbsEnabled = v }
+        }
+        val textVoiceClimbsDesc = TextView(this).apply {
+            text = getString(R.string.elite_voice_climbs_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 2, 0, 8)
+        }
+        voiceOptionsLayout.addView(switchVoiceClimbs)
+        voiceOptionsLayout.addView(textVoiceClimbsDesc)
+
+        // Endurecimiento de pendiente
+        val switchVoiceSteep = Switch(this).apply {
+            text = getString(R.string.elite_voice_steep_title)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.voiceSteepEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, v -> prefs.voiceSteepEnabled = v }
+        }
+        val textVoiceSteepDesc = TextView(this).apply {
+            text = getString(R.string.elite_voice_steep_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 2, 0, 4)
+        }
+        voiceOptionsLayout.addView(switchVoiceSteep)
+        voiceOptionsLayout.addView(textVoiceSteepDesc)
+
+        // Selector de umbral de pendiente (%)
+        val steepThresholdLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(0, 0, 0, 8)
+        }
+        val steepThresholdLabel = TextView(this).apply {
+            text = getString(R.string.elite_voice_steep_threshold_title) + ": "
+            textSize = 13f
+            setTextColor(Color.LTGRAY)
+        }
+        val steepThresholdSpinner = Spinner(this).apply {
+            isEnabled = prefs.isEliteUnlocked
+            val options = arrayOf("6%", "7%", "8%", "9%", "10%", "12%")
+            val values = doubleArrayOf(6.0, 7.0, 8.0, 9.0, 10.0, 12.0)
+            val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, options)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            this.adapter = adapter
+            val currentVal = prefs.voiceSteepThreshold
+            val idx = values.indexOfFirst { Math.abs(it - currentVal) < 0.5 }.coerceAtLeast(2)
+            setSelection(idx)
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(p: AdapterView<*>?, v: View?, pos: Int, id: Long) {
+                    prefs.voiceSteepThreshold = values[pos]
+                    (v as? TextView)?.setTextColor(Color.parseColor("#4CAF50"))
+                }
+                override fun onNothingSelected(p: AdapterView<*>?) {}
+            }
+        }
+        steepThresholdLayout.addView(steepThresholdLabel)
+        steepThresholdLayout.addView(steepThresholdSpinner)
+        voiceOptionsLayout.addView(steepThresholdLayout)
+
+        // Muros extremos
+        val switchVoiceWall = Switch(this).apply {
+            text = getString(R.string.elite_voice_gear_wall_title)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.voiceGearWallEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, v -> prefs.voiceGearWallEnabled = v }
+        }
+        val textVoiceWallDesc = TextView(this).apply {
+            text = getString(R.string.elite_voice_gear_wall_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 2, 0, 8)
+        }
+        voiceOptionsLayout.addView(switchVoiceWall)
+        voiceOptionsLayout.addView(textVoiceWallDesc)
+
+        // Herraduras (Apex)
+        val switchVoiceHairpins = Switch(this).apply {
+            text = getString(R.string.elite_voice_hairpins_title)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.voiceHairpinsEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, v -> prefs.voiceHairpinsEnabled = v }
+        }
+        val textVoiceHairpinsDesc = TextView(this).apply {
+            text = getString(R.string.elite_voice_hairpins_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 2, 0, 8)
+        }
+        voiceOptionsLayout.addView(switchVoiceHairpins)
+        voiceOptionsLayout.addView(textVoiceHairpinsDesc)
+
+        // KGhost Rival Gap
+        val switchVoiceKGhost = Switch(this).apply {
+            text = getString(R.string.elite_voice_kghost_title)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.voiceKGhostEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, v -> prefs.voiceKGhostEnabled = v }
+        }
+        val textVoiceKGhostDesc = TextView(this).apply {
+            text = getString(R.string.elite_voice_kghost_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 2, 0, 4)
+        }
+        voiceOptionsLayout.addView(switchVoiceKGhost)
+        voiceOptionsLayout.addView(textVoiceKGhostDesc)
+
+        // Intervalo KGhost
+        val kghostIntervalLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(0, 0, 0, 8)
+        }
+        val kghostIntervalLabel = TextView(this).apply {
+            text = getString(R.string.elite_voice_kghost_interval_title) + ": "
+            textSize = 13f
+            setTextColor(Color.LTGRAY)
+        }
+        val kghostIntervalSpinner = Spinner(this).apply {
+            isEnabled = prefs.isEliteUnlocked
+            val options = arrayOf("500 m", "1000 m (1 km)", "2000 m (2 km)", "5000 m (5 km)")
+            val values = doubleArrayOf(500.0, 1000.0, 2000.0, 5000.0)
+            val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, options)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            this.adapter = adapter
+            val currentInterval = prefs.voiceKGhostIntervalMeters
+            val idx = values.indexOfFirst { Math.abs(it - currentInterval) < 100.0 }.coerceAtLeast(1)
+            setSelection(idx)
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(p: AdapterView<*>?, v: View?, pos: Int, id: Long) {
+                    prefs.voiceKGhostIntervalMeters = values[pos]
+                    (v as? TextView)?.setTextColor(Color.parseColor("#4CAF50"))
+                }
+                override fun onNothingSelected(p: AdapterView<*>?) {}
+            }
+        }
+        kghostIntervalLayout.addView(kghostIntervalLabel)
+        kghostIntervalLayout.addView(kghostIntervalSpinner)
+        voiceOptionsLayout.addView(kghostIntervalLayout)
+
+        // Puntos de agua (POIs)
+        val switchVoicePois = Switch(this).apply {
+            text = getString(R.string.elite_voice_pois_title)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.voicePoisEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, v -> prefs.voicePoisEnabled = v }
+        }
+        val textVoicePoisDesc = TextView(this).apply {
+            text = getString(R.string.elite_voice_pois_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 2, 0, 8)
+        }
+        voiceOptionsLayout.addView(switchVoicePois)
+        voiceOptionsLayout.addView(textVoicePoisDesc)
+
+        switchVoiceMaster.setOnCheckedChangeListener { _, isChecked ->
+            prefs.voiceDirectorEnabled = isChecked
+            voiceOptionsLayout.visibility = if (isChecked) View.VISIBLE else View.GONE
+        }
+
+        voiceCard.addView(voiceOptionsLayout)
+        tabEliteContainer.addView(voiceCard)
+
         licenseInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
                 activateBtn.performClick()
@@ -1596,6 +1806,16 @@ class MainActivity : Activity() {
             switchSmoothMap.isEnabled = unlocked
             radarResTitle.alpha = if (unlocked) 1.0f else 0.5f
             mapOverlayTitle.alpha = if (unlocked) 1.0f else 0.5f
+            switchVoiceMaster.isEnabled = unlocked
+            switchVoiceClimbs.isEnabled = unlocked
+            switchVoiceSteep.isEnabled = unlocked
+            steepThresholdSpinner.isEnabled = unlocked
+            switchVoiceWall.isEnabled = unlocked
+            switchVoiceHairpins.isEnabled = unlocked
+            switchVoiceKGhost.isEnabled = unlocked
+            kghostIntervalSpinner.isEnabled = unlocked
+            switchVoicePois.isEnabled = unlocked
+            voiceOptionsLayout.visibility = if (unlocked && switchVoiceMaster.isChecked) View.VISIBLE else View.GONE
 
             // Los interruptores se crearon bloqueados (apagados): reflejar el estado real al desbloquear
             if (unlocked) {
@@ -1617,6 +1837,14 @@ class MainActivity : Activity() {
                 switchProfileTvClimbNames.isChecked = prefs.eliteProfileTvShowClimbNames
                 switchCustomClimbs.isChecked = prefs.eliteCustomClimbsEnabled
                 switchSmoothMap.isChecked = prefs.eliteSmoothMapOverlayEnabled
+                switchVoiceMaster.isChecked = prefs.voiceDirectorEnabled
+                switchVoiceClimbs.isChecked = prefs.voiceClimbsEnabled
+                switchVoiceSteep.isChecked = prefs.voiceSteepEnabled
+                switchVoiceWall.isChecked = prefs.voiceGearWallEnabled
+                switchVoiceHairpins.isChecked = prefs.voiceHairpinsEnabled
+                switchVoiceKGhost.isChecked = prefs.voiceKGhostEnabled
+                switchVoicePois.isChecked = prefs.voicePoisEnabled
+                voiceOptionsLayout.visibility = if (switchVoiceMaster.isChecked) View.VISIBLE else View.GONE
                 val currentMode = prefs.eliteMapOverlayMode
                 mapOverlaySpinner.setSelection(when(currentMode) {
                     "all" -> 2

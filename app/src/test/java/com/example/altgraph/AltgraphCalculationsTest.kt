@@ -236,9 +236,9 @@ class AltgraphCalculationsTest {
 
     @Test
     fun testAltimetriaStyleEnumsAndKeys() {
-        // 1. Verificación de existencia de las 6 vistas
+        // 1. Verificación de existencia de las 7 vistas (incluyendo HILLSHADE_APEX)
         val entries = AltimetriaStyle.entries
-        assertEquals(6, entries.size)
+        assertEquals(7, entries.size)
 
         // 2. Modelo por defecto: CLASSIC
         assertEquals(AltimetriaStyle.CLASSIC, AltimetriaStyle.fromKey("classic"))
@@ -248,6 +248,7 @@ class AltgraphCalculationsTest {
         assertEquals(AltimetriaStyle.CLASSIC, AltimetriaStyle.fromKey(AltimetriaStyle.CLASSIC.key))
         assertEquals(AltimetriaStyle.HORIZON_ISOMETRIC, AltimetriaStyle.fromKey("horizon_iso"))
         assertEquals(AltimetriaStyle.TACTICAL_OASES, AltimetriaStyle.fromKey("tactical_oases"))
+        assertEquals(AltimetriaStyle.HILLSHADE_APEX, AltimetriaStyle.fromKey("hillshade_apex"))
         assertEquals(AltimetriaStyle.DYNAMIC_FORCE_FIELD, AltimetriaStyle.fromKey("force_field"))
         assertEquals(AltimetriaStyle.MONOLITHIC_OBSIDIAN, AltimetriaStyle.fromKey("monolithic"))
         assertEquals(AltimetriaStyle.GLOBAL_ISOMETRIC, AltimetriaStyle.fromKey("global_iso"))

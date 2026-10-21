@@ -240,4 +240,34 @@
     <string name="setting_wbal_title">W\'bal Burn-Rate &amp; Failure Point</string>
     <string name="setting_wbal_desc">Displays remaining anaerobic battery overlay and estimated failure location</string>
     <string name="gear_wall_badge">GEAR WALL</string>
+
+    <!-- Voice Copilot Alerts (Elite) -->
+    <string name="elite_voice_director_title">Voice Copilot Alerts (Audio / Bluetooth)</string>
+    <string name="elite_voice_director_desc">Spoken audio announcements for climbs, steep gradients, hairpin bends, and KGhost gap</string>
+    <string name="elite_voice_climbs_title">Climbs and Summits</string>
+    <string name="elite_voice_climbs_desc">Announces climb start with distance, gradient, category, and summit proximity</string>
+    <string name="elite_voice_steep_title">Steeper Slope Ahead</string>
+    <string name="elite_voice_steep_desc">Warns when upcoming section exceeds the selected grade threshold</string>
+    <string name="elite_voice_steep_threshold_title">Steeper Slope Threshold</string>
+    <string name="elite_voice_gear_wall_title">Wall and Extreme Ramps</string>
+    <string name="elite_voice_gear_wall_desc">Warns when approaching ramps of 15% or higher</string>
+    <string name="elite_voice_hairpins_title">Hairpin Bends (Apex)</string>
+    <string name="elite_voice_hairpins_desc">Announces sharp switchback turns ahead</string>
+    <string name="elite_voice_kghost_title">KGhost Rival Gap</string>
+    <string name="elite_voice_kghost_desc">Periodic spoken gap and overtake announcements</string>
+    <string name="elite_voice_kghost_interval_title">KGhost Gap Interval</string>
+    <string name="elite_voice_pois_title">Water Points (POIs)</string>
+    <string name="elite_voice_pois_desc">Announces nearby fountains and water refills</string>
+
+    <!-- Spoken Phrases (TTS) -->
+    <string name="voice_climb_start">Approaching climb %1$s. %2$s kilometers at %3$s percent average. %4$s.</string>
+    <string name="voice_climb_summit_near">Summit in %1$s meters.</string>
+    <string name="voice_steep_ahead">Slope steepens: next %1$s meters at %2$s percent average.</string>
+    <string name="voice_wall_ahead">Warning: Wall of %1$s percent in %2$s meters.</string>
+    <string name="voice_hairpin_ahead">Hairpin bend in %1$s meters at %2$s percent.</string>
+    <string name="voice_kghost_lead">Leading: Ghost is %1$s meters behind, gap %2$s.</string>
+    <string name="voice_kghost_chase">Ghost is leading: %1$s meters ahead, gap %2$s.</string>
+    <string name="voice_kghost_overtake_lead">Attention: You have overtaken the Ghost. New race leader.</string>
+    <string name="voice_kghost_overtaken">Attention: The Ghost has overtaken you.</string>
+    <string name="voice_poi_water">Water point in %1$s meters.</string>
 </resources>

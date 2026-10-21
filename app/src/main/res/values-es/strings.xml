@@ -240,4 +240,34 @@
     <string name="setting_wbal_title">Línea de Agotamiento W\'bal y Punto de Quiebre</string>
     <string name="setting_wbal_desc">Muestra la reserva anaeróbica restante y proyecta el punto de agotamiento en la subida</string>
     <string name="gear_wall_badge">MURO DESARROLLO</string>
+
+    <!-- Avisos por Voz Copiloto (Elite) -->
+    <string name="elite_voice_director_title">Avisos de Copiloto por Voz (Audio / Bluetooth)</string>
+    <string name="elite_voice_director_desc">Locución de audio para puertos, dureza de pendientes, curvas de herradura y hueco con KGhost</string>
+    <string name="elite_voice_climbs_title">Puertos y Cimas</string>
+    <string name="elite_voice_climbs_desc">Locución de inicio de puerto con distancia, desnivel, categoría y aviso de proximidad de cima</string>
+    <string name="elite_voice_steep_title">Endurecimiento de Pendiente</string>
+    <string name="elite_voice_steep_desc">Avisa cuando el tramo siguiente supera el porcentaje de pendiente configurado</string>
+    <string name="elite_voice_steep_threshold_title">Umbral de endurecimiento</string>
+    <string name="elite_voice_gear_wall_title">Muros y Rampas Extremas</string>
+    <string name="elite_voice_gear_wall_desc">Avisa con antelación ante rampas del 15% o superiores</string>
+    <string name="elite_voice_hairpins_title">Curvas de Herradura (Apex)</string>
+    <string name="elite_voice_hairpins_desc">Avisa ante paellas o giros cerrados en subida</string>
+    <string name="elite_voice_kghost_title">Hueco con Rival KGhost</string>
+    <string name="elite_voice_kghost_desc">Locución periódica de ventaja o retraso y avisos de adelantamiento</string>
+    <string name="elite_voice_kghost_interval_title">Frecuencia de aviso KGhost</string>
+    <string name="elite_voice_pois_title">Puntos de Agua (POIs)</string>
+    <string name="elite_voice_pois_desc">Avisa ante fuentes y puntos de recarga de agua próximos</string>
+
+    <!-- Frases de Locución (TTS) -->
+    <string name="voice_climb_start">Atención: Inicio de puerto %1$s. %2$s kilómetros al %3$s por ciento de media. %4$s.</string>
+    <string name="voice_climb_summit_near">Cima a %1$s metros.</string>
+    <string name="voice_steep_ahead">El puerto se endurece: próximos %1$s metros al %2$s por ciento de media.</string>
+    <string name="voice_wall_ahead">Atención: Muro del %1$s por ciento en %2$s metros.</string>
+    <string name="voice_hairpin_ahead">Curva de herradura en %1$s metros al %2$s por ciento.</string>
+    <string name="voice_kghost_lead">Liderando: llevas al Ghost %1$s metros por detrás, a %2$s.</string>
+    <string name="voice_kghost_chase">El Ghost lidera: va %1$s metros por delante, a %2$s.</string>
+    <string name="voice_kghost_overtake_lead">Atención: Has adelantado al Ghost. Nueva cabeza de carrera.</string>
+    <string name="voice_kghost_overtaken">Atención: El Ghost te acaba de adelantar.</string>
+    <string name="voice_poi_water">Punto de agua a %1$s metros.</string>
 </resources>

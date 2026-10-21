@@ -213,4 +213,34 @@
     <string name="setting_wbal_title">W\'bal-Verbrauchslinie &amp; Erschöpfungspunkt</string>
     <string name="setting_wbal_desc">Zeigt verbleibende anaerobe Reserve und prognostizierten Einbruchspunkt am Anstieg</string>
     <string name="gear_wall_badge">ÜBERSETZUNGSWAND</string>
+
+    <!-- Sprachansagen-Kopilot (Elite) -->
+    <string name="elite_voice_director_title">Sprachansagen-Kopilot (Audio / Bluetooth)</string>
+    <string name="elite_voice_director_desc">Gesprochene Audiohinweise für Pässe, steile Abschnitte, Serpentinen und KGhost-Abstand</string>
+    <string name="elite_voice_climbs_title">Pässe und Gipfel</string>
+    <string name="elite_voice_climbs_desc">Ansage des Passbeginns mit Distanz, Steigung, Kategorie und Gipfelannäherung</string>
+    <string name="elite_voice_steep_title">Steilerer Abschnitt Voraus</string>
+    <string name="elite_voice_steep_desc">Warnt, wenn der kommende Abschnitt den gewählten Steigungsschwellenwert übersteigt</string>
+    <string name="elite_voice_steep_threshold_title">Steigungsschwellenwert</string>
+    <string name="elite_voice_gear_wall_title">Extremrampen und Steilwände</string>
+    <string name="elite_voice_gear_wall_desc">Warnt bei Annäherung an Rampen von 15% oder mehr</string>
+    <string name="elite_voice_hairpins_title">Serpentinen (Apex)</string>
+    <string name="elite_voice_hairpins_desc">Kündigt scharfe Spitzkehren im Anstieg an</string>
+    <string name="elite_voice_kghost_title">Abstand zu KGhost-Rivalen</string>
+    <string name="elite_voice_kghost_desc">Regelmäßige Ansagen zu Vorsprung, Rückstand und Überholmanövern</string>
+    <string name="elite_voice_kghost_interval_title">KGhost-Ansageintervall</string>
+    <string name="elite_voice_pois_title">Wasserstellen (POIs)</string>
+    <string name="elite_voice_pois_desc">Kündigt Brunnen und Wasserquellen in der Nähe an</string>
+
+    <!-- Sprachphrasen (TTS) -->
+    <string name="voice_climb_start">Achtung: Beginn des Passes %1$s. %2$s Kilometer bei durchschnittlich %3$s Prozent. %4$s.</string>
+    <string name="voice_climb_summit_near">Gipfel in %1$s Metern.</string>
+    <string name="voice_steep_ahead">Anstieg wird steiler: nächste %1$s Meter bei %2$s Prozent im Schnitt.</string>
+    <string name="voice_wall_ahead">Achtung: Steilwand mit %1$s Prozent in %2$s Metern.</string>
+    <string name="voice_hairpin_ahead">Serpentine in %1$s Metern bei %2$s Prozent.</string>
+    <string name="voice_kghost_lead">In Führung: Ghost liegt %1$s Meter zurück, Abstand %2$s.</string>
+    <string name="voice_kghost_chase">Ghost führt: %1$s Meter voraus, Abstand %2$s.</string>
+    <string name="voice_kghost_overtake_lead">Achtung: Du hast den Ghost überholt. Neue Rennspitze.</string>
+    <string name="voice_kghost_overtaken">Achtung: Der Ghost hat dich überholt.</string>
+    <string name="voice_poi_water">Wasserstelle in %1$s Metern.</string>
 </resources>
