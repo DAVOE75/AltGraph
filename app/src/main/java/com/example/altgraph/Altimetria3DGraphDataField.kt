@@ -189,10 +189,16 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         altimetria3DView.virtualPacerRelativeDistance = strategy.virtualPacerRelativeDistance
                         altimetria3DView.energyBatteryLevel = strategy.energyBatteryLevel
                 
-                        // ELITE
+                        // ELITE & W'bal
                         altimetria3DView.stravaSegmentDistance = strategy.stravaSegmentDistance
                         altimetria3DView.stravaPrGhostDistance = strategy.stravaPrGhostDistance
                         altimetria3DView.windEffectIntensity = strategy.windEffectIntensity
+                        altimetria3DView.wbal = snap.wbal
+                        altimetria3DView.wbalFailureMeters = snap.wbalFailureMeters
+                        altimetria3DView.wPrime = prefs.userWPrime
+                        altimetria3DView.currentCadence = strategy.currentCadence
+                        altimetria3DView.currentSpeedMs = snap.currentSpeed
+                        altimetria3DView.gearWallEnabled = prefs.gearWallEnabled
                         val isHeadingUp = prefs.routeMapHeadingUp
                         val mapRotAngle = if (isHeadingUp) {
                             // Si el heading es 90, la cámara apunta al este, así que rotamos -90 para que apunte arriba
@@ -344,17 +350,29 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         if (prefs.show3dZoomControls) {
                             val intentZoomIn = Intent(ACTION_ZOOM_IN).apply { setPackage(context.packageName) }
                             val pendingZoomIn = PendingIntent.getBroadcast(context, 4, intentZoomIn, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                            remoteViews.setOnClickPendingIntent(R.id.btn_zoom_in, pendingZoomIn)
 
                             val intentZoomOut = Intent(ACTION_ZOOM_OUT).apply { setPackage(context.packageName) }
                             val pendingZoomOut = PendingIntent.getBroadcast(context, 5, intentZoomOut, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+                            remoteViews.setOnClickPendingIntent(R.id.btn_zoom_in, pendingZoomIn)
                             remoteViews.setOnClickPendingIntent(R.id.btn_zoom_out, pendingZoomOut)
-                    
-                            remoteViews.setViewVisibility(R.id.btn_zoom_in, android.view.View.VISIBLE)
-                            remoteViews.setViewVisibility(R.id.btn_zoom_out, android.view.View.VISIBLE)
+                            remoteViews.setOnClickPendingIntent(R.id.btn_zoom_in_top, pendingZoomIn)
+                            remoteViews.setOnClickPendingIntent(R.id.btn_zoom_out_top, pendingZoomOut)
+
+                            // Si el usuario deselecciona "Mostrar Pendiente Máxima" Y "Mostrar Datos en Encabezado",
+                            // el espacio superior queda completamente despejado. En ese caso colocamos los botones centrados arriba
+                            // para no estorbar a la gráfica lateralmente. Si cualquiera está activa, los botones van al lateral.
+                            val isHeaderClean = !prefs.showMaxGradient && !prefs.show3dHeaderStats
+                            if (isHeaderClean) {
+                                remoteViews.setViewVisibility(R.id.zoom_controls_top, android.view.View.VISIBLE)
+                                remoteViews.setViewVisibility(R.id.zoom_controls_side, android.view.View.GONE)
+                            } else {
+                                remoteViews.setViewVisibility(R.id.zoom_controls_top, android.view.View.GONE)
+                                remoteViews.setViewVisibility(R.id.zoom_controls_side, android.view.View.VISIBLE)
+                            }
                         } else {
-                            remoteViews.setViewVisibility(R.id.btn_zoom_in, android.view.View.GONE)
-                            remoteViews.setViewVisibility(R.id.btn_zoom_out, android.view.View.GONE)
+                            remoteViews.setViewVisibility(R.id.zoom_controls_top, android.view.View.GONE)
+                            remoteViews.setViewVisibility(R.id.zoom_controls_side, android.view.View.GONE)
                         }
                                         if (prefs.showRouteCompass && strategy.routeCoords.isNotEmpty() && prefs.altimetriaStyle == AltimetriaStyle.GLOBAL_ISOMETRIC) {
                               val intentCompass = Intent(ACTION_TOGGLE_COMPASS).apply {
@@ -381,14 +399,19 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                           val intentPanRight = Intent(ACTION_PAN_RIGHT).apply { setPackage(context.packageName) }
                           val pendingPanRight = PendingIntent.getBroadcast(context, 3, intentPanRight, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
-                          val isPanTop = prefs.panButtonsPosition == "top"
-                          if (isPanTop) {
+                          val panPos = prefs.panButtonsPosition
+                          if (panPos == "top") {
                               remoteViews.setViewVisibility(R.id.btn_pan_left, android.view.View.GONE)
                               remoteViews.setViewVisibility(R.id.btn_pan_right, android.view.View.GONE)
                               remoteViews.setViewVisibility(R.id.btn_pan_left_top, android.view.View.VISIBLE)
                               remoteViews.setViewVisibility(R.id.btn_pan_right_top, android.view.View.VISIBLE)
                               remoteViews.setOnClickPendingIntent(R.id.btn_pan_left_top, pendingPanLeft)
                               remoteViews.setOnClickPendingIntent(R.id.btn_pan_right_top, pendingPanRight)
+                          } else if (panPos == "none") {
+                              remoteViews.setViewVisibility(R.id.btn_pan_left, android.view.View.GONE)
+                              remoteViews.setViewVisibility(R.id.btn_pan_right, android.view.View.GONE)
+                              remoteViews.setViewVisibility(R.id.btn_pan_left_top, android.view.View.GONE)
+                              remoteViews.setViewVisibility(R.id.btn_pan_right_top, android.view.View.GONE)
                           } else {
                               remoteViews.setViewVisibility(R.id.btn_pan_left, android.view.View.VISIBLE)
                               remoteViews.setViewVisibility(R.id.btn_pan_right, android.view.View.VISIBLE)

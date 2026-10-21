@@ -156,6 +156,8 @@
     <string name="style_monolith_desc">Faceted dark crystal with luminous plasma core and laser ridge</string>
     <string name="style_global_title">Global Isometric Map</string>
     <string name="style_global_desc">Architectural 3D vision of the entire route in snake form</string>
+    <string name="style_hillshade_title">Hillshade &amp; Apex</string>
+    <string name="style_hillshade_desc">Relief shading with dynamic light source and hairpin apex markers</string>
     <string name="toast_vista">View: %1$s</string>
     <string name="toast_visor_puertos">Climb Viewer: %1$s</string>
     <string name="label_elite_header">ALTGRAPH ELITE</string>
@@ -230,6 +232,12 @@
     <string name="setting_pan_buttons_position_desc">Places pan scroll arrows at the top or bottom of the 3D elevation profile</string>
     <string name="pan_position_bottom">Bottom (Default)</string>
     <string name="pan_position_top">Top</string>
+    <string name="pan_position_none">Hidden</string>
     <string name="setting_climb_zoom_top_title">Zoom Controls at Top (Climb Viewer)</string>
     <string name="setting_climb_zoom_top_desc">Positions zoom in and out buttons in the top header to avoid covering climb gradient bars</string>
+    <string name="setting_gear_wall_title">Virtual Gear Wall &amp; Target Cadence</string>
+    <string name="setting_gear_wall_desc">Highlights insurmountable grade zones and projects recommended gear ratios</string>
+    <string name="setting_wbal_title">W\'bal Burn-Rate &amp; Failure Point</string>
+    <string name="setting_wbal_desc">Displays remaining anaerobic battery overlay and estimated failure location</string>
+    <string name="gear_wall_badge">GEAR WALL</string>
 </resources>

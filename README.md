@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v1.1.0 ELITE)
+# ALTGRAPH (v2.0 REVOLUTION)
 <p>Leer en: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 <p align="center">
@@ -13,11 +13,27 @@
 </p>
 
 **ALTGRAPH** es una extensión de rendimiento y altimetría profesional de última generación para ciclocomputadores **Hammerhead Karoo** (Karoo 2 y Karoo 3) desarrollada por **hesiOX** utilizando el SDK oficial `karoo-ext`.
-Revoluciona el concepto tradicional de altimetría ciclista incorporando una **Suite de 6 Modelos de Visualización Altimétrica** con selector dinámico en vivo, escala monocromática continua de 15 tramos, avance cuántico en ventana rodante de 50 metros, resolución adaptativa multiescala, análisis de puertos de montaña, cálculo topográfico opcional (proyección horizontal pura), detección matemática de curvas de herradura (tornanti), filtrado por categorías de Hitos (Pueblos, Fuentes, Miradores, Cimas), conmutador de escala de zoom al tocar la pantalla, tipografías Google Sans / Condensed, modo apaisado rotado a 90° a pantalla completa, ritmo **VAM** dual con velocidad recomendada y cálculo científico del **Grado de Fatiga (GF)**.
+Revoluciona el concepto tradicional de altimetría ciclista incorporando una **Suite de 7 Modelos de Visualización Altimétrica**, telemetría biomecánica y análisis metabólico en tiempo real.
 
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## 🚀 VERSIÓN 2.0: LAS 3 SUPERNovedades REVOLUCIONARIAS
+
+### 1. Thermal Slope Shading & Dynamic Apex (Nuevo Estilo Altimétrico 3D)
+* **Sombreado Topográfico Dinámico (Faux-3D Hillshade)**: El perfil ya no es un dibujo plano. Se simula una fuente de luz cenital oblicua sobre las aristas del puerto, generando sombras y relieve real esculpido con producto escalar según las normales de pendiente.
+* **Marcadores de Apex en Herraduras**: Detección geométrica de las curvas más cerradas y paellas críticas, clavando marcadores flotantes con la pendiente local y la distancia de salida.
+
+### 2. Target Cadence & Virtual Gear Wall (Telemetría Mecánica Predictiva)
+* **Muro de Desarrollo (Gear Wall)**: Fractura visual de la montaña con trama estriada carmesí de advertencia (`⚠️ GEAR WALL`) en rampas extremas (≥16%) donde la relación desarrollo/velocidad hace inviable sostener una cadencia óptima sentado.
+* **Desarrollo Recomendado Proyectado**: Algoritmo en tiempo real que predice el desarrollo plato/corona aconsejado (`⚙️ 34x32`, `34x34`, etc.) en la base del gráfico para mantener tu cadencia objetivo sin atrancarte.
+
+### 3. Grand Tour W'bal Burn Rate & Failure Point (Gestión Metabólica Pro)
+* **Línea de Fuego Dinámica W'bal**: Monitoreo de tu tanque anaeróbico ($W'$) según tu FTP y $W'_{max}$, con recarga bajo umbral y consumo por encima de potencia crítica.
+* **Punto de Quiebre Proyectado (Estimated Failure Point)**: Marca en el propio perfil de la subida los metros o kilómetros exactos donde se agotará tu reserva si mantienes el ritmo actual (`⚡ Failure Point`).
+
+---
 
 ## VERSIÓN 1.1.0 ELITE: PUERTOS DE MONTAÑA DEFINIDOS POR USUARIO (POIs)
 

@@ -135,6 +135,8 @@
     <string name="style_monolith_desc">Cristal escuro facetado com núcleo de plasma brilhante e crista laser</string>
     <string name="style_global_title">Mapa Isométrico Global</string>
     <string name="style_global_desc">Visão arquitetônica 3D de todo o percurso em formato serpentina</string>
+    <string name="style_hillshade_title">Hillshade e Apex</string>
+    <string name="style_hillshade_desc">Sombreamento de relevo com fonte de luz dinâmica e marcadores de apex em curvas fechadas</string>
     <string name="toast_vista">Vista: %1$s</string>
     <string name="toast_visor_puertos">Visor Subidas: %1$s</string>
     <string name="label_elite_header">ALTGRAPH ELITE</string>
@@ -203,6 +205,12 @@
     <string name="setting_pan_buttons_position_desc">Coloca as setas de deslocamento no topo ou na base do perfil 3D</string>
     <string name="pan_position_bottom">Abaixo (Padrão)</string>
     <string name="pan_position_top">Acima</string>
+    <string name="pan_position_none">Oculto</string>
     <string name="setting_climb_zoom_top_title">Controles de zoom no topo (Visualizador de subidas)</string>
     <string name="setting_climb_zoom_top_desc">Posiciona os botões de zoom no cabeçalho superior para não tapar o perfil da subida</string>
+    <string name="setting_gear_wall_title">Muro de Relação &amp; Cadência Alvo</string>
+    <string name="setting_gear_wall_desc">Destaca zonas de inclinação extrema e projeta as relações mecânicas recomendadas</string>
+    <string name="setting_wbal_title">Linha de Esgotamento W\'bal &amp; Ponto de Ruptura</string>
+    <string name="setting_wbal_desc">Exibe a reserva anaeróbica restante e estima o ponto de quebra na subida</string>
+    <string name="gear_wall_badge">MURO DE RELAÇÃO</string>
 </resources>

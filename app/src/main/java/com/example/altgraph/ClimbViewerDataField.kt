@@ -266,10 +266,16 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 altimetria3DView.virtualPacerRelativeDistance = strategy.virtualPacerRelativeDistance
                 altimetria3DView.energyBatteryLevel = strategy.energyBatteryLevel
                 
-                // ELITE
+                // ELITE & W'bal
                 altimetria3DView.stravaSegmentDistance = strategy.stravaSegmentDistance
                 altimetria3DView.stravaPrGhostDistance = strategy.stravaPrGhostDistance
                 altimetria3DView.windEffectIntensity = strategy.windEffectIntensity
+                altimetria3DView.wbal = snap.wbal
+                altimetria3DView.wbalFailureMeters = snap.wbalFailureMeters
+                altimetria3DView.wPrime = prefs.userWPrime
+                altimetria3DView.currentCadence = strategy.currentCadence
+                altimetria3DView.currentSpeedMs = snap.currentSpeed
+                altimetria3DView.gearWallEnabled = prefs.gearWallEnabled
                 altimetria3DView.update3DData(
                         blocks = strategy.nextBlocks,
                         elevation = strategy.windowStartElevation,

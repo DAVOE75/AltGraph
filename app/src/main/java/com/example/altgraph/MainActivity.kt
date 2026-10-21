@@ -650,7 +650,8 @@ class MainActivity : Activity() {
         }
         val panPositions = listOf(
             "bottom" to getString(R.string.pan_position_bottom),
-            "top" to getString(R.string.pan_position_top)
+            "top" to getString(R.string.pan_position_top),
+            "none" to getString(R.string.pan_position_none)
         )
         val currentPanPosLabel = panPositions.find { it.first == prefs.panButtonsPosition }?.second ?: getString(R.string.pan_position_bottom)
         val panPosValueText = createValueText(currentPanPosLabel)

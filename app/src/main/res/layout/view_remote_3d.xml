@@ -63,7 +63,9 @@
         android:visibility="gone"
         android:background="#01000000" />
 
+    <!-- Controles de Zoom en el lateral (posición estándar cuando el encabezado está activo) -->
     <LinearLayout
+        android:id="@+id/zoom_controls_side"
         android:layout_width="64dp"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -85,6 +87,39 @@
 
         <Button
             android:id="@+id/btn_zoom_out"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="-"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:background="#88333333" />
+    </LinearLayout>
+
+    <!-- Controles de Zoom centrados en el espacio libre superior (uno al lado del otro: + y -) -->
+    <LinearLayout
+        android:id="@+id/zoom_controls_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btn_zoom_in_top"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:text="+"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:background="#88333333"
+            android:layout_marginEnd="12dp" />
+
+        <Button
+            android:id="@+id/btn_zoom_out_top"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:text="-"

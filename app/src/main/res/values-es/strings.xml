@@ -156,6 +156,8 @@
     <string name="style_monolith_desc">Cristal oscuro facetado con núcleo de plasma luminoso y cresta láser</string>
     <string name="style_global_title">Mapa Isométrico Global</string>
     <string name="style_global_desc">Visión arquitectónica 3D de todo el recorrido en forma de serpiente</string>
+    <string name="style_hillshade_title">Hillshade y Apex</string>
+    <string name="style_hillshade_desc">Sombreado de relieve con fuente de luz dinámica y marcadores de apex en herraduras</string>
     <string name="toast_vista">Vista: %1$s</string>
     <string name="toast_visor_puertos">Visor Puertos: %1$s</string>
     <string name="label_elite_header">ALTGRAPH ELITE</string>
@@ -230,6 +232,12 @@
     <string name="setting_pan_buttons_position_desc">Coloca las flechas de desplazamiento en la parte inferior o superior del gráfico 3D</string>
     <string name="pan_position_bottom">Abajo (Por defecto)</string>
     <string name="pan_position_top">Arriba</string>
+    <string name="pan_position_none">Oculto</string>
     <string name="setting_climb_zoom_top_title">Controles de zoom arriba (Visor de puertos)</string>
     <string name="setting_climb_zoom_top_desc">Coloca los botones de zoom en el encabezado superior para no tapar el perfil ni las barras de pendiente</string>
+    <string name="setting_gear_wall_title">Muro de Desarrollo y Cadencia Objetivo</string>
+    <string name="setting_gear_wall_desc">Destaca zonas de pendiente extrema e indica el desarrollo recomendado para no atascarse</string>
+    <string name="setting_wbal_title">Línea de Agotamiento W\'bal y Punto de Quiebre</string>
+    <string name="setting_wbal_desc">Muestra la reserva anaeróbica restante y proyecta el punto de agotamiento en la subida</string>
+    <string name="gear_wall_badge">MURO DESARROLLO</string>
 </resources>

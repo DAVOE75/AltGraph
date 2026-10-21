@@ -135,6 +135,8 @@
     <string name="style_monolith_desc">Facettiertes dunkles Glas mit leuchtendem Plasmakern und Laserkante</string>
     <string name="style_global_title">Globale Isometrische Karte</string>
     <string name="style_global_desc">Architektonische 3D-Sicht auf die gesamte Strecke im Schlangenlinien-Stil</string>
+    <string name="style_hillshade_title">Hillshade &amp; Apex</string>
+    <string name="style_hillshade_desc">Reliefschattierung mit dynamischer Lichtquelle und Kurvenscheitelpunkt-Markierungen</string>
     <string name="toast_vista">Ansicht: %1$s</string>
     <string name="toast_visor_puertos">Pässe-Viewer: %1$s</string>
     <string name="label_elite_header">ALTGRAPH ELITE</string>
@@ -203,6 +205,12 @@
     <string name="setting_pan_buttons_position_desc">Platziert die Pfeile zum Vor-/Zurückscrollen oben oder unten im 3D-Profil</string>
     <string name="pan_position_bottom">Unten (Standard)</string>
     <string name="pan_position_top">Oben</string>
+    <string name="pan_position_none">Ausgeblendet</string>
     <string name="setting_climb_zoom_top_title">Zoom-Steuerung oben (Steigungsanzeige)</string>
     <string name="setting_climb_zoom_top_desc">Platziert die Zoom-Tasten in der oberen Leiste, um das Steigungsprofil nicht zu verdecken</string>
+    <string name="setting_gear_wall_title">Virtuelle Übersetzungswand &amp; Zielkadenz</string>
+    <string name="setting_gear_wall_desc">Hebt extreme Steigungszonen hervor und projiziert die empfohlene Übersetzung</string>
+    <string name="setting_wbal_title">W\'bal-Verbrauchslinie &amp; Erschöpfungspunkt</string>
+    <string name="setting_wbal_desc">Zeigt verbleibende anaerobe Reserve und prognostizierten Einbruchspunkt am Anstieg</string>
+    <string name="gear_wall_badge">ÜBERSETZUNGSWAND</string>
 </resources>

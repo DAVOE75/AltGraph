@@ -113,6 +113,7 @@ data class StrategyData(
     val virtualPacerRelativeDistance: Double? = null,
     val energyBatteryLevel: Double = 100.0,
     val currentPower: Double = 0.0,
+    val currentCadence: Double = 0.0,
     // ELITE Features
     val stravaSegmentDistance: Double? = null,
     val stravaPrGhostDistance: Double? = null,
@@ -170,6 +171,7 @@ class AltimetriaStrategyCalculator {
     private var virtualPacerDistance: Double = 0.0
     private var energyBatteryLevel: Double = 100.0
     private var currentPower: Double = 0.0
+    private var currentCadence: Double = 0.0
     
     // ELITE Feature States
     private var isStravaSegmentActive = false
@@ -199,6 +201,10 @@ class AltimetriaStrategyCalculator {
 
     fun setPower(power: Double) {
         currentPower = power
+    }
+
+    fun setCadence(cadence: Double) {
+        currentCadence = cadence
     }
 
     // ── Datos del Climber nativo de Karoo (DISTANCE_TO_TOP, ELEVATION_TO_TOP, …) ──
@@ -2263,6 +2269,7 @@ class AltimetriaStrategyCalculator {
             virtualPacerRelativeDistance = if (virtualPacerEnabled) virtualPacerDistance - currentRiderDistance else null,
             energyBatteryLevel = energyBatteryLevel,
             currentPower = currentPower,
+            currentCadence = currentCadence,
             stravaSegmentDistance = stravaRelDist,
             stravaPrGhostDistance = stravaGhostRelDist,
             windEffectIntensity = windEffect,

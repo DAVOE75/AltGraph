@@ -452,6 +452,14 @@ class Altimetria3DView @JvmOverloads constructor(
     var stravaSegmentDistance: Double? = null
     var stravaPrGhostDistance: Double? = null
     var windEffectIntensity: Double? = null // -1 to 1
+    // W'bal Feature
+    var wbal: Double? = null
+    var wbalFailureMeters: Double? = null
+    var wPrime: Int = 20000  // anaerobic capacity in joules
+    // Target Cadence & Gear Wall Feature
+    var currentCadence: Double = 0.0
+    var currentSpeedMs: Double = 0.0
+    var gearWallEnabled: Boolean = true
 
     private val stravaPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#FC4C02") // Strava Orange
@@ -1012,7 +1020,7 @@ class Altimetria3DView @JvmOverloads constructor(
             canvas.drawText("${elevMark}m", 6f, yIso + 4f, axisTextPaint)
         }
 
-        // 2. RENDERIZADO DEL PERFIL SEGÚN EL MODELO SELECCIONADO (5 VISTAS REVOLUCIONARIAS)
+        // 2. RENDERIZADO DEL PERFIL SEGÚN EL MODELO SELECCIONADO
         when (altimetriaStyle) {
             AltimetriaStyle.CLASSIC -> {
                 drawClassicRibbon(canvas, totalMicroSamples, microGrades, xFront, yFront, xBack, yBack, yBase, depth3dY)
@@ -1028,6 +1036,9 @@ class Altimetria3DView @JvmOverloads constructor(
             }
             AltimetriaStyle.MONOLITHIC_OBSIDIAN -> {
                 drawMonolithicObsidianRibbon(canvas, w, h, totalMicroSamples, microGrades, xFront, yFront, xBack, yBack, yBase, startX, baseEndX, baseGroundY, maxPeakHeight)
+            }
+            AltimetriaStyle.HILLSHADE_APEX -> {
+                drawHillshadeApexRibbon(canvas, w, h, totalMicroSamples, microGrades, xFront, yFront, xBack, yBack, yBase, depth3dY)
             }
             else -> {}
         }
@@ -1337,18 +1348,20 @@ class Altimetria3DView @JvmOverloads constructor(
             typeface = Typeface.DEFAULT_BOLD
         }
         
-        val radius = 28f // Flechas más grandes y fáciles de pulsar (antes 22f)
-        val cy = if (panButtonsPosition == "top") 45f else (h - 38f)
-        val cxLeft = 50f
-        val cxRight = w - 50f
-        
-        canvas.drawCircle(cxLeft, cy, radius, btnPaint)
-        canvas.drawCircle(cxLeft, cy, radius, btnStrokePaint)
-        canvas.drawText("<", cxLeft, cy + (arrowPaint.textSize * 0.36f), arrowPaint)
-        
-        canvas.drawCircle(cxRight, cy, radius, btnPaint)
-        canvas.drawCircle(cxRight, cy, radius, btnStrokePaint)
-        canvas.drawText(">", cxRight, cy + (arrowPaint.textSize * 0.36f), arrowPaint)
+        if (panButtonsPosition != "none") {
+            val radius = 28f // Flechas más grandes y fáciles de pulsar (antes 22f)
+            val cy = if (panButtonsPosition == "top") 45f else (h - 38f)
+            val cxLeft = 50f
+            val cxRight = w - 50f
+            
+            canvas.drawCircle(cxLeft, cy, radius, btnPaint)
+            canvas.drawCircle(cxLeft, cy, radius, btnStrokePaint)
+            canvas.drawText("<", cxLeft, cy + (arrowPaint.textSize * 0.36f), arrowPaint)
+            
+            canvas.drawCircle(cxRight, cy, radius, btnPaint)
+            canvas.drawCircle(cxRight, cy, radius, btnStrokePaint)
+            canvas.drawText(">", cxRight, cy + (arrowPaint.textSize * 0.36f), arrowPaint)
+        }
 
         // 10. Baliza del ciclista en 3D: avanza limpiamente por la cresta frontal de la pendiente
         if (riderProgress >= 0f && riderProgress <= 1f) {
@@ -1429,6 +1442,198 @@ class Altimetria3DView @JvmOverloads constructor(
                     canvas.drawText("KOM", gX, gY - 45f, prTextPaint)
                 }
             }
+        }
+
+        // W'BAL BURN RATE OVERLAY: línea de fuego y punto de quiebre
+        val wbalNow = wbal
+        val failMeters = wbalFailureMeters
+        if (wbalNow != null && wPrime > 0) {
+            val wbalFrac = (wbalNow / wPrime).toFloat().coerceIn(0f, 1f)
+            // Color de la línea: verde (lleno) -> naranja -> rojo (agotado)
+            val fireColor = when {
+                wbalFrac > 0.6f -> Color.parseColor("#22C55E")  // verde
+                wbalFrac > 0.3f -> Color.parseColor("#F59E0B")  // ámbar
+                else            -> Color.parseColor("#EF4444")  // rojo
+            }
+            // Barra horizontal bajo el perfil que representa el W'bal restante
+            val barY = h - 6f
+            val barStartX = startX
+            val barEndX = baseEndX
+            val barW = barEndX - barStartX
+            val wbalBarPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.parseColor("#33FFFFFF")
+                style = Paint.Style.FILL
+            }
+            canvas.drawRect(barStartX, barY - 4f, barEndX, barY, wbalBarPaint)
+            val wbalFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = fireColor
+                style = Paint.Style.FILL
+                alpha = 220
+            }
+            canvas.drawRect(barStartX, barY - 4f, barStartX + barW * wbalFrac, barY, wbalFillPaint)
+
+            // Etiqueta W'bal
+            val wbalLabelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = fireColor
+                textSize = (h * 0.07f).coerceIn(9f, 14f)
+                textAlign = Paint.Align.LEFT
+                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                setShadowLayer(3f, 0f, 1f, Color.BLACK)
+            }
+            val wbalPct = (wbalFrac * 100).toInt()
+            canvas.drawText("W' ${wbalPct}%", barStartX + 4f, barY - 6f, wbalLabelPaint)
+
+            // Marcador de punto de quiebre si hay déficit activo
+            if (failMeters != null && failMeters < lookaheadMeters) {
+                val failFrac = (failMeters / lookaheadMeters).toFloat().coerceIn(0f, 1f)
+                val failIdx = (failFrac * (totalMicroSamples - 1)).toInt().coerceIn(0, totalMicroSamples - 1)
+                val failX = xFront[failIdx]
+                val failY = yFront[failIdx]
+
+                val failLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.parseColor("#EF4444")
+                    strokeWidth = 2f
+                    style = Paint.Style.STROKE
+                    pathEffect = android.graphics.DashPathEffect(floatArrayOf(6f, 4f), 0f)
+                }
+                canvas.drawLine(failX, failY - 30f, failX, yBase[failIdx], failLinePaint)
+
+                val failTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.parseColor("#EF4444")
+                    textSize = (h * 0.075f).coerceIn(9f, 13f)
+                    textAlign = Paint.Align.CENTER
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
+                    setShadowLayer(4f, 0f, 2f, Color.BLACK)
+                }
+                val failKm = String.format("%.1f", failMeters / 1000.0)
+                canvas.drawText("⚡ ${failKm}km", failX, failY - 34f, failTextPaint)
+            }
+        }
+
+        // --- TARGET CADENCE & VIRTUAL GEAR WALL ---
+        if (gearWallEnabled && totalMicroSamples > 1) {
+            // 1. Detección y renderizado del "Muro de Desarrollo" (Gear Wall)
+            // Se considera "muro" donde la pendiente supere el 16% o donde para la velocidad actual
+            // la cadencia caiga por debajo de 60 rpm con desarrollo mínimo de escalador (34x34 = ratio 1.0).
+            val gearWallHatchPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.parseColor("#FFFF3B30")
+                strokeWidth = 2.5f
+                style = Paint.Style.STROKE
+            }
+            val gearWallBgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.parseColor("#44FF3B30")
+                style = Paint.Style.FILL
+            }
+
+            var inWall = false
+            var wallStartIdx = 0
+
+            for (i in 0 until totalMicroSamples) {
+                val grade = microGrades[i]
+                val isWall = grade >= 16.0f
+
+                if (isWall && !inWall) {
+                    inWall = true
+                    wallStartIdx = i
+                } else if (!isWall && inWall) {
+                    inWall = false
+                    val wStart = wallStartIdx
+                    val wEnd = i - 1
+                    if (wEnd > wStart) {
+                        val wallPoly = Path()
+                        wallPoly.moveTo(xFront[wStart], yFront[wStart])
+                        for (k in wStart..wEnd) wallPoly.lineTo(xFront[k], yFront[k])
+                        for (k in wEnd downTo wStart) wallPoly.lineTo(xFront[k], yBase[k])
+                        wallPoly.close()
+                        canvas.drawPath(wallPoly, gearWallBgPaint)
+
+                        val stepPx = 10f
+                        var hx = xFront[wStart]
+                        val limitX = xFront[wEnd]
+                        while (hx <= limitX) {
+                            val sampleFrac = ((hx - startX) / (baseEndX - startX)).coerceIn(0f, 1f)
+                            val sIdx = (sampleFrac * (totalMicroSamples - 1)).toInt().coerceIn(0, totalMicroSamples - 1)
+                            val topY = yFront[sIdx]
+                            val botY = yBase[sIdx]
+                            canvas.drawLine(hx, topY, hx + 12f, botY, gearWallHatchPaint)
+                            hx += stepPx
+                        }
+
+                        val midIdx = (wStart + wEnd) / 2
+                        val midX = xFront[midIdx]
+                        val midY = yFront[midIdx]
+                        val wallTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                            color = Color.parseColor("#FFFEE2E2")
+                            textSize = (h * 0.075f).coerceIn(8f, 12f)
+                            textAlign = Paint.Align.CENTER
+                            typeface = android.graphics.Typeface.DEFAULT_BOLD
+                            setShadowLayer(5f, 0f, 1f, Color.parseColor("#99000000"))
+                        }
+                        val wallBadge = try { context.getString(R.string.gear_wall_badge) } catch (_: Exception) { "GEAR WALL" }
+                        canvas.drawText("⚠️ $wallBadge", midX, (midY - 12f).coerceAtLeast(18f), wallTextPaint)
+                    }
+                }
+            }
+            if (inWall && totalMicroSamples - 1 > wallStartIdx) {
+                val wStart = wallStartIdx
+                val wEnd = totalMicroSamples - 1
+                val wallPoly = Path()
+                wallPoly.moveTo(xFront[wStart], yFront[wStart])
+                for (k in wStart..wEnd) wallPoly.lineTo(xFront[k], yFront[k])
+                for (k in wEnd downTo wStart) wallPoly.lineTo(xFront[k], yBase[k])
+                wallPoly.close()
+                canvas.drawPath(wallPoly, gearWallBgPaint)
+
+                var hx = xFront[wStart]
+                val limitX = xFront[wEnd]
+                while (hx <= limitX) {
+                    val sampleFrac = ((hx - startX) / (baseEndX - startX)).coerceIn(0f, 1f)
+                    val sIdx = (sampleFrac * (totalMicroSamples - 1)).toInt().coerceIn(0, totalMicroSamples - 1)
+                    val topY = yFront[sIdx]
+                    val botY = yBase[sIdx]
+                    canvas.drawLine(hx, topY, hx + 12f, botY, gearWallHatchPaint)
+                    hx += 10f
+                }
+            }
+
+            // 2. Telemetría de Marcha Recomendada y Proyección de Desarrollo en el eje inferior
+            val targetCadence = if (currentCadence > 40.0) currentCadence else 75.0
+            val speedKmh = (currentSpeedMs * 3.6).coerceAtLeast(3.0)
+            val avgNextGrade = microGrades.take((totalMicroSamples * 0.3f).toInt().coerceAtLeast(1)).average().toFloat()
+            val recSprocket = when {
+                avgNextGrade >= 15f -> "34x34"
+                avgNextGrade >= 12f -> "34x32"
+                avgNextGrade >= 9f  -> "34x28"
+                avgNextGrade >= 6f  -> "34x24"
+                avgNextGrade >= 3f  -> "34x21"
+                avgNextGrade >= 0f  -> "50x21"
+                else                -> "50x16"
+            }
+
+            val gearBadgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.parseColor("#CC111827")
+                style = Paint.Style.FILL
+            }
+            val gearBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.parseColor("#4438BDF8")
+                style = Paint.Style.STROKE
+                strokeWidth = 1.5f
+            }
+            val gearTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.parseColor("#38BDF8")
+                textSize = (h * 0.075f).coerceIn(9f, 13f)
+                textAlign = Paint.Align.RIGHT
+                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                setShadowLayer(3f, 0f, 1f, Color.BLACK)
+            }
+
+            val badgeR = baseEndX - 6f
+            val badgeB = h - 14f
+            val badgeL = badgeR - 65f
+            val badgeT = badgeB - 18f
+            canvas.drawRoundRect(badgeL, badgeT, badgeR, badgeB, 6f, 6f, gearBadgePaint)
+            canvas.drawRoundRect(badgeL, badgeT, badgeR, badgeB, 6f, 6f, gearBorderPaint)
+            canvas.drawText("⚙️ $recSprocket", badgeR - 4f, badgeB - 4f, gearTextPaint)
         }
 
         // Meta / Final de ruta: Bandera de cuadros / Línea de meta en el último bloque
@@ -2372,6 +2577,182 @@ class Altimetria3DView @JvmOverloads constructor(
             val textX = currentX + (boxWidth / 2f) - (labelW / 2f)
             canvas.drawText(labels[idx], textX, legendY + 24f, textPaint)
             currentX += spacing
+        }
+    }
+
+    /**
+     * HILLSHADE & APEX — Estilo de visualizaci\u00f3n con sombreado de relieve y marcadores de apex.
+     *
+     * Fuente de luz virtual oblicua desde arriba-izquierda: luz = (-0.7, -1.0) normalizado.
+     * Cada segmento del perfil tiene un vector normal (perpendicular a la pendiente).
+     * El dot-product con la luz produce un factor de brillo que modula el color base del gradiente.
+     * Resultado: rampas duras (normales casi horizontales) quedan en sombra; llanos reciben luz directa.
+     */
+    private fun drawHillshadeApexRibbon(
+        canvas: Canvas,
+        w: Float,
+        h: Float,
+        totalMicroSamples: Int,
+        microGrades: FloatArray,
+        xFront: FloatArray,
+        yFront: FloatArray,
+        xBack: FloatArray,
+        yBack: FloatArray,
+        yBase: FloatArray,
+        depth3dY: Float
+    ) {
+        // Vector de luz oblicua (normalizado), desde arriba-izquierda
+        val lightX = -0.6f
+        val lightY = -0.8f
+        val lightLen = kotlin.math.sqrt(lightX * lightX + lightY * lightY)
+        val lx = lightX / lightLen
+        val ly = lightY / lightLen
+
+        val hillshadePath = Path()
+
+        for (i in 0 until totalMicroSamples - 1) {
+            val grade = if (i < microGrades.size) microGrades[i] else 0f
+
+            // Normal al segmento de pendiente: la pendiente sube \u00e1dx, dy => normal = (-dy, dx) normalizado
+            val dx = xFront[i + 1] - xFront[i]
+            val dy = yFront[i + 1] - yFront[i]
+            val segLen = kotlin.math.sqrt(dx * dx + dy * dy).coerceAtLeast(0.001f)
+            val nx = -dy / segLen
+            val ny = dx / segLen
+
+            // Dot product con la luz: cuanto m\u00e1s alineado, m\u00e1s brillante
+            val dot = (nx * lx + ny * ly).coerceIn(-1f, 1f)
+            // brightness: 0.25 (sombra m\u00e1xima) .. 1.0 (luz directa)
+            val brightness = (0.25f + 0.75f * ((dot + 1f) / 2f))
+
+            // Color base del gradiente de pendiente
+            val baseColor = Color.parseColor(getGradeColor(grade.toDouble()))
+            val r = ((Color.red(baseColor) * brightness).toInt()).coerceIn(0, 255)
+            val g = ((Color.green(baseColor) * brightness).toInt()).coerceIn(0, 255)
+            val b = ((Color.blue(baseColor) * brightness).toInt()).coerceIn(0, 255)
+            val shadedColor = Color.rgb(r, g, b)
+
+            // Capa de sombra adicional (tono oscuro) para pendiente muy pronunciada (>12%)
+            val shadowAlpha = if (grade > 12f) ((grade - 12f) / 10f * 80f).toInt().coerceIn(0, 80) else 0
+
+            // Pared frontal (relleno hillshade)
+            hillshadePath.reset()
+            hillshadePath.moveTo(xFront[i], yFront[i])
+            hillshadePath.lineTo(xFront[i + 1], yFront[i + 1])
+            hillshadePath.lineTo(xFront[i + 1], yBase[i + 1])
+            hillshadePath.lineTo(xFront[i], yBase[i])
+            hillshadePath.close()
+
+            val hillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = shadedColor
+                style = Paint.Style.FILL
+            }
+            canvas.drawPath(hillshadePath, hillPaint)
+
+            // Capa de sombra de rampa
+            if (shadowAlpha > 0) {
+                val shadowOverlay = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.BLACK
+                    alpha = shadowAlpha
+                    style = Paint.Style.FILL
+                }
+                canvas.drawPath(hillshadePath, shadowOverlay)
+            }
+
+            // Separador de bloque fino
+            val sepPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.parseColor(if (i % currentMicroSubDivisions == 0) "#66FFFFFF" else "#22FFFFFF")
+                strokeWidth = if (i % currentMicroSubDivisions == 0) 1.2f else 0.6f
+                style = Paint.Style.STROKE
+            }
+            canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], sepPaint)
+        }
+
+        // Cap izquierdo
+        if (totalMicroSamples > 1) {
+            val startGrade = if (microGrades.isNotEmpty()) microGrades[0].toDouble() else 4.0
+            leftEndcapPath.reset()
+            leftEndcapPath.moveTo(xBack[0], yBack[0])
+            leftEndcapPath.lineTo(xFront[0], yFront[0])
+            leftEndcapPath.lineTo(xFront[0], yBase[0])
+            leftEndcapPath.lineTo(xBack[0], yBase[0] - depth3dY)
+            leftEndcapPath.close()
+            leftEndcapPaint.color = getGradeColorDarkShaded(startGrade)
+            canvas.drawPath(leftEndcapPath, leftEndcapPaint)
+        }
+
+        // Cresta superior (ribbon top) con efecto de luz de cresta
+        for (i in 0 until totalMicroSamples - 1) {
+            val grade = if (i < microGrades.size) microGrades[i] else 0f
+            val topColor = getGradeColorTopFacet(grade.toDouble())
+
+            ribbonQuadPath.reset()
+            ribbonQuadPath.moveTo(xFront[i], yFront[i])
+            ribbonQuadPath.lineTo(xBack[i], yBack[i])
+            ribbonQuadPath.lineTo(xBack[i + 1], yBack[i + 1])
+            ribbonQuadPath.lineTo(xFront[i + 1], yFront[i + 1])
+            ribbonQuadPath.close()
+
+            ribbonSurfacePaint.color = topColor
+            canvas.drawPath(ribbonQuadPath, ribbonSurfacePaint)
+            canvas.drawLine(xBack[i], yBack[i], xBack[i + 1], yBack[i + 1], ribbonBackLinePaint)
+            canvas.drawLine(xFront[i], yFront[i], xFront[i + 1], yFront[i + 1], ribbonFrontLinePaint)
+        }
+
+        // APEX: marcadores en herraduras (hairpins) como chinchetas flotantes 3D
+        if (showHairpins && hairpins.isNotEmpty()) {
+            for (hp in hairpins) {
+                val relDist = hp - windowStartMeters
+                if (relDist < 0 || relDist > lookaheadMeters) continue
+                val frac = (relDist / lookaheadMeters).toFloat().coerceIn(0f, 1f)
+                val microIdx = (frac * (totalMicroSamples - 1)).toInt().coerceIn(0, totalMicroSamples - 1)
+                val apexX = xFront[microIdx]
+                val apexY = yFront[microIdx]
+
+                // Pendiente local en el apex
+                val localGrade = if (microIdx < microGrades.size) microGrades[microIdx] else 0f
+
+                // Palo de la chincheta
+                val pinLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.parseColor("#FF6B6B")
+                    strokeWidth = 2f
+                    style = Paint.Style.STROKE
+                }
+                canvas.drawLine(apexX, apexY - 6f, apexX, apexY - 32f, pinLinePaint)
+
+                // Diamante flotante (apex marker)
+                val diamondPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.parseColor("#FF6B6B")
+                    style = Paint.Style.FILL
+                }
+                val diamondBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.WHITE
+                    strokeWidth = 1.5f
+                    style = Paint.Style.STROKE
+                }
+                val apexPath = Path().apply {
+                    val cx = apexX
+                    val cy = apexY - 40f
+                    val r = 8f
+                    moveTo(cx, cy - r)
+                    lineTo(cx + r, cy)
+                    lineTo(cx, cy + r)
+                    lineTo(cx - r, cy)
+                    close()
+                }
+                canvas.drawPath(apexPath, diamondPaint)
+                canvas.drawPath(apexPath, diamondBorderPaint)
+
+                // Etiqueta de pendiente local encima del diamante
+                val apexTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = Color.WHITE
+                    textSize = (h * 0.07f).coerceIn(8f, 12f)
+                    textAlign = Paint.Align.CENTER
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
+                    setShadowLayer(3f, 0f, 1f, Color.BLACK)
+                }
+                canvas.drawText("${localGrade.toInt()}%", apexX, apexY - 52f, apexTextPaint)
+            }
         }
     }
 

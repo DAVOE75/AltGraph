@@ -135,6 +135,8 @@
     <string name="style_monolith_desc">Cristal sombre facetté avec noyau de plasma lumineux et crête laser</string>
     <string name="style_global_title">Carte Isométrique Globale</string>
     <string name="style_global_desc">Vision architecturale 3D de l\'ensemble du parcours en serpentin</string>
+    <string name="style_hillshade_title">Hillshade &amp; Apex</string>
+    <string name="style_hillshade_desc">Ombrage du relief avec source lumineuse dynamique et marqueurs d\'apex en épingles</string>
     <string name="toast_vista">Vue : %1$s</string>
     <string name="toast_visor_puertos">Visionneur Cols : %1$s</string>
     <string name="label_elite_header">ALTGRAPH ELITE</string>
@@ -203,6 +205,12 @@
     <string name="setting_pan_buttons_position_desc">Place les flèches de défilement en haut ou en bas du profil 3D</string>
     <string name="pan_position_bottom">En bas (Par défaut)</string>
     <string name="pan_position_top">En haut</string>
+    <string name="pan_position_none">Masqué</string>
     <string name="setting_climb_zoom_top_title">Commandes de zoom en haut (Viseur de cols)</string>
     <string name="setting_climb_zoom_top_desc">Place les boutons de zoom dans l\'en-tête supérieur pour éviter de masquer le profil et les barres de pente</string>
+    <string name="setting_gear_wall_title">Mur de Braquet &amp; Cadence Cible</string>
+    <string name="setting_gear_wall_desc">Met en évidence les zones de pente extrême et projette le braquet conseillé</string>
+    <string name="setting_wbal_title">Ligne d\'Épuisement W\'bal &amp; Point de Rupture</string>
+    <string name="setting_wbal_desc">Affiche la réserve anaérobie restante et localise le point de défaillance estimé</string>
+    <string name="gear_wall_badge">MUR DE BRAQUET</string>
 </resources>

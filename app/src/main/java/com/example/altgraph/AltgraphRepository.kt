@@ -237,7 +237,10 @@ object AltgraphRepository {
         while (isActive) {
             // Un tick que falla se registra y el bucle sigue (tick no es suspend: no traga cancelaciones)
             try {
-                _snapshot.value = core.tick(appContext)
+                val ctx = appContext
+                val ftp = if (ctx != null) AppPreferences.getInstance(ctx).userFtp else 250
+                val wPrime = if (ctx != null) AppPreferences.getInstance(ctx).userWPrime else 20000
+                _snapshot.value = core.tick(ctx, ftp, wPrime)
             } catch (e: Exception) {
                 Log.e(TAG, "tick", e)
             }

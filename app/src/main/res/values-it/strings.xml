@@ -135,6 +135,8 @@
     <string name="style_monolith_desc">Cristallo scuro sfaccettato con nucleo di plasma luminoso e cresta laser</string>
     <string name="style_global_title">Mappa Isometrica Globale</string>
     <string name="style_global_desc">Visione architettonica 3D dell\'intero percorso a forma di serpente</string>
+    <string name="style_hillshade_title">Hillshade &amp; Apex</string>
+    <string name="style_hillshade_desc">Ombreggiatura del rilievo con sorgente luminosa dinamica e indicatori di apex nei tornanti</string>
     <string name="toast_vista">Vista: %1$s</string>
     <string name="toast_visor_puertos">Visore Salite: %1$s</string>
     <string name="label_elite_header">ALTGRAPH ELITE</string>
@@ -203,6 +205,12 @@
     <string name="setting_pan_buttons_position_desc">Posiziona le frecce di scorrimento in alto o in basso nel profilo altimetrico 3D</string>
     <string name="pan_position_bottom">In basso (Predefinito)</string>
     <string name="pan_position_top">In alto</string>
+    <string name="pan_position_none">Nascosto</string>
     <string name="setting_climb_zoom_top_title">Comandi zoom in alto (Visualizzatore salite)</string>
     <string name="setting_climb_zoom_top_desc">Posiziona i pulsanti zoom nell\'intestazione superiore per non coprire il profilo della salita</string>
+    <string name="setting_gear_wall_title">Muro di Rapporto &amp; Cadenza Obiettivo</string>
+    <string name="setting_gear_wall_desc">Evidenzia i tratti di pendenza estrema e proietta i rapporti consigliati</string>
+    <string name="setting_wbal_title">Linea di Consumo W\'bal &amp; Punto di Cedimento</string>
+    <string name="setting_wbal_desc">Mostra la riserva anaerobica residua e prevede il punto di esaurimento lungo la salita</string>
+    <string name="gear_wall_badge">MURO RAPPORTO</string>
 </resources>

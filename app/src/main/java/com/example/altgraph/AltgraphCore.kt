@@ -17,7 +17,11 @@ data class Snapshot(
     val zoneColor: String,
     val routeClimbs: List<RouteClimb>,
     // Hueco con el fantasma de KGhost (null si KGhost no publica)
-    val ghostGap: GhostGap? = null
+    val ghostGap: GhostGap? = null,
+    // W'bal: batería anaeróbica actual (julios). Null si no hay potenciómetro o FTP=0.
+    val wbal: Double? = null,
+    // Distancia desde posición actual (metros) donde W'bal llega a 0 al ritmo actual. Null = no aplica.
+    val wbalFailureMeters: Double? = null
 )
 
 /**
@@ -32,12 +36,47 @@ class AltgraphCore(val calculator: AltimetriaStrategyCalculator = AltimetriaStra
     // Últimas partes del hueco de KGhost (tiempo y distancia); null = sin dato
     var kghostTime: GapPart? = null
     var kghostDist: GapPart? = null
+    // W'bal: se acumula con cada tick (1 Hz). Se resetea cuando Power==0 o al inicio.
+    private var wbalJoules: Double? = null  // null = sin potenciómetro todavía
 
     /** Único punto que avanza el calculador (una vez por segundo). */
-    fun tick(context: Context?): Snapshot {
+    fun tick(context: Context?, ftp: Int = 250, wPrime: Int = 20000): Snapshot {
         calculator.mapZoomLevel = null
         calculator.manualPanOffsetMeters = 0.0
         val strategy = calculator.calculateStrategy(context, advance = true)
+        val power = strategy.currentPower
+
+        // W'bal: integración de Skiba (1 segundo por tick)
+        val wbal: Double?
+        val wbalFailureMeters: Double?
+        if (power > 0.0 && ftp > 0) {
+            val surplus = power - ftp  // positivo = sobre umbral (gasta W'); negativo = recupera
+            val current = wbalJoules ?: wPrime.toDouble()
+            val next = if (surplus > 0) {
+                (current - surplus).coerceAtLeast(0.0)
+            } else {
+                // Recuperación exponencial: Wbal_rec = W' - (W' - Wbal) * e^(-surplus/tau)
+                // tau ≈ 546 s (valor estándar de Skiba 2012). surplus es negativo aquí.
+                val tau = 546.0
+                val deficit = wPrime - current
+                wPrime - deficit * kotlin.math.exp(surplus / tau)
+            }
+            wbalJoules = next
+            wbal = next
+
+            // Proyección de fallo: si hay déficit activo y subBlocks disponibles
+            if (surplus > 0 && next < wPrime) {
+                // Metros hasta agotar el W'bal restante al ritmo de gasto actual
+                wbalFailureMeters = next / surplus.coerceAtLeast(1.0)
+            } else {
+                wbalFailureMeters = null
+            }
+        } else {
+            // Sin potenciómetro o parado: no actualizamos ni mostramos
+            wbal = wbalJoules  // mantiene el último valor conocido
+            wbalFailureMeters = null
+        }
+
         return Snapshot(
             strategy = strategy,
             currentElevation = calculator.currentElevation,
@@ -50,7 +89,9 @@ class AltgraphCore(val calculator: AltimetriaStrategyCalculator = AltimetriaStra
             isNavigatingRoute = calculator.isNavigatingRoute,
             zoneColor = calculator.getZoneColor(calculator.currentElevation),
             routeClimbs = calculator.routeClimbs.toList(),
-            ghostGap = combineGhostGap(kghostTime, kghostDist)
+            ghostGap = combineGhostGap(kghostTime, kghostDist),
+            wbal = wbal,
+            wbalFailureMeters = wbalFailureMeters
         )
     }
 

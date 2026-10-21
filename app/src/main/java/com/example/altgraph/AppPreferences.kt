@@ -250,6 +250,18 @@ class AppPreferences(context: Context) {
         get() = prefs.getInt(KEY_USER_FTP, 250)
         set(value) = prefs.edit().putInt(KEY_USER_FTP, value).apply()
 
+    var userWPrime: Int
+        get() = prefs.getInt(KEY_USER_WPRIME, 20000)
+        set(value) = prefs.edit().putInt(KEY_USER_WPRIME, value).apply()
+
+    var wbalOverlayEnabled: Boolean
+        get() = prefs.getBoolean(KEY_WBAL_OVERLAY_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_WBAL_OVERLAY_ENABLED, value).apply()
+
+    var gearWallEnabled: Boolean
+        get() = prefs.getBoolean(KEY_GEAR_WALL_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_GEAR_WALL_ENABLED, value).apply()
+
     var eliteRadarResolution: Int
         get() = prefs.getInt(KEY_ELITE_RADAR_RESOLUTION, 0)
         set(value) = prefs.edit().putInt(KEY_ELITE_RADAR_RESOLUTION, value).apply()
@@ -340,6 +352,9 @@ class AppPreferences(context: Context) {
         private const val KEY_ELITE_SMOOTH_MAP_OVERLAY = "elite_smooth_map_overlay"
         private const val KEY_ELITE_CUSTOM_CLIMBS_ENABLED = "elite_custom_climbs_enabled"
         private const val KEY_USER_FTP = "user_ftp"
+        private const val KEY_USER_WPRIME = "user_wprime"
+        private const val KEY_WBAL_OVERLAY_ENABLED = "wbal_overlay_enabled"
+        private const val KEY_GEAR_WALL_ENABLED = "gear_wall_enabled"
         private const val KEY_ELITE_RADAR_RESOLUTION = "elite_radar_resolution"
 
         @Volatile
@@ -389,6 +404,12 @@ enum class AltimetriaStyle(val key: String, val icon: String, val titleRes: Int,
         icon = "",
         titleRes = R.string.style_global_title,
         descRes = R.string.style_global_desc
+    ),
+    HILLSHADE_APEX(
+        key = "hillshade_apex",
+        icon = "",
+        titleRes = R.string.style_hillshade_title,
+        descRes = R.string.style_hillshade_desc
     );
 
     companion object {
