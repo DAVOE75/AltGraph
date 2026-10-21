@@ -1,11 +1,11 @@
 <p align="center">
- <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="Logo ALTGRAPH" width="150" />
+ <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v1.1.0 ELITE)
+# ALTGRAPH (v2.0 REVOLUTION)
 <p>Leggi in: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** è un'estensione professionale per l'altimetria e le prestazioni ciclistiche di ultima generazione per i ciclocomputer **Hammerhead Karoo** (Karoo 2 e Karoo 3), sviluppata da **hesiOX** utilizzando l'SDK ufficiale `karoo-ext`.
-Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **Suite di 6 Modelli di Visualizzazione Altimetrica 3D** con selettore dinamico in tempo reale, scala monocromatica continua di 15 livelli, avanzamento quantistico con finestra scorrevole di 50 metri, risoluzione adattiva multiscala, analisi dei passi di montagna, calcolo topografico opzionale (proiezione orizzontale pura), rilevamento matematico dei tornanti, filtraggio per categorie di POI (Paesi, Fontane, Punti Panoramici, Cime), controlli touch di zoom, caratteri Google Sans / Condensed, layout a schermo intero ruotato di 90°, passo **VAM** target e calcolo scientifico del **Grado di Fatica (GF)**.
+Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **Suite di 7 Modelli di Visualizzazione Altimetrica 3D**, telemetria biomeccanica e analisi metabolica in tempo reale.F)**.
 
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />

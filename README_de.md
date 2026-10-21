@@ -1,11 +1,11 @@
 <p align="center">
- <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="ALTGRAPH Logo" width="150" />
+ <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v1.1.0 ELITE)
+# ALTGRAPH (v2.0 REVOLUTION)
 <p>Lesen auf: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** ist eine professionelle Höhen- und Leistungserweiterung der nächsten Generation für **Hammerhead Karoo** Fahrradcomputer (Karoo 2 und Karoo 3), entwickelt von **hesiOX** unter Verwendung des offiziellen `karoo-ext` SDKs.
-Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 6 3D-Höhenvisualisierungsmodellen** mit dynamischer Live-Umschaltung, einer kontinuierlichen 15-Stufen-Gradientenskala, einem gleitenden 50-Meter-Fenster, adaptiver Multiskalen-Auflösung, Passanalysen, optionaler topografischer Berechnung, mathematischer Tornanti-Erkennung (Haarnadelkurven), POI-Filterung, Touch-Zoom-Steuerung, Google Sans / Condensed Schriften, 90°-Querformatmodus, Ziel-**VAM**-Geschwindigkeit und wissenschaftlicher Berechnung des **Ermüdungsgrades (GF)**.
+Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 7 3D-Höhenvisualisierungsmodellen**, biomechanische Telemetrie und metabolische Echtzeit-Pacing-Analyse.
 
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />

@@ -1,7 +1,7 @@
 <p align="center">
- <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="ALTGRAPH Logo" width="150" />
+ <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v1.1.0 ELITE)
+# ALTGRAPH (v2.0 REVOLUTION)
 <p>Read in: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 <p align="center">
@@ -13,7 +13,7 @@
 </p>
 
 **ALTGRAPH** is a next-generation professional altimetry and cycling performance extension for **Hammerhead Karoo** computers (Karoo 2 and Karoo 3) developed by **hesiOX** using the official `karoo-ext` SDK.
-It revolutionizes traditional cycling elevation profiles by featuring a **Suite of 6 Altimetry 3D Visualization Models** with a live dynamic selector, continuous monochromatic 15-segment gradient scale, a 50-meter quantum rolling window advance, adaptive multiscale resolution, mountain pass analysis, optional topographic calculation (pure horizontal projection), mathematical hairpin turn (tornanti) detection, POI categorization (Towns, Fountains, Viewpoints, Summits), tap-to-zoom controls, Google Sans / Condensed fonts, 90° rotated full-screen landscape mode, dual **VAM** target pace with recommended speed, and scientific calculation of the **Fatigue Grade (GF)**.
+It revolutionizes traditional cycling elevation profiles by featuring a **Suite of 7 Altimetry 3D Visualization Models**, biomechanical telemetry and real-time metabolic pacing analysis.
 
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />

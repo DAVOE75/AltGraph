@@ -1,11 +1,11 @@
 <p align="center">
- <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="Logo ALTGRAPH" width="150" />
+ <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v1.1.0 ELITE)
+# ALTGRAPH (v2.0 REVOLUTION)
 <p>Lire en : <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** est une extension professionnelle d'altimétrie et de performance cycliste de nouvelle génération pour les compteurs GPS **Hammerhead Karoo** (Karoo 2 et Karoo 3), développée par **hesiOX** à l'aide du SDK officiel `karoo-ext`.
-Elle révolutionne le concept traditionnel de l'altimétrie cycliste en intégrant une **Suite de 6 Modèles de Visualisation Altimétrique 3D** avec sélecteur dynamique en direct, échelle monochromatique continue de 15 niveaux, avancée quantique en fenêtre glissante de 50 mètres, résolution adaptative multi-échelle, analyse des cols de montagne, calcul topographique optionnel (projection horizontale pure), détection mathématique des virages en épingle (tornanti), filtrage par catégories de POI (Villes, Fontaines, Belvédères, Sommets), commandes de zoom tactile, polices Google Sans / Condensed, mode paysage pivoté à 90°, allure **VAM** cible et calcul scientifique du **Degré de Fatigue (GF)**.
+Elle révolutionne le concept traditionnel de l'altimétrie cycliste en intégrant une **Suite de 7 Modèles de Visualisation Altimétrique 3D**, de la télémétrie biomécanique et une analyse métabolique en direct.
 
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />

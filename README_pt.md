@@ -1,11 +1,11 @@
 <p align="center">
- <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon.png" alt="Logotipo ALTGRAPH" width="150" />
+ <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logotipo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v1.1.0 ELITE)
+# ALTGRAPH (v2.0 REVOLUTION)
 <p>Ler em: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** é uma extensão profissional de altimetria e desempenho de ciclismo de última geração para os ciclocomputadores **Hammerhead Karoo** (Karoo 2 e Karoo 3), desenvolvida por **hesiOX** utilizando o SDK oficial `karoo-ext`.
-Revoluciona o conceito tradicional de altimetria de ciclismo incorporando um **Conjunto de 6 Modelos de Visualização Altimétrica 3D** com seletor dinâmico ao vivo, escala monocromática contínua de 15 níveis, avanço quântico com janela deslizante de 50 metros, resolução multiescala adaptável, análise de passagens de montanha, cálculo topográfico opcional (projeção horizontal pura), detecção matemática de curvas fechadas (tornanti), filtragem de POIs (Cidades, Fontes, Miradouros, Cumes), controlos de zoom por toque, tipos de letra Google Sans / Condensed, modo horizontal rodado a 90°, ritmo **VAM** alvo e cálculo científico do **Grau de Fadiga (GF)**.
+Revoluciona o conceito tradicional de altimetria de ciclismo incorporando um **Conjunto de 7 Modelos de Visualização Altimétrica 3D**, telemetria biomecânica e análise metabólica em tempo real.
 
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logotipo ALTGRAPH" width="350" />
