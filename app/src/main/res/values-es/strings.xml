@@ -258,13 +258,29 @@
     <string name="elite_voice_kghost_interval_title">Frecuencia de aviso KGhost</string>
     <string name="elite_voice_pois_title">Puntos de Agua (POIs)</string>
     <string name="elite_voice_pois_desc">Avisa ante fuentes y puntos de recarga de agua próximos</string>
+    <string name="elite_voice_elevation_milestones_title">Hitos de Desnivel Acumulado</string>
+    <string name="elite_voice_elevation_milestones_desc">Avisa cada 250m o 500m de desnivel positivo acumulado</string>
+    <string name="elite_voice_periodic_report_title">Resumen Periódico de Marcha</string>
+    <string name="elite_voice_periodic_report_desc">Locución de velocidad media, cadencia y desnivel acumulado</string>
+    <string name="elite_voice_periodic_interval_title">Frecuencia del resumen</string>
+    <string name="elite_voice_cadence_alert_title">Alerta de Cadencia Baja en Subida</string>
+    <string name="elite_voice_cadence_alert_desc">Avisa si la cadencia desciende de 60 pedaladas en tramos empinados</string>
+    <string name="elite_voice_pre_chime_title">Tono de Atención Previo</string>
+    <string name="elite_voice_pre_chime_desc">Emite un breve tono antes de hablar para activar auriculares Bluetooth</string>
+    <string name="elite_voice_speech_rate_title">Velocidad y Ritmo de Voz</string>
 
     <!-- Frases de Locución (TTS) -->
     <string name="voice_climb_start">Atención: Inicio de puerto %1$s. %2$s kilómetros al %3$s por ciento de media. %4$s.</string>
+    <string name="voice_climb_km_progress">Kilómetro %1$s de puerto. Pendiente actual del %2$s por ciento.</string>
     <string name="voice_climb_summit_near">Cima a %1$s metros.</string>
     <string name="voice_steep_ahead">El puerto se endurece: próximos %1$s metros al %2$s por ciento de media.</string>
     <string name="voice_wall_ahead">Atención: Muro del %1$s por ciento en %2$s metros.</string>
     <string name="voice_hairpin_ahead">Curva de herradura en %1$s metros al %2$s por ciento.</string>
+    <string name="voice_slope_relief">Descanso: la pendiente suaviza durante los próximos %1$s metros.</string>
+    <string name="voice_elevation_milestone">Desnivel positivo acumulado: %1$s metros. Altitud actual: %2$s metros.</string>
+    <string name="voice_periodic_summary">Resumen de ruta. Distancia %1$s kilómetros. Velocidad media %2$s kilómetros por hora. Desnivel acumulado %3$s metros.</string>
+    <string name="voice_cadence_low">Cadencia baja: %1$s pedaladas. Aligera desarrollo.</string>
+    <string name="voice_wbal_warning">Reserva anaeróbica baja: queda el %1$s por ciento.</string>
     <string name="voice_kghost_lead">Liderando: llevas al Ghost %1$s metros por detrás, a %2$s.</string>
     <string name="voice_kghost_chase">El Ghost lidera: va %1$s metros por delante, a %2$s.</string>
     <string name="voice_kghost_overtake_lead">Atención: Has adelantado al Ghost. Nueva cabeza de carrera.</string>

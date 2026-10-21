@@ -299,6 +299,30 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_VOICE_POIS_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_VOICE_POIS_ENABLED, value).apply()
 
+    var voiceElevationMilestonesEnabled: Boolean
+        get() = prefs.getBoolean(KEY_VOICE_ELEVATION_MILESTONES, true)
+        set(value) = prefs.edit().putBoolean(KEY_VOICE_ELEVATION_MILESTONES, value).apply()
+
+    var voicePeriodicReportEnabled: Boolean
+        get() = prefs.getBoolean(KEY_VOICE_PERIODIC_REPORT, true)
+        set(value) = prefs.edit().putBoolean(KEY_VOICE_PERIODIC_REPORT, value).apply()
+
+    var voicePeriodicIntervalKm: Double
+        get() = prefs.getFloat(KEY_VOICE_PERIODIC_INTERVAL_KM, 5.0f).toDouble()
+        set(value) = prefs.edit().putFloat(KEY_VOICE_PERIODIC_INTERVAL_KM, value.toFloat()).apply()
+
+    var voiceCadenceAlertEnabled: Boolean
+        get() = prefs.getBoolean(KEY_VOICE_CADENCE_ALERT, true)
+        set(value) = prefs.edit().putBoolean(KEY_VOICE_CADENCE_ALERT, value).apply()
+
+    var voicePreChimeEnabled: Boolean
+        get() = prefs.getBoolean(KEY_VOICE_PRE_CHIME, true)
+        set(value) = prefs.edit().putBoolean(KEY_VOICE_PRE_CHIME, value).apply()
+
+    var voiceSpeechRate: Float
+        get() = prefs.getFloat(KEY_VOICE_SPEECH_RATE, 0.95f)
+        set(value) = prefs.edit().putFloat(KEY_VOICE_SPEECH_RATE, value).apply()
+
     var eliteRadarResolution: Int
         get() = prefs.getInt(KEY_ELITE_RADAR_RESOLUTION, 0)
         set(value) = prefs.edit().putInt(KEY_ELITE_RADAR_RESOLUTION, value).apply()
@@ -401,6 +425,12 @@ class AppPreferences(context: Context) {
         private const val KEY_VOICE_KGHOST_ENABLED = "voice_kghost_enabled"
         private const val KEY_VOICE_KGHOST_INTERVAL = "voice_kghost_interval"
         private const val KEY_VOICE_POIS_ENABLED = "voice_pois_enabled"
+        private const val KEY_VOICE_ELEVATION_MILESTONES = "voice_elevation_milestones"
+        private const val KEY_VOICE_PERIODIC_REPORT = "voice_periodic_report"
+        private const val KEY_VOICE_PERIODIC_INTERVAL_KM = "voice_periodic_interval_km"
+        private const val KEY_VOICE_CADENCE_ALERT = "voice_cadence_alert"
+        private const val KEY_VOICE_PRE_CHIME = "voice_pre_chime"
+        private const val KEY_VOICE_SPEECH_RATE = "voice_speech_rate"
         private const val KEY_ELITE_RADAR_RESOLUTION = "elite_radar_resolution"
 
         @Volatile

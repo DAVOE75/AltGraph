@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v2.1 REVOLUTION)
+# ALTGRAPH (v2.2 REVOLUTION)
 <p>Lesen auf: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** ist eine professionelle Höhen- und Leistungserweiterung der nächsten Generation für **Hammerhead Karoo** Fahrradcomputer (Karoo 2 und Karoo 3), entwickelt von **hesiOX** unter Verwendung des offiziellen `karoo-ext` SDKs.
@@ -11,26 +11,39 @@ Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 7 3D-Höhenv
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
-## VERSION 2.1: SPRACHANSAGEN-KOPILOT (AUDIO BLUETOOTH / LAUTSPRECHER)
+## VERSION 2.2: PROFESSIONELLER SPRACHANSAGEN-KOPILOT (AUDIO BLUETOOTH / LAUTSPRECHER)
 
-In Version 2.1 führt AltGraph ein umfassendes **Sprachansagensystem (Voice Copilot)** im Hintergrund ein, kompatibel mit Bluetooth-Kopfhörern oder dem Karoo-Lautsprecher und konfigurierbar im **ELITE**-Menü:
+In Version 2.2 führt AltGraph ein umfassendes **Sprachansagensystem (Voice Copilot)** im Hintergrund ein, kompatibel mit Bluetooth-Kopfhörern oder dem Karoo-Lautsprecher und konfigurierbar im **ELITE**-Menü:
 
 * **Pässe- und Gipfelansagen**:
   * Sprachansage bei Annäherung an den Passbeginn mit Passname, Länge, Durchschnittssteigung und offizieller Kategorie.
+  * Kilometerfortschritt am Pass: Audioansage jedes bewältigten Kilometers inklusive aktueller Steigung.
   * Zweistufige Gipfelansage: Vorwarnung bei 500 Metern und finale Ansage bei 100 Metern vor der Passhöhe.
 * **Warnung vor steileren Abschnitten (Slope Ahead)**:
   * Analysiert die bevorstehende Strecke und warnt im Voraus, wenn der kommende Abschnitt den gewählten Steigungsschwellenwert übersteigt (wählbar zwischen 6%, 7%, 8%, 9%, 10% oder 12%). Beispiel: *"Anstieg wird steiler: nächste 500 Meter bei 10.4 Prozent im Schnitt."*
+* **Erkennung von Flachstücken und Erholungsabschnitten**:
+  * Meldet, wenn ein Steilstück abflacht, um rechtzeitig Erholungsphasen und Trittfrequenzwechsel anzukündigen.
 * **Extremrampen und Steilwände**:
   * Frühzeitige Warnung vor Steigungen von 15% oder mehr zum rechtzeitigen Schalten.
 * **Serpentinen (Apex Cues)**:
   * Sprachansagen vor engen Spitzkehren mit starkem Neigungswechsel.
+* **Höhenmeter-Meilensteine**:
+  * Audiobenachrichtigung beim Erreichen runder Höhenmeter-Etappen (alle 250m oder 500m) mit Ansage der aktuellen Meereshöhe.
+* **Regelmäßige Fahrtzusammenfassung**:
+  * Konfigurierbare periodische Sprachansage (alle 3, 5, 10, 15 oder 20 km) zu Gesamtdistanz, Durchschnittsgeschwindigkeit und absolvierten Höhenmetern.
+* **Warnung bei zu niedriger Trittfrequenz am Berg**:
+  * Proaktiver Warnhinweis, wenn die Trittfrequenz an Rampen mit über 8% Steigung unter 60 U/min fällt.
+* **Warnung bei kritischem W'bal-Füllstand**:
+  * Dringender Audiohinweis, sobald der anaerobe Energiespeicher unter 20% fällt.
 * **KGhost-Rivalen-Pacing**:
   * Regelmäßige Audioansagen zu Vorsprung und Rückstand (Distanz und Zeit) gegenüber dem virtuellen Rivalen (Ghost), konfigurierbar alle 500m, 1 km, 2 km oder 5 km.
   * Sofortige Ansage bei Führungswechsel oder Überholung.
 * **Wasserstellen (POIs)**:
   * Audiohinweis bei weniger als 150 Metern Entfernung zu Brunnen oder Wasserstellen auf der Route.
-* **Intelligente Audio-Architektur**:
-  * Nutzt die native Android TextToSpeech-Engine in der Gerätesprache mit automatischer Musikabsenkung (Audio Ducking) und Anti-Spam-Warteschlange.
+* **Akustische Klangtreue und Intelligente Audio-Architektur**:
+  * Aufmerksamkeitston vor Ansage (Pre-Chime): aktiviert Bluetooth-Kopfhörer rechtzeitig durch einen kurzen Signalton, damit der Satzbeginn nicht abgeschnitten wird.
+  * Ausgewogenes Sprechtempo (0.95x) für einwandfreie Sprachverständlichkeit bei Windgeräuschen.
+  * Native TextToSpeech-Engine mit automatischer Musikabsenkung (Audio Ducking) und dynamisch priorisierter Warteschlange.
 
 ---
 

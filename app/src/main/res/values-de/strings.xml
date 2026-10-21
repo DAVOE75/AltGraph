@@ -231,13 +231,29 @@
     <string name="elite_voice_kghost_interval_title">KGhost-Ansageintervall</string>
     <string name="elite_voice_pois_title">Wasserstellen (POIs)</string>
     <string name="elite_voice_pois_desc">Kündigt Brunnen und Wasserquellen in der Nähe an</string>
+    <string name="elite_voice_elevation_milestones_title">Höhenmeter-Meilensteine</string>
+    <string name="elite_voice_elevation_milestones_desc">Ansage alle 250m oder 500m absolvierter Höhenmeter</string>
+    <string name="elite_voice_periodic_report_title">Regelmäßige Fahrtzusammenfassung</string>
+    <string name="elite_voice_periodic_report_desc">Ansage von Durchschnittsgeschwindigkeit, Trittfrequenz und Höhenmetern</string>
+    <string name="elite_voice_periodic_interval_title">Intervall der Zusammenfassung</string>
+    <string name="elite_voice_cadence_alert_title">Warnung bei niedriger Trittfrequenz</string>
+    <string name="elite_voice_cadence_alert_desc">Warnt, wenn die Trittfrequenz an steilen Rampen unter 60 U/min fällt</string>
+    <string name="elite_voice_pre_chime_title">Aufmerksamkeitston vor Ansage</string>
+    <string name="elite_voice_pre_chime_desc">Spielt einen kurzen Ton ab, um Bluetooth-Kopfhörer rechtzeitig zu aktivieren</string>
+    <string name="elite_voice_speech_rate_title">Sprechtempo und Sprachfluss</string>
 
     <!-- Sprachphrasen (TTS) -->
     <string name="voice_climb_start">Achtung: Beginn des Passes %1$s. %2$s Kilometer bei durchschnittlich %3$s Prozent. %4$s.</string>
+    <string name="voice_climb_km_progress">Kilometer %1$s des Anstiegs. Aktuelle Steigung %2$s Prozent.</string>
     <string name="voice_climb_summit_near">Gipfel in %1$s Metern.</string>
     <string name="voice_steep_ahead">Anstieg wird steiler: nächste %1$s Meter bei %2$s Prozent im Schnitt.</string>
     <string name="voice_wall_ahead">Achtung: Steilwand mit %1$s Prozent in %2$s Metern.</string>
     <string name="voice_hairpin_ahead">Serpentine in %1$s Metern bei %2$s Prozent.</string>
+    <string name="voice_slope_relief">Erholung: Steigung flacht für die nächsten %1$s Meter ab.</string>
+    <string name="voice_elevation_milestone">Höhenmeter erreicht: %1$s Meter. Aktuelle Höhe: %2$s Meter.</string>
+    <string name="voice_periodic_summary">Fahrtzusammenfassung. Distanz %1$s Kilometer. Durchschnittsgeschwindigkeit %2$s km/h. Höhenmeter %3$s Meter.</string>
+    <string name="voice_cadence_low">Niedrige Trittfrequenz: %1$s Umdrehungen. Kleineren Gang wählen.</string>
+    <string name="voice_wbal_warning">Anaerobe Reserve niedrig: noch %1$s Prozent übrig.</string>
     <string name="voice_kghost_lead">In Führung: Ghost liegt %1$s Meter zurück, Abstand %2$s.</string>
     <string name="voice_kghost_chase">Ghost führt: %1$s Meter voraus, Abstand %2$s.</string>
     <string name="voice_kghost_overtake_lead">Achtung: Du hast den Ghost überholt. Neue Rennspitze.</string>

@@ -231,13 +231,29 @@
     <string name="elite_voice_kghost_interval_title">Frequenza annunci KGhost</string>
     <string name="elite_voice_pois_title">Punti d\'Acqua (POI)</string>
     <string name="elite_voice_pois_desc">Avverte in prossimità di fontane e punti di rifornimento</string>
+    <string name="elite_voice_elevation_milestones_title">Traguardi di Dislivello Accumulato</string>
+    <string name="elite_voice_elevation_milestones_desc">Annuncia ogni 250m o 500m di dislivello positivo accumulato</string>
+    <string name="elite_voice_periodic_report_title">Riepilogo Periodico della Corsa</string>
+    <string name="elite_voice_periodic_report_desc">Annuncio di velocità media, cadenza e dislivello accumulato</string>
+    <string name="elite_voice_periodic_interval_title">Frequenza del riepilogo</string>
+    <string name="elite_voice_cadence_alert_title">Avviso di Cadenza Bassa in Salita</string>
+    <string name="elite_voice_cadence_alert_desc">Avvisa se la cadenza scende sotto le 60 pedalate su tratti ripidi</string>
+    <string name="elite_voice_pre_chime_title">Tono di Attenzione Previo</string>
+    <string name="elite_voice_pre_chime_desc">Emette un breve segnale acustico prima di parlare per attivare le cuffie Bluetooth</string>
+    <string name="elite_voice_speech_rate_title">Velocità e Ritmo Vocale</string>
 
     <!-- Frasi Vocali (TTS) -->
     <string name="voice_climb_start">Attenzione: Inizio salita %1$s. %2$s chilometri al %3$s per cento di media. %4$s.</string>
+    <string name="voice_climb_km_progress">Chilometro %1$s di salita. Pendenza attuale del %2$s per cento.</string>
     <string name="voice_climb_summit_near">Cima a %1$s metri.</string>
     <string name="voice_steep_ahead">La salita si indurisce: prossimi %1$s metri al %2$s per cento di media.</string>
     <string name="voice_wall_ahead">Attenzione: Muro del %1$s per cento tra %2$s metri.</string>
     <string name="voice_hairpin_ahead">Tornante tra %1$s metri al %2$s per cento.</string>
+    <string name="voice_slope_relief">Tratto di riposo: la pendenza diminuisce per i prossimi %1$s metri.</string>
+    <string name="voice_elevation_milestone">Dislivello positivo accumulato: %1$s metri. Altitudine attuale: %2$s metri.</string>
+    <string name="voice_periodic_summary">Riepilogo percorso. Distanza %1$s chilometri. Velocità media %2$s chilometri orari. Dislivello accumulato %3$s metri.</string>
+    <string name="voice_cadence_low">Cadenza bassa: %1$s pedalate. Alleggerisci il rapporto.</string>
+    <string name="voice_wbal_warning">Riserva anaerobica bassa: rimane il %1$s per cento.</string>
     <string name="voice_kghost_lead">In testa: il Ghost è %1$s metri dietro, distacco %2$s.</string>
     <string name="voice_kghost_chase">Il Ghost è al comando: %1$s metri avanti, distacco %2$s.</string>
     <string name="voice_kghost_overtake_lead">Attenzione: Hai superato il Ghost. Nuovo leader della corsa.</string>

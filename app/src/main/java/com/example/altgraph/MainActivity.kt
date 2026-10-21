@@ -1751,6 +1751,111 @@ class MainActivity : Activity() {
         voiceOptionsLayout.addView(switchVoicePois)
         voiceOptionsLayout.addView(textVoicePoisDesc)
 
+        // Hitos de Desnivel Acumulado (Elevation Milestones)
+        val switchVoiceElevationMilestones = Switch(this).apply {
+            text = getString(R.string.elite_voice_elevation_milestones_title)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.voiceElevationMilestonesEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, v -> prefs.voiceElevationMilestonesEnabled = v }
+        }
+        val textVoiceElevationDesc = TextView(this).apply {
+            text = getString(R.string.elite_voice_elevation_milestones_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 2, 0, 8)
+        }
+        voiceOptionsLayout.addView(switchVoiceElevationMilestones)
+        voiceOptionsLayout.addView(textVoiceElevationDesc)
+
+        // Resumen Periódico de Marcha (Periodic Summary)
+        val switchVoicePeriodic = Switch(this).apply {
+            text = getString(R.string.elite_voice_periodic_report_title)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.voicePeriodicReportEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, v -> prefs.voicePeriodicReportEnabled = v }
+        }
+        val textVoicePeriodicDesc = TextView(this).apply {
+            text = getString(R.string.elite_voice_periodic_report_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 2, 0, 4)
+        }
+        voiceOptionsLayout.addView(switchVoicePeriodic)
+        voiceOptionsLayout.addView(textVoicePeriodicDesc)
+
+        // Intervalo del Resumen Periódico
+        val periodicIntervalLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(0, 0, 0, 8)
+        }
+        val periodicIntervalLabel = TextView(this).apply {
+            text = getString(R.string.elite_voice_periodic_interval_title) + ": "
+            textSize = 13f
+            setTextColor(Color.LTGRAY)
+        }
+        val periodicIntervalSpinner = Spinner(this).apply {
+            isEnabled = prefs.isEliteUnlocked
+            val options = arrayOf("3 km", "5 km", "10 km", "15 km", "20 km")
+            val values = doubleArrayOf(3.0, 5.0, 10.0, 15.0, 20.0)
+            val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, options)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            this.adapter = adapter
+            val currentInterval = prefs.voicePeriodicIntervalKm
+            val idx = values.indexOfFirst { Math.abs(it - currentInterval) < 0.5 }.coerceAtLeast(1)
+            setSelection(idx)
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(p: AdapterView<*>?, v: View?, pos: Int, id: Long) {
+                    prefs.voicePeriodicIntervalKm = values[pos]
+                    (v as? TextView)?.setTextColor(Color.parseColor("#4CAF50"))
+                }
+                override fun onNothingSelected(p: AdapterView<*>?) {}
+            }
+        }
+        periodicIntervalLayout.addView(periodicIntervalLabel)
+        periodicIntervalLayout.addView(periodicIntervalSpinner)
+        voiceOptionsLayout.addView(periodicIntervalLayout)
+
+        // Alerta de Cadencia Baja en Subida (<60 rpm en rampas >8%)
+        val switchVoiceCadence = Switch(this).apply {
+            text = getString(R.string.elite_voice_cadence_alert_title)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.voiceCadenceAlertEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, v -> prefs.voiceCadenceAlertEnabled = v }
+        }
+        val textVoiceCadenceDesc = TextView(this).apply {
+            text = getString(R.string.elite_voice_cadence_alert_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 2, 0, 8)
+        }
+        voiceOptionsLayout.addView(switchVoiceCadence)
+        voiceOptionsLayout.addView(textVoiceCadenceDesc)
+
+        // Tono de Atención Previo (Pre-Chime)
+        val switchVoicePreChime = Switch(this).apply {
+            text = getString(R.string.elite_voice_pre_chime_title)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.voicePreChimeEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, v -> prefs.voicePreChimeEnabled = v }
+        }
+        val textVoicePreChimeDesc = TextView(this).apply {
+            text = getString(R.string.elite_voice_pre_chime_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 2, 0, 8)
+        }
+        voiceOptionsLayout.addView(switchVoicePreChime)
+        voiceOptionsLayout.addView(textVoicePreChimeDesc)
+
         switchVoiceMaster.setOnCheckedChangeListener { _, isChecked ->
             prefs.voiceDirectorEnabled = isChecked
             voiceOptionsLayout.visibility = if (isChecked) View.VISIBLE else View.GONE
@@ -1815,6 +1920,11 @@ class MainActivity : Activity() {
             switchVoiceKGhost.isEnabled = unlocked
             kghostIntervalSpinner.isEnabled = unlocked
             switchVoicePois.isEnabled = unlocked
+            switchVoiceElevationMilestones.isEnabled = unlocked
+            switchVoicePeriodic.isEnabled = unlocked
+            periodicIntervalSpinner.isEnabled = unlocked
+            switchVoiceCadence.isEnabled = unlocked
+            switchVoicePreChime.isEnabled = unlocked
             voiceOptionsLayout.visibility = if (unlocked && switchVoiceMaster.isChecked) View.VISIBLE else View.GONE
 
             // Los interruptores se crearon bloqueados (apagados): reflejar el estado real al desbloquear
@@ -1844,6 +1954,10 @@ class MainActivity : Activity() {
                 switchVoiceHairpins.isChecked = prefs.voiceHairpinsEnabled
                 switchVoiceKGhost.isChecked = prefs.voiceKGhostEnabled
                 switchVoicePois.isChecked = prefs.voicePoisEnabled
+                switchVoiceElevationMilestones.isChecked = prefs.voiceElevationMilestonesEnabled
+                switchVoicePeriodic.isChecked = prefs.voicePeriodicReportEnabled
+                switchVoiceCadence.isChecked = prefs.voiceCadenceAlertEnabled
+                switchVoicePreChime.isChecked = prefs.voicePreChimeEnabled
                 voiceOptionsLayout.visibility = if (switchVoiceMaster.isChecked) View.VISIBLE else View.GONE
                 val currentMode = prefs.eliteMapOverlayMode
                 mapOverlaySpinner.setSelection(when(currentMode) {

@@ -10,6 +10,7 @@ import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
+import android.media.ToneGenerator
 import java.util.ArrayDeque
 import java.util.Locale
 
@@ -17,6 +18,7 @@ import java.util.Locale
  * Motor de locución por voz (Voice Copilot) para AltGraph.
  *
  * Se ejecuta en segundo plano como singleton. Gestiona la inicialización de TextToSpeech (TTS),
+ * tono de atención pre-chime para despertar auriculares Bluetooth,
  * la petición de AUDIOFOCUS para atenuar suavemente la música mientras habla,
  * y una cola con prioridades y control inteligente de anti-spam para no saturar al ciclista.
  */
@@ -40,6 +42,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     private val mainHandler = Handler(Looper.getMainLooper())
     private var tts: TextToSpeech? = null
     private var isTtsReady = false
+    private var toneGenerator: ToneGenerator? = null
 
     // Control de audio focus según versión de Android
     private var audioFocusRequest: AudioFocusRequest? = null
@@ -48,21 +51,36 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     private val speechQueue = ArrayDeque<String>()
     private var isSpeaking = false
 
-    // Control anti-spam: marcas de tiempo por tipo de aviso para no repetir
+    // Control anti-spam: marcas de tiempo y distancias para no saturar
     private var lastSpokenTimeMs = 0L
-    private val minSilenceBetweenCuesMs = 12000L // Mínimo 12 segundos entre frases
+    private val minSilenceBetweenCuesMs = 4500L // 4.5 segundos entre frases para no perder avisos clave
     private var lastAnnouncedClimbIndex = -1
     private var lastSummit500AnnouncedClimbIndex = -1
     private var lastSummit100AnnouncedClimbIndex = -1
+    private var lastAnnouncedKmInClimb = -1
     private var lastAnnouncedSteepDistance = -10000.0
+    private var lastAnnouncedReliefDistance = -10000.0
     private var lastAnnouncedWallDistance = -10000.0
     private var lastAnnouncedHairpinDistance = -10000.0
     private var lastAnnouncedKGhostDistance = 0.0
     private var lastKGhostWasLeading: Boolean? = null
+    private var lastAnnouncedElevationMilestone = 0
+    private var lastPeriodicDistanceKm = 0.0
+    private var lastCadenceWarningTimeMs = 0L
+    private var lastWbalWarningPercent = 100
     private val announcedPoiNames = mutableSetOf<String>()
+
+    // Estimador de desnivel positivo acumulado cuando no hay sensor dedicado
+    private var lastRecordedElevation = 0.0
+    private var estimatedElevationGain = 0.0
 
     init {
         initTts()
+        try {
+            toneGenerator = ToneGenerator(AudioManager.STREAM_NOTIFICATION, 75)
+        } catch (e: Exception) {
+            Log.w(TAG, "ToneGenerator init failed", e)
+        }
     }
 
     private fun initTts() {
@@ -83,7 +101,8 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                 engine.setLanguage(Locale.US)
             }
             engine.setPitch(1.0f)
-            engine.setSpeechRate(1.05f) // Levemente ágil para ciclismo
+            val prefs = AppPreferences.getInstance(context)
+            engine.setSpeechRate(prefs.voiceSpeechRate) // Cadencia de voz configurada (0.95x para máxima claridad)
 
             engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) {
@@ -149,17 +168,33 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
 
         if (!isTtsReady || tts == null) return
 
+        val prefs = AppPreferences.getInstance(context)
+        tts?.setSpeechRate(prefs.voiceSpeechRate)
+
         requestAudioFocus()
         lastSpokenTimeMs = System.currentTimeMillis()
         isSpeaking = true
 
-        val utteranceId = "$UTTERANCE_PREFIX${System.currentTimeMillis()}"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            tts?.speak(next, TextToSpeech.QUEUE_FLUSH, null, utteranceId)
-        } else {
-            @Suppress("DEPRECATION")
-            tts?.speak(next, TextToSpeech.QUEUE_FLUSH, hashMapOf(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID to utteranceId))
+        // Si pre-chime está activado, emitimos un bip sutil para despertar el auricular Bluetooth
+        if (prefs.voicePreChimeEnabled) {
+            try {
+                toneGenerator?.startTone(ToneGenerator.TONE_PROP_BEEP, 120)
+            } catch (e: Exception) {
+                Log.w(TAG, "Error playing pre-chime", e)
+            }
         }
+
+        val utteranceId = "$UTTERANCE_PREFIX${System.currentTimeMillis()}"
+        val delayBeforeSpeak = if (prefs.voicePreChimeEnabled) 200L else 0L
+
+        mainHandler.postDelayed({
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                tts?.speak(next, TextToSpeech.QUEUE_FLUSH, null, utteranceId)
+            } else {
+                @Suppress("DEPRECATION")
+                tts?.speak(next, TextToSpeech.QUEUE_FLUSH, hashMapOf(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID to utteranceId))
+            }
+        }, delayBeforeSpeak)
     }
 
     private fun requestAudioFocus() {
@@ -210,13 +245,24 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
         val strategy = snapshot.strategy
         val currentDist = strategy.windowStartMeters
         val climbs = snapshot.routeClimbs
+        val elev = snapshot.currentElevation
 
-        // 1. AVISO DE PUERTO (Inicio y Cima)
+        // Acumular ganancia de elevación estimada
+        if (lastRecordedElevation > 0.0 && elev > lastRecordedElevation && snapshot.currentSpeed > 0.5) {
+            val delta = elev - lastRecordedElevation
+            if (delta in 0.2..15.0) { // Descartar saltos o ruido
+                estimatedElevationGain += delta
+            }
+        }
+        if (elev > 0.0) lastRecordedElevation = elev
+
+        // 1. AVISO DE PUERTO (Inicio, Kilómetros y Cima)
         if (prefs.voiceClimbsEnabled && climbs.isNotEmpty()) {
             for ((idx, climb) in climbs.withIndex()) {
                 val distToClimb = climb.startDistance - currentDist
                 if (distToClimb in 50.0..250.0 && lastAnnouncedClimbIndex != idx) {
                     lastAnnouncedClimbIndex = idx
+                    lastAnnouncedKmInClimb = 0
                     val climbName = climb.name ?: (context.getString(R.string.profile_tv_climb_item_prefix) + " " + (idx + 1))
                     val km = String.format(Locale.getDefault(), "%.1f", climb.length / 1000.0)
                     val avgGrade = String.format(Locale.getDefault(), "%.1f", climb.avgGrade)
@@ -242,6 +288,18 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                     speak(phrase, priority = true)
                     break
                 }
+
+                // Progresión kilómetro a kilómetro dentro del puerto (ej: Km 1, Km 2...)
+                if (currentDist >= climb.startDistance && currentDist <= climb.endDistance) {
+                    val distInsideClimb = currentDist - climb.startDistance
+                    val kmInside = (distInsideClimb / 1000.0).toInt()
+                    if (kmInside >= 1 && kmInside != lastAnnouncedKmInClimb && (distInsideClimb % 1000.0) < 180.0) {
+                        lastAnnouncedKmInClimb = kmInside
+                        val currentGradeStr = String.format(Locale.getDefault(), "%.0f", strategy.visibleAvgGrade.coerceAtLeast(0.0))
+                        val phrase = context.getString(R.string.voice_climb_km_progress, kmInside.toString(), currentGradeStr)
+                        speak(phrase, priority = false)
+                    }
+                }
             }
         }
 
@@ -251,7 +309,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
             val threshold = prefs.voiceSteepThreshold
             val subBlockSize = strategy.subBlockSizeMeters.coerceAtLeast(20.0)
             
-            // Miramos los próximos 300m a 600m
+            // Miramos los próximos 300m a 500m
             val lookAheadCount = (500.0 / subBlockSize).toInt().coerceIn(2, subBlocksList.size)
             val upcomingGrades: List<Float> = subBlocksList.take(lookAheadCount)
             if (upcomingGrades.isNotEmpty()) {
@@ -262,6 +320,12 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                     val meters = (lookAheadCount * subBlockSize).toInt()
                     val gradeFormatted = String.format(Locale.getDefault(), "%.1f", avgUpcoming)
                     val phrase = context.getString(R.string.voice_steep_ahead, meters.toString(), gradeFormatted)
+                    speak(phrase, priority = false)
+                } else if (strategy.visibleAvgGrade >= 8.0 && avgUpcoming < 3.5 && (currentDist - lastAnnouncedReliefDistance) > 2000.0) {
+                    // Descansillo / Alivio de pendiente en subida
+                    lastAnnouncedReliefDistance = currentDist
+                    val meters = (lookAheadCount * subBlockSize).toInt()
+                    val phrase = context.getString(R.string.voice_slope_relief, meters.toString())
                     speak(phrase, priority = false)
                 }
             }
@@ -292,7 +356,62 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
             }
         }
 
-        // 5. GAP CON RIVAL KGHOST
+        // 5. HITOS DE DESNIVEL ACUMULADO (Cada 250m o 500m)
+        if (prefs.voiceElevationMilestonesEnabled) {
+            val milestoneStep = 500
+            val currentMilestone = (estimatedElevationGain / milestoneStep).toInt() * milestoneStep
+            if (currentMilestone >= milestoneStep && currentMilestone > lastAnnouncedElevationMilestone) {
+                lastAnnouncedElevationMilestone = currentMilestone
+                val currentAltStr = elev.toInt().toString()
+                val phrase = context.getString(R.string.voice_elevation_milestone, currentMilestone.toString(), currentAltStr)
+                speak(phrase, priority = false)
+            }
+        }
+
+        // 6. RESUMEN PERIÓDICO DE RUTA (Cada X km)
+        if (prefs.voicePeriodicReportEnabled) {
+            val intervalKm = prefs.voicePeriodicIntervalKm.coerceAtLeast(2.0)
+            val currentKm = currentDist / 1000.0
+            if (currentKm >= intervalKm && (currentKm - lastPeriodicDistanceKm) >= intervalKm) {
+                lastPeriodicDistanceKm = currentKm
+                val distStr = String.format(Locale.getDefault(), "%.0f", currentKm)
+                val avgSpeedKmh = (snapshot.currentSpeed * 3.6).coerceAtLeast(0.0)
+                val speedStr = String.format(Locale.getDefault(), "%.1f", avgSpeedKmh)
+                val elevGainStr = estimatedElevationGain.toInt().toString()
+                val phrase = context.getString(R.string.voice_periodic_summary, distStr, speedStr, elevGainStr)
+                speak(phrase, priority = false)
+            }
+        }
+
+        // 7. ALERTA DE CADENCIA BAJA EN SUBIDAS (< 60 rpm en rampas > 8%)
+        if (prefs.voiceCadenceAlertEnabled) {
+            val now = System.currentTimeMillis()
+            val cad = strategy.currentCadence
+            val grade = strategy.visibleAvgGrade
+            if (cad in 20.0..58.0 && grade >= 8.0 && snapshot.currentSpeed > 1.5) {
+                if ((now - lastCadenceWarningTimeMs) > 90000L) { // Máximo una vez cada 90s
+                    lastCadenceWarningTimeMs = now
+                    val phrase = context.getString(R.string.voice_cadence_low, cad.toInt().toString())
+                    speak(phrase, priority = false)
+                }
+            }
+        }
+
+        // 8. BATERÍA ANAERÓBICA W'BAL (Alerta crítica cuando cae por debajo de 20%)
+        val wbal = snapshot.wbal
+        if (wbal != null) {
+            val userWPrime = prefs.userWPrime.toDouble().coerceAtLeast(5000.0)
+            val pct = ((wbal / userWPrime) * 100.0).toInt().coerceIn(0, 100)
+            if (pct <= 20 && lastWbalWarningPercent > 20) {
+                lastWbalWarningPercent = pct
+                val phrase = context.getString(R.string.voice_wbal_warning, pct.toString())
+                speak(phrase, priority = true)
+            } else if (pct > 50) {
+                lastWbalWarningPercent = pct
+            }
+        }
+
+        // 9. GAP CON RIVAL KGHOST
         if (prefs.voiceKGhostEnabled) {
             val ghost = snapshot.ghostGap
             val distM = ghost?.distM
@@ -330,7 +449,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
             }
         }
 
-        // 6. PUNTOS DE AGUA (POIs)
+        // 10. PUNTOS DE AGUA (POIs)
         val poisList: List<Poi> = strategy.pois
         if (prefs.voicePoisEnabled && poisList.isNotEmpty()) {
             for (poi in poisList) {
@@ -350,6 +469,8 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     fun shutdown() {
         abandonAudioFocus()
         try {
+            toneGenerator?.release()
+            toneGenerator = null
             tts?.stop()
             tts?.shutdown()
         } catch (e: Exception) {

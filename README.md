@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v2.1 REVOLUTION)
+# ALTGRAPH (v2.2 REVOLUTION)
 <p>Leer en: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 <p align="center">
@@ -19,26 +19,39 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
-## VERSION 2.1: COPILOTO DE VOZ ALTIMETRICO (AUDIO BLUETOOTH / ALTAVOZ)
+## VERSION 2.2: COPILOTO DE VOZ ALTIMETRICO PROFESIONAL (AUDIO BLUETOOTH / ALTAVOZ)
 
-En la version 2.1, AltGraph incorpora un completo sistema de **avisos audibles por voz (Voice Copilot)** gestionado en segundo plano, compatible con auriculares Bluetooth o con el altavoz del Karoo y disponible en el apartado **ELITE**:
+En la version 2.2, AltGraph incorpora un completo sistema de **avisos audibles por voz (Voice Copilot)** gestionado en segundo plano, compatible con auriculares Bluetooth o con el altavoz del Karoo y disponible en el apartado **ELITE**:
 
 * **Avisos de Puertos y Cimas**:
   * Anuncio al aproximarse al inicio de un puerto con su nombre, kilometros de subida, pendiente media y categoria oficial.
+  * Progresion de puerto: locucion cada kilometro superado indicando la pendiente actual.
   * Avisos de cima por partida doble: advertencia a 500 metros y recordatorio final a 100 metros de coronar.
 * **Alerta de Endurecimiento de Pendiente (Slope Ahead)**:
   * Analiza la ruta y avisa con antelacion cuando los proximos metros o kilometros superan el umbral medio de pendiente configurado por el ciclista (ajustable en 6%, 7%, 8%, 9%, 10% o 12%). Ejemplo: *"El puerto se endurece: proximos 500 metros al 10.4 por ciento de media."*
+* **Deteccion de Descansillos y Alivio de Pendiente**:
+  * Notifica cuando una rampa empinada da un respiro con un tramo suave para permitir recuperacion.
 * **Muros y Rampas Extremas**:
   * Advertencia anticipada ante pendientes del 15% o superiores para preparar el desarrollo y anticipar la cadencia.
 * **Curvas de Herradura (Apex Cues)**:
   * Aviso al aproximarse a curvas cerradas en subida con fuerte cambio de rasante o peralte critico.
+* **Hitos de Desnivel Positivo Acumulado**:
+  * Notificacion por voz al cruzar hitos acumulados de ganancia vertical con lectura de la altitud actual.
+* **Resumen Periodico de Marcha**:
+  * Locucion periodica configurable (cada 3, 5, 10, 15 o 20 km) con resumen de distancia recorrida, velocidad media de la sesion y desnivel acumulado.
+* **Alerta de Cadencia Baja en Subida**:
+  * Aviso preventivo cuando la cadencia cae por debajo de 60 pedaladas por minuto en tramos con pendiente superior al 8% para evitar atrancamientos y sobrecargas articulares.
+* **Alerta de Bateria Anaerobica W'bal**:
+  * Aviso urgente cuando el tanque anaerobico cae por debajo del 20% para regular el esfuerzo.
 * **Radio-Tour KGhost (Gap y Sorpasso)**:
   * Lectura periodica configurable de la distancia y diferencia temporal frente al ciclista virtual (Ghost), con frecuencia personalizable cada 500m, 1 km, 2 km o 5 km.
   * Alertas instantaneas de cambio de lider: avisa de inmediato cuando adelantas al Ghost o cuando el Ghost te sobrepasa.
 * **Puntos de Agua y Fuentes (POIs)**:
   * Notificacion por voz al estar a menos de 150 metros de un punto de recarga de agua registrado en el track.
-* **Gestion Inteligente de Audio**:
-  * Utiliza el motor TextToSpeech en el idioma del usuario, solicitando atenuacion automatica de musica (audio focus ducking) y filtro anti-spam para evitar avisos superpuestos.
+* **Calidad de Sonido y Gestion Inteligente de Audio**:
+  * Tono previo de atencion (Pre-Chime): emite un pulso acustico antes de hablar que despierta los auriculares Bluetooth y evita perdidas de inicio de frase.
+  * Cadencia vocal optimizada (0.95x) para una comprension limpia incluso con fuerte viento.
+  * Motor TextToSpeech nativo con atenuacion de musica (audio focus ducking) y filtro anti-spam dinamicamente priorizado.
 
 ---
 

@@ -231,13 +231,29 @@
     <string name="elite_voice_kghost_interval_title">Frequência de aviso KGhost</string>
     <string name="elite_voice_pois_title">Pontos de Água (POIs)</string>
     <string name="elite_voice_pois_desc">Avisa perante fontes e pontos de água próximos</string>
+    <string name="elite_voice_elevation_milestones_title">Marcos de Desnível Acumulado</string>
+    <string name="elite_voice_elevation_milestones_desc">Avisa a cada 250m ou 500m de ganho de elevação acumulado</string>
+    <string name="elite_voice_periodic_report_title">Resumo Periódico de Atividade</string>
+    <string name="elite_voice_periodic_report_desc">Locução de velocidade média, cadência e desnível acumulado</string>
+    <string name="elite_voice_periodic_interval_title">Frequência do resumo</string>
+    <string name="elite_voice_cadence_alert_title">Alerta de Cadência Baixa em Subida</string>
+    <string name="elite_voice_cadence_alert_desc">Avisa se a cadência descer abaixo de 60 rpm em troços íngremes</string>
+    <string name="elite_voice_pre_chime_title">Tom de Atenção Prévio</string>
+    <string name="elite_voice_pre_chime_desc">Emite um breve sinal sonoro antes de falar para ativar auriculares Bluetooth</string>
+    <string name="elite_voice_speech_rate_title">Velocidade e Ritmo de Voz</string>
 
     <!-- Frases de Locução (TTS) -->
     <string name="voice_climb_start">Atenção: Início da subida %1$s. %2$s quilómetros a %3$s por cento de média. %4$s.</string>
+    <string name="voice_climb_km_progress">Quilómetro %1$s de subida. Inclinação atual de %2$s por cento.</string>
     <string name="voice_climb_summit_near">Cume a %1$s metros.</string>
     <string name="voice_steep_ahead">A subida agrava-se: próximos %1$s metros a %2$s por cento de média.</string>
     <string name="voice_wall_ahead">Atenção: Muro de %1$s por cento em %2$s metros.</string>
     <string name="voice_hairpin_ahead">Curva em gancho em %1$s metros a %2$s por cento.</string>
+    <string name="voice_slope_relief">Descanso: a inclinação suaviza durante os próximos %1$s metros.</string>
+    <string name="voice_elevation_milestone">Desnível acumulado: %1$s metros. Altitude atual: %2$s metros.</string>
+    <string name="voice_periodic_summary">Resumo de volta. Distância %1$s quilómetros. Velocidade média %2$s quilómetros por hora. Desnível acumulado %3$s metros.</string>
+    <string name="voice_cadence_low">Cadência baixa: %1$s rotações. Engrena uma relação mais leve.</string>
+    <string name="voice_wbal_warning">Reserva anaeróbica baixa: resta %1$s por cento.</string>
     <string name="voice_kghost_lead">Na frente: o Ghost está %1$s metros atrás, diferença %2$s.</string>
     <string name="voice_kghost_chase">O Ghost lidera: vai %1$s metros à frente, diferença %2$s.</string>
     <string name="voice_kghost_overtake_lead">Atenção: Ultrapassaste o Ghost. Novo líder da corrida.</string>

@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v2.1 REVOLUTION)
+# ALTGRAPH (v2.2 REVOLUTION)
 <p>Lire en : <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** est une extension professionnelle d'altimétrie et de performance cycliste de nouvelle génération pour les compteurs GPS **Hammerhead Karoo** (Karoo 2 et Karoo 3), développée par **hesiOX** à l'aide du SDK officiel `karoo-ext`.
@@ -11,26 +11,39 @@ Elle révolutionne le concept traditionnel de l'altimétrie cycliste en intégra
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />
 </p>
 
-## VERSION 2.1 : COPILOTE VOCAL ALTIMÉTRIQUE (AUDIO BLUETOOTH / HAUT-PARLEUR)
+## VERSION 2.2 : COPILOTE VOCAL ALTIMÉTRIQUE PROFESSIONNEL (AUDIO BLUETOOTH / HAUT-PARLEUR)
 
-Dans la version 2.1, AltGraph intègre un système complet d'**alertes vocales audibles (Voice Copilot)** géré en arrière-plan, compatible avec des écouteurs Bluetooth ou le haut-parleur du Karoo et disponible dans la section **ELITE** :
+Dans la version 2.2, AltGraph intègre un système complet d'**alertes vocales audibles (Voice Copilot)** géré en arrière-plan, compatible avec des écouteurs Bluetooth ou le haut-parleur du Karoo et disponible dans la section **ELITE** :
 
 * **Annonces de Cols et Sommets** :
   * Annonce vocale à l'approche du pied du col avec le nom du col, la distance d'ascension, la pente moyenne et la catégorie officielle.
+  * Progression de l'ascension : annonce à chaque kilomètre gravi avec indication du pourcentage de pente instantané.
   * Double annonce au sommet : alerte d'approche à 500 mètres et rappel final à 100 mètres de la bascule.
 * **Alerte de Durcissement de Pente** :
   * Analyse le parcours à venir et prévient lorsque la section suivante dépasse le seuil de pente moyen configuré par le cycliste (réglable à 6%, 7%, 8%, 9%, 10% ou 12%). Exemple : *"La pente se durcit : prochains 500 mètres à 10.4 pour cent de moyenne."*
+* **Détection de Replats et Zones de Récupération** :
+  * Signale lorsqu'un passage raide s'adoucit pour permettre de récupérer et caler son braquet.
 * **Murs et Rampes Extrêmes** :
   * Avertissement précoce à l'approche de rampes de 15% ou plus pour anticiper le changement de vitesse.
 * **Virages en Épingle (Apex Cues)** :
   * Alertes vocales à l'approche des lacets serrés présentant une forte rupture de pente.
+* **Paliers de Dénivelé Positif Cumulé** :
+  * Annonce vocale franchissant chaque palier de dénivelé gravi (tous les 250m ou 500m) accompagnée de l'altitude actuelle.
+* **Résumé Périodique de Sortie** :
+  * Annonce vocale personnalisable (tous les 3, 5, 10, 15 ou 20 km) résumant la distance parcourue, la vitesse moyenne et le dénivelé cumulé.
+* **Alerte de Cadence Basse en Montée** :
+  * Signal préventif lorsque la cadence de pédalage descend sous les 60 tr/min dans les pentes supérieures à 8%.
+* **Alerte de Réserve Anaérobie W'bal** :
+  * Avertissement prioritaire lorsque le réservoir anaérobie descend sous les 20% pour éviter la panne sèche.
 * **Radio-Course KGhost (Écart et Dépassement)** :
   * Annonce périodique de l'écart métrique et temporel par rapport au cycliste virtuel (Ghost), configurable tous les 500m, 1 km, 2 km ou 5 km.
   * Détection immédiate de prise de tête ou de dépassement par le rival.
 * **Points d'Eau (POIs)** :
   * Alerte sonore à moins de 150 mètres des fontaines et points d'eau renseignés sur le parcours.
-* **Gestion Audio Intelligente** :
-  * Utilise le moteur TextToSpeech Android dans la langue du cycliste avec atténuation douce de la musique (audio ducking) et file d'attente anti-saturation.
+* **Fidélité Acoustique et Gestion Audio Intelligente** :
+  * Tonalité préalable d'attention (Pre-Chime) : réveille immédiatement les oreillettes Bluetooth pour ne jamais tronquer le début des phrases.
+  * Débit vocal équilibré (0.95x) pour une clarté optimale par vent fort.
+  * Moteur TextToSpeech natif avec atténuation douce de la musique (audio ducking) et priorisation intelligente de la file d'attente.
 
 ---
 

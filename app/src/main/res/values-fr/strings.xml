@@ -231,13 +231,29 @@
     <string name="elite_voice_kghost_interval_title">Fréquence des annonces KGhost</string>
     <string name="elite_voice_pois_title">Points d\'Eau (POIs)</string>
     <string name="elite_voice_pois_desc">Annonce les fontaines et points d\'eau proches</string>
+    <string name="elite_voice_elevation_milestones_title">Paliers de Dénivelé Positif</string>
+    <string name="elite_voice_elevation_milestones_desc">Annonce tous les 250m ou 500m de dénivelé gravi</string>
+    <string name="elite_voice_periodic_report_title">Rapport Périodique de Sortie</string>
+    <string name="elite_voice_periodic_report_desc">Annonce vocale de vitesse moyenne, cadence et dénivelé total</string>
+    <string name="elite_voice_periodic_interval_title">Intervalle du rapport</string>
+    <string name="elite_voice_cadence_alert_title">Alerte Cadence Faible en Montée</string>
+    <string name="elite_voice_cadence_alert_desc">Alerte si la cadence passe sous 60 tr/min en forte pente</string>
+    <string name="elite_voice_pre_chime_title">Tonalité d\'Avertissement</string>
+    <string name="elite_voice_pre_chime_desc">Émet un bip avant de parler pour réveiller les écouteurs Bluetooth</string>
+    <string name="elite_voice_speech_rate_title">Rythme et Débit Vocal</string>
 
     <!-- Phrases Vocales (TTS) -->
     <string name="voice_climb_start">Attention : Début du col %1$s. %2$s kilomètres à %3$s pour cent de moyenne. %4$s.</string>
+    <string name="voice_climb_km_progress">Kilomètre %1$s du col. Pente actuelle %2$s pour cent.</string>
     <string name="voice_climb_summit_near">Sommet à %1$s mètres.</string>
     <string name="voice_steep_ahead">La pente se durcit : prochains %1$s mètres à %2$s pour cent de moyenne.</string>
     <string name="voice_wall_ahead">Attention : Mur de %1$s pour cent dans %2$s mètres.</string>
     <string name="voice_hairpin_ahead">Virage en épingle dans %1$s mètres à %2$s pour cent.</string>
+    <string name="voice_slope_relief">Replat : la pente s\'adoucit sur les prochains %1$s mètres.</string>
+    <string name="voice_elevation_milestone">Dénivelé positif : %1$s mètres. Altitude actuelle : %2$s mètres.</string>
+    <string name="voice_periodic_summary">Point parcours. Distance %1$s kilomètres. Vitesse moyenne %2$s km/h. Dénivelé cumulé %3$s mètres.</string>
+    <string name="voice_cadence_low">Cadence faible : %1$s tr/min. Rétrogradez.</string>
+    <string name="voice_wbal_warning">Réserve anaérobie faible : reste %1$s pour cent.</string>
     <string name="voice_kghost_lead">En tête : vous devancez le Ghost de %1$s mètres, écart %2$s.</string>
     <string name="voice_kghost_chase">Le Ghost mène : %1$s mètres devant vous, écart %2$s.</string>
     <string name="voice_kghost_overtake_lead">Attention : Vous avez dépassé le Ghost. Nouveau leader.</string>
