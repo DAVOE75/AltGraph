@@ -19,7 +19,7 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
-## 🚀 VERSIÓN 2.0: LAS 3 SUPERNovedades REVOLUCIONARIAS
+## VERSIÓN 2.0: LAS 3 Novedades REVOLUCIONARIAS
 
 ### 1. Thermal Slope Shading & Dynamic Apex (Nuevo Estilo Altimétrico 3D)
 * **Sombreado Topográfico Dinámico (Faux-3D Hillshade)**: El perfil ya no es un dibujo plano. Se simula una fuente de luz cenital oblicua sobre las aristas del puerto, generando sombras y relieve real esculpido con producto escalar según las normales de pendiente.
