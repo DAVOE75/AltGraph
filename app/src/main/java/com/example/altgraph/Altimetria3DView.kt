@@ -2612,30 +2612,42 @@ class Altimetria3DView @JvmOverloads constructor(
 
         for (i in 0 until totalMicroSamples - 1) {
             val grade = if (i < microGrades.size) microGrades[i] else 0f
+            val prevGrade = if (i > 0 && i - 1 < microGrades.size) microGrades[i - 1] else grade
+            val nextGrade = if (i + 1 < microGrades.size) microGrades[i + 1] else grade
 
-            // Normal al segmento de pendiente: la pendiente sube \u00e1dx, dy => normal = (-dy, dx) normalizado
-            val dx = xFront[i + 1] - xFront[i]
-            val dy = yFront[i + 1] - yFront[i]
-            val segLen = kotlin.math.sqrt(dx * dx + dy * dy).coerceAtLeast(0.001f)
-            val nx = -dy / segLen
-            val ny = dx / segLen
+            // Pendiente normalizada (-1 a 1 para pendientes de 0% a 20%)
+            val slopeNorm = (grade / 15f).coerceIn(0f, 1.5f)
 
-            // Dot product con la luz: cuanto m\u00e1s alineado, m\u00e1s brillante
-            val dot = (nx * lx + ny * ly).coerceIn(-1f, 1f)
-            // brightness: 0.25 (sombra m\u00e1xima) .. 1.0 (luz directa)
-            val brightness = (0.25f + 0.75f * ((dot + 1f) / 2f))
+            // Cambio relativo de pendiente (escalón de relieve): si la rampa se empina respecto al anterior
+            val gradeStep = (grade - prevGrade)
 
-            // Color base del gradiente de pendiente
+            // Iluminación cenital oblicua de relieve (Hillshading topográfico):
+            // 1. Efecto pendiente intrínseca: las rampas más empinadas reciben más sombra cenital en la pared vertical
+            // 2. Efecto escalón (aristas de relieve): un incremento brusco de pendiente genera contraste de luz y sombra
+            val slopeShade = (1.0f - (slopeNorm * 0.45f)).coerceIn(0.40f, 1.15f)
+            val stepShade = (gradeStep * 0.08f).coerceIn(-0.35f, 0.35f)
+            val lightFactor = (slopeShade + stepShade).coerceIn(0.35f, 1.25f)
+
+            // Color base del gradiente de pendiente (verde, amarillo, naranja, rojo, negro)
             val baseColor = Color.parseColor(getGradeColor(grade.toDouble()))
-            val r = ((Color.red(baseColor) * brightness).toInt()).coerceIn(0, 255)
-            val g = ((Color.green(baseColor) * brightness).toInt()).coerceIn(0, 255)
-            val b = ((Color.blue(baseColor) * brightness).toInt()).coerceIn(0, 255)
-            val shadedColor = Color.rgb(r, g, b)
+            val baseR = Color.red(baseColor)
+            val baseG = Color.green(baseColor)
+            val baseB = Color.blue(baseColor)
 
-            // Capa de sombra adicional (tono oscuro) para pendiente muy pronunciada (>12%)
-            val shadowAlpha = if (grade > 12f) ((grade - 12f) / 10f * 80f).toInt().coerceIn(0, 80) else 0
+            val rTop = (baseR * lightFactor).toInt().coerceIn(0, 255)
+            val gTop = (baseG * lightFactor).toInt().coerceIn(0, 255)
+            val bTop = (baseB * lightFactor).toInt().coerceIn(0, 255)
 
-            // Pared frontal (relleno hillshade)
+            // La base del muro proyecta sombra de oclusión ambiental profunda hacia el suelo
+            val ambientOcclusion = (0.35f * (1f - (slopeNorm * 0.2f))).coerceIn(0.20f, 0.50f)
+            val rBot = (baseR * ambientOcclusion).toInt().coerceIn(0, 255)
+            val gBot = (baseG * ambientOcclusion).toInt().coerceIn(0, 255)
+            val bBot = (baseB * ambientOcclusion).toInt().coerceIn(0, 255)
+
+            val colorTop = Color.rgb(rTop, gTop, bTop)
+            val colorBot = Color.rgb(rBot, gBot, bBot)
+
+            // Pared frontal esculpida con degradado vertical de volumen
             hillshadePath.reset()
             hillshadePath.moveTo(xFront[i], yFront[i])
             hillshadePath.lineTo(xFront[i + 1], yFront[i + 1])
@@ -2643,20 +2655,26 @@ class Altimetria3DView @JvmOverloads constructor(
             hillshadePath.lineTo(xFront[i], yBase[i])
             hillshadePath.close()
 
+            val hillShader = LinearGradient(
+                xFront[i], yFront[i],
+                xFront[i], yBase[i],
+                colorTop, colorBot,
+                Shader.TileMode.CLAMP
+            )
             val hillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                color = shadedColor
+                shader = hillShader
                 style = Paint.Style.FILL
             }
             canvas.drawPath(hillshadePath, hillPaint)
 
-            // Capa de sombra de rampa
-            if (shadowAlpha > 0) {
-                val shadowOverlay = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = Color.BLACK
-                    alpha = shadowAlpha
-                    style = Paint.Style.FILL
+            // Relieve biselado en aristas de cambio de pendiente (Línea de sombra/luz esculpida)
+            if (kotlin.math.abs(gradeStep) > 1.2f) {
+                val ridgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    color = if (gradeStep > 0) Color.parseColor("#55FFFFFF") else Color.parseColor("#66000000")
+                    strokeWidth = 1.8f
+                    style = Paint.Style.STROKE
                 }
-                canvas.drawPath(hillshadePath, shadowOverlay)
+                canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], ridgePaint)
             }
 
             // Separador de bloque fino
