@@ -1,15 +1,38 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v2.0 REVOLUTION)
+# ALTGRAPH (v2.1 REVOLUTION)
 <p>Lesen auf: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** ist eine professionelle Höhen- und Leistungserweiterung der nächsten Generation für **Hammerhead Karoo** Fahrradcomputer (Karoo 2 und Karoo 3), entwickelt von **hesiOX** unter Verwendung des offiziellen `karoo-ext` SDKs.
-Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 7 3D-Höhenvisualisierungsmodellen**, biomechanische Telemetrie und metabolische Echtzeit-Pacing-Analyse.
+Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 7 3D-Höhenvisualisierungsmodellen**, biomechanische Telemetrie, metabolische Echtzeit-Pacing-Analyse und Sprachansagen.
 
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## VERSION 2.1: SPRACHANSAGEN-KOPILOT (AUDIO BLUETOOTH / LAUTSPRECHER)
+
+In Version 2.1 führt AltGraph ein umfassendes **Sprachansagensystem (Voice Copilot)** im Hintergrund ein, kompatibel mit Bluetooth-Kopfhörern oder dem Karoo-Lautsprecher und konfigurierbar im **ELITE**-Menü:
+
+* **Pässe- und Gipfelansagen**:
+  * Sprachansage bei Annäherung an den Passbeginn mit Passname, Länge, Durchschnittssteigung und offizieller Kategorie.
+  * Zweistufige Gipfelansage: Vorwarnung bei 500 Metern und finale Ansage bei 100 Metern vor der Passhöhe.
+* **Warnung vor steileren Abschnitten (Slope Ahead)**:
+  * Analysiert die bevorstehende Strecke und warnt im Voraus, wenn der kommende Abschnitt den gewählten Steigungsschwellenwert übersteigt (wählbar zwischen 6%, 7%, 8%, 9%, 10% oder 12%). Beispiel: *"Anstieg wird steiler: nächste 500 Meter bei 10.4 Prozent im Schnitt."*
+* **Extremrampen und Steilwände**:
+  * Frühzeitige Warnung vor Steigungen von 15% oder mehr zum rechtzeitigen Schalten.
+* **Serpentinen (Apex Cues)**:
+  * Sprachansagen vor engen Spitzkehren mit starkem Neigungswechsel.
+* **KGhost-Rivalen-Pacing**:
+  * Regelmäßige Audioansagen zu Vorsprung und Rückstand (Distanz und Zeit) gegenüber dem virtuellen Rivalen (Ghost), konfigurierbar alle 500m, 1 km, 2 km oder 5 km.
+  * Sofortige Ansage bei Führungswechsel oder Überholung.
+* **Wasserstellen (POIs)**:
+  * Audiohinweis bei weniger als 150 Metern Entfernung zu Brunnen oder Wasserstellen auf der Route.
+* **Intelligente Audio-Architektur**:
+  * Nutzt die native Android TextToSpeech-Engine in der Gerätesprache mit automatischer Musikabsenkung (Audio Ducking) und Anti-Spam-Warteschlange.
+
+---
 
 ## VERSION 1.1.0 ELITE: BENUTZERDEFINIERTE BERGPÄSSE (POIs)
 

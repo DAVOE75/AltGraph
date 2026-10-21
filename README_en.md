@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v2.0 REVOLUTION)
+# ALTGRAPH (v2.1 REVOLUTION)
 <p>Read in: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 <p align="center">
@@ -13,13 +13,50 @@
 </p>
 
 **ALTGRAPH** is a next-generation professional altimetry and cycling performance extension for **Hammerhead Karoo** computers (Karoo 2 and Karoo 3) developed by **hesiOX** using the official `karoo-ext` SDK.
-It revolutionizes traditional cycling elevation profiles by featuring a **Suite of 7 Altimetry 3D Visualization Models**, biomechanical telemetry and real-time metabolic pacing analysis.
+It revolutionizes traditional cycling elevation profiles by featuring a **Suite of 7 Altimetry 3D Visualization Models**, biomechanical telemetry, real-time metabolic pacing analysis, and spoken audio cues.
 
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
-## VERSION 1.1.0 ELITE: USER-DEFINED MOUNTAIN PASSES (POIs)
+## VERSION 2.1: SPOKEN VOICE COPILOT (AUDIO BLUETOOTH / SPEAKER)
+
+In version 2.1, AltGraph introduces a comprehensive **Voice Copilot Alert System** running in the background. It is fully compatible with Bluetooth earphones or the Karoo internal speaker, configured in the **ELITE** settings:
+
+* **Climbs and Summits Announcements**:
+  * Speaks approaching climb starts with pass name, length, average grade, and official category.
+  * Dual summit notifications: warning at 500 meters and final countdown at 100 meters to summit.
+* **Steeper Slope Ahead Alerts**:
+  * Continuously evaluates upcoming route meters and warns when average upcoming gradient exceeds the rider's chosen threshold (configurable at 6%, 7%, 8%, 9%, 10%, or 12%). Example: *"Slope steepens: next 500 meters at 10.4 percent average."*
+* **Wall and Extreme Ramps**:
+  * Early warning for extreme grades of 15% or higher to allow timely gear shifting.
+* **Hairpin Bends (Apex Cues)**:
+  * Spoken alerts ahead of sharp switchback turns and steep hairpins.
+* **KGhost Rival Audio Pacing**:
+  * Periodic spoken gap updates (distance and time) against your virtual rival (Ghost), customizable every 500m, 1 km, 2 km, or 5 km.
+  * Instant overtake alerts: announces immediately when you take the lead or when the Ghost passes you.
+* **Water Points (POIs)**:
+  * Audio notification when within 150 meters of fountains or water refills mapped on your route.
+* **Smart Audio Architecture**:
+  * Employs native TextToSpeech in the rider's locale, requests audio focus ducking to soften background music during speech, and applies anti-spam queuing to prevent announcement overlaps.
+
+---
+
+## VERSION 2.0: REVOLUTIONARY HIGHLIGHTS
+
+### 1. Thermal Slope Shading & Dynamic Apex (Volumetric 3D Relief)
+* **Faux-3D Hillshading**: Replaces flat fills with simulated directional overhead light over slope edges, generating realistic topographical relief and sculpted polygon volume.
+* **Hairpin Apex Pins**: Identifies severe turns and nails floating pins showing local grade and remaining climb distance.
+
+### 2. Target Cadence & Virtual Gear Wall (Mechanical Telemetry)
+* **Gear Wall**: Fractures steep profile sections with carmine hatching (`GEAR WALL`) on ramps ≥16% where standard cadence cannot be sustained.
+* **Projected Gear Ratio**: Real-time badge suggesting optimal chainring/cog combinations (`34x32`, `34x34`) to protect rhythm.
+
+### 3. Grand Tour W'bal Burn Rate & Failure Point (Metabolic Pacing)
+* **Dynamic W'bal Line**: Continuous anaerobic battery depletion and recovery tracking based on FTP and W'.
+* **Estimated Failure Point**: Projects the exact distance ahead on the elevation profile where reserves will exhaust at the current burn rate.
+
+---
 
 The most anticipated feature for elite cycling and gran fondos: **define with pinpoint accuracy which climbs are true mountain passes, preventing automatic algorithms from splitting climbs in two due to intermediate flats or false flats**.
 

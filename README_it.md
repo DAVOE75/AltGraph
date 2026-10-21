@@ -1,15 +1,38 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v2.0 REVOLUTION)
+# ALTGRAPH (v2.1 REVOLUTION)
 <p>Leggi in: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** è un'estensione professionale per l'altimetria e le prestazioni ciclistiche di ultima generazione per i ciclocomputer **Hammerhead Karoo** (Karoo 2 e Karoo 3), sviluppata da **hesiOX** utilizzando l'SDK ufficiale `karoo-ext`.
-Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **Suite di 7 Modelli di Visualizzazione Altimetrica 3D**, telemetria biomeccanica e analisi metabolica in tempo reale.F)**.
+Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **Suite di 7 Modelli di Visualizzazione Altimetrica 3D**, telemetria biomeccanica, analisi metabolica e avvisi vocali in tempo reale.
 
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />
 </p>
+
+## VERSIONE 2.1: COPILOTA VOCALE ALTIMETRICO (AUDIO BLUETOOTH / ALTOPARLANTE)
+
+Nella versione 2.1, AltGraph introduce un sistema completo di **avvisi vocali audibili (Voice Copilot)** in background, compatibile con cuffie Bluetooth o altoparlante del Karoo e configurabile nella sezione **ELITE**:
+
+* **Annunci di Salite e Cime**:
+  * Annuncio vocale in avvicinamento all'inizio della salita con nome, chilometri di ascesa, pendenza media e categoria ufficiale.
+  * Doppio avviso per la vetta: avvertimento a 500 metri e promemoria finale a 100 metri dallo scollinamento.
+* **Avviso di Aumento di Pendenza (Slope Ahead)**:
+  * Analizza il percorso e avverte in anticipo quando i metri successivi superano la soglia di pendenza media impostata dal ciclista (regolabile a 6%, 7%, 8%, 9%, 10% o 12%). Esempio: *"La salita si indurisce: prossimi 500 metri al 10.4 per cento di media."*
+* **Muri e Rampe Estreme**:
+  * Avviso preventivo per rampe del 15% o superiori per impostare in anticipo il rapporto ideale.
+* **Tornanti (Apex Cues)**:
+  * Annunci vocali prima di tornanti stretti con marcata variazione di dislivello.
+* **Radio-Corsa KGhost (Distacco e Sorpasso)**:
+  * Lettura periodica di distacco metrico e cronometrico rispetto al ciclista virtuale (Ghost), personalizzabile ogni 500m, 1 km, 2 km o 5 km.
+  * Avvisi istantanei di cambio comando quando superi il Ghost o vieni superato.
+* **Punti d'Acqua (POI)**:
+  * Notifica vocale a meno di 150 metri da fontane o rifornimenti d'acqua sul tracciato.
+* **Gestione Audio Intelligente**:
+  * Utilizza il motore TextToSpeech nella lingua del dispositivo, abbassa automaticamente la musica (audio ducking) e gestisce una coda anti-sovrapposizione.
+
+---
 
 ## VERSIONE 1.1.0 ELITE: PASSI DI MONTAGNA DEFINITI DALL'UTENTE (POI)
 
