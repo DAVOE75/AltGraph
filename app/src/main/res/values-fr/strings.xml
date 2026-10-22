@@ -264,4 +264,10 @@
     <string name="voice_gender_female">Voix féminine</string>
     <string name="voice_gender_male">Voix masculine</string>
     <string name="voice_destination_near">Arrivée proche : reste %1$s.</string>
+    <string name="elite_voice_surfaces_title">Changements de Type de Surface</string>
+    <string name="elite_voice_surfaces_desc">Annonces vocales à l\'entrée des secteurs gravel, sentier VTT ou asphalte avec longueur</string>
+    <string name="voice_surface_entry">Entrée sur secteur %1$s : %2$s à parcourir.</string>
+    <string name="surface_gravel">gravel</string>
+    <string name="surface_trail">sentier VTT</string>
+    <string name="surface_asphalt">asphalte</string>
 </resources>

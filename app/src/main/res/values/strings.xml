@@ -291,4 +291,10 @@
     <string name="voice_gender_female">Female Voice</string>
     <string name="voice_gender_male">Male Voice</string>
     <string name="voice_destination_near">Approaching finish line: %1$s remaining.</string>
+    <string name="elite_voice_surfaces_title">Terrain Surface Changes</string>
+    <string name="elite_voice_surfaces_desc">Spoken alerts when entering gravel, singletrack/MTB, or asphalt sectors with length</string>
+    <string name="voice_surface_entry">Entering %1$s sector: %2$s ahead.</string>
+    <string name="surface_gravel">gravel</string>
+    <string name="surface_trail">singletrack trail</string>
+    <string name="surface_asphalt">paved road</string>
 </resources>

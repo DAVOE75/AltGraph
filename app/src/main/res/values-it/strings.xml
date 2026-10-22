@@ -264,4 +264,10 @@
     <string name="voice_gender_female">Voce femminile</string>
     <string name="voice_gender_male">Voce maschile</string>
     <string name="voice_destination_near">Traguardo vicino: mancano %1$s.</string>
+    <string name="elite_voice_surfaces_title">Cambi di Superficie Stradale</string>
+    <string name="elite_voice_surfaces_desc">Annunci vocali all\'entrata di tratti in sterrato, sentiero MTB o asfalto con lunghezza</string>
+    <string name="voice_surface_entry">Inizio tratto in %1$s: %2$s da percorrere.</string>
+    <string name="surface_gravel">sterrato</string>
+    <string name="surface_trail">sentiero sterrato</string>
+    <string name="surface_asphalt">asfalto</string>
 </resources>

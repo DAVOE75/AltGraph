@@ -1856,6 +1856,24 @@ class MainActivity : Activity() {
         voiceOptionsLayout.addView(switchVoicePreChime)
         voiceOptionsLayout.addView(textVoicePreChimeDesc)
 
+        // Cambios de Superficie de Terreno (Gravel/MTB/Asfalto)
+        val switchVoiceSurfaces = Switch(this).apply {
+            text = getString(R.string.elite_voice_surfaces_title)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.voiceSurfacesEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, v -> prefs.voiceSurfacesEnabled = v }
+        }
+        val textVoiceSurfacesDesc = TextView(this).apply {
+            text = getString(R.string.elite_voice_surfaces_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 2, 0, 8)
+        }
+        voiceOptionsLayout.addView(switchVoiceSurfaces)
+        voiceOptionsLayout.addView(textVoiceSurfacesDesc)
+
         // Género de Voz (Masculina / Femenina / Por defecto)
         val voiceGenderLayout = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -1962,11 +1980,13 @@ class MainActivity : Activity() {
             periodicIntervalSpinner.isEnabled = unlocked
             switchVoiceCadence.isEnabled = unlocked
             switchVoicePreChime.isEnabled = unlocked
+            switchVoiceSurfaces.isEnabled = unlocked
             voiceGenderSpinner.isEnabled = unlocked
             voiceOptionsLayout.visibility = if (unlocked && switchVoiceMaster.isChecked) View.VISIBLE else View.GONE
 
             // Los interruptores se crearon bloqueados (apagados): reflejar el estado real al desbloquear
             if (unlocked) {
+                switchVoiceSurfaces.isChecked = prefs.voiceSurfacesEnabled
                 switchStrava.isChecked = prefs.stravaSegmentsEnabled
                 switchWeather.isChecked = prefs.weatherOverlayEnabled
                 switchRadar.isChecked = prefs.eliteRadarEnabled

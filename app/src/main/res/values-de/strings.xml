@@ -264,4 +264,10 @@
     <string name="voice_gender_female">Weibliche Stimme</string>
     <string name="voice_gender_male">Männliche Stimme</string>
     <string name="voice_destination_near">Zielankunft naht: noch %1$s.</string>
+    <string name="elite_voice_surfaces_title">Untergrundwechsel</string>
+    <string name="elite_voice_surfaces_desc">Sprachansagen beim Wechsel auf Schotter, MTB-Trails oder Asphalt mit Längenangabe</string>
+    <string name="voice_surface_entry">Einfahrt in %1$s-Abschnitt: noch %2$s.</string>
+    <string name="surface_gravel">Schotter</string>
+    <string name="surface_trail">Singletrail</string>
+    <string name="surface_asphalt">Asphalt</string>
 </resources>

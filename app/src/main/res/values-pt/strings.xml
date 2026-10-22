@@ -264,4 +264,10 @@
     <string name="voice_gender_female">Voz Feminina</string>
     <string name="voice_gender_male">Voz Masculina</string>
     <string name="voice_destination_near">Aproximação da meta: restam %1$s.</string>
+    <string name="elite_voice_surfaces_title">Mudanças de Tipo de Piso</string>
+    <string name="elite_voice_surfaces_desc">Avisos de voz ao entrar em setores de gravel, trilho BTT ou asfalto com indicação da distância</string>
+    <string name="voice_surface_entry">Entrando em setor de %1$s: %2$s pela frente.</string>
+    <string name="surface_gravel">gravel</string>
+    <string name="surface_trail">trilho de terra</string>
+    <string name="surface_asphalt">asfalto</string>
 </resources>

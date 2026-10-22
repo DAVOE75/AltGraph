@@ -78,6 +78,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     private var rideMovingTimeSeconds = 0L
     private var rideDistanceMetersAccumulated = 0.0
     private var lastAnnouncedFinishKm = Int.MAX_VALUE
+    private var lastAnnouncedSurfaceIndex = -1
 
     init {
         initTts()
@@ -444,6 +445,31 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                  if (remainingDist <= thresholdMeters && remainingDist >= (thresholdMeters - 150) && lastAnnouncedFinishKm > thresholdMeters) {
                      lastAnnouncedFinishKm = thresholdMeters
                      val phrase = context.getString(R.string.voice_destination_near, label)
+                     speak(phrase, priority = true)
+                     break
+                 }
+             }
+         }
+
+         // 6C. CAMBIOS DE SUPERFICIE DE TERRENO (Gravel / Trail / Asfalto y su longitud)
+         val surfaceSegments = strategy.surfaceSegments
+         if (prefs.voiceSurfacesEnabled && surfaceSegments.isNotEmpty()) {
+             for ((idx, seg) in surfaceSegments.withIndex()) {
+                 val distToStart = seg.startDistance - currentDist
+                 // Avisar al aproximarse a menos de 100m o justo al entrar
+                 if (distToStart in -20.0..100.0 && lastAnnouncedSurfaceIndex != idx) {
+                     lastAnnouncedSurfaceIndex = idx
+                     val surfaceName = when (seg.type) {
+                         SurfaceType.GRAVEL -> context.getString(R.string.surface_gravel)
+                         SurfaceType.TRAIL -> context.getString(R.string.surface_trail)
+                         SurfaceType.ASPHALT -> context.getString(R.string.surface_asphalt)
+                     }
+                     val lenStr = if (seg.length >= 1000.0) {
+                         String.format(Locale.getDefault(), "%.1f km", seg.length / 1000.0)
+                     } else {
+                         "${seg.length.toInt()} metros"
+                     }
+                     val phrase = context.getString(R.string.voice_surface_entry, surfaceName, lenStr)
                      speak(phrase, priority = true)
                      break
                  }

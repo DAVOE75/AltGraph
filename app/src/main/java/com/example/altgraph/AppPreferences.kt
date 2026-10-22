@@ -299,6 +299,10 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_VOICE_POIS_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_VOICE_POIS_ENABLED, value).apply()
 
+    var voiceSurfacesEnabled: Boolean
+        get() = prefs.getBoolean(KEY_VOICE_SURFACES_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_VOICE_SURFACES_ENABLED, value).apply()
+
     var voiceElevationMilestonesEnabled: Boolean
         get() = prefs.getBoolean(KEY_VOICE_ELEVATION_MILESTONES, true)
         set(value) = prefs.edit().putBoolean(KEY_VOICE_ELEVATION_MILESTONES, value).apply()
@@ -429,6 +433,7 @@ class AppPreferences(context: Context) {
         private const val KEY_VOICE_KGHOST_ENABLED = "voice_kghost_enabled"
         private const val KEY_VOICE_KGHOST_INTERVAL = "voice_kghost_interval"
         private const val KEY_VOICE_POIS_ENABLED = "voice_pois_enabled"
+        private const val KEY_VOICE_SURFACES_ENABLED = "voice_surfaces_enabled"
         private const val KEY_VOICE_ELEVATION_MILESTONES = "voice_elevation_milestones"
         private const val KEY_VOICE_PERIODIC_REPORT = "voice_periodic_report"
         private const val KEY_VOICE_PERIODIC_INTERVAL_KM = "voice_periodic_interval_km"

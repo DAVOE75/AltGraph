@@ -291,4 +291,10 @@
     <string name="voice_gender_female">Voz Femenina</string>
     <string name="voice_gender_male">Voz Masculina</string>
     <string name="voice_destination_near">Aproximación a meta: quedan %1$s.</string>
+    <string name="elite_voice_surfaces_title">Cambios de Tipo de Terreno</string>
+    <string name="elite_voice_surfaces_desc">Avisa al entrar en tramos de grava, sendero/MTB o asfalto indicando la longitud</string>
+    <string name="voice_surface_entry">Entrando en tramo de %1$s: %2$s por delante.</string>
+    <string name="surface_gravel">grava</string>
+    <string name="surface_trail">sendero de tierra</string>
+    <string name="surface_asphalt">asfalto</string>
 </resources>

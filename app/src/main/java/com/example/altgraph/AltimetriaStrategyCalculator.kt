@@ -21,6 +21,16 @@ enum class PoiType { TOWN, WATER, VIEWPOINT, SUMMIT }
 
 data class Poi(val relativeDistance: Double, val icon: String, val name: String, val type: PoiType)
 
+enum class SurfaceType { ASPHALT, GRAVEL, TRAIL }
+
+data class SurfaceSegment(
+    val startDistance: Double,
+    val endDistance: Double,
+    val type: SurfaceType
+) {
+    val length: Double get() = (endDistance - startDistance).coerceAtLeast(0.0)
+}
+
 data class RouteClimb(
     val startDistance: Double,
     val endDistance: Double,
@@ -120,7 +130,9 @@ data class StrategyData(
     val windEffectIntensity: Double? = null, // -1 to 1 (-1 headwind, 1 tailwind)
     val routeCoords: List<Pair<Double, Double>> = emptyList(), // Added for Global Isometric GPS
     // Pendientes de los bloques posteriores a subBlocks: reserva a la derecha de la RouteBar (solo la RouteBar la usa)
-    val rightBufferBlocks: List<Float> = emptyList()
+    val rightBufferBlocks: List<Float> = emptyList(),
+    // Tramos de superficie (Asfalto / Grava / Sendero-MTB)
+    val surfaceSegments: List<SurfaceSegment> = emptyList()
 )
 
 class AltimetriaStrategyCalculator {
@@ -238,6 +250,7 @@ class AltimetriaStrategyCalculator {
     // Curvas de herradura (distancias absolutas detectadas)
     private var absoluteHairpins = mutableListOf<Double>()
     private val routePois = mutableListOf<Poi>()
+    var routeSurfaceSegments = mutableListOf<SurfaceSegment>()
     
     var currentHeading: Double = 0.0
     var mapZoomLevel: Double? = null
@@ -467,6 +480,51 @@ class AltimetriaStrategyCalculator {
 
         // ELITE: Detectar puertos de montaña definidos manualmente mediante POIs por el usuario
         detectUserDefinedClimbsFromPois(symbols)
+
+        // ELITE: Detectar tramos de superficie (Gravel / Trail / Asfalto)
+        detectSurfaceSegmentsFromPois(symbols)
+    }
+
+    private fun detectSurfaceSegmentsFromPois(symbols: List<io.hammerhead.karooext.models.Symbol.POI>) {
+        routeSurfaceSegments.clear()
+        if (routePoints.isEmpty()) return
+
+        // Extraer POIs con etiquetas de superficie
+        val surfaceMarkers = mutableListOf<Pair<Double, SurfaceType>>()
+        for (sym in symbols) {
+            val text = sym.name.orEmpty().lowercase()
+            val type = when {
+                text.contains("gravel") || text.contains("grava") || text.contains("ripio") || text.contains("sterrato") || text.contains("kies") -> SurfaceType.GRAVEL
+                text.contains("trail") || text.contains("sendero") || text.contains("mtb") || text.contains("singletrack") || text.contains("pista") -> SurfaceType.TRAIL
+                text.contains("asfalto") || text.contains("asphalt") || text.contains("road") || text.contains("pavé") || text.contains("paved") -> SurfaceType.ASPHALT
+                else -> null
+            }
+            if (type != null) {
+                var nearestDist = 0.0
+                var minDist = Double.MAX_VALUE
+                for (pt in routePoints) {
+                    val d = hypot(pt.latitude - sym.lat, pt.longitude - sym.lng)
+                    if (d < minDist) {
+                        minDist = d
+                        nearestDist = pt.distance
+                    }
+                }
+                surfaceMarkers.add(Pair(nearestDist, type))
+            }
+        }
+
+        surfaceMarkers.sortBy { it.first }
+        val totalLen = routePoints.last().distance
+
+        if (surfaceMarkers.isNotEmpty()) {
+            for (i in surfaceMarkers.indices) {
+                val start = surfaceMarkers[i].first
+                val end = if (i + 1 < surfaceMarkers.size) surfaceMarkers[i + 1].first else totalLen
+                if (end > start + 30.0) {
+                    routeSurfaceSegments.add(SurfaceSegment(start, end, surfaceMarkers[i].second))
+                }
+            }
+        }
     }
 
     /**
@@ -2273,7 +2331,8 @@ class AltimetriaStrategyCalculator {
             stravaSegmentDistance = stravaRelDist,
             stravaPrGhostDistance = stravaGhostRelDist,
             windEffectIntensity = windEffect,
-            routeCoords = getVisibleRouteCoords(windowStartIndex, routePoints, actualLookahead.toInt())
+            routeCoords = getVisibleRouteCoords(windowStartIndex, routePoints, actualLookahead.toInt()),
+            surfaceSegments = routeSurfaceSegments
         )
     }
 
