@@ -28,9 +28,12 @@ In Version 2.3 erweitert AltGraph die Fähigkeiten des **Voice Copilot** um inte
 
 ---
 
-## VERSION 2.2: PROFESSIONELLER SPRACHANSAGEN-KOPILOT (AUDIO BLUETOOTH / LAUTSPRECHER)
+## VERSION 2.2: PROFESSIONELLER SPRACHANSAGEN-KOPILOT (BLUETOOTH-AUDIO)
 
-In Version 2.2 führt AltGraph ein umfassendes **Sprachansagensystem (Voice Copilot)** im Hintergrund ein, kompatibel mit Bluetooth-Kopfhörern oder dem Karoo-Lautsprecher und konfigurierbar im **ELITE**-Menü:
+> [!NOTE]
+> **Audio-Anforderung bei Karoo 2 und Karoo 3**: Der interne Lautsprecher/Summer von Hammerhead Karoo-Geräten ist hardwareseitig ausschließlich für Systemtöne (Radar- und Navigationspieptöne) mit fester Lautstärke ausgelegt. Um die menschlichen Sprachansagen (Text-to-Speech) des Kopiloten zu hören, ist **ein Bluetooth-Audiogerät erforderlich** (Kopfhörer, Knochenschall-Kopfhörer wie Shokz oder ein kompakter Bluetooth-Lenkerlautsprecher). Erst bei verbundener Bluetooth-Verbindung aktiviert das Karoo-System den Medienlautstärkeregler.
+
+In Version 2.2 führt AltGraph ein umfassendes **Sprachansagensystem (Voice Copilot)** im Hintergrund über Bluetooth ein, konfigurierbar im **ELITE**-Menü:
 
 * **Pässe- und Gipfelansagen**:
   * Sprachansage bei Annäherung an den Passbeginn mit Passname, Länge, Durchschnittssteigung und offizieller Kategorie.

@@ -36,9 +36,12 @@ En la versión 2.3, AltGraph amplía las capacidades del **Copiloto de Voz** con
 
 ---
 
-## VERSION 2.2: COPILOTO DE VOZ ALTIMETRICO PROFESIONAL (AUDIO BLUETOOTH / ALTAVOZ)
+## VERSION 2.2: COPILOTO DE VOZ ALTIMETRICO PROFESIONAL (AUDIO BLUETOOTH)
 
-En la version 2.2, AltGraph incorpora un completo sistema de **avisos audibles por voz (Voice Copilot)** gestionado en segundo plano, compatible con auriculares Bluetooth o con el altavoz del Karoo y disponible en el apartado **ELITE**:
+> [!NOTE]
+> **Requisito de audio en Karoo 2 y Karoo 3**: El altavoz/zumbador interno integrado de los dispositivos Hammerhead Karoo está diseñado exclusivamente por hardware para pitidos de sistema (beeps de radar y navegación). Para escuchar las locuciones de voz humana sintetizada del Copiloto (Text-to-Speech), es **imprescindible conectar un dispositivo de audio Bluetooth** (auriculares convencionales, auriculares de conducción ósea tipo Shokz o un mini altavoz Bluetooth en el manillar). Al conectar el dispositivo Bluetooth, el sistema Karoo activará automáticamente el control de volumen multimedia.
+
+En la version 2.2, AltGraph incorpora un completo sistema de **avisos audibles por voz (Voice Copilot)** gestionado en segundo plano a través de Bluetooth y disponible en el apartado **ELITE**:
 
 * **Avisos de Puertos y Cimas**:
   * Anuncio al aproximarse al inicio de un puerto con su nombre, kilometros de subida, pendiente media y categoria oficial.

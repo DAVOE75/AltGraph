@@ -36,9 +36,12 @@ In version 2.3, AltGraph expands the **Voice Copilot** capabilities with terrain
 
 ---
 
-## VERSION 2.2: PROFESSIONAL VOICE COPILOT (BLUETOOTH AUDIO / SPEAKER)
+## VERSION 2.2: PROFESSIONAL VOICE COPILOT (BLUETOOTH AUDIO)
 
-In version 2.2, AltGraph introduces a comprehensive **Voice Copilot Alert System** running in the background. It is fully compatible with Bluetooth earphones or the Karoo internal speaker, configured in the **ELITE** settings:
+> [!NOTE]
+> **Audio Requirement on Karoo 2 and Karoo 3**: The internal built-in speaker/buzzer on Hammerhead Karoo devices is engineered at the hardware level solely for fixed-volume system beeps (radar and turn alerts). To hear synthesized human voice announcements (Text-to-Speech) from the Copilot, **a Bluetooth audio device is required** (standard earbuds, bone conduction headphones like Shokz, or a compact handlebar-mounted Bluetooth speaker). Connecting a Bluetooth device will automatically enable the multimedia volume slider in the Karoo interface.
+
+In version 2.2, AltGraph introduces a comprehensive **Voice Copilot Alert System** running in the background via Bluetooth, configured in the **ELITE** settings:
 
 * **Climbs and Summits Announcements**:
   * Speaks approaching climb starts with pass name, length, average grade, and official category.
