@@ -418,7 +418,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
             val timeS = ghost?.timeS
             if (ghost != null && distM != null && timeS != null) {
                 val meters = Math.abs(distM).toInt()
-                val isLeading = distM < 0.0 // En KGhost distancia negativa = vas por delante
+                val isLeading = distM > 0.0 // En KGhost distancia positiva = ciclista real por delante
 
                 // Detectar Sorpasso / Cambio de líder
                 val previousState = lastKGhostWasLeading
