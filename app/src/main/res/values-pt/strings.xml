@@ -259,4 +259,9 @@
     <string name="voice_kghost_overtake_lead">Atenção: Ultrapassaste o Ghost. Novo líder da corrida.</string>
     <string name="voice_kghost_overtaken">Atenção: O Ghost acabou de te ultrapassar.</string>
     <string name="voice_poi_water">Ponto de água em %1$s metros.</string>
+    <string name="elite_voice_gender_title">Género da Voz</string>
+    <string name="voice_gender_auto">Padrão do Sistema</string>
+    <string name="voice_gender_female">Voz Feminina</string>
+    <string name="voice_gender_male">Voz Masculina</string>
+    <string name="voice_destination_near">Aproximação da meta: restam %1$s.</string>
 </resources>

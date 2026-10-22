@@ -323,6 +323,10 @@ class AppPreferences(context: Context) {
         get() = prefs.getFloat(KEY_VOICE_SPEECH_RATE, 0.95f)
         set(value) = prefs.edit().putFloat(KEY_VOICE_SPEECH_RATE, value).apply()
 
+    var voiceGender: String // "auto", "female", "male"
+        get() = prefs.getString(KEY_VOICE_GENDER, "auto") ?: "auto"
+        set(value) = prefs.edit().putString(KEY_VOICE_GENDER, value).apply()
+
     var eliteRadarResolution: Int
         get() = prefs.getInt(KEY_ELITE_RADAR_RESOLUTION, 0)
         set(value) = prefs.edit().putInt(KEY_ELITE_RADAR_RESOLUTION, value).apply()
@@ -431,6 +435,7 @@ class AppPreferences(context: Context) {
         private const val KEY_VOICE_CADENCE_ALERT = "voice_cadence_alert"
         private const val KEY_VOICE_PRE_CHIME = "voice_pre_chime"
         private const val KEY_VOICE_SPEECH_RATE = "voice_speech_rate"
+        private const val KEY_VOICE_GENDER = "voice_gender"
         private const val KEY_ELITE_RADAR_RESOLUTION = "elite_radar_resolution"
 
         @Volatile

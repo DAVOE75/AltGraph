@@ -286,4 +286,9 @@
     <string name="voice_kghost_overtake_lead">Attention: You have overtaken the Ghost. New race leader.</string>
     <string name="voice_kghost_overtaken">Attention: The Ghost has overtaken you.</string>
     <string name="voice_poi_water">Water point in %1$s meters.</string>
+    <string name="elite_voice_gender_title">Voice Gender</string>
+    <string name="voice_gender_auto">System Default</string>
+    <string name="voice_gender_female">Female Voice</string>
+    <string name="voice_gender_male">Male Voice</string>
+    <string name="voice_destination_near">Approaching finish line: %1$s remaining.</string>
 </resources>

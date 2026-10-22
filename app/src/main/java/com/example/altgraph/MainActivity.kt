@@ -1856,6 +1856,43 @@ class MainActivity : Activity() {
         voiceOptionsLayout.addView(switchVoicePreChime)
         voiceOptionsLayout.addView(textVoicePreChimeDesc)
 
+        // Género de Voz (Masculina / Femenina / Por defecto)
+        val voiceGenderLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(0, 0, 0, 8)
+        }
+        val voiceGenderLabel = TextView(this).apply {
+            text = getString(R.string.elite_voice_gender_title) + ": "
+            textSize = 13f
+            setTextColor(Color.LTGRAY)
+        }
+        val voiceGenderSpinner = Spinner(this).apply {
+            isEnabled = prefs.isEliteUnlocked
+            val options = arrayOf(
+                getString(R.string.voice_gender_auto),
+                getString(R.string.voice_gender_female),
+                getString(R.string.voice_gender_male)
+            )
+            val keys = arrayOf("auto", "female", "male")
+            val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, options)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            this.adapter = adapter
+            val currentKey = prefs.voiceGender
+            val idx = keys.indexOf(currentKey).coerceAtLeast(0)
+            setSelection(idx)
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(p: AdapterView<*>?, v: View?, pos: Int, id: Long) {
+                    prefs.voiceGender = keys[pos]
+                    (v as? TextView)?.setTextColor(Color.parseColor("#4CAF50"))
+                }
+                override fun onNothingSelected(p: AdapterView<*>?) {}
+            }
+        }
+        voiceGenderLayout.addView(voiceGenderLabel)
+        voiceGenderLayout.addView(voiceGenderSpinner)
+        voiceOptionsLayout.addView(voiceGenderLayout)
+
         switchVoiceMaster.setOnCheckedChangeListener { _, isChecked ->
             prefs.voiceDirectorEnabled = isChecked
             voiceOptionsLayout.visibility = if (isChecked) View.VISIBLE else View.GONE
@@ -1925,6 +1962,7 @@ class MainActivity : Activity() {
             periodicIntervalSpinner.isEnabled = unlocked
             switchVoiceCadence.isEnabled = unlocked
             switchVoicePreChime.isEnabled = unlocked
+            voiceGenderSpinner.isEnabled = unlocked
             voiceOptionsLayout.visibility = if (unlocked && switchVoiceMaster.isChecked) View.VISIBLE else View.GONE
 
             // Los interruptores se crearon bloqueados (apagados): reflejar el estado real al desbloquear

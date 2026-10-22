@@ -74,6 +74,11 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     private var lastRecordedElevation = 0.0
     private var estimatedElevationGain = 0.0
 
+    // Estadísticas acumuladas de la sesión para cálculo de media real
+    private var rideMovingTimeSeconds = 0L
+    private var rideDistanceMetersAccumulated = 0.0
+    private var lastAnnouncedFinishKm = Int.MAX_VALUE
+
     init {
         initTts()
         try {
@@ -103,6 +108,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
             engine.setPitch(1.0f)
             val prefs = AppPreferences.getInstance(context)
             engine.setSpeechRate(prefs.voiceSpeechRate) // Cadencia de voz configurada (0.95x para máxima claridad)
+            applyVoiceGender(engine, prefs.voiceGender)
 
             engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) {
@@ -131,6 +137,39 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
         } else {
             Log.w(TAG, "VoiceDirector TTS initialization failed with status: $status")
             isTtsReady = false
+        }
+    }
+
+    private fun applyVoiceGender(engine: TextToSpeech, gender: String) {
+        if (gender == "auto") return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                val currentLang = engine.language ?: Locale.getDefault()
+                val voices = engine.voices
+                if (!voices.isNullOrEmpty()) {
+                    val matchingVoices = voices.filter { v ->
+                        v.locale.language.equals(currentLang.language, ignoreCase = true)
+                    }
+                    val targetVoice = matchingVoices.firstOrNull { v ->
+                        val name = v.name.lowercase(Locale.US)
+                        if (gender == "female") {
+                            name.contains("female") || name.contains("fem") || name.contains("-f-") || name.endsWith("f")
+                        } else {
+                            name.contains("male") && !name.contains("female") || name.contains("-m-") || name.endsWith("m")
+                        }
+                    } ?: if (matchingVoices.size >= 2) {
+                        // En Android TTS común: primera voz = mujer, segunda voz = hombre
+                        if (gender == "female") matchingVoices[0] else matchingVoices[1]
+                    } else null
+
+                    if (targetVoice != null) {
+                        engine.voice = targetVoice
+                        Log.i(TAG, "Voice gender applied: ${targetVoice.name}")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Error setting voice gender", e)
+            }
         }
     }
 
@@ -238,150 +277,178 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     /**
      * Evalúa las condiciones de la ruta y genera los avisos pertinentes según los ajustes.
      */
-    fun evaluate(snapshot: Snapshot, prefs: AppPreferences) {
-        if (!prefs.isEliteUnlocked || !prefs.voiceDirectorEnabled) return
-        if (!snapshot.isNavigatingRoute) return
+     fun evaluate(snapshot: Snapshot, prefs: AppPreferences) {
+         if (!prefs.isEliteUnlocked || !prefs.voiceDirectorEnabled) return
+         if (!snapshot.isNavigatingRoute) return
 
-        val strategy = snapshot.strategy
-        val currentDist = strategy.windowStartMeters
-        val climbs = snapshot.routeClimbs
-        val elev = snapshot.currentElevation
+         val strategy = snapshot.strategy
+         // Posición exacta continua del ciclista proyectada sobre la ruta (no la ventana desplazada del 3D)
+         val currentDist = if (snapshot.currentRouteDistance > 0.0) snapshot.currentRouteDistance else strategy.windowStartMeters
+         val climbs = snapshot.routeClimbs
+         val elev = snapshot.currentElevation
+         val speed = snapshot.currentSpeed
 
-        // Acumular ganancia de elevación estimada
-        if (lastRecordedElevation > 0.0 && elev > lastRecordedElevation && snapshot.currentSpeed > 0.5) {
-            val delta = elev - lastRecordedElevation
-            if (delta in 0.2..15.0) { // Descartar saltos o ruido
-                estimatedElevationGain += delta
-            }
-        }
-        if (elev > 0.0) lastRecordedElevation = elev
+         // Acumular tiempo y distancia en movimiento para velocidad media real
+         if (speed > 1.0) {
+             rideMovingTimeSeconds += 1L
+             rideDistanceMetersAccumulated += speed
+         }
 
-        // 1. AVISO DE PUERTO (Inicio, Kilómetros y Cima)
-        if (prefs.voiceClimbsEnabled && climbs.isNotEmpty()) {
-            for ((idx, climb) in climbs.withIndex()) {
-                val distToClimb = climb.startDistance - currentDist
-                if (distToClimb in 50.0..250.0 && lastAnnouncedClimbIndex != idx) {
-                    lastAnnouncedClimbIndex = idx
-                    lastAnnouncedKmInClimb = 0
-                    val climbName = climb.name ?: (context.getString(R.string.profile_tv_climb_item_prefix) + " " + (idx + 1))
-                    val km = String.format(Locale.getDefault(), "%.1f", climb.length / 1000.0)
-                    val avgGrade = String.format(Locale.getDefault(), "%.1f", climb.avgGrade)
-                    val catStr = if (climb.category.isNotBlank()) climb.category else ""
-                    val phrase = context.getString(R.string.voice_climb_start, climbName, km, avgGrade, catStr).trim()
-                    speak(phrase, priority = true)
-                    break
-                }
+         // Acumular ganancia de elevación estimada
+         if (lastRecordedElevation > 0.0 && elev > lastRecordedElevation && speed > 0.5) {
+             val delta = elev - lastRecordedElevation
+             if (delta in 0.2..15.0) { // Descartar saltos o ruido
+                 estimatedElevationGain += delta
+             }
+         }
+         if (elev > 0.0) lastRecordedElevation = elev
 
-                // Cima próxima (a 500 metros)
-                val distToSummit = climb.endDistance - currentDist
-                if (distToSummit in 450.0..550.0 && currentDist >= climb.startDistance && lastSummit500AnnouncedClimbIndex != idx) {
-                    lastSummit500AnnouncedClimbIndex = idx
-                    val phrase = context.getString(R.string.voice_climb_summit_near, "500")
-                    speak(phrase, priority = true)
-                    break
-                }
+         // 1. AVISO DE PUERTO (Inicio, Kilómetros y Cima)
+         if (prefs.voiceClimbsEnabled && climbs.isNotEmpty()) {
+             for ((idx, climb) in climbs.withIndex()) {
+                 val distToClimb = climb.startDistance - currentDist
+                 if (distToClimb in 40.0..300.0 && lastAnnouncedClimbIndex != idx) {
+                     lastAnnouncedClimbIndex = idx
+                     lastAnnouncedKmInClimb = 0
+                     val climbName = climb.name ?: (context.getString(R.string.profile_tv_climb_item_prefix) + " " + (idx + 1))
+                     val km = String.format(Locale.getDefault(), "%.1f", climb.length / 1000.0)
+                     val avgGrade = String.format(Locale.getDefault(), "%.1f", climb.avgGrade)
+                     val catStr = if (climb.category.isNotBlank()) climb.category else ""
+                     val phrase = context.getString(R.string.voice_climb_start, climbName, km, avgGrade, catStr).trim()
+                     speak(phrase, priority = true)
+                     break
+                 }
 
-                // Cima inminente (a 100 metros)
-                if (distToSummit in 70.0..130.0 && currentDist >= climb.startDistance && lastSummit100AnnouncedClimbIndex != idx) {
-                    lastSummit100AnnouncedClimbIndex = idx
-                    val phrase = context.getString(R.string.voice_climb_summit_near, "100")
-                    speak(phrase, priority = true)
-                    break
-                }
+                 // Cima próxima (a 500 metros reales de la cima)
+                 val distToSummit = climb.endDistance - currentDist
+                 if (distToSummit <= 520.0 && distToSummit >= 400.0 && currentDist >= climb.startDistance && lastSummit500AnnouncedClimbIndex != idx) {
+                     lastSummit500AnnouncedClimbIndex = idx
+                     val phrase = context.getString(R.string.voice_climb_summit_near, "500")
+                     speak(phrase, priority = true)
+                     break
+                 }
 
-                // Progresión kilómetro a kilómetro dentro del puerto (ej: Km 1, Km 2...)
-                if (currentDist >= climb.startDistance && currentDist <= climb.endDistance) {
-                    val distInsideClimb = currentDist - climb.startDistance
-                    val kmInside = (distInsideClimb / 1000.0).toInt()
-                    if (kmInside >= 1 && kmInside != lastAnnouncedKmInClimb && (distInsideClimb % 1000.0) < 180.0) {
-                        lastAnnouncedKmInClimb = kmInside
-                        val currentGradeStr = String.format(Locale.getDefault(), "%.0f", strategy.visibleAvgGrade.coerceAtLeast(0.0))
-                        val phrase = context.getString(R.string.voice_climb_km_progress, kmInside.toString(), currentGradeStr)
-                        speak(phrase, priority = false)
-                    }
-                }
-            }
-        }
+                 // Cima inminente (a 100 metros reales de la cima)
+                 if (distToSummit <= 130.0 && distToSummit >= 40.0 && currentDist >= climb.startDistance && lastSummit100AnnouncedClimbIndex != idx) {
+                     lastSummit100AnnouncedClimbIndex = idx
+                     val phrase = context.getString(R.string.voice_climb_summit_near, "100")
+                     speak(phrase, priority = true)
+                     break
+                 }
 
-        // 2. ENDURECIMIENTO DE PENDIENTE (Próximo tramo supera el umbral configurado)
-        val subBlocksList: List<Float> = strategy.subBlocks
-        if (prefs.voiceSteepEnabled && subBlocksList.isNotEmpty()) {
-            val threshold = prefs.voiceSteepThreshold
-            val subBlockSize = strategy.subBlockSizeMeters.coerceAtLeast(20.0)
-            
-            // Miramos los próximos 300m a 500m
-            val lookAheadCount = (500.0 / subBlockSize).toInt().coerceIn(2, subBlocksList.size)
-            val upcomingGrades: List<Float> = subBlocksList.take(lookAheadCount)
-            if (upcomingGrades.isNotEmpty()) {
-                val sum = upcomingGrades.fold(0.0) { acc, g -> acc + g.toDouble() }
-                val avgUpcoming = sum / upcomingGrades.size
-                if (avgUpcoming >= threshold && (currentDist - lastAnnouncedSteepDistance) > 1500.0) {
-                    lastAnnouncedSteepDistance = currentDist
-                    val meters = (lookAheadCount * subBlockSize).toInt()
-                    val gradeFormatted = String.format(Locale.getDefault(), "%.1f", avgUpcoming)
-                    val phrase = context.getString(R.string.voice_steep_ahead, meters.toString(), gradeFormatted)
-                    speak(phrase, priority = false)
-                } else if (strategy.visibleAvgGrade >= 8.0 && avgUpcoming < 3.5 && (currentDist - lastAnnouncedReliefDistance) > 2000.0) {
-                    // Descansillo / Alivio de pendiente en subida
-                    lastAnnouncedReliefDistance = currentDist
-                    val meters = (lookAheadCount * subBlockSize).toInt()
-                    val phrase = context.getString(R.string.voice_slope_relief, meters.toString())
-                    speak(phrase, priority = false)
-                }
-            }
-        }
+                 // Progresión kilómetro a kilómetro dentro del puerto (ej: Km 1, Km 2...)
+                 if (currentDist >= climb.startDistance && currentDist <= climb.endDistance) {
+                     val distInsideClimb = currentDist - climb.startDistance
+                     val kmInside = (distInsideClimb / 1000.0).toInt()
+                     if (kmInside >= 1 && kmInside != lastAnnouncedKmInClimb && (distInsideClimb % 1000.0) < 200.0) {
+                         lastAnnouncedKmInClimb = kmInside
+                         val currentGradeStr = String.format(Locale.getDefault(), "%.0f", strategy.visibleAvgGrade.coerceAtLeast(0.0))
+                         val phrase = context.getString(R.string.voice_climb_km_progress, kmInside.toString(), currentGradeStr)
+                         speak(phrase, priority = false)
+                     }
+                 }
+             }
+         }
 
-        // 3. MURO DE DESARROLLO (Rampas >= 15% o muro extremo)
-        val subBlocksMaxList: List<Float> = strategy.subBlocksMax
-        if (prefs.voiceGearWallEnabled && subBlocksMaxList.isNotEmpty()) {
-            val maxAhead = subBlocksMaxList.take(4).maxByOrNull { it } ?: 0f
-            if (maxAhead >= 15.0f && (currentDist - lastAnnouncedWallDistance) > 1200.0) {
-                lastAnnouncedWallDistance = currentDist
-                val gradeFormatted = String.format(Locale.getDefault(), "%.0f", maxAhead.toDouble())
-                val phrase = context.getString(R.string.voice_wall_ahead, gradeFormatted, "150")
-                speak(phrase, priority = true)
-            }
-        }
+         // 2. ENDURECIMIENTO DE PENDIENTE (Próximo tramo supera el umbral configurado)
+         val subBlocksList: List<Float> = strategy.subBlocks
+         if (prefs.voiceSteepEnabled && subBlocksList.isNotEmpty()) {
+             val threshold = prefs.voiceSteepThreshold
+             val subBlockSize = strategy.subBlockSizeMeters.coerceAtLeast(20.0)
+             
+             // Miramos los próximos 300m a 500m
+             val lookAheadCount = (500.0 / subBlockSize).toInt().coerceIn(2, subBlocksList.size)
+             val upcomingGrades: List<Float> = subBlocksList.take(lookAheadCount)
+             if (upcomingGrades.isNotEmpty()) {
+                 val sum = upcomingGrades.fold(0.0) { acc, g -> acc + g.toDouble() }
+                 val avgUpcoming = sum / upcomingGrades.size
+                 if (avgUpcoming >= threshold && (currentDist - lastAnnouncedSteepDistance) > 1500.0) {
+                     lastAnnouncedSteepDistance = currentDist
+                     val meters = (lookAheadCount * subBlockSize).toInt()
+                     val gradeFormatted = String.format(Locale.getDefault(), "%.1f", avgUpcoming)
+                     val phrase = context.getString(R.string.voice_steep_ahead, meters.toString(), gradeFormatted)
+                     speak(phrase, priority = false)
+                 } else if (strategy.visibleAvgGrade >= 8.0 && avgUpcoming < 3.5 && (currentDist - lastAnnouncedReliefDistance) > 2000.0) {
+                     // Descansillo / Alivio de pendiente en subida
+                     lastAnnouncedReliefDistance = currentDist
+                     val meters = (lookAheadCount * subBlockSize).toInt()
+                     val phrase = context.getString(R.string.voice_slope_relief, meters.toString())
+                     speak(phrase, priority = false)
+                 }
+             }
+         }
 
-        // 4. CURVAS DE HERRADURA (Apex)
-        val hairpinsList: List<Double> = strategy.hairpins
-        if (prefs.voiceHairpinsEnabled && hairpinsList.isNotEmpty()) {
-            val nextHairpin = hairpinsList.firstOrNull { h -> h > currentDist && (h - currentDist) in 40.0..120.0 }
-            if (nextHairpin != null && (nextHairpin - lastAnnouncedHairpinDistance) > 300.0) {
-                lastAnnouncedHairpinDistance = nextHairpin
-                val distAhead = (nextHairpin - currentDist).toInt()
-                val gradeAtHairpin = String.format(Locale.getDefault(), "%.0f", strategy.visibleAvgGrade.coerceAtLeast(8.0))
-                val phrase = context.getString(R.string.voice_hairpin_ahead, distAhead.toString(), gradeAtHairpin)
-                speak(phrase, priority = false)
-            }
-        }
+         // 3. MURO DE DESARROLLO (Rampas >= 15% o muro extremo)
+         val subBlocksMaxList: List<Float> = strategy.subBlocksMax
+         if (prefs.voiceGearWallEnabled && subBlocksMaxList.isNotEmpty()) {
+             val maxAhead = subBlocksMaxList.take(4).maxByOrNull { it } ?: 0f
+             if (maxAhead >= 15.0f && (currentDist - lastAnnouncedWallDistance) > 1200.0) {
+                 lastAnnouncedWallDistance = currentDist
+                 val gradeFormatted = String.format(Locale.getDefault(), "%.0f", maxAhead.toDouble())
+                 val phrase = context.getString(R.string.voice_wall_ahead, gradeFormatted, "150")
+                 speak(phrase, priority = true)
+             }
+         }
 
-        // 5. HITOS DE DESNIVEL ACUMULADO (Cada 250m o 500m)
-        if (prefs.voiceElevationMilestonesEnabled) {
-            val milestoneStep = 500
-            val currentMilestone = (estimatedElevationGain / milestoneStep).toInt() * milestoneStep
-            if (currentMilestone >= milestoneStep && currentMilestone > lastAnnouncedElevationMilestone) {
-                lastAnnouncedElevationMilestone = currentMilestone
-                val currentAltStr = elev.toInt().toString()
-                val phrase = context.getString(R.string.voice_elevation_milestone, currentMilestone.toString(), currentAltStr)
-                speak(phrase, priority = false)
-            }
-        }
+         // 4. CURVAS DE HERRADURA (Apex)
+         val hairpinsList: List<Double> = strategy.hairpins
+         if (prefs.voiceHairpinsEnabled && hairpinsList.isNotEmpty()) {
+             val nextHairpin = hairpinsList.firstOrNull { h -> h > currentDist && (h - currentDist) in 40.0..120.0 }
+             if (nextHairpin != null && (nextHairpin - lastAnnouncedHairpinDistance) > 300.0) {
+                 lastAnnouncedHairpinDistance = nextHairpin
+                 val distAhead = (nextHairpin - currentDist).toInt()
+                 val gradeAtHairpin = String.format(Locale.getDefault(), "%.0f", strategy.visibleAvgGrade.coerceAtLeast(8.0))
+                 val phrase = context.getString(R.string.voice_hairpin_ahead, distAhead.toString(), gradeAtHairpin)
+                 speak(phrase, priority = false)
+             }
+         }
 
-        // 6. RESUMEN PERIÓDICO DE RUTA (Cada X km)
-        if (prefs.voicePeriodicReportEnabled) {
-            val intervalKm = prefs.voicePeriodicIntervalKm.coerceAtLeast(2.0)
-            val currentKm = currentDist / 1000.0
-            if (currentKm >= intervalKm && (currentKm - lastPeriodicDistanceKm) >= intervalKm) {
-                lastPeriodicDistanceKm = currentKm
-                val distStr = String.format(Locale.getDefault(), "%.0f", currentKm)
-                val avgSpeedKmh = (snapshot.currentSpeed * 3.6).coerceAtLeast(0.0)
-                val speedStr = String.format(Locale.getDefault(), "%.1f", avgSpeedKmh)
-                val elevGainStr = estimatedElevationGain.toInt().toString()
-                val phrase = context.getString(R.string.voice_periodic_summary, distStr, speedStr, elevGainStr)
-                speak(phrase, priority = false)
-            }
-        }
+         // 5. HITOS DE DESNIVEL ACUMULADO (Avisa cada 250m de ganancia vertical)
+         if (prefs.voiceElevationMilestonesEnabled) {
+             val milestoneStep = 250
+             val currentMilestone = (estimatedElevationGain / milestoneStep).toInt() * milestoneStep
+             if (currentMilestone >= milestoneStep && currentMilestone > lastAnnouncedElevationMilestone) {
+                 lastAnnouncedElevationMilestone = currentMilestone
+                 val currentAltStr = elev.toInt().toString()
+                 val phrase = context.getString(R.string.voice_elevation_milestone, currentMilestone.toString(), currentAltStr)
+                 speak(phrase, priority = false)
+             }
+         }
+
+         // 6. RESUMEN PERIÓDICO DE RUTA (Cada X km configurados con velocidad media REAL)
+         if (prefs.voicePeriodicReportEnabled) {
+             val intervalKm = prefs.voicePeriodicIntervalKm.coerceAtLeast(2.0)
+             val currentKm = currentDist / 1000.0
+             if (currentKm >= intervalKm && (currentKm - lastPeriodicDistanceKm) >= intervalKm) {
+                 lastPeriodicDistanceKm = currentKm
+                 val distStr = String.format(Locale.getDefault(), "%.0f", currentKm)
+                 // Media real = distancia acumulada / tiempo en movimiento
+                 val avgSpeedKmh = if (rideMovingTimeSeconds > 5) {
+                     ((rideDistanceMetersAccumulated / rideMovingTimeSeconds) * 3.6).coerceIn(5.0, 70.0)
+                 } else {
+                     (speed * 3.6).coerceAtLeast(0.0)
+                 }
+                 val speedStr = String.format(Locale.getDefault(), "%.1f", avgSpeedKmh)
+                 val elevGainStr = estimatedElevationGain.toInt().toString()
+                 val phrase = context.getString(R.string.voice_periodic_summary, distStr, speedStr, elevGainStr)
+                 speak(phrase, priority = false)
+             }
+         }
+
+         // 6B. AVISO DE APROXIMACIÓN A META (a 5 km, 2 km, 1 km y 500 m)
+         val totalRoute = snapshot.routeTotalLength
+         if (totalRoute > 1000.0) {
+             val remainingDist = totalRoute - currentDist
+             val finishMilestones = listOf(5000 to "5 kilómetros", 2000 to "2 kilómetros", 1000 to "1 kilómetro", 500 to "500 metros")
+             for ((thresholdMeters, label) in finishMilestones) {
+                 if (remainingDist <= thresholdMeters && remainingDist >= (thresholdMeters - 150) && lastAnnouncedFinishKm > thresholdMeters) {
+                     lastAnnouncedFinishKm = thresholdMeters
+                     val phrase = context.getString(R.string.voice_destination_near, label)
+                     speak(phrase, priority = true)
+                     break
+                 }
+             }
+         }
 
         // 7. ALERTA DE CADENCIA BAJA EN SUBIDAS (< 60 rpm en rampas > 8%)
         if (prefs.voiceCadenceAlertEnabled) {

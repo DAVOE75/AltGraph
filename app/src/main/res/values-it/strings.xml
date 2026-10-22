@@ -259,4 +259,9 @@
     <string name="voice_kghost_overtake_lead">Attenzione: Hai superato il Ghost. Nuovo leader della corsa.</string>
     <string name="voice_kghost_overtaken">Attenzione: Il Ghost ti ha appena superato.</string>
     <string name="voice_poi_water">Punto d\'acqua tra %1$s metri.</string>
+    <string name="elite_voice_gender_title">Genere della voce</string>
+    <string name="voice_gender_auto">Predefinito di sistema</string>
+    <string name="voice_gender_female">Voce femminile</string>
+    <string name="voice_gender_male">Voce maschile</string>
+    <string name="voice_destination_near">Traguardo vicino: mancano %1$s.</string>
 </resources>
