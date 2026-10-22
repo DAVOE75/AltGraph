@@ -50,14 +50,16 @@ class AltgraphCalculationsTest {
         calculator.routePoints = points
         calculator.isNavigatingRoute = true
 
-        // La ventana avanza en bloques de 50m dejando al ciclista a 1/4 de la ventana
+        // La ventana avanza por páginas: la baliza llega al borde derecho y el perfil salta, dejándola a la izquierda
+        var prevStart = -1.0
         for (i in listOf(1, 2, 3, 4, 8, 12, 16, 40, 60)) {
             calculator.updateCurrentLocation(points[i].latitude, points[i].longitude)
             val strategy = calculator.calculateStrategy()
             val dist = points[i].distance
-            val expectedStart = (Math.floor((dist - strategy.windowLengthMeters / 4.0) / 50.0) * 50.0).coerceAtLeast(0.0)
-            assertEquals(expectedStart, strategy.windowStartMeters, 0.1)
-            assertEquals((dist - expectedStart) / strategy.windowLengthMeters, strategy.riderProgress.toDouble(), 0.01)
+            assertEquals(true, dist >= strategy.windowStartMeters && dist <= strategy.windowStartMeters + strategy.windowLengthMeters * 0.96)
+            assertEquals((dist - strategy.windowStartMeters) / strategy.windowLengthMeters, strategy.riderProgress.toDouble(), 0.01)
+            assertEquals(true, strategy.windowStartMeters >= prevStart)
+            prevStart = strategy.windowStartMeters
         }
     }
 

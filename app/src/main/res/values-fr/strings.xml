@@ -262,10 +262,6 @@
     <string name="voice_kghost_overtake_lead">Attention : Vous avez dépassé le Ghost. Nouveau leader.</string>
     <string name="voice_kghost_overtaken">Attention : Le Ghost vient de vous dépasser.</string>
     <string name="voice_poi_water">Point d\'eau dans %1$s mètres.</string>
-    <string name="elite_voice_gender_title">Genre de la voix</string>
-    <string name="voice_gender_auto">Par défaut du système</string>
-    <string name="voice_gender_female">Voix féminine</string>
-    <string name="voice_gender_male">Voix masculine</string>
     <string name="voice_destination_near">Arrivée proche : reste %1$s.</string>
     <string name="elite_voice_surfaces_title">Changements de Type de Surface</string>
     <string name="elite_voice_surfaces_desc">Annonces vocales à l\'entrée des secteurs gravel, sentier VTT ou asphalte avec longueur</string>

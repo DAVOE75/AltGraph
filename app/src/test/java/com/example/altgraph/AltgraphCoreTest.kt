@@ -97,10 +97,34 @@ class AltgraphCoreTest {
             )
         )
         val snap = core.tick(null)
-        core.pan3dMeters = 1000.0
+        core.calculator.currentRouteDistance = 1500.0
+        val base = core.strategyFor3D(null, snap).windowStartMeters
+        core.pan3dMeters = -100.0
         val s3d = core.strategyFor3D(null, snap)
-        assertNotEquals(snap.strategy.windowStartMeters, s3d.windowStartMeters, 0.0)
+        assertNotEquals(base, s3d.windowStartMeters, 0.0)
         assertEquals(0.0, core.calculator.manualPanOffsetMeters, 0.0)
+    }
+
+    @Test
+    fun riderStaysInsideWindowAndPagesForward() {
+        val core = AltgraphCore()
+        withRoute(core.calculator)
+        val snap = core.tick(null)
+        var lastStart = -1.0
+        var jumps = 0
+        for (d in 0..5000 step 25) {
+            core.calculator.currentRouteDistance = d.toDouble()
+            val s = core.calculator.calculateStrategy(null)
+            assertEquals("d=$d", true, s.riderProgress in 0f..0.96f)
+            if (s.windowStartMeters > lastStart && lastStart >= 0.0) {
+                jumps++
+                // Tras cada salto la baliza reaparece en el lado izquierdo de la ventana
+                assertEquals("d=$d", true, s.riderProgress < 0.2f)
+            }
+            lastStart = s.windowStartMeters
+        }
+        assertEquals(snap.strategy.riderProgress >= 0f, true)
+        assertEquals(true, jumps >= 1)
     }
 
     @Test

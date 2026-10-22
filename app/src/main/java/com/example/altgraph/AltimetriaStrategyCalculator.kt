@@ -262,6 +262,8 @@ class AltimetriaStrategyCalculator {
     var currentHeading: Double = 0.0
     var mapZoomLevel: Double? = null
     var manualPanOffsetMeters: Double = 0.0
+    private var pagedWindowStart: Double = -1.0
+    private fun actualLookaheadForPaging(lookahead: Double) = lookahead * 0.95
     var appContext: Context? = null
 
     fun updateLiveGrade(grade: Double) {
@@ -1874,15 +1876,22 @@ class AltimetriaStrategyCalculator {
 
         // 2. Ventana deslizante en bloques cuánticos de 50 metros (avance gradual y continuo)
         val quantumMeters = 50.0
-        // Desplazamos la ventana 1/4 hacia atrás para que el ciclista aparezca al 25% de la pantalla SIEMPRE
-        val autoStart = currentRiderDistance - (lookaheadDist / 4.0)
-        
-        // Restauramos el coerceAtLeast(0.0) a petición del usuario para que la ruta empiece en 0m y no en negativo.
-        var windowStartDist = (Math.floor(autoStart / quantumMeters).toLong() * quantumMeters).toDouble().coerceAtLeast(0.0)
-        
+        // Ventana por páginas: la baliza avanza hasta el borde derecho (95%) y entonces el perfil salta hacia delante,
+        // dejándola de nuevo a la izquierda. La página solo cambia en el tick (advance), así no depende de zooms intermedios.
+        val pageEdge = actualLookaheadForPaging(lookaheadDist)
+        val riderNow = currentRiderDistance.coerceAtLeast(0.0)
+        if (advance && (pagedWindowStart < 0.0 || riderNow < pagedWindowStart || riderNow > pagedWindowStart + pageEdge)) {
+            pagedWindowStart = (Math.floor((riderNow - lookaheadDist * 0.03) / quantumMeters) * quantumMeters).coerceAtLeast(0.0)
+        }
+        var windowStartDist = if (pagedWindowStart >= 0.0 && riderNow >= pagedWindowStart && riderNow <= pagedWindowStart + pageEdge) {
+            pagedWindowStart
+        } else {
+            (Math.floor((riderNow - lookaheadDist * 0.03) / quantumMeters) * quantumMeters).coerceAtLeast(0.0)
+        }
+
         // Aplicamos el pan manual DESPUÉS del cálculo base para que funcione instantáneamente
         windowStartDist = (windowStartDist + manualPanOffsetMeters).coerceAtLeast(0.0)
-        
+
         var actualLookahead = lookaheadDist
         val totalRouteLength = routeElevationProfile.lastOrNull()?.distance ?: (routePoints.lastOrNull()?.distance ?: 0.0)
 
@@ -2462,7 +2471,9 @@ class AltimetriaStrategyCalculator {
         val avgGrade = if (ascentDistance > 0) (totalAscent / ascentDistance) * 100.0 else climb.avgGrade
         
         val actualRiderDist = currentRouteDistance
-        val progress = if (windowLength > 0.0) ((actualRiderDist - startDist) / windowLength).toFloat().coerceIn(0f, 1f) else 0f
+        // El perfil dibujado se recorta al final del puerto: el progreso debe normalizarse con la longitud real muestreada
+        val sampledLength = endDist - startDist
+        val progress = if (sampledLength > 0.0) ((actualRiderDist - startDist) / sampledLength).toFloat().coerceIn(0f, 1f) else 0f
 
         val visibleHairpins = absoluteHairpins.toList()
             .filter { it in startDist..endDist }

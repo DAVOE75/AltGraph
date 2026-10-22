@@ -47,6 +47,8 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
     private var currentClimbIndex = 0
     private var climbLookaheadMeters: Double = 0.0 // 0.0 = full climb
     private var climbPanOffsetMeters: Double = 0.0
+    @Volatile private var lastManualPanMs: Long = 0L
+    @Volatile private var lastEffectivePan: Double = 0.0
     private val refreshChannel = Channel<Unit>(Channel.CONFLATED)
 
     companion object {
@@ -117,6 +119,7 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                                 else -> 200.0
                             }
                             climbLookaheadMeters = next.coerceAtMost(climbLen)
+                            lastManualPanMs = 0L
                         }
                         ACTION_ZOOM_OUT -> {
                             val climbLen = currentClimb?.length ?: 2000.0
@@ -135,20 +138,23 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                                 climbPanOffsetMeters = 0.0
                             } else {
                                 climbLookaheadMeters = next
+                                lastManualPanMs = 0L
                             }
                         }
                         ACTION_PAN_LEFT -> {
                             val climbLen = currentClimb?.length ?: 2000.0
                             val win = if (climbLookaheadMeters > 0.0) climbLookaheadMeters else climbLen
                             val step = (win / 3.0).coerceAtLeast(100.0)
-                            climbPanOffsetMeters = (climbPanOffsetMeters - step).coerceAtLeast(0.0)
+                            climbPanOffsetMeters = (lastEffectivePan - step).coerceAtLeast(0.0)
+                            lastManualPanMs = System.currentTimeMillis()
                         }
                         ACTION_PAN_RIGHT -> {
                             val climbLen = currentClimb?.length ?: 2000.0
                             val win = if (climbLookaheadMeters > 0.0) climbLookaheadMeters else climbLen
                             val maxOffset = (climbLen - win).coerceAtLeast(0.0)
                             val step = (win / 3.0).coerceAtLeast(100.0)
-                            climbPanOffsetMeters = (climbPanOffsetMeters + step).coerceAtMost(maxOffset)
+                            climbPanOffsetMeters = (lastEffectivePan + step).coerceAtMost(maxOffset)
+                            lastManualPanMs = System.currentTimeMillis()
                         }
                     }
                     refreshChannel.trySend(Unit)
@@ -221,7 +227,18 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                     climbLookaheadMeters
                 }
                 val maxPan = (climbLen - customLength).coerceAtLeast(0.0)
-                val effectivePan = climbPanOffsetMeters.coerceIn(0.0, maxPan)
+                val riderDistNow = snap.currentRouteDistance
+                // Con zoom, el perfil avanza por páginas: la baliza llega a la derecha y la ventana salta, dejándola a la izquierda
+                val followRider = climb != null && customLength < climbLen &&
+                    riderDistNow >= climb.startDistance && riderDistNow <= climb.endDistance &&
+                    System.currentTimeMillis() - lastManualPanMs > 10_000L
+                val effectivePan = if (followRider) {
+                    val pageStep = (customLength * 0.95).coerceAtLeast(50.0)
+                    (Math.floor((riderDistNow - climb!!.startDistance) / pageStep) * pageStep).coerceIn(0.0, maxPan)
+                } else {
+                    climbPanOffsetMeters.coerceIn(0.0, maxPan)
+                }
+                lastEffectivePan = effectivePan
                 val customStartDist = if (climb == null) 0.0 else climb.startDistance + effectivePan
                 safeUpdate(onDead = { cancel(); AltgraphRepository.release(emitter); AltgraphRepository.removeNavListener(navListener) }) {
                 // Suspend (calcula en el hilo del calculador); dentro de safeUpdate para que un fallo no mate el bucle
@@ -256,8 +273,9 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                     val lookahead = customLength.toInt().coerceAtLeast(100)
                     
                     // Calculamos progreso del ciclista
-                    val riderProgress = if (snap.currentRouteDistance >= customStartDist && snap.currentRouteDistance <= customStartDist + customLength) {
-                        ((snap.currentRouteDistance - customStartDist) / customLength).toFloat()
+                    val sampledLength = (minOf(customStartDist + customLength, climb.endDistance) - customStartDist).coerceAtLeast(1.0)
+                    val riderProgress = if (snap.currentRouteDistance >= customStartDist && snap.currentRouteDistance <= customStartDist + sampledLength) {
+                        ((snap.currentRouteDistance - customStartDist) / sampledLength).toFloat().coerceIn(0f, 1f)
                     } else {
                         -1f // -1f ocultará la baliza en la gráfica
                     }

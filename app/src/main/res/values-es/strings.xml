@@ -289,10 +289,6 @@
     <string name="voice_kghost_overtake_lead">Atención: Has adelantado al Ghost. Nueva cabeza de carrera.</string>
     <string name="voice_kghost_overtaken">Atención: El Ghost te acaba de adelantar.</string>
     <string name="voice_poi_water">Punto de agua a %1$s metros.</string>
-    <string name="elite_voice_gender_title">Voz Masculina o Femenina</string>
-    <string name="voice_gender_auto">Predeterminada del sistema</string>
-    <string name="voice_gender_female">Voz Femenina</string>
-    <string name="voice_gender_male">Voz Masculina</string>
     <string name="voice_destination_near">Aproximación a meta: quedan %1$s.</string>
     <string name="elite_voice_surfaces_title">Cambios de Tipo de Terreno</string>
     <string name="elite_voice_surfaces_desc">Avisa al entrar en tramos de grava, sendero/MTB o asfalto indicando la longitud</string>

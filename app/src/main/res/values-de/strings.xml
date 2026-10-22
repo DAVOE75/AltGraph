@@ -262,10 +262,6 @@
     <string name="voice_kghost_overtake_lead">Achtung: Du hast den Ghost überholt. Neue Rennspitze.</string>
     <string name="voice_kghost_overtaken">Achtung: Der Ghost hat dich überholt.</string>
     <string name="voice_poi_water">Wasserstelle in %1$s Metern.</string>
-    <string name="elite_voice_gender_title">Stimmgeschlecht</string>
-    <string name="voice_gender_auto">Systemstandard</string>
-    <string name="voice_gender_female">Weibliche Stimme</string>
-    <string name="voice_gender_male">Männliche Stimme</string>
     <string name="voice_destination_near">Zielankunft naht: noch %1$s.</string>
     <string name="elite_voice_surfaces_title">Untergrundwechsel</string>
     <string name="elite_voice_surfaces_desc">Sprachansagen beim Wechsel auf Schotter, MTB-Trails oder Asphalt mit Längenangabe</string>
