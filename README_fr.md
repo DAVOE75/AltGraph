@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v2.2 REVOLUTION)
+# ALTGRAPH (v2.3 REVOLUTION)
 <p>Lire en : <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** est une extension professionnelle d'altimétrie et de performance cycliste de nouvelle génération pour les compteurs GPS **Hammerhead Karoo** (Karoo 2 et Karoo 3), développée par **hesiOX** à l'aide du SDK officiel `karoo-ext`.
@@ -10,6 +10,23 @@ Elle révolutionne le concept traditionnel de l'altimétrie cycliste en intégra
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />
 </p>
+
+## VERSION 2.3 : ALERTES VOCALES DE TYPE DE SURFACE (GRAVIER / VTT / ASPHALTE) & CHOIX DE VOIX
+
+Dans la version 2.3, AltGraph enrichit le **Copilote Vocal** avec la reconnaissance du type de surface et une personnalisation audio avancée :
+
+* **Annonces des Secteurs de Surface (Gravier / Sentier / Asphalte)** :
+  * Détection automatique des changements de revêtement via les POIs/waypoints du parcours (`gravel`, `grava`, `ripio`, `sterrato`, `kies`, `trail`, `sendero`, `mtb`, `singletrack`, `asfalto`, `asphalt`, `road`, `paved`).
+  * Annonce vocale anticipée à l'entrée du secteur indiquant le type de revêtement et la distance exacte jusqu'au prochain changement. Exemple : *"Entrée dans un secteur de gravier, pendant 2,4 kilomètres"* ou *"Entrée dans un secteur de sentier, pendant 800 mètres"*.
+  * Interrupteur indépendant dans le menu **ELITE > Copilote Vocal**.
+* **Sélecteur de Voix Féminine / Masculine** :
+  * Permet de choisir dans les paramètres du Copilote entre une voix féminine ou masculine.
+* **Précision & Synchronisation Acoustique Accrues** :
+  * Déclenchement au millimètre des annonces de sommet (500m et 100m) en temps réel et sans délai.
+  * Correction des alertes de position et de dépassement face au rival virtuel (Ghost).
+  * Traduction et vocalisation complètes dans les 6 langues (Français, Espagnol, Anglais, Allemand, Italien, Portugais).
+
+---
 
 ## VERSION 2.2 : COPILOTE VOCAL ALTIMÉTRIQUE PROFESSIONNEL (AUDIO BLUETOOTH / HAUT-PARLEUR)
 

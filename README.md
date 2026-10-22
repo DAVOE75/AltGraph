@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v2.2 REVOLUTION)
+# ALTGRAPH (v2.3 REVOLUTION)
 <p>Leer en: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 <p align="center">
@@ -18,6 +18,23 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## VERSION 2.3: AVISOS POR VOZ DE SUPERFICIE (GRAVEL / MTB / ASFALTO) Y SELECTOR DE VOZ
+
+En la versión 2.3, AltGraph amplía las capacidades del **Copiloto de Voz** con detección de terreno y personalización acústica avanzada:
+
+* **Avisos de Tramos de Superficie (Grava / Sendero / Asfalto)**:
+  * Detecta el cambio de superficie a través de waypoints/POIs en la ruta (`gravel`, `grava`, `ripio`, `sterrato`, `kies`, `trail`, `sendero`, `mtb`, `singletrack`, `asfalto`, `asphalt`, `road`, `paved`).
+  * Anuncio por voz anticipado al entrar en el sector indicando el tipo de superficie y la longitud exacta del tramo antes del siguiente cambio. Ejemplo: *"Entrando en tramo de grava, durante 2,4 kilómetros"* o *"Entrando en tramo de sendero, durante 800 metros"*.
+  * Interruptor independiente en los ajustes **ELITE > Copiloto por Voz**.
+* **Selector de Voz Femenina / Masculina**:
+  * Permite elegir en los ajustes del Copiloto por voz entre tono y timbre de voz femenino o masculino para una experiencia sonora totalmente adaptada al ciclista.
+* **Sincronización y Precisión del Copiloto**:
+  * Ajuste de timings en las alertas de cima (500m y 100m) para garantizar un aviso milimétrico en tiempo real sin retrasos.
+  * Corrección en las alertas de posición frente al rival virtual (Ghost) al liderar o ser rebasado.
+  * Localización completa de todas las nuevas locuciones en los 6 idiomas (Español, Inglés, Alemán, Francés, Italiano y Portugués).
+
+---
 
 ## VERSION 2.2: COPILOTO DE VOZ ALTIMETRICO PROFESIONAL (AUDIO BLUETOOTH / ALTAVOZ)
 

@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v2.2 REVOLUTION)
+# ALTGRAPH (v2.3 REVOLUTION)
 <p>Lesen auf: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** ist eine professionelle Höhen- und Leistungserweiterung der nächsten Generation für **Hammerhead Karoo** Fahrradcomputer (Karoo 2 und Karoo 3), entwickelt von **hesiOX** unter Verwendung des offiziellen `karoo-ext` SDKs.
@@ -10,6 +10,23 @@ Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 7 3D-Höhenv
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## VERSION 2.3: UNTERGRUND-SPRACHANSAGEN (SCHOTTER / TRAIL / ASPHALT) & STIMMEN-AUSWAHL
+
+In Version 2.3 erweitert AltGraph die Fähigkeiten des **Voice Copilot** um intelligente Geländebodenerkennung und akustische Personalisierung:
+
+* **Sprachansagen bei Untergrundwechsel (Schotter / Trail / Asphalt)**:
+  * Erkennt Streckenabschnittswechsel über Wegpunkte/POIs (`gravel`, `grava`, `ripio`, `sterrato`, `kies`, `trail`, `sendero`, `mtb`, `singletrack`, `asfalto`, `asphalt`, `road`, `paved`).
+  * Frühzeitige Sprachansage bei Einfahrt in den Abschnitt mit Untergrundart und exakter Abschnittslänge bis zum nächsten Wechsel. Beispiel: *"Einfahrt in Schotter-Abschnitt, für 2,4 Kilometer"* oder *"Einfahrt in Trail-Abschnitt, für 800 Meter"*.
+  * Separater Schalter in den Einstellungen unter **ELITE > Sprachansagen-Kopilot**.
+* **Auswahl Weibliche / Männliche Stimme**:
+  * Wählen Sie in den Einstellungen zwischen weiblicher und männlicher Stimmlage für eine optimale Sprachausgabe.
+* **Verbesserte Präzision & Timing**:
+  * Exakte Auslösung der Gipfelwarnungen (500m und 100m) in Echtzeit ohne Verzögerung.
+  * Korrektur der Überholansagen für den virtuellen Rivalen (Ghost).
+  * Vollständige Sprachunterstützung in allen 6 Sprachen (Deutsch, Englisch, Spanisch, Französisch, Italienisch, Portugiesisch).
+
+---
 
 ## VERSION 2.2: PROFESSIONELLER SPRACHANSAGEN-KOPILOT (AUDIO BLUETOOTH / LAUTSPRECHER)
 

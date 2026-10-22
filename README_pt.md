@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logotipo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v2.2 REVOLUTION)
+# ALTGRAPH (v2.3 REVOLUTION)
 <p>Ler em: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** é uma extensão profissional de altimetria e desempenho de ciclismo de última geração para os ciclocomputadores **Hammerhead Karoo** (Karoo 2 e Karoo 3), desenvolvida por **hesiOX** utilizando o SDK oficial `karoo-ext`.
@@ -10,6 +10,23 @@ Revoluciona o conceito tradicional de altimetria de ciclismo incorporando um **C
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logotipo ALTGRAPH" width="350" />
 </p>
+
+## VERSÃO 2.3: AVISOS POR VOZ DE SUPERFÍCIE (CASCALHO / TRILHA / ASFALTO) & SELETOR DE VOZ
+
+Na versão 2.3, o AltGraph alarga as capacidades do **Copiloto de Voz** com a deteção do tipo de piso e personalização acústica avançada:
+
+* **Avisos de Troços de Superfície (Cascalho / Trilha / Asfalto)**:
+  * Deteção da transição de superfície através de waypoints/POIs no traçado (`gravel`, `grava`, `ripio`, `sterrato`, `kies`, `trail`, `sendero`, `mtb`, `singletrack`, `asfalto`, `asphalt`, `road`, `paved`).
+  * Anúncio por voz antecipado ao entrar no setor indicando o tipo de superfície e a distância exata até à próxima transição. Exemplo: *"Entrando em trecho de cascalho, durante 2,4 quilómetros"* ou *"Entrando em trecho de trilha, durante 800 metros"*.
+  * Interruptor independente nas definições **ELITE > Copiloto de Voz**.
+* **Seletor de Voz Feminina / Masculina**:
+  * Permite escolher nas definições entre timbre de voz feminino ou masculino para uma experiência à medida.
+* **Sincronização e Rigor do Copiloto**:
+  * Ajuste de cadência nos alertas de cume (500m e 100m) em tempo real sem latência.
+  * Correção dos alertas de posição e ultrapassagem face ao ciclista virtual (Ghost).
+  * Localização integral de todas as locuções nos 6 idiomas (Português, Espanhol, Inglês, Alemão, Francês, Italiano).
+
+---
 
 ## VERSÃO 2.2: COPILOTO DE VOZ ALTIMÉTRICO PROFISSIONAL (ÁUDIO BLUETOOTH / ALTIFALANTE)
 

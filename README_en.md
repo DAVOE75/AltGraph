@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v2.2 REVOLUTION)
+# ALTGRAPH (v2.3 REVOLUTION)
 <p>Read in: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 <p align="center">
@@ -18,6 +18,23 @@ It revolutionizes traditional cycling elevation profiles by featuring a **Suite 
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## VERSION 2.3: TERRAIN SURFACE AUDIO CUES (GRAVEL / MTB / ASPHALT) & VOICE SELECTOR
+
+In version 2.3, AltGraph expands the **Voice Copilot** capabilities with terrain awareness and enhanced acoustic personalization:
+
+* **Terrain Surface Sector Alerts (Gravel / Trail / Asphalt)**:
+  * Detects surface transitions via route waypoints/POIs (`gravel`, `grava`, `ripio`, `sterrato`, `kies`, `trail`, `sendero`, `mtb`, `singletrack`, `asfalto`, `asphalt`, `road`, `paved`).
+  * Spoken audio cues upon approaching/entering each sector, specifying the surface type and sector distance before the next transition. Example: *"Entering gravel sector, for 2.4 kilometers"* or *"Entering trail sector, for 800 meters"*.
+  * Dedicated toggle in **ELITE > Voice Copilot** settings.
+* **Female / Male Voice Selector**:
+  * Select between feminine or masculine voice pitch and timbre in Voice Copilot settings for personalized spoken audio.
+* **Refined Copilot Precision & Timing**:
+  * Fine-tuned summit countdown triggers (500m & 100m) ensuring zero lag.
+  * Corrected position logic for the virtual rival (Ghost) when leading or being overtaken.
+  * Full localization across all 6 supported languages (English, Spanish, German, French, Italian, Portuguese).
+
+---
 
 ## VERSION 2.2: PROFESSIONAL VOICE COPILOT (BLUETOOTH AUDIO / SPEAKER)
 

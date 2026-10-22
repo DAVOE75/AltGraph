@@ -1,17 +1,34 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v2.2 REVOLUTION)
+# ALTGRAPH (v2.3 REVOLUTION)
 <p>Leggi in: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
-**ALTGRAPH** è un'estensione professionale per l'altimetria e le prestazioni ciclistiche di ultima generazione per i ciclocomputer **Hammerhead Karoo** (Karoo 2 e Karoo 3), sviluppata da **hesiOX** utilizzando l'SDK ufficiale `karoo-ext`.
+**ALTGRAPH** è un'estensione professionale per l'altimetria e le prestazioni ciclistiche di ultima generazione per i ciclocomputer **Hammerhead Karoo** (Karoo 2 e Karoo 3), sviluppata da **hesiOX** utilizando l'SDK ufficiale `karoo-ext`.
 Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **Suite di 7 Modelli di Visualizzazione Altimetrica 3D**, telemetria biomeccanica, analisi metabolica e avvisi vocali in tempo reale.
 
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />
 </p>
 
-## VERSIONE 2.2: COPILOTA VOCALE ALTIMETRICO PROFESSIONALE (AUDIO BLUETOOTH / ALTOPARLANTE)
+## VERSIONE 2.3: AVVISI VOCALI TIPO DI SUPERFICIE (STERRATO / TRAIL / ASFALTO) & SELETTORE VOCE
+
+Nella versione 2.3, AltGraph amplia le funzionalità del **Voice Copilot** con il rilevamento del tipo di superficie e la personalizzazione acustica:
+
+* **Avvisi per Settori di Superficie (Sterrato / Sentiero / Asfalto)**:
+  * Rilevamento automatico del fondo stradale tramite POI/waypoint nel percorso (`gravel`, `grava`, `ripio`, `sterrato`, `kies`, `trail`, `sendero`, `mtb`, `singletrack`, `asfalto`, `asphalt`, `road`, `paved`).
+  * Avviso vocale anticipato all'ingresso del settore con tipo di superficie e lunghezza esatta fino alla variazione successiva. Esempio: *"Ingresso nel settore sterrato, per 2,4 chilometri"* o *"Ingresso nel settore sentiero, per 800 metri"*.
+  * Interruttore dedicato nelle impostazioni **ELITE > Copilota Vocale**.
+* **Selettore Voce Femminile / Maschile**:
+  * Consente di scegliere nelle impostazioni tra timbro vocale femminile o maschile.
+* **Precisione & Sincronizzazione Ottimizzate**:
+  * Avvisi per la cima (500m e 100m) perfettamente calibrati in tempo reale senza ritardi.
+  * Correzione degli annunci di posizione rispetto al rivale virtuale (Ghost) nei cambi al comando.
+  * Localizzazione completa in tutte le 6 lingue (Italiano, Spagnolo, Inglese, Tedesco, Francese, Portoghese).
+
+---
+
+## VERSIONE 2.2: COPILOTA VOCALE ALTIMETRICO PROFESSIONALE (AUDIO BLUETOOTH / ALTOPARLANTE)NTE)
 
 Nella versione 2.2, AltGraph introduce un sistema completo di **avvisi vocali audibili (Voice Copilot)** in background, compatibile con cuffie Bluetooth o altoparlante del Karoo e configurabile nella sezione **ELITE**:
 
