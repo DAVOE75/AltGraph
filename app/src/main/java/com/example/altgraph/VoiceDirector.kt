@@ -149,41 +149,87 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
         var voiceApplied = false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             try {
-                val currentLang = engine.language ?: Locale.getDefault()
+                val currentLocale = engine.voice?.locale ?: engine.language ?: Locale.getDefault()
                 val voices = engine.voices
                 if (!voices.isNullOrEmpty()) {
-                    val matchingVoices = voices.filter { v ->
-                        v.locale.language.equals(currentLang.language, ignoreCase = true)
+                    // 1. Filtrar voces por idioma (ej. "es", "en", "fr", "de", "it", "pt")
+                    val langVoices = voices.filter { v ->
+                        v.locale.language.equals(currentLocale.language, ignoreCase = true)
                     }
-                    val targetVoice = matchingVoices.firstOrNull { v ->
+
+                    // Preferir voces offline (sin necesidad de red para ciclismo outdoor)
+                    val offlineLangVoices = langVoices.filter { !it.isNetworkConnectionRequired }
+                    val pool = if (offlineLangVoices.isNotEmpty()) offlineLangVoices else langVoices
+
+                    // 2. Ordenar dando prioridad al acento regional exacto del país (ej. es_ES vs es_US, en_GB vs en_US)
+                    // y mayor calidad de sintetización de audio
+                    val targetCountry = currentLocale.country
+                    val sortedByAccentAndQuality = pool.sortedWith(
+                        compareByDescending<android.speech.tts.Voice> { v ->
+                            if (targetCountry.isNotEmpty() && v.locale.country.equals(targetCountry, ignoreCase = true)) 1 else 0
+                        }.thenByDescending { v ->
+                            v.quality
+                        }.thenBy { v ->
+                            v.latency
+                        }
+                    )
+
+                    // 3. Buscar la mejor voz masculina o femenina según identificadores reales de Google TTS / Android
+                    val targetVoice = sortedByAccentAndQuality.firstOrNull { v ->
                         val name = v.name.lowercase(Locale.US)
                         if (gender == "female") {
-                            name.contains("female") || name.contains("fem") || name.contains("-f-") || name.endsWith("f") || name.contains("woman")
+                            name.contains("female") || name.contains("-fem-") || name.contains("_fem_") ||
+                            name.contains("-f-") || name.endsWith("f") || name.contains("woman") ||
+                            name.contains("-eea-") || name.contains("-eec-") || name.contains("-eee-") ||
+                            name.contains("-fis-") || name.contains("-sfg-") || name.contains("-fra-") ||
+                            name.contains("-dea-") || name.contains("-ita-") || name.contains("-pta-") ||
+                            name.contains("a-local") || name.contains("c-local") || name.contains("e-local")
                         } else {
-                            (name.contains("male") && !name.contains("female")) || name.contains("-m-") || name.endsWith("m") || name.contains("man")
+                            (name.contains("male") && !name.contains("female")) || name.contains("-m-") ||
+                            name.contains("_m_") || name.endsWith("m") || name.contains("man") ||
+                            name.contains("-eeb-") || name.contains("-eed-") || name.contains("-eef-") ||
+                            name.contains("-tpd-") || name.contains("-rjs-") || name.contains("-frb-") ||
+                            name.contains("-frd-") || name.contains("-deb-") || name.contains("-ded-") ||
+                            name.contains("-itb-") || name.contains("-itd-") || name.contains("-ptb-") ||
+                            name.contains("-ptd-") || name.contains("b-local") || name.contains("d-local") ||
+                            name.contains("f-local")
                         }
-                    } ?: if (matchingVoices.size >= 2) {
-                        // En la mayoría de paquetes TTS de Android (Google / Pico / Samsung): voz 0 = femenina, voz 1 = masculina
-                        if (gender == "female") matchingVoices[0] else matchingVoices[1]
-                    } else null
+                    } ?: if (sortedByAccentAndQuality.size >= 2) {
+                        // En paquetes estándar de Google TTS, la alternancia es:
+                        // Índice 0 = Femenina (Voz 1), Índice 1 = Masculina (Voz 2), Índice 2 = Femenina (Voz 3), Índice 3 = Masculina (Voz 4)
+                        if (gender == "female") {
+                            sortedByAccentAndQuality.firstOrNull()
+                        } else {
+                            sortedByAccentAndQuality.getOrNull(1) ?: sortedByAccentAndQuality.getOrNull(3)
+                        }
+                    } else {
+                        sortedByAccentAndQuality.firstOrNull()
+                    }
 
                     if (targetVoice != null) {
                         engine.voice = targetVoice
                         voiceApplied = true
-                        Log.i(TAG, "Voice gender applied: ${targetVoice.name}")
+                        Log.i(TAG, "Natural voice selected: ${targetVoice.name} (accent=${targetVoice.locale}, quality=${targetVoice.quality})")
                     }
                 }
             } catch (e: Exception) {
-                Log.w(TAG, "Error setting voice gender", e)
+                Log.w(TAG, "Error setting voice gender/accent", e)
             }
         }
-        // Modulación acústica del tono (Pitch) para asegurar una voz claramente masculina o femenina en cualquier dispositivo
-        if (gender == "female") {
-            engine.setPitch(1.06f) // Voz femenina dulce, cálida y natural sin agudos estridentes
-        } else if (gender == "male") {
-            engine.setPitch(0.62f) // Tono grave, profundo, varonil y con empaque
+
+        // Si se aplicó una voz nativa real (de estudio / grabada), MANTENER el pitch en 1.0f natural
+        // para que se escuchen los formantes humanos reales sin distorsión metálica/robótica.
+        if (voiceApplied) {
+            engine.setPitch(1.0f) // 100% natural, cero distorsión
         } else {
-            engine.setPitch(1.0f)
+            // Solo si el dispositivo no tiene voz del género deseado y hay que emularla:
+            if (gender == "female") {
+                engine.setPitch(1.04f) // Modulación sutil, dulce y sin estridencias
+            } else if (gender == "male") {
+                engine.setPitch(0.88f) // Tono más grave pero completamente inteligible y humano (sin artefacto robótico)
+            } else {
+                engine.setPitch(1.0f)
+            }
         }
     }
 
