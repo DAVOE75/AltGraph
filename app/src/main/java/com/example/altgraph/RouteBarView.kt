@@ -161,6 +161,15 @@ class RouteBarView(context: Context) : View(context) {
      * cuadro de diamante, ruedas con radios/eje y cabeza con casco aerodinámico.
      */
     private fun drawCyclistVector(canvas: Canvas, cx: Float, cy: Float, size: Float, color: Int) {
+        val s = size / 24f
+        // Sombra sutil para resaltar sobre fondos claros o dinámicos
+        val shadowColor = Color.argb(125, 0, 0, 0)
+        renderCyclistVector(canvas, cx + 0.8f * s, cy + 1.0f * s, size, shadowColor)
+        // Dibujo principal en su color
+        renderCyclistVector(canvas, cx, cy, size, color)
+    }
+
+    private fun renderCyclistVector(canvas: Canvas, cx: Float, cy: Float, size: Float, color: Int) {
         val s = size / 24f // Escala normalizada en cuadrícula 24x24
         ghostWidgetStrokePaint.color = color
         ghostWidgetFillPaint.color = color

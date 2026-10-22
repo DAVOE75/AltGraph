@@ -31,6 +31,11 @@ data class SurfaceSegment(
     val length: Double get() = (endDistance - startDistance).coerceAtLeast(0.0)
 }
 
+data class HairpinInfo(
+    val distance: Double,
+    val isRight: Boolean
+)
+
 data class RouteClimb(
     val startDistance: Double,
     val endDistance: Double,
@@ -102,6 +107,7 @@ data class StrategyData(
     val blockSizeMeters: Double,
     val totalFatigueGrade: Int,
     val hairpins: List<Double>,
+    val hairpinsInfo: List<HairpinInfo> = emptyList(),
     val pois: List<Poi>,
     val curvatureOffsets: List<Float> = emptyList(),
     val riderProgress: Float = 0.0f,
@@ -247,8 +253,9 @@ class AltimetriaStrategyCalculator {
     var routeClimbs: List<RouteClimb> = emptyList()
     private var routeKeyForClimbs: String? = null
 
-    // Curvas de herradura (distancias absolutas detectadas)
+    // Curvas de herradura (distancias absolutas detectadas e información de dirección)
     private var absoluteHairpins = mutableListOf<Double>()
+    private var absoluteHairpinInfos = mutableListOf<HairpinInfo>()
     private val routePois = mutableListOf<Poi>()
     var routeSurfaceSegments = mutableListOf<SurfaceSegment>()
     
@@ -434,6 +441,9 @@ class AltimetriaStrategyCalculator {
                     routePoints = routePoints.map { it.copy(distance = it.distance * factor) }
                     if (absoluteHairpins.isNotEmpty()) {
                         absoluteHairpins = absoluteHairpins.map { it * factor }.toMutableList()
+                    }
+                    if (absoluteHairpinInfos.isNotEmpty()) {
+                        absoluteHairpinInfos = absoluteHairpinInfos.map { it.copy(distance = it.distance * factor) }.toMutableList()
                     }
                     // El perfil de elevación ya viene en distancia real de Karoo: no se escala
                     if (routeElevationProfile.isNotEmpty()) applyTrueElevationsToRoutePoints()
@@ -1638,6 +1648,7 @@ class AltimetriaStrategyCalculator {
 
     private fun detectHairpins() {
         absoluteHairpins.clear()
+        absoluteHairpinInfos.clear()
         if (routePoints.size < 3) return
         
         var lastP = routePoints[0]
@@ -1656,12 +1667,16 @@ class AltimetriaStrategyCalculator {
             val b1 = bearing(lastP.latitude, lastP.longitude, p1.latitude, p1.longitude)
             val b2 = bearing(p1.latitude, p1.longitude, p2.latitude, p2.longitude)
             
-            var diff = abs(b2 - b1)
-            if (diff > 180.0) diff = 360.0 - diff
+            var signedDiff = b2 - b1
+            while (signedDiff > 180.0) signedDiff -= 360.0
+            while (signedDiff < -180.0) signedDiff += 360.0
+            val absDiff = abs(signedDiff)
             
-            if (diff > 130.0) {
+            if (absDiff > 130.0) {
                 if (absoluteHairpins.isEmpty() || (p1.distance - absoluteHairpins.last() > 50.0)) {
+                    val isRight = signedDiff > 0.0
                     absoluteHairpins.add(p1.distance)
+                    absoluteHairpinInfos.add(HairpinInfo(p1.distance, isRight))
                 }
             }
             lastP = p1
@@ -1686,6 +1701,7 @@ class AltimetriaStrategyCalculator {
         this.routeClimbs = emptyList()
         this.routeKeyForClimbs = null
         this.absoluteHairpins.clear()
+        this.absoluteHairpinInfos.clear()
         this.routePois.clear()
         this.isNavigatingRoute = false
         this.activeRouteName = null
@@ -2075,6 +2091,10 @@ class AltimetriaStrategyCalculator {
             .map { it - windowStartDist }
             .filter { it in 0.0..actualLookahead }
 
+        val visibleHairpinsInfo = absoluteHairpinInfos.toList()
+            .map { it.copy(distance = it.distance - windowStartDist) }
+            .filter { it.distance in 0.0..actualLookahead }
+
         val showPoiTowns = prefs?.showPoiTowns ?: true
         val showPoiWater = prefs?.showPoiWater ?: true
         val showPoiViewpoints = prefs?.showPoiViewpoints ?: true
@@ -2308,6 +2328,7 @@ class AltimetriaStrategyCalculator {
             blockSizeMeters = majorBlockSize,
             totalFatigueGrade = totalGf,
             hairpins = visibleHairpins,
+            hairpinsInfo = visibleHairpinsInfo,
             pois = visiblePois,
             curvatureOffsets = curvatureOffsets,
             riderProgress = riderProgress,
@@ -2447,6 +2468,10 @@ class AltimetriaStrategyCalculator {
             .filter { it in startDist..endDist }
             .map { it - startDist }
 
+        val visibleHairpinsInfo = absoluteHairpinInfos.toList()
+            .filter { it.distance in startDist..endDist }
+            .map { it.copy(distance = it.distance - startDist) }
+
         return StrategyData(
             remainingDistance = climb.length,
             timeToSummit = 0L,
@@ -2456,6 +2481,7 @@ class AltimetriaStrategyCalculator {
             blockSizeMeters = majorBlock,
             totalFatigueGrade = climb.apm.roundToInt(),
             hairpins = visibleHairpins,
+            hairpinsInfo = visibleHairpinsInfo,
             pois = emptyList(),
             curvatureOffsets = emptyList(),
             riderProgress = progress,

@@ -179,9 +179,9 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
         }
         // Modulación acústica del tono (Pitch) para asegurar una voz claramente masculina o femenina en cualquier dispositivo
         if (gender == "female") {
-            engine.setPitch(1.22f)
+            engine.setPitch(1.06f) // Voz femenina dulce, cálida y natural sin agudos estridentes
         } else if (gender == "male") {
-            engine.setPitch(0.72f) // Tono grave profundo claramente masculino
+            engine.setPitch(0.62f) // Tono grave, profundo, varonil y con empaque
         } else {
             engine.setPitch(1.0f)
         }
@@ -421,16 +421,42 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
              }
          }
 
-         // 4. CURVAS DE HERRADURA (Apex)
+         // 4. CURVAS DE HERRADURA Y CURVAS CERRADAS (Apex en subida y bajada con sentido derecha/izquierda)
+         val hairpinsInfoList: List<HairpinInfo> = strategy.hairpinsInfo
          val hairpinsList: List<Double> = strategy.hairpins
-         if (prefs.voiceHairpinsEnabled && hairpinsList.isNotEmpty()) {
-             val nextHairpin = hairpinsList.firstOrNull { h -> h > currentDist && (h - currentDist) in 40.0..120.0 }
-             if (nextHairpin != null && (nextHairpin - lastAnnouncedHairpinDistance) > 300.0) {
-                 lastAnnouncedHairpinDistance = nextHairpin
-                 val distAhead = (nextHairpin - currentDist).toInt()
-                 val gradeAtHairpin = String.format(Locale.getDefault(), "%.0f", strategy.visibleAvgGrade.coerceAtLeast(8.0))
-                 val phrase = context.getString(R.string.voice_hairpin_ahead, distAhead.toString(), gradeAtHairpin)
-                 speak(phrase, priority = false)
+         if (prefs.voiceHairpinsEnabled && (hairpinsInfoList.isNotEmpty() || hairpinsList.isNotEmpty())) {
+             val isDescent = speed > 6.94 || strategy.visibleAvgGrade < -1.5 // > 25 km/h o bajando
+             val minLookahead = if (isDescent) 60.0 else 40.0
+             val maxLookahead = if (isDescent) 160.0 else 120.0
+
+             val nextHairpinInfo = hairpinsInfoList.firstOrNull { h ->
+                 val dAhead = h.distance - currentDist
+                 dAhead in minLookahead..maxLookahead
+             }
+
+             val nextHairpinDist = nextHairpinInfo?.distance ?: hairpinsList.firstOrNull { h ->
+                 val dAhead = h - currentDist
+                 dAhead in minLookahead..maxLookahead
+             }
+
+             if (nextHairpinDist != null && (nextHairpinDist - lastAnnouncedHairpinDistance) > 300.0) {
+                 lastAnnouncedHairpinDistance = nextHairpinDist
+                 val distAhead = (nextHairpinDist - currentDist).toInt()
+                 val isRight = nextHairpinInfo?.isRight
+                 val dirText = when (isRight) {
+                     true -> context.getString(R.string.voice_direction_right)
+                     false -> context.getString(R.string.voice_direction_left)
+                     null -> ""
+                 }
+
+                 if (isDescent) {
+                     val phrase = context.getString(R.string.voice_hairpin_descent, dirText, distAhead.toString())
+                     speak(phrase, priority = true)
+                 } else {
+                     val gradeAtHairpin = String.format(Locale.getDefault(), "%.0f", strategy.visibleAvgGrade.coerceAtLeast(8.0))
+                     val phrase = context.getString(R.string.voice_hairpin_ahead, dirText, distAhead.toString(), gradeAtHairpin)
+                     speak(phrase, priority = false)
+                 }
              }
          }
 
@@ -580,10 +606,11 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                             "$mins $minUnit $secs $secUnit"
                         }
                     }
+                    val distVoiceStr = formatDistanceVoice(meters)
                     val phrase = if (isLeading) {
-                        context.getString(R.string.voice_kghost_lead, meters.toString(), timeStr)
+                        context.getString(R.string.voice_kghost_lead, distVoiceStr, timeStr)
                     } else {
-                        context.getString(R.string.voice_kghost_chase, meters.toString(), timeStr)
+                        context.getString(R.string.voice_kghost_chase, distVoiceStr, timeStr)
                     }
                     speak(phrase, priority = false)
                 }
@@ -622,5 +649,27 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
         speechQueue.clear()
         announcedPoiNames.clear()
         INSTANCE = null
+    }
+
+    private fun formatDistanceVoice(meters: Int): String {
+        return if (meters >= 1000) {
+            val km = meters / 1000.0
+            val kmRounded = Math.round(km * 10.0) / 10.0
+            val isExact = (kmRounded * 10).toLong() % 10L == 0L
+            val kmStr = if (isExact) kmRounded.toInt().toString() else String.format(Locale.getDefault(), "%.1f", kmRounded)
+            val unit = if (kmRounded <= 1.05) {
+                context.getString(R.string.voice_unit_km_singular)
+            } else {
+                context.getString(R.string.voice_unit_km_plural)
+            }
+            "$kmStr $unit"
+        } else {
+            val unit = if (meters == 1) {
+                context.getString(R.string.voice_unit_meter)
+            } else {
+                context.getString(R.string.voice_unit_meters)
+            }
+            "$meters $unit"
+        }
     }
 }
