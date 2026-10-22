@@ -177,11 +177,11 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                 Log.w(TAG, "Error setting voice gender", e)
             }
         }
-        // Modulación acústica del tono (Pitch): si el motor TTS sólo tiene una voz instalada o para acentuar el timbre
+        // Modulación acústica del tono (Pitch) para asegurar una voz claramente masculina o femenina en cualquier dispositivo
         if (gender == "female") {
-            engine.setPitch(if (voiceApplied) 1.05f else 1.25f)
+            engine.setPitch(1.22f)
         } else if (gender == "male") {
-            engine.setPitch(if (voiceApplied) 0.95f else 0.78f)
+            engine.setPitch(0.72f) // Tono grave profundo claramente masculino
         } else {
             engine.setPitch(1.0f)
         }

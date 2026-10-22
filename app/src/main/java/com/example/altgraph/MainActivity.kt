@@ -1578,6 +1578,114 @@ class MainActivity : Activity() {
             visibility = if (switchVoiceMaster.isChecked && prefs.isEliteUnlocked) View.VISIBLE else View.GONE
         }
 
+        // ── SELECTOR DESTACADO DE GÉNERO DE VOZ (ARRIBA DE LAS OPCIONES) ──
+        val voiceGenderCard = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundColor(Color.parseColor("#1E293B"))
+            setPadding(16, 12, 16, 14)
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                bottomMargin = 14
+            }
+            layoutParams = params
+        }
+
+        val voiceGenderHeader = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+
+        val voiceGenderTitle = TextView(this).apply {
+            text = getString(R.string.elite_voice_gender_title)
+            textSize = 14f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.WHITE)
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+        }
+        voiceGenderHeader.addView(voiceGenderTitle)
+        voiceGenderCard.addView(voiceGenderHeader)
+
+        // Botones segmentados: Femenina / Masculina / Automática
+        val genderButtonsLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setPadding(0, 8, 0, 0)
+        }
+
+        val btnFemale = Button(this)
+        val btnMale = Button(this)
+        val btnAuto = Button(this)
+
+        fun updateGenderButtonStyles() {
+            val current = prefs.voiceGender
+            val activeBg = Color.parseColor("#00E676")
+            val inactiveBg = Color.parseColor("#334155")
+            val activeText = Color.BLACK
+            val inactiveText = Color.WHITE
+
+            btnFemale.setBackgroundColor(if (current == "female") activeBg else inactiveBg)
+            btnFemale.setTextColor(if (current == "female") activeText else inactiveText)
+
+            btnMale.setBackgroundColor(if (current == "male") activeBg else inactiveBg)
+            btnMale.setTextColor(if (current == "male") activeText else inactiveText)
+
+            btnAuto.setBackgroundColor(if (current == "auto") activeBg else inactiveBg)
+            btnAuto.setTextColor(if (current == "auto") activeText else inactiveText)
+        }
+
+        val btnParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f).apply {
+            marginEnd = 6
+        }
+        val btnParamsLast = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+
+        btnFemale.apply {
+            text = "♀ " + getString(R.string.voice_gender_female)
+            textSize = 12f
+            typeface = Typeface.DEFAULT_BOLD
+            layoutParams = btnParams
+            isEnabled = prefs.isEliteUnlocked
+            setOnClickListener {
+                prefs.voiceGender = "female"
+                updateGenderButtonStyles()
+                VoiceDirector.getInstance(this@MainActivity).speak(getString(R.string.voice_gender_female), priority = true)
+            }
+        }
+
+        btnMale.apply {
+            text = "♂ " + getString(R.string.voice_gender_male)
+            textSize = 12f
+            typeface = Typeface.DEFAULT_BOLD
+            layoutParams = btnParams
+            isEnabled = prefs.isEliteUnlocked
+            setOnClickListener {
+                prefs.voiceGender = "male"
+                updateGenderButtonStyles()
+                VoiceDirector.getInstance(this@MainActivity).speak(getString(R.string.voice_gender_male), priority = true)
+            }
+        }
+
+        btnAuto.apply {
+            text = getString(R.string.voice_gender_auto)
+            textSize = 11f
+            layoutParams = btnParamsLast
+            isEnabled = prefs.isEliteUnlocked
+            setOnClickListener {
+                prefs.voiceGender = "auto"
+                updateGenderButtonStyles()
+                VoiceDirector.getInstance(this@MainActivity).speak(getString(R.string.voice_gender_auto), priority = true)
+            }
+        }
+
+        updateGenderButtonStyles()
+
+        genderButtonsLayout.addView(btnFemale)
+        genderButtonsLayout.addView(btnMale)
+        genderButtonsLayout.addView(btnAuto)
+        voiceGenderCard.addView(genderButtonsLayout)
+
+        voiceOptionsLayout.addView(voiceGenderCard)
+
         val switchVoiceClimbs = Switch(this).apply {
             text = getString(R.string.elite_voice_climbs_title)
             textSize = 14f
@@ -1874,43 +1982,6 @@ class MainActivity : Activity() {
         voiceOptionsLayout.addView(switchVoiceSurfaces)
         voiceOptionsLayout.addView(textVoiceSurfacesDesc)
 
-        // Género de Voz (Masculina / Femenina / Por defecto)
-        val voiceGenderLayout = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(0, 0, 0, 8)
-        }
-        val voiceGenderLabel = TextView(this).apply {
-            text = getString(R.string.elite_voice_gender_title) + ": "
-            textSize = 13f
-            setTextColor(Color.LTGRAY)
-        }
-        val voiceGenderSpinner = Spinner(this).apply {
-            isEnabled = prefs.isEliteUnlocked
-            val options = arrayOf(
-                getString(R.string.voice_gender_auto),
-                getString(R.string.voice_gender_female),
-                getString(R.string.voice_gender_male)
-            )
-            val keys = arrayOf("auto", "female", "male")
-            val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, options)
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            this.adapter = adapter
-            val currentKey = prefs.voiceGender
-            val idx = keys.indexOf(currentKey).coerceAtLeast(0)
-            setSelection(idx)
-            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(p: AdapterView<*>?, v: View?, pos: Int, id: Long) {
-                    prefs.voiceGender = keys[pos]
-                    (v as? TextView)?.setTextColor(Color.parseColor("#4CAF50"))
-                }
-                override fun onNothingSelected(p: AdapterView<*>?) {}
-            }
-        }
-        voiceGenderLayout.addView(voiceGenderLabel)
-        voiceGenderLayout.addView(voiceGenderSpinner)
-        voiceOptionsLayout.addView(voiceGenderLayout)
-
         switchVoiceMaster.setOnCheckedChangeListener { _, isChecked ->
             prefs.voiceDirectorEnabled = isChecked
             voiceOptionsLayout.visibility = if (isChecked) View.VISIBLE else View.GONE
@@ -1981,7 +2052,9 @@ class MainActivity : Activity() {
             switchVoiceCadence.isEnabled = unlocked
             switchVoicePreChime.isEnabled = unlocked
             switchVoiceSurfaces.isEnabled = unlocked
-            voiceGenderSpinner.isEnabled = unlocked
+            btnFemale.isEnabled = unlocked
+            btnMale.isEnabled = unlocked
+            btnAuto.isEnabled = unlocked
             voiceOptionsLayout.visibility = if (unlocked && switchVoiceMaster.isChecked) View.VISIBLE else View.GONE
 
             // Los interruptores se crearon bloqueados (apagados): reflejar el estado real al desbloquear
