@@ -330,7 +330,16 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                      val climbName = climb.name ?: (context.getString(R.string.profile_tv_climb_item_prefix) + " " + (idx + 1))
                      val km = String.format(Locale.getDefault(), "%.1f", climb.length / 1000.0)
                      val avgGrade = String.format(Locale.getDefault(), "%.1f", climb.avgGrade)
-                     val catStr = if (climb.category.isNotBlank()) climb.category else ""
+                     val rawCat = climb.category.trim()
+                     val catStr = when {
+                         rawCat.contains("4") -> context.getString(R.string.voice_climb_cat_4)
+                         rawCat.contains("3") -> context.getString(R.string.voice_climb_cat_3)
+                         rawCat.contains("2") -> context.getString(R.string.voice_climb_cat_2)
+                         rawCat.contains("1") -> context.getString(R.string.voice_climb_cat_1)
+                         rawCat.contains("esp", ignoreCase = true) || rawCat.contains("hc", ignoreCase = true) || rawCat.contains("hors", ignoreCase = true) -> context.getString(R.string.voice_climb_cat_special)
+                         rawCat.isNotBlank() -> rawCat
+                         else -> ""
+                     }
                      val phrase = context.getString(R.string.voice_climb_start, climbName, km, avgGrade, catStr).trim()
                      speak(phrase, priority = true)
                      break

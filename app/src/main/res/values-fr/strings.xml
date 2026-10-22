@@ -274,4 +274,9 @@
     <string name="voice_unit_seconds">secondes</string>
     <string name="voice_unit_minute">minute</string>
     <string name="voice_unit_minutes">minutes</string>
+    <string name="voice_climb_cat_4">quatrième catégorie</string>
+    <string name="voice_climb_cat_3">troisième catégorie</string>
+    <string name="voice_climb_cat_2">deuxième catégorie</string>
+    <string name="voice_climb_cat_1">première catégorie</string>
+    <string name="voice_climb_cat_special">hors catégorie</string>
 </resources>
