@@ -215,7 +215,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             remainingDist = strategy.remainingDistance,
                             blockSizeMeters = strategy.blockSizeMeters,
                             fontScale = prefs.fontSize3dScale,
-                            lookaheadMeters = prefs.lookaheadMeters3d,
+                            lookaheadMeters = strategy.windowLengthMeters.toInt(),
                             showCotas = prefs.show3dCotas,
                             showRamps = prefs.show3dRamps,
                             showMaxGrade = prefs.showMaxGradient,

@@ -1878,15 +1878,10 @@ class AltimetriaStrategyCalculator {
 
         // ADAPTACIÓN DE ZOOM A LA RUTA:
         // Si tenemos una ruta activa y el zoom solicitado es mayor o igual a la longitud total,
-        // limitamos la ventana a la ruta completa empezando en el km 0 para no mostrar tramos planos.
-        if (totalRouteLength > 0.0 && (lookaheadDist >= totalRouteLength || lookaheadDist >= 100000.0)) {
+        // limitamos la ventana a la ruta completa empezando en el km 0 para no mostrar áreas planas más allá del final de ruta.
+        if (totalRouteLength > 500.0 && (lookaheadDist >= totalRouteLength || lookaheadDist >= 100000.0)) {
             windowStartDist = 0.0
-            actualLookahead = totalRouteLength.coerceAtMost(lookaheadDist)
-        } else if (lookaheadDist >= 100000.0) {
-            windowStartDist = 0.0
-            if (totalRouteLength > 0.0 && totalRouteLength < lookaheadDist) {
-                actualLookahead = totalRouteLength
-            }
+            actualLookahead = totalRouteLength
         }
         
         val windowEndDist = windowStartDist + actualLookahead
@@ -1945,10 +1940,14 @@ class AltimetriaStrategyCalculator {
         }
         val majorBlockSize = getMajorBlockSize(actualLookahead)
 
-        // Add extra blocks (+ 2) to buffer the right edge. As riderProgress increases, 
-        // the view slides left, revealing the right edge. Without extra blocks, it shows a black gap 
-        // until the 50m quantum window snaps and regenerates the array.
-        val numSubBlocks = (actualLookahead / subBlockSize).roundToInt().coerceIn(2, 2000) + 2
+        // Add extra blocks (+ 2) to buffer the right edge during local rolling window. 
+        // When viewing the entire route (actualLookahead == totalRouteLength), cap exactly at route end so no flat ground appears.
+        val isFullRouteView = totalRouteLength > 500.0 && actualLookahead >= (totalRouteLength - 1.0)
+        val numSubBlocks = if (isFullRouteView) {
+            (actualLookahead / subBlockSize).roundToInt().coerceIn(2, 2000)
+        } else {
+            (actualLookahead / subBlockSize).roundToInt().coerceIn(2, 2000) + 2
+        }
         val routeSubBlocks = mutableListOf<Float>()
         val routeSubBlocksMax = mutableListOf<Float>()
         val routeElevations = mutableListOf<Float>()
@@ -2028,23 +2027,26 @@ class AltimetriaStrategyCalculator {
         }
 
         // Reserva a la derecha medida en distancia (no en nº de bloques): cubre el desfase de la ventana
-        // cuantizada a 50 m y la inclinación del efecto 3D, para que nunca asome un hueco sin datos
-        val rightBufferMeters = quantumMeters + actualLookahead * 0.4
-        val rightBufferCount = Math.ceil(rightBufferMeters / subBlockSize).toInt().coerceIn(2, 500)
+        // cuantizada a 50 m y la inclinación del efecto 3D, para que nunca asome un hueco sin datos.
+        // En vista de ruta completa no añadimos buffer a la derecha para no mostrar tramos planos irreales.
+        val rightBufferMeters = if (isFullRouteView) 0.0 else (quantumMeters + actualLookahead * 0.4)
+        val rightBufferCount = if (isFullRouteView) 0 else Math.ceil(rightBufferMeters / subBlockSize).toInt().coerceIn(2, 500)
         val rightBufferBlocks = ArrayList<Float>(rightBufferCount)
-        for (j in numSubBlocks until numSubBlocks + rightBufferCount) {
-            val bStart = windowStartDist + (j * subBlockSize)
-            val bEnd = bStart + subBlockSize
-            val bElevDiff = getElevationAtDistance(bEnd) - getElevationAtDistance(bStart)
-            val bGrade = if (useTopographicCalculation) {
-                val distRealSq = subBlockSize * subBlockSize
-                val elevSq = bElevDiff * bElevDiff
-                val horizontalDist = if (distRealSq > elevSq) sqrt(distRealSq - elevSq) else subBlockSize
-                (bElevDiff / horizontalDist) * 100.0
-            } else {
-                (bElevDiff / subBlockSize) * 100.0
+        if (!isFullRouteView) {
+            for (j in numSubBlocks until numSubBlocks + rightBufferCount) {
+                val bStart = windowStartDist + (j * subBlockSize)
+                val bEnd = bStart + subBlockSize
+                val bElevDiff = getElevationAtDistance(bEnd) - getElevationAtDistance(bStart)
+                val bGrade = if (useTopographicCalculation) {
+                    val distRealSq = subBlockSize * subBlockSize
+                    val elevSq = bElevDiff * bElevDiff
+                    val horizontalDist = if (distRealSq > elevSq) sqrt(distRealSq - elevSq) else subBlockSize
+                    (bElevDiff / horizontalDist) * 100.0
+                } else {
+                    (bElevDiff / subBlockSize) * 100.0
+                }
+                rightBufferBlocks.add(bGrade.toFloat())
             }
-            rightBufferBlocks.add(bGrade.toFloat())
         }
 
         // Construcción de bloques mayores para telemetría y rótulos

@@ -297,4 +297,8 @@
     <string name="surface_gravel">grava</string>
     <string name="surface_trail">sendero de tierra</string>
     <string name="surface_asphalt">asfalto</string>
+    <string name="voice_unit_second">segundo</string>
+    <string name="voice_unit_seconds">segundos</string>
+    <string name="voice_unit_minute">minuto</string>
+    <string name="voice_unit_minutes">minutos</string>
 </resources>

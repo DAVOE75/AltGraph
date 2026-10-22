@@ -142,7 +142,11 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     }
 
     private fun applyVoiceGender(engine: TextToSpeech, gender: String) {
-        if (gender == "auto") return
+        if (gender == "auto") {
+            engine.setPitch(1.0f)
+            return
+        }
+        var voiceApplied = false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             try {
                 val currentLang = engine.language ?: Locale.getDefault()
@@ -154,23 +158,32 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                     val targetVoice = matchingVoices.firstOrNull { v ->
                         val name = v.name.lowercase(Locale.US)
                         if (gender == "female") {
-                            name.contains("female") || name.contains("fem") || name.contains("-f-") || name.endsWith("f")
+                            name.contains("female") || name.contains("fem") || name.contains("-f-") || name.endsWith("f") || name.contains("woman")
                         } else {
-                            name.contains("male") && !name.contains("female") || name.contains("-m-") || name.endsWith("m")
+                            (name.contains("male") && !name.contains("female")) || name.contains("-m-") || name.endsWith("m") || name.contains("man")
                         }
                     } ?: if (matchingVoices.size >= 2) {
-                        // En Android TTS común: primera voz = mujer, segunda voz = hombre
+                        // En la mayoría de paquetes TTS de Android (Google / Pico / Samsung): voz 0 = femenina, voz 1 = masculina
                         if (gender == "female") matchingVoices[0] else matchingVoices[1]
                     } else null
 
                     if (targetVoice != null) {
                         engine.voice = targetVoice
+                        voiceApplied = true
                         Log.i(TAG, "Voice gender applied: ${targetVoice.name}")
                     }
                 }
             } catch (e: Exception) {
                 Log.w(TAG, "Error setting voice gender", e)
             }
+        }
+        // Modulación acústica del tono (Pitch): si el motor TTS sólo tiene una voz instalada o para acentuar el timbre
+        if (gender == "female") {
+            engine.setPitch(if (voiceApplied) 1.05f else 1.25f)
+        } else if (gender == "male") {
+            engine.setPitch(if (voiceApplied) 0.95f else 0.78f)
+        } else {
+            engine.setPitch(1.0f)
         }
     }
 
@@ -209,7 +222,10 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
         if (!isTtsReady || tts == null) return
 
         val prefs = AppPreferences.getInstance(context)
-        tts?.setSpeechRate(prefs.voiceSpeechRate)
+        tts?.let { engine ->
+            engine.setSpeechRate(prefs.voiceSpeechRate)
+            applyVoiceGender(engine, prefs.voiceGender)
+        }
 
         requestAudioFocus()
         lastSpokenTimeMs = System.currentTimeMillis()
@@ -366,7 +382,12 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                  if (avgUpcoming >= threshold && (currentDist - lastAnnouncedSteepDistance) > 1500.0) {
                      lastAnnouncedSteepDistance = currentDist
                      val meters = (lookAheadCount * subBlockSize).toInt()
-                     val gradeFormatted = String.format(Locale.getDefault(), "%.1f", avgUpcoming)
+                     val rounded = Math.round(avgUpcoming * 10.0) / 10.0
+                     val gradeFormatted = if (rounded % 1.0 == 0.0) {
+                         String.format(Locale.getDefault(), "%.0f", rounded)
+                     } else {
+                         String.format(Locale.getDefault(), "%.1f", rounded)
+                     }
                      val phrase = context.getString(R.string.voice_steep_ahead, meters.toString(), gradeFormatted)
                      speak(phrase, priority = false)
                  } else if (strategy.visibleAvgGrade >= 8.0 && avgUpcoming < 3.5 && (currentDist - lastAnnouncedReliefDistance) > 2000.0) {
@@ -530,8 +551,21 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                 val interval = prefs.voiceKGhostIntervalMeters.coerceAtLeast(500.0)
                 if ((currentDist - lastAnnouncedKGhostDistance) >= interval) {
                     lastAnnouncedKGhostDistance = currentDist
-                    val absSeconds = Math.abs(Math.round(timeS))
-                    val timeStr = if (absSeconds < 60) "$absSeconds s" else String.format(Locale.getDefault(), "%d:%02d", absSeconds / 60, absSeconds % 60)
+                    val absSeconds = Math.abs(Math.round(timeS)).toLong()
+                    val timeStr = if (absSeconds < 60) {
+                        val unit = if (absSeconds == 1L) context.getString(R.string.voice_unit_second) else context.getString(R.string.voice_unit_seconds)
+                        "$absSeconds $unit"
+                    } else {
+                        val mins = absSeconds / 60
+                        val secs = absSeconds % 60
+                        val minUnit = if (mins == 1L) context.getString(R.string.voice_unit_minute) else context.getString(R.string.voice_unit_minutes)
+                        if (secs == 0L) {
+                            "$mins $minUnit"
+                        } else {
+                            val secUnit = if (secs == 1L) context.getString(R.string.voice_unit_second) else context.getString(R.string.voice_unit_seconds)
+                            "$mins $minUnit $secs $secUnit"
+                        }
+                    }
                     val phrase = if (isLeading) {
                         context.getString(R.string.voice_kghost_lead, meters.toString(), timeStr)
                     } else {

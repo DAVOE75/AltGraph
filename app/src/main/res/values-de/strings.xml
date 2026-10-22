@@ -270,4 +270,8 @@
     <string name="surface_gravel">Schotter</string>
     <string name="surface_trail">Singletrail</string>
     <string name="surface_asphalt">Asphalt</string>
+    <string name="voice_unit_second">Sekunde</string>
+    <string name="voice_unit_seconds">Sekunden</string>
+    <string name="voice_unit_minute">Minute</string>
+    <string name="voice_unit_minutes">Minuten</string>
 </resources>

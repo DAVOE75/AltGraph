@@ -270,4 +270,8 @@
     <string name="surface_gravel">gravel</string>
     <string name="surface_trail">sentier VTT</string>
     <string name="surface_asphalt">asphalte</string>
+    <string name="voice_unit_second">seconde</string>
+    <string name="voice_unit_seconds">secondes</string>
+    <string name="voice_unit_minute">minute</string>
+    <string name="voice_unit_minutes">minutes</string>
 </resources>
