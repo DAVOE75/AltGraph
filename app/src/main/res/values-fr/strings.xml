@@ -279,4 +279,8 @@
     <string name="voice_climb_cat_2">deuxième catégorie</string>
     <string name="voice_climb_cat_1">première catégorie</string>
     <string name="voice_climb_cat_special">hors catégorie</string>
+    <string name="voice_finish_5km">5 kilomètres</string>
+    <string name="voice_finish_2km">2 kilomètres</string>
+    <string name="voice_finish_1km">1 kilomètre</string>
+    <string name="voice_finish_500m">500 mètres</string>
 </resources>

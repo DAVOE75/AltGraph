@@ -279,4 +279,8 @@
     <string name="voice_climb_cat_2">zweite Kategorie</string>
     <string name="voice_climb_cat_1">erste Kategorie</string>
     <string name="voice_climb_cat_special">höchste Kategorie, Ehrenkategorie</string>
+    <string name="voice_finish_5km">5 Kilometer</string>
+    <string name="voice_finish_2km">2 Kilometer</string>
+    <string name="voice_finish_1km">1 Kilometer</string>
+    <string name="voice_finish_500m">500 Meter</string>
 </resources>

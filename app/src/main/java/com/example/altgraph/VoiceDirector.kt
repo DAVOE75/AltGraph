@@ -306,15 +306,15 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
          val speed = snapshot.currentSpeed
 
          // Acumular tiempo y distancia en movimiento para velocidad media real
-         if (speed > 1.0) {
+         if (speed > 0.8) {
              rideMovingTimeSeconds += 1L
              rideDistanceMetersAccumulated += speed
          }
 
          // Acumular ganancia de elevación estimada
-         if (lastRecordedElevation > 0.0 && elev > lastRecordedElevation && speed > 0.5) {
+         if (lastRecordedElevation > 0.0 && elev > lastRecordedElevation && speed > 0.4) {
              val delta = elev - lastRecordedElevation
-             if (delta in 0.2..15.0) { // Descartar saltos o ruido
+             if (delta in 0.05..15.0) { // Contar ganancias graduales sin saltos anómalos
                  estimatedElevationGain += delta
              }
          }
@@ -470,7 +470,12 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
          val totalRoute = snapshot.routeTotalLength
          if (totalRoute > 1000.0) {
              val remainingDist = totalRoute - currentDist
-             val finishMilestones = listOf(5000 to "5 kilómetros", 2000 to "2 kilómetros", 1000 to "1 kilómetro", 500 to "500 metros")
+             val finishMilestones = listOf(
+                 5000 to context.getString(R.string.voice_finish_5km),
+                 2000 to context.getString(R.string.voice_finish_2km),
+                 1000 to context.getString(R.string.voice_finish_1km),
+                 500 to context.getString(R.string.voice_finish_500m)
+             )
              for ((thresholdMeters, label) in finishMilestones) {
                  if (remainingDist <= thresholdMeters && remainingDist >= (thresholdMeters - 150) && lastAnnouncedFinishKm > thresholdMeters) {
                      lastAnnouncedFinishKm = thresholdMeters

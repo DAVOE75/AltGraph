@@ -306,4 +306,8 @@
     <string name="voice_climb_cat_2">category 2</string>
     <string name="voice_climb_cat_1">category 1</string>
     <string name="voice_climb_cat_special">hors catégorie, special category</string>
+    <string name="voice_finish_5km">5 kilometers</string>
+    <string name="voice_finish_2km">2 kilometers</string>
+    <string name="voice_finish_1km">1 kilometer</string>
+    <string name="voice_finish_500m">500 meters</string>
 </resources>
