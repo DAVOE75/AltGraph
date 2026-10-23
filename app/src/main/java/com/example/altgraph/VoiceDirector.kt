@@ -460,7 +460,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
          }
 
          // 4. CURVAS DE HERRADURA Y CURVAS CERRADAS (Apex en subida y bajada con sentido derecha/izquierda)
-         val hairpinsInfoList: List<HairpinInfo> = strategy.hairpinsInfo
+         val hairpinsInfoList: List<HairpinInfo> =          strategy.allHairpinsInfo
          if (prefs.voiceHairpinsEnabled && hairpinsInfoList.isNotEmpty()) {
              val isDescent = speed > 6.94 || strategy.visibleAvgGrade < -1.5 // > 25 km/h o bajando
              // El margen se adapta a la velocidad: ~12 s de antelación como máximo, ~5 s como mínimo

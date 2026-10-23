@@ -5,7 +5,7 @@ import io.hammerhead.karooext.extension.DataTypeImpl
 import io.hammerhead.karooext.extension.KarooExtension
 import kotlinx.coroutines.cancel
 
-class AltimetriaExtensionService : KarooExtension("altgraph", "2.8.4") {
+class AltimetriaExtensionService : KarooExtension("altgraph", "2.8.5") {
 
     override val types: List<DataTypeImpl> by lazy {
         listOf(

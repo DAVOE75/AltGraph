@@ -108,6 +108,8 @@ data class StrategyData(
     val totalFatigueGrade: Int,
     val hairpins: List<Double>,
     val hairpinsInfo: List<HairpinInfo> = emptyList(),
+    // Herraduras con distancia absoluta de ruta (hairpinsInfo es relativa a la ventana visible)
+    val allHairpinsInfo: List<HairpinInfo> = emptyList(),
     val pois: List<Poi>,
     val curvatureOffsets: List<Float> = emptyList(),
     val riderProgress: Float = 0.0f,
@@ -2439,6 +2441,7 @@ class AltimetriaStrategyCalculator {
             totalFatigueGrade = totalGf,
             hairpins = visibleHairpins,
             hairpinsInfo = visibleHairpinsInfo,
+            allHairpinsInfo = absoluteHairpinInfos.toList(),
             pois = visiblePois,
             curvatureOffsets = curvatureOffsets,
             riderProgress = riderProgress,
