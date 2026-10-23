@@ -18,6 +18,8 @@ data class Snapshot(
     val routeClimbs: List<RouteClimb>,
     // Hueco con el fantasma de KGhost (null si KGhost no publica)
     val ghostGap: GhostGap? = null,
+    // El Ghost ya cruzó la meta (ghostGap pasa a null)
+    val ghostFinished: Boolean = false,
     // W'bal: batería anaeróbica actual (julios). Null si no hay potenciómetro o FTP=0.
     val wbal: Double? = null,
     // Distancia desde posición actual (metros) donde W'bal llega a 0 al ritmo actual. Null = no aplica.
@@ -36,6 +38,7 @@ class AltgraphCore(val calculator: AltimetriaStrategyCalculator = AltimetriaStra
     // Últimas partes del hueco de KGhost (tiempo y distancia); null = sin dato
     var kghostTime: GapPart? = null
     var kghostDist: GapPart? = null
+    private var ghostFinished = false
     // W'bal: se acumula con cada tick (1 Hz). Se resetea cuando Power==0 o al inicio.
     private var wbalJoules: Double? = null  // null = sin potenciómetro todavía
 
@@ -77,6 +80,19 @@ class AltgraphCore(val calculator: AltimetriaStrategyCalculator = AltimetriaStra
             wbalFailureMeters = null
         }
 
+        val rawGap = combineGhostGap(kghostTime, kghostDist)
+        val routeTotal = if (calculator.routePoints.isNotEmpty()) calculator.routePoints.last().distance else 0.0
+        val riderDist = calculator.currentRouteDistance
+        val gapDist = rawGap?.distM
+        if (gapDist != null && routeTotal > 0.0) {
+            val ghostPos = riderDist - gapDist
+            if (ghostPos >= routeTotal - 30.0) {
+                ghostFinished = true
+            } else if (riderDist < 200.0 && ghostPos < routeTotal - 200.0) {
+                ghostFinished = false
+            }
+        }
+
         return Snapshot(
             strategy = strategy,
             currentElevation = calculator.currentElevation,
@@ -85,11 +101,13 @@ class AltgraphCore(val calculator: AltimetriaStrategyCalculator = AltimetriaStra
             currentHeading = calculator.currentHeading,
             currentSpeed = calculator.currentSpeed,
             currentRouteDistance = calculator.currentRouteDistance,
-            routeTotalLength = if (calculator.routePoints.isNotEmpty()) calculator.routePoints.last().distance else 0.0,
+            routeTotalLength = routeTotal,
             isNavigatingRoute = calculator.isNavigatingRoute,
             zoneColor = calculator.getZoneColor(calculator.currentElevation),
             routeClimbs = calculator.routeClimbs.toList(),
-            ghostGap = combineGhostGap(kghostTime, kghostDist),
+            // Con el Ghost ya en meta no se muestra ni se anuncia más hueco
+            ghostGap = if (ghostFinished) null else rawGap,
+            ghostFinished = ghostFinished,
             wbal = wbal,
             wbalFailureMeters = wbalFailureMeters
         )

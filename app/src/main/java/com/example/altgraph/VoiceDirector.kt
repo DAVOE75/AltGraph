@@ -67,6 +67,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     private var lastAnnouncedKGhostDistance = 0.0
     private var lastKGhostWasLeading: Boolean? = null
     private var ghostFinishAnnounced = false
+    private var ghostFinishedAtMs = 0L
     private var riderFinishGhostAnnounced = false
 
     private fun formatTimeVoice(totalSeconds: Long): String {
@@ -585,57 +586,65 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
 
         // 9. GAP CON RIVAL KGHOST
         if (prefs.voiceKGhostEnabled) {
-            val ghost = snapshot.ghostGap
-            val distM = ghost?.distM
-            val timeS = ghost?.timeS
-            if (ghost != null && distM != null && timeS != null) {
-                val meters = Math.abs(distM).toInt()
-                val isLeading = distM > 0.0 // En KGhost distancia positiva = ciclista real por delante
-
-                // Detectar Sorpasso / Cambio de líder
-                val previousState = lastKGhostWasLeading
-                if (previousState != null && previousState != isLeading && meters > 10 && !ghostFinishAnnounced) {
-                    lastKGhostWasLeading = isLeading
-                    if (isLeading) {
-                        speak(context.getString(R.string.voice_kghost_overtake_lead), priority = true)
-                    } else {
-                        speak(context.getString(R.string.voice_kghost_overtaken), priority = true)
-                    }
-                } else if (previousState == null) {
-                    lastKGhostWasLeading = isLeading
-                }
-
-                // El Ghost llega a meta antes que el ciclista (posición del Ghost = ciclista - distM)
-                val routeEnd = snapshot.routeTotalLength
-                val ghostAtFinish = routeEnd > 0.0 && (currentDist - distM) >= routeEnd
-                if (!ghostFinishAnnounced && ghostAtFinish && !isLeading && currentDist < routeEnd - 20.0) {
+            val routeEnd = snapshot.routeTotalLength
+            val riderAtFinish = routeEnd > 0.0 && currentDist >= routeEnd - 20.0
+            if (snapshot.ghostFinished) {
+                if (!ghostFinishAnnounced) {
                     ghostFinishAnnounced = true
-                    speak(context.getString(R.string.voice_kghost_finished), priority = true)
-                }
-                if (ghostAtFinish) ghostFinishAnnounced = true
-
-                // El ciclista llega a meta: tiempo respecto al Ghost
-                val riderRoute = snapshot.routeTotalLength
-                if (!riderFinishGhostAnnounced && riderRoute > 0.0 && currentDist >= riderRoute - 20.0) {
-                    riderFinishGhostAnnounced = true
-                    val gapStr = formatTimeVoice(Math.abs(Math.round(timeS)))
-                    val resId = if (isLeading) R.string.voice_kghost_finish_before else R.string.voice_kghost_finish_after
-                    speak(context.getString(resId, gapStr), priority = true)
-                }
-
-                // Con el Ghost ya en meta no hay más avisos de ventaja/persecución
-                // Avisos periódicos por intervalo de distancia (ej. cada 1000m)
-                val interval = prefs.voiceKGhostIntervalMeters.coerceAtLeast(500.0)
-                if (!ghostFinishAnnounced && (currentDist - lastAnnouncedKGhostDistance) >= interval) {
-                    lastAnnouncedKGhostDistance = currentDist
-                    val timeStr = formatTimeVoice(Math.abs(Math.round(timeS)))
-                    val distVoiceStr = formatDistanceVoice(meters)
-                    val phrase = if (isLeading) {
-                        context.getString(R.string.voice_kghost_lead, distVoiceStr, timeStr)
-                    } else {
-                        context.getString(R.string.voice_kghost_chase, distVoiceStr, timeStr)
+                    ghostFinishedAtMs = System.currentTimeMillis()
+                    if (!riderAtFinish && !riderFinishGhostAnnounced) {
+                        speak(context.getString(R.string.voice_kghost_finished), priority = true)
                     }
-                    speak(phrase, priority = false)
+                }
+                if (riderAtFinish && !riderFinishGhostAnnounced) {
+                    riderFinishGhostAnnounced = true
+                    val behind = (System.currentTimeMillis() - ghostFinishedAtMs) / 1000
+                    if (behind >= 1) {
+                        speak(context.getString(R.string.voice_kghost_finish_after, formatTimeVoice(behind)), priority = true)
+                    }
+                }
+            } else {
+                val ghost = snapshot.ghostGap
+                val distM = ghost?.distM
+                val timeS = ghost?.timeS
+                if (ghost != null && distM != null && timeS != null) {
+                    val meters = Math.abs(distM).toInt()
+                    val isLeading = distM > 0.0 // En KGhost distancia positiva = ciclista real por delante
+
+                    // Detectar Sorpasso / Cambio de líder
+                    val previousState = lastKGhostWasLeading
+                    if (previousState != null && previousState != isLeading && meters > 10) {
+                        lastKGhostWasLeading = isLeading
+                        if (isLeading) {
+                            speak(context.getString(R.string.voice_kghost_overtake_lead), priority = true)
+                        } else {
+                            speak(context.getString(R.string.voice_kghost_overtaken), priority = true)
+                        }
+                    } else if (previousState == null) {
+                        lastKGhostWasLeading = isLeading
+                    }
+
+                    // El ciclista llega a meta antes que el Ghost
+                    if (!riderFinishGhostAnnounced && riderAtFinish) {
+                        riderFinishGhostAnnounced = true
+                        val gapStr = formatTimeVoice(Math.abs(Math.round(timeS)))
+                        val resId = if (isLeading) R.string.voice_kghost_finish_before else R.string.voice_kghost_finish_after
+                        speak(context.getString(resId, gapStr), priority = true)
+                    }
+
+                    // Avisos periódicos por intervalo de distancia (ej. cada 1000m)
+                    val interval = prefs.voiceKGhostIntervalMeters.coerceAtLeast(500.0)
+                    if ((currentDist - lastAnnouncedKGhostDistance) >= interval) {
+                        lastAnnouncedKGhostDistance = currentDist
+                        val timeStr = formatTimeVoice(Math.abs(Math.round(timeS)))
+                        val distVoiceStr = formatDistanceVoice(meters)
+                        val phrase = if (isLeading) {
+                            context.getString(R.string.voice_kghost_lead, distVoiceStr, timeStr)
+                        } else {
+                            context.getString(R.string.voice_kghost_chase, distVoiceStr, timeStr)
+                        }
+                        speak(phrase, priority = false)
+                    }
                 }
             }
         }
