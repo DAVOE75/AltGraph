@@ -274,7 +274,7 @@ class AltimetriaStrategyCalculator {
     var mapZoomLevel: Double? = null
     var manualPanOffsetMeters: Double = 0.0
     private var pagedWindowStart: Double = -1.0
-    private fun actualLookaheadForPaging(lookahead: Double) = lookahead * 0.88
+    private fun actualLookaheadForPaging(lookahead: Double) = lookahead * 0.96
     var appContext: Context? = null
 
     fun updateLiveGrade(grade: Double) {
