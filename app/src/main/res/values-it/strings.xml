@@ -306,6 +306,7 @@
     <string name="beacon_color_green">Verde</string>
     <string name="beacon_color_orange">Arancione</string>
     <string name="beacon_color_white">Bianco</string>
+    <string name="setting_gear_show">Mostra il rapporto consigliato nel grafico 3D</string>
     <string name="setting_gear_title">Trasmissione (rapporto consigliato 3D)</string>
     <string name="setting_gear_desc">Inserisci i denti delle corone e dei pignoni della cassetta separati da virgole per adattare il rapporto consigliato alla tua bici</string>
     <string name="setting_gear_chainrings">Corone (es. 50,34)</string>

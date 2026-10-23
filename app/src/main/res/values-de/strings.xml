@@ -306,6 +306,7 @@
     <string name="beacon_color_green">Grün</string>
     <string name="beacon_color_orange">Orange</string>
     <string name="beacon_color_white">Weiß</string>
+    <string name="setting_gear_show">Empfohlenen Gang im 3D-Diagramm anzeigen</string>
     <string name="setting_gear_title">Schaltung (empfohlener Gang 3D)</string>
     <string name="setting_gear_desc">Gib die Zähne deiner Kettenblätter und Ritzel der Kassette durch Kommas getrennt ein, damit der empfohlene Gang zu deinem Rad passt</string>
     <string name="setting_gear_chainrings">Kettenblätter (z. B. 50,34)</string>

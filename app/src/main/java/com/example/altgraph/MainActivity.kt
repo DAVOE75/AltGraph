@@ -730,6 +730,13 @@ class MainActivity : Activity() {
             setTextColor(Color.LTGRAY)
             setPadding(0, 4, 0, 8)
         })
+        gearCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_gear_show)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.showGearBadge
+            setOnCheckedChangeListener { _, isChecked -> prefs.showGearBadge = isChecked }
+        })
         fun gearInput(label: String, current: String, onChange: (String) -> Unit) {
             gearCard.addView(createValueText(label))
             gearCard.addView(EditText(this).apply {

@@ -198,6 +198,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         altimetria3DView.wPrime = prefs.userWPrime
                         altimetria3DView.currentCadence = strategy.currentCadence
                         altimetria3DView.currentSpeedMs = snap.currentSpeed
+                        altimetria3DView.showGearBadge = prefs.showGearBadge
                         altimetria3DView.gearWallEnabled = prefs.gearWallEnabled
                         altimetria3DView.gearChainrings = prefs.gearChainrings
                         altimetria3DView.gearCassette = prefs.gearCassette

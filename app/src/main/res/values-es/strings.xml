@@ -333,6 +333,7 @@
     <string name="beacon_color_green">Verde</string>
     <string name="beacon_color_orange">Naranja</string>
     <string name="beacon_color_white">Blanco</string>
+    <string name="setting_gear_show">Mostrar marcha recomendada en el gráfico 3D</string>
     <string name="setting_gear_title">Transmisión (marcha recomendada 3D)</string>
     <string name="setting_gear_desc">Introduce los dientes de tus platos y los piñones del cassette separados por comas para que la marcha recomendada se adapte a tu bici</string>
     <string name="setting_gear_chainrings">Platos (ej. 50,34)</string>

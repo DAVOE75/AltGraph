@@ -306,6 +306,7 @@
     <string name="beacon_color_green">Vert</string>
     <string name="beacon_color_orange">Orange</string>
     <string name="beacon_color_white">Blanc</string>
+    <string name="setting_gear_show">Afficher le rapport conseillé sur le graphique 3D</string>
     <string name="setting_gear_title">Transmission (rapport conseillé 3D)</string>
     <string name="setting_gear_desc">Saisissez les dents de vos plateaux et les pignons de la cassette séparés par des virgules pour adapter le rapport conseillé à votre vélo</string>
     <string name="setting_gear_chainrings">Plateaux (ex. 50,34)</string>

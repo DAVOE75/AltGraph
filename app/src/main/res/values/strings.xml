@@ -333,6 +333,7 @@
     <string name="beacon_color_green">Green</string>
     <string name="beacon_color_orange">Orange</string>
     <string name="beacon_color_white">White</string>
+    <string name="setting_gear_show">Show recommended gear in 3D graph</string>
     <string name="setting_gear_title">Gearing (Global 3D gear hint)</string>
     <string name="setting_gear_desc">Enter your chainring teeth and cassette sprockets, separated by commas, so the recommended gear matches your bike</string>
     <string name="setting_gear_chainrings">Chainrings (e.g. 50,34)</string>

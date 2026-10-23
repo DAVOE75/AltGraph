@@ -46,6 +46,10 @@ class AppPreferences(context: Context) {
         get() = prefs.getInt(KEY_LOOKAHEAD_METERS_3D, 350)
         set(value) = prefs.edit().putInt(KEY_LOOKAHEAD_METERS_3D, value).apply()
 
+    var showGearBadge: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_GEAR_BADGE, true)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_GEAR_BADGE, value).apply()
+
     var show3dCotas: Boolean
         get() = prefs.getBoolean(KEY_SHOW_3D_COTAS, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_COTAS, value).apply()
@@ -382,6 +386,7 @@ class AppPreferences(context: Context) {
         private const val KEY_FONT_SIZE_3D_SCALE = "font_size_3d_scale"
         private const val KEY_SHOW_BLOCK_PERCENTAGES = "show_block_percentages"
         private const val KEY_LOOKAHEAD_METERS_3D = "lookahead_meters_3d"
+        private const val KEY_SHOW_GEAR_BADGE = "show_gear_badge"
         private const val KEY_SHOW_3D_COTAS = "show_3d_cotas"
         private const val KEY_SHOW_3D_RAMPS = "show_3d_ramps"
         private const val KEY_SHOW_MAX_GRADIENT = "show_max_gradient"

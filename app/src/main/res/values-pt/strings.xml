@@ -306,6 +306,7 @@
     <string name="beacon_color_green">Verde</string>
     <string name="beacon_color_orange">Laranja</string>
     <string name="beacon_color_white">Branco</string>
+    <string name="setting_gear_show">Mostrar marcha recomendada no gráfico 3D</string>
     <string name="setting_gear_title">Transmissão (marcha recomendada 3D)</string>
     <string name="setting_gear_desc">Introduza os dentes das coroas e as roldanas da cassete separados por vírgulas para adaptar a marcha recomendada à sua bicicleta</string>
     <string name="setting_gear_chainrings">Coroas (ex. 50,34)</string>
