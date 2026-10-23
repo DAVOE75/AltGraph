@@ -114,12 +114,27 @@ class AltgraphCore(val calculator: AltimetriaStrategyCalculator = AltimetriaStra
     }
 
     fun strategyForRouteBar(context: Context?, viewWidth: Int, base: Snapshot): StrategyData {
-        if (mapZoomLevel == null) return base.strategy
-        calculator.viewWidth = viewWidth
-        calculator.mapZoomLevel = mapZoomLevel
+        // La posición GPS llega a 1 Hz: a velocidad alta la barra daba saltos de varios metros.
+        // Entre fixes se extrapola la distancia con la velocidad (limitada a 2,5 s) y se recalcula la vista.
+        val speed = calculator.currentSpeed
+        val extra = if (speed > 1.0) {
+            val elapsed = (System.currentTimeMillis() - calculator.lastLocationMs) / 1000.0
+            (speed * elapsed.coerceIn(0.0, 2.5))
+        } else 0.0
+        if (mapZoomLevel == null && extra <= 0.0) return base.strategy
+        if (mapZoomLevel != null) {
+            calculator.viewWidth = viewWidth
+            calculator.mapZoomLevel = mapZoomLevel
+        }
+        val saved = calculator.currentRouteDistance
+        val total = calculator.routePoints.lastOrNull()?.distance ?: Double.MAX_VALUE
+        val shifted = if (saved > 0.0) (saved + extra).coerceAtMost(total) else saved
+        calculator.currentRouteDistance = shifted
         try {
             return calculator.calculateStrategy(context, advance = false)
         } finally {
+            // Si un fix GPS llegó mientras tanto, se respeta el valor nuevo
+            if (calculator.currentRouteDistance == shifted) calculator.currentRouteDistance = saved
             calculator.mapZoomLevel = null
         }
     }

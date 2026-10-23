@@ -139,7 +139,8 @@ class RouteBarDataType(extension: String) : DataTypeImpl(extension, "route_bar")
                         lastFrame = frame
                     }
                 }
-                delay(1000)
+                // A velocidad alta se redibuja 4 veces por segundo (la distancia se extrapola entre fixes GPS)
+                delay(if ((AltgraphRepository.snapshot.value?.currentSpeed ?: 0.0) > 5.0) 250L else 1000L)
             }
         }
         // Siempre libera el token al terminar el bucle (excepción, parada del repositorio...); es idempotente

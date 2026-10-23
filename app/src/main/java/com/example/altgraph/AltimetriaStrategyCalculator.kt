@@ -248,6 +248,8 @@ class AltimetriaStrategyCalculator {
     // Distancia exacta reportada por Karoo en la ruta
     var currentRouteDistance: Double = 0.0
 
+    // Instante del último fix GPS proyectado sobre la ruta (para extrapolar entre fixes)
+    @Volatile var lastLocationMs: Long = 0L
     // Distancia exacta restante reportada por Karoo en la ruta (útil si no hay puntos GPS)
     var fallbackRemainingDistance: Double = 0.0
     var globalRouteOffset: Double = 0.0
@@ -273,6 +275,9 @@ class AltimetriaStrategyCalculator {
     var currentHeading: Double = 0.0
     var mapZoomLevel: Double? = null
     var manualPanOffsetMeters: Double = 0.0
+    private var pageStartDist = 0.0
+    private var pageLengthDist = 0.0
+    private var pageBaseLookahead = -1.0
     var appContext: Context? = null
 
     fun updateLiveGrade(grade: Double) {
@@ -338,7 +343,9 @@ class AltimetriaStrategyCalculator {
         if (customResolution > 0) return customResolution.toDouble()
         return when {
             lookaheadDist <= 500.0 -> 50.0
+            lookaheadDist <= 1000.0 -> 150.0
             lookaheadDist <= 5000.0 -> 100.0
+            lookaheadDist <= 10000.0 -> 500.0
             lookaheadDist <= 20000.0 -> 500.0
             lookaheadDist <= 50000.0 -> 1000.0
             lookaheadDist <= 100000.0 -> 1000.0
@@ -350,7 +357,9 @@ class AltimetriaStrategyCalculator {
     fun getMajorBlockSize(lookaheadDist: Double): Double {
         return when {
             lookaheadDist <= 500.0 -> 100.0
+            lookaheadDist <= 1000.0 -> 300.0
             lookaheadDist <= 5000.0 -> 500.0
+            lookaheadDist <= 10000.0 -> 1000.0
             lookaheadDist <= 20000.0 -> 2000.0
             lookaheadDist <= 50000.0 -> 5000.0
             lookaheadDist <= 100000.0 -> 10000.0
@@ -429,6 +438,7 @@ class AltimetriaStrategyCalculator {
             
             val computedDist = projectedRouteDistance(lat, lng, nearestIndex)
             this.currentRouteDistance = computedDist
+            this.lastLocationMs = System.currentTimeMillis()
         }
     }
 
@@ -1693,16 +1703,30 @@ class AltimetriaStrategyCalculator {
         return lo
     }
 
+    // Posición interpolada a una distancia dada: con puntos de ruta muy separados (rutas simplificadas) el índice
+    // más cercano repetía el mismo punto y la herradura no se detectaba.
+    private fun positionAtDistance(dist: Double): Pair<Double, Double> {
+        val i = pointIndexAtDistance(dist)
+        val p1 = routePoints[i]
+        if (i == 0) return p1.latitude to p1.longitude
+        val p0 = routePoints[i - 1]
+        val span = (p1.distance - p0.distance)
+        if (span < 1e-6) return p1.latitude to p1.longitude
+        val t = ((dist - p0.distance) / span).coerceIn(0.0, 1.0)
+        return (p0.latitude + t * (p1.latitude - p0.latitude)) to (p0.longitude + t * (p1.longitude - p0.longitude))
+    }
+
     // Una herradura es un arco redondeado repartido en varios puntos: se mide el cambio de rumbo entre
-    // la trayectoria ~35 m antes y ~35 m después de cada punto, no el giro en un único vértice.
+    // la trayectoria ~30 m antes y ~30 m después de cada punto, no el giro en un único vértice.
     private fun detectHairpins() {
         absoluteHairpins.clear()
         absoluteHairpinInfos.clear()
-        if (routePoints.size < 5) return
+        if (routePoints.size < 3) return
 
-        val span = 35.0
-        val gap = 5.0
-        val threshold = 105.0
+        val span = 30.0
+        val gap = 4.0
+        val threshold = 100.0
+        val step = 5.0
         val total = routePoints.last().distance
 
         var clusterBest = 0.0
@@ -1720,17 +1744,15 @@ class AltimetriaStrategyCalculator {
             clusterBest = 0.0
         }
 
-        for (i in 1 until routePoints.size - 1) {
-            val d = routePoints[i].distance
-            if (d < span || d > total - span) { flush(); continue }
-            val a = routePoints[pointIndexAtDistance(d - span)]
-            val b = routePoints[pointIndexAtDistance(d - gap)]
-            val c = routePoints[pointIndexAtDistance(d + gap)]
-            val e = routePoints[pointIndexAtDistance(d + span)]
-            if (a === b || c === e) continue
+        var d = span
+        while (d <= total - span) {
+            val a = positionAtDistance(d - span)
+            val b = positionAtDistance(d - gap)
+            val c = positionAtDistance(d + gap)
+            val e = positionAtDistance(d + span)
 
-            val b1 = bearing(a.latitude, a.longitude, b.latitude, b.longitude)
-            val b2 = bearing(c.latitude, c.longitude, e.latitude, e.longitude)
+            val b1 = bearing(a.first, a.second, b.first, b.second)
+            val b2 = bearing(c.first, c.second, e.first, e.second)
             var signedDiff = b2 - b1
             while (signedDiff > 180.0) signedDiff -= 360.0
             while (signedDiff < -180.0) signedDiff += 360.0
@@ -1746,6 +1768,7 @@ class AltimetriaStrategyCalculator {
             } else if (inCluster && d - clusterDist > 40.0) {
                 flush()
             }
+            d += step
         }
         flush()
     }
@@ -1944,11 +1967,33 @@ class AltimetriaStrategyCalculator {
         // (sin estado), así el salto es inmediato en cuanto cambia la distancia.
         val riderNow = currentRiderDistance.coerceAtLeast(0.0)
         var windowStartDist = if (lookaheadDist > 0.0) Math.floor(riderNow / lookaheadDist) * lookaheadDist else 0.0
+        var pagedLookahead = lookaheadDist
+        // El zoom inteligente cambia lookaheadDist en cada tick: con paginación sin estado la baliza se quedaba
+        // "pillada" porque la página se movía con ella. La longitud de página se congela hasta que el ciclista la completa.
+        if (mapZoomLevel == null && lookaheadDist > 0.0) {
+            var pStart = pageStartDist
+            var pLen = pageLengthDist
+            if (pageBaseLookahead != baseLookahead || (!smartZoomEnabled && pLen != lookaheadDist)) {
+                pLen = 0.0
+                pageLengthDist = 0.0
+                if (advance) pageBaseLookahead = baseLookahead
+            }
+            val inPage = pLen > 0.0 && riderNow >= pStart && riderNow < pStart + pLen
+            if (!inPage) {
+                val prevEnd = pStart + pLen
+                pLen = lookaheadDist
+                pStart = if (pageLengthDist > 0.0 && riderNow >= prevEnd && riderNow < prevEnd + pLen) prevEnd
+                         else Math.floor(riderNow / pLen) * pLen
+            }
+            if (advance) { pageStartDist = pStart; pageLengthDist = pLen }
+            windowStartDist = pStart
+            pagedLookahead = pLen
+        }
 
         // Aplicamos el pan manual DESPUÉS del cálculo base para que funcione instantáneamente
         windowStartDist = (windowStartDist + manualPanOffsetMeters).coerceAtLeast(0.0)
 
-        var actualLookahead = lookaheadDist
+        var actualLookahead = pagedLookahead
         val totalRouteLength = routeElevationProfile.lastOrNull()?.distance ?: (routePoints.lastOrNull()?.distance ?: 0.0)
 
         // Limitar desplazamiento manual (pan) para no arrastrar más allá del final de la ruta (evitar bloques al 0% irreales)

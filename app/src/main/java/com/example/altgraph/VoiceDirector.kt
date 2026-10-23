@@ -52,6 +52,8 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     // Cola de locuciones pendientes
     private val speechQueue = ArrayDeque<Pair<String, Long>>()
     private var isSpeaking = false
+    private var speakStartedMs = 0L
+    private var lastTtsInitAttemptMs = 0L
 
     // Control anti-spam: marcas de tiempo y distancias para no saturar
     private var lastSpokenTimeMs = 0L
@@ -211,7 +213,22 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     }
 
     private fun processNextInQueue() {
+        // Vigilante: si el TTS no notificó el fin de la locución (onDone perdido), no se queda mudo para siempre
+        if (isSpeaking && (System.currentTimeMillis() - speakStartedMs) > 20_000L) {
+            Log.w(TAG, "TTS sin onDone tras 20 s: se libera la cola")
+            isSpeaking = false
+        }
         if (isSpeaking) return
+        if (!isTtsReady || tts == null) {
+            val now = System.currentTimeMillis()
+            if (now - lastTtsInitAttemptMs > 15_000L) {
+                lastTtsInitAttemptMs = now
+                Log.w(TAG, "TTS no listo: reintentando inicialización")
+                try { tts?.shutdown() } catch (_: Exception) {}
+                initTts()
+            }
+            return
+        }
         val now0 = System.currentTimeMillis()
         if ((now0 - lastSpokenTimeMs) < minSilenceBetweenCuesMs) {
             val hasPending = synchronized(speechQueue) { speechQueue.isNotEmpty() }
@@ -231,8 +248,6 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
             if (speechQueue.isEmpty()) null else speechQueue.removeFirst().first
         } ?: return
 
-        if (!isTtsReady || tts == null) return
-
         val prefs = AppPreferences.getInstance(context)
         tts?.let { engine ->
             engine.setSpeechRate(prefs.voiceSpeechRate)
@@ -240,7 +255,9 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
 
         requestAudioFocus()
         lastSpokenTimeMs = System.currentTimeMillis()
+        speakStartedMs = lastSpokenTimeMs
         isSpeaking = true
+        Log.i(TAG, "Aviso: $next")
 
         // Si pre-chime está activado, emitimos un bip sutil para despertar el auricular Bluetooth
         if (prefs.voicePreChimeEnabled) {
@@ -307,6 +324,8 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
      */
      fun evaluate(snapshot: Snapshot, prefs: AppPreferences) {
          if (!prefs.isEliteUnlocked || !prefs.voiceDirectorEnabled) return
+         // Cada tick se drena la cola por si quedó algo pendiente (vigilante del TTS incluido)
+         mainHandler.post { processNextInQueue() }
          if (!snapshot.isNavigatingRoute) return
 
          val strategy = snapshot.strategy
@@ -442,32 +461,23 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
 
          // 4. CURVAS DE HERRADURA Y CURVAS CERRADAS (Apex en subida y bajada con sentido derecha/izquierda)
          val hairpinsInfoList: List<HairpinInfo> = strategy.hairpinsInfo
-         val hairpinsList: List<Double> = strategy.hairpins
-         if (prefs.voiceHairpinsEnabled && (hairpinsInfoList.isNotEmpty() || hairpinsList.isNotEmpty())) {
+         if (prefs.voiceHairpinsEnabled && hairpinsInfoList.isNotEmpty()) {
              val isDescent = speed > 6.94 || strategy.visibleAvgGrade < -1.5 // > 25 km/h o bajando
-             val minLookahead = if (isDescent) 60.0 else 40.0
-             val maxLookahead = if (isDescent) 160.0 else 120.0
+             // El margen se adapta a la velocidad: ~12 s de antelación como máximo, ~5 s como mínimo
+             val minLookahead = (speed * 5.0).coerceIn(30.0, 90.0)
+             val maxLookahead = (speed * 14.0).coerceIn(110.0, 260.0)
 
              val nextHairpinInfo = hairpinsInfoList.firstOrNull { h ->
                  val dAhead = h.distance - currentDist
-                 dAhead in minLookahead..maxLookahead
+                 dAhead in minLookahead..maxLookahead && h.distance - lastAnnouncedHairpinDistance > 30.0
              }
 
-             val nextHairpinDist = nextHairpinInfo?.distance ?: hairpinsList.firstOrNull { h ->
-                 val dAhead = h - currentDist
-                 dAhead in minLookahead..maxLookahead
-             }
-
-             if (nextHairpinDist != null && (nextHairpinDist - lastAnnouncedHairpinDistance) > 60.0) {
+             if (nextHairpinInfo != null) {
+                 val nextHairpinDist = nextHairpinInfo.distance
                  lastAnnouncedHairpinDistance = nextHairpinDist
-                 val distAhead = (nextHairpinDist - currentDist).toInt()
-                 val isRight = nextHairpinInfo?.isRight
-                 val dirText = when (isRight) {
-                     true -> context.getString(R.string.voice_direction_right)
-                     false -> context.getString(R.string.voice_direction_left)
-                     null -> ""
-                 }
-
+                 val distAhead = ((nextHairpinDist - currentDist) / 10.0).toInt() * 10
+                 val dirText = if (nextHairpinInfo.isRight) context.getString(R.string.voice_direction_right)
+                     else context.getString(R.string.voice_direction_left)
                  if (isDescent) {
                      val phrase = context.getString(R.string.voice_hairpin_descent, dirText, distAhead.toString())
                      speak(phrase, priority = true)
@@ -560,9 +570,9 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
         if (prefs.voiceCadenceAlertEnabled) {
             val now = System.currentTimeMillis()
             val cad = strategy.currentCadence
-            val grade = strategy.visibleAvgGrade
-            if (cad in 20.0..58.0 && grade >= 8.0 && snapshot.currentSpeed > 1.5) {
-                if ((now - lastCadenceWarningTimeMs) > 90000L) { // Máximo una vez cada 90s
+            val grade = maxOf(strategy.visibleAvgGrade, snapshot.instantBarometricGrade)
+            if (cad in 15.0..60.0 && grade >= 5.0 && snapshot.currentSpeed > 1.5) {
+                if ((now - lastCadenceWarningTimeMs) > 60000L) { // Máximo una vez por minuto
                     lastCadenceWarningTimeMs = now
                     val phrase = context.getString(R.string.voice_cadence_low, cad.toInt().toString())
                     speak(phrase, priority = false)

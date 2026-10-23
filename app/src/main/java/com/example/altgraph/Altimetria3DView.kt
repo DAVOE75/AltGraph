@@ -1622,8 +1622,7 @@ class Altimetria3DView @JvmOverloads constructor(
                         var hx = xFront[wStart]
                         val limitX = xFront[wEnd]
                         while (hx <= limitX) {
-                            val sampleFrac = ((hx - startX) / (baseEndX - startX)).coerceIn(0f, 1f)
-                            val sIdx = (sampleFrac * (totalMicroSamples - 1)).toInt().coerceIn(0, totalMicroSamples - 1)
+                            val sIdx = ((hx - startX + panOffsetX) / microStepX).toInt().coerceIn(0, totalMicroSamples - 1)
                             val topY = yFront[sIdx]
                             val botY = yBase[sIdx]
                             canvas.drawLine(hx, topY, hx + 12f, botY, gearWallHatchPaint)
@@ -1658,8 +1657,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 var hx = xFront[wStart]
                 val limitX = xFront[wEnd]
                 while (hx <= limitX) {
-                    val sampleFrac = ((hx - startX) / (baseEndX - startX)).coerceIn(0f, 1f)
-                    val sIdx = (sampleFrac * (totalMicroSamples - 1)).toInt().coerceIn(0, totalMicroSamples - 1)
+                    val sIdx = ((hx - startX + panOffsetX) / microStepX).toInt().coerceIn(0, totalMicroSamples - 1)
                     val topY = yFront[sIdx]
                     val botY = yBase[sIdx]
                     canvas.drawLine(hx, topY, hx + 12f, botY, gearWallHatchPaint)
@@ -1676,7 +1674,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 else riderProgress * (totalMicroSamples - 1)
             } else 0f
             val gearIdx = gearIdxF.toInt().coerceIn(0, (microGrades.size - 1).coerceAtLeast(0))
-            val gearSpan = if (subBlockSizeMeters > 0.0) (100.0 / subBlockSizeMeters).toInt().coerceAtLeast(1) else 1
+            val gearSpan = if (subBlockSizeMeters > 0.0) (50.0 / subBlockSizeMeters).toInt().coerceAtLeast(1) else 1
             val gearEnd = (gearIdx + gearSpan).coerceAtMost(microGrades.size)
             val avgNextGrade = if (microGrades.isEmpty()) 0f else (gearIdx until gearEnd).map { microGrades[it] }.average().toFloat()
             if (showGearBadge) {
