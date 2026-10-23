@@ -467,6 +467,11 @@ class Altimetria3DView @JvmOverloads constructor(
     private var mapRotationAngle: Double = 0.0
     private var isHeadingUp: Boolean = false
     private var riderProgress: Float = 0.0f
+    private val riddenDimPath = Path()
+    private val riddenDimPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        color = Color.argb(120, 0, 0, 0)
+    }
     private var windowStartMeters: Double = 0.0
     private var subBlocks: List<Float> = emptyList()
     private var subBlockSizeMeters: Double = 50.0
@@ -1436,6 +1441,19 @@ class Altimetria3DView @JvmOverloads constructor(
             val rem = exactIndexF - idx
             val rx = xFront[idx] + rem * (xFront[idx + 1] - xFront[idx])
             val ry = yFront[idx] + rem * (yFront[idx + 1] - yFront[idx])
+
+            // Atenúa suavemente el tramo ya recorrido (a la izquierda de la baliza)
+            if (idx > 0) {
+                val ryBase = yBase[idx] + rem * (yBase[idx + 1] - yBase[idx])
+                riddenDimPath.reset()
+                riddenDimPath.moveTo(xFront[0], yFront[0])
+                for (i in 1..idx) riddenDimPath.lineTo(xFront[i], yFront[i])
+                riddenDimPath.lineTo(rx, ry)
+                riddenDimPath.lineTo(rx, ryBase)
+                for (i in idx downTo 0) riddenDimPath.lineTo(xFront[i], yBase[i])
+                riddenDimPath.close()
+                canvas.drawPath(riddenDimPath, riddenDimPaint)
+            }
             
             // Haz de luz frontal en Horizonte Isométrico (orientado según la pendiente que sube el ciclista)
         if (altimetriaStyle == AltimetriaStyle.HORIZON_ISOMETRIC) {
@@ -1692,7 +1710,7 @@ class Altimetria3DView @JvmOverloads constructor(
             }
             val gearTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = Color.parseColor("#38BDF8")
-                textSize = ((h * 0.15f) * fontScale).coerceIn(32f, 48f)
+                textSize = ((h * 0.15f) * fontScale).coerceIn(36f, 56f)
                 textAlign = Paint.Align.CENTER
                 typeface = android.graphics.Typeface.DEFAULT_BOLD
                 setShadowLayer(3f, 0f, 1f, Color.BLACK)
@@ -1704,7 +1722,8 @@ class Altimetria3DView @JvmOverloads constructor(
             val arrowsBottom = panButtonsPosition == "bottom"
             val gapR = if (arrowsBottom) w - 50f - 28f - 8f else w - 8f
             val gearLabel = if (climbGrade != null) "Rec. ⚙ $recSprocket" else "⚙ $recSprocket"
-            while (gearTextPaint.measureText(gearLabel) + 28f > (gapR - gapL) && gearTextPaint.textSize > 20f) {
+            val gearMaxW = if (rotate90) (gapR - gapL) else (w - 40f)
+            while (gearTextPaint.measureText(gearLabel) + 28f > gearMaxW && gearTextPaint.textSize > 20f) {
                 gearTextPaint.textSize -= 1f
             }
             if (rotate90) gearTextPaint.textSize = gearTextPaint.textSize * 0.62f + 1f
