@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v2.3 REVOLUTION)
+# ALTGRAPH (v2.8 REVOLUTION)
 <p>Lire en : <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** est une extension professionnelle d'altimétrie et de performance cycliste de nouvelle génération pour les compteurs GPS **Hammerhead Karoo** (Karoo 2 et Karoo 3), développée par **hesiOX** à l'aide du SDK officiel `karoo-ext`.
@@ -10,6 +10,16 @@ Elle révolutionne le concept traditionnel de l'altimétrie cycliste en intégra
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />
 </p>
+
+## VERSION 2.8 : BALISE PERSONNALISABLE, TRANSMISSION ET VITESSE RECOMMANDÉE
+
+* **Balise du cycliste en 3D global** : positionnement exact par distance (sans décalage) et options de taille, forme (cercle, losange, flèche) et couleur dans le panneau.
+* **Vitesse recommandée** : calculée selon la pente à votre position exacte et votre **transmission** (plateaux et pignons configurables dans l'onglet 3D). Le visualiseur de cols affiche « Rec. ⚙ XxY » selon la pente moyenne du col.
+* **Nouvelle icône de cycliste KGhost** : blanche avec bord noir intérieur pour le rival virtuel, remplissage rouge et bord rouge intense pour le cycliste ; flèche plus fine et plus courte.
+* **Nouvelles valeurs par défaut** : rotation TV 2D et mise en évidence des montées activées ; barre de puissance, barre en perspective isométrique, barre d'énergie et segments Strava désactivés.
+* Libellé « Barre de zone d'entraînement » traduit dans les 6 langues.
+
+---
 
 ## VERSION 2.3 : ALERTES VOCALES DE TYPE DE SURFACE (GRAVIER / VTT / ASPHALTE) & CHOIX DE VOIX
 

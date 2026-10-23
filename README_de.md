@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v2.3 REVOLUTION)
+# ALTGRAPH (v2.8 REVOLUTION)
 <p>Lesen auf: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** ist eine professionelle Höhen- und Leistungserweiterung der nächsten Generation für **Hammerhead Karoo** Fahrradcomputer (Karoo 2 und Karoo 3), entwickelt von **hesiOX** unter Verwendung des offiziellen `karoo-ext` SDKs.
@@ -10,6 +10,16 @@ Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 7 3D-Höhenv
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## VERSION 2.8: ANPASSBARE BAKE, ANTRIEB UND EMPFOHLENER GANG
+
+* **Fahrer-Bake im globalen 3D**: exakte Positionierung nach Distanz (ohne Versatz) sowie Größe, Form (Kreis, Raute, Pfeil) und Farbe im Einstellungsmenü.
+* **Empfohlener Gang**: berechnet aus der Steigung an Ihrer exakten Streckenposition und Ihrem **Antrieb** (Kettenblätter und Kassette im 3D-Tab einstellbar). Der Anstiegs-Viewer zeigt „Rec. ⚙ XxY“ anhand der Durchschnittssteigung.
+* **Neues KGhost-Radfahrer-Symbol**: weiß mit schwarzem Innenrand für den virtuellen Rivalen, rote Füllung mit kräftig rotem Rand für den Fahrer; schmalerer, kürzerer Pfeil.
+* **Neue Standardwerte**: TV-2D-Rotation und Anstiegshervorhebung aktiv; Leistungsbalken, isometrischer Perspektivbalken, Energiebalken und Strava-Segmente deaktiviert.
+* Bezeichnung „Trainingszonen-Balken“ in alle 6 Sprachen übersetzt.
+
+---
 
 ## VERSION 2.3: UNTERGRUND-SPRACHANSAGEN (SCHOTTER / TRAIL / ASPHALT) & STIMMEN-AUSWAHL
 

@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logotipo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v2.3 REVOLUTION)
+# ALTGRAPH (v2.8 REVOLUTION)
 <p>Ler em: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** é uma extensão profissional de altimetria e desempenho de ciclismo de última geração para os ciclocomputadores **Hammerhead Karoo** (Karoo 2 e Karoo 3), desenvolvida por **hesiOX** utilizando o SDK oficial `karoo-ext`.
@@ -10,6 +10,16 @@ Revoluciona o conceito tradicional de altimetria de ciclismo incorporando um **C
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logotipo ALTGRAPH" width="350" />
 </p>
+
+## VERSÃO 2.8: BALIZA PERSONALIZÁVEL, TRANSMISSÃO E MARCHA RECOMENDADA
+
+* **Baliza do ciclista no 3D global**: posicionamento exato por distância (sem desfasamento) e opções de tamanho, forma (círculo, losango, seta) e cor no painel.
+* **Marcha recomendada**: calculada pela inclinação na sua posição exata e pela sua **transmissão** (pratos e carretos configuráveis no separador 3D). O visualizador de subidas mostra «Rec. ⚙ XxY» pela inclinação média.
+* **Novo ícone de ciclista KGhost**: branco com contorno preto interior para o rival virtual, preenchimento vermelho com contorno vermelho intenso para o ciclista; seta mais fina e curta.
+* **Novos valores predefinidos**: rotação TV 2D e destaque de subidas ativos; barra de potência, barra em perspetiva isométrica, barra de energia e segmentos Strava desativados.
+* Etiqueta «Barra de Zona de Treino» traduzida nos 6 idiomas.
+
+---
 
 ## VERSÃO 2.3: AVISOS POR VOZ DE SUPERFÍCIE (CASCALHO / TRILHA / ASFALTO) & SELETOR DE VOZ
 

@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v2.3 REVOLUTION)
+# ALTGRAPH (v2.8 REVOLUTION)
 <p>Leer en: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 <p align="center">
@@ -18,6 +18,16 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## VERSION 2.8: BALIZA PERSONALIZABLE, TRANSMISIÓN Y MARCHA RECOMENDADA
+
+* **Baliza del ciclista en el 3D global**: posición exacta por distancia (sin desfase) y opciones de tamaño, forma (círculo, rombo, flecha) y color en el panel.
+* **Engranaje recomendado**: se calcula con la pendiente en tu posición exacta de la ruta y según tu **transmisión** (platos y piñones configurables en la pestaña 3D). En el visor de puertos muestra «Rec. ⚙ XxY» según la pendiente media del puerto.
+* **Nuevo icono de ciclista KGhost**: blanco con borde negro interior para el rival virtual y relleno rojo con borde rojo intenso para el ciclista; flecha entre ambos más fina y corta.
+* **Nuevos valores por defecto**: rotación TV 2D y resaltado de subidas activados; barra de potencia, barra en perspectiva isométrica, barra de energía y segmentos Strava desactivados.
+* Etiqueta «Barra de Zona de Entrenamiento» traducida a los 6 idiomas.
+
+---
 
 ## VERSION 2.3: AVISOS POR VOZ DE SUPERFICIE (GRAVEL / MTB / ASFALTO) Y SELECTOR DE VOZ
 

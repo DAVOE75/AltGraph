@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v2.3 REVOLUTION)
+# ALTGRAPH (v2.8 REVOLUTION)
 <p>Leggi in: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** è un'estensione professionale per l'altimetria e le prestazioni ciclistiche di ultima generazione per i ciclocomputer **Hammerhead Karoo** (Karoo 2 e Karoo 3), sviluppata da **hesiOX** utilizando l'SDK ufficiale `karoo-ext`.
@@ -10,6 +10,16 @@ Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **S
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />
 </p>
+
+## VERSIONE 2.8: BALISE PERSONALIZZABILE, TRASMISSIONE E RAPPORTO CONSIGLIATO
+
+* **Baliza del ciclista nel 3D globale**: posizionamento esatto per distanza (senza sfasamento) e opzioni di dimensione, forma (cerchio, rombo, freccia) e colore nel pannello.
+* **Rapporto consigliato**: calcolato in base alla pendenza nella tua posizione esatta e alla tua **trasmissione** (corone e pignoni configurabili nella scheda 3D). Il visualizzatore dei passi mostra «Rec. ⚙ XxY» in base alla pendenza media.
+* **Nuova icona ciclista KGhost**: bianca con bordo nero interno per il rivale virtuale, riempimento rosso con bordo rosso intenso per il ciclista; freccia più sottile e corta.
+* **Nuovi valori predefiniti**: rotazione TV 2D ed evidenziazione delle salite attive; barra potenza, barra in prospettiva isometrica, barra energia e segmenti Strava disattivati.
+* Etichetta «Barra zona di allenamento» tradotta in tutte e 6 le lingue.
+
+---
 
 ## VERSIONE 2.3: AVVISI VOCALI TIPO DI SUPERFICIE (STERRATO / TRAIL / ASFALTO) & SELETTORE VOCE
 

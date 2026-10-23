@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v2.3 REVOLUTION)
+# ALTGRAPH (v2.8 REVOLUTION)
 <p>Read in: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 <p align="center">
@@ -18,6 +18,16 @@ It revolutionizes traditional cycling elevation profiles by featuring a **Suite 
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## VERSION 2.8: CUSTOMIZABLE BEACON, DRIVETRAIN & RECOMMENDED GEAR
+
+* **Rider beacon in Global 3D**: exact distance-based positioning (no offset) plus size, shape (circle, diamond, arrow) and color options in the settings panel.
+* **Recommended gear**: computed from the gradient at your exact route position and your **drivetrain** (chainrings and cassette configurable in the 3D tab). The climb viewer shows "Rec. ⚙ XxY" based on the climb's average gradient.
+* **New KGhost cyclist icon**: white with inner black border for the virtual rival, red fill with deep red border for the rider; slimmer, shorter arrow between both.
+* **New defaults**: TV 2D rotation and climb highlighting enabled; power bar, isometric perspective bar, energy bar and Strava segments disabled.
+* "Training Zone Bar" label translated into all 6 languages.
+
+---
 
 ## VERSION 2.3: TERRAIN SURFACE AUDIO CUES (GRAVEL / MTB / ASPHALT) & VOICE SELECTOR
 
