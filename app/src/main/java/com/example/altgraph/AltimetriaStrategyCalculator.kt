@@ -142,26 +142,37 @@ data class StrategyData(
 )
 
 class AltimetriaStrategyCalculator {
-    private fun getVisibleRouteCoords(startIdx: Int, points: List<RoutePoint>, rangeMeters: Int): List<Pair<Double, Double>> {
-        if (points.isEmpty() || startIdx >= points.size) return emptyList()
-        val coords = mutableListOf<Pair<Double, Double>>()
-        val startDist = points[startIdx].distance
-        val endDist = startDist + rangeMeters
-        for (i in startIdx until points.size) {
-            val pt = points[i]
-            if (pt.distance > endDist) {
-                // Add the last point just to close the shape correctly
-                if (pt.latitude != 0.0 || pt.longitude != 0.0) {
-                    coords.add(Pair(pt.latitude, pt.longitude))
-                }
-                break
-            }
-            // Skip points with no valid GPS coordinates (0.0, 0.0) which might occur if decoding fails partially
-            if (pt.latitude != 0.0 || pt.longitude != 0.0) {
-                coords.add(Pair(pt.latitude, pt.longitude))
-            }
-        }
-        return coords
+    // Tramo GPS exacto [startDist, startDist+range], interpolando los extremos: con puntos de ruta muy separados
+    // empezar en el punto anterior desplazaría el mapa respecto a la baliza (que se calcula por distancia).
+    private fun getVisibleRouteCoords(startDist: Double, points: List<RoutePoint>, rangeMeters: Int): List<Pair<Double, Double>> {
+       if (points.size < 2) return emptyList()
+       val endDist = startDist + rangeMeters
+       fun valid(p: RoutePoint) = p.latitude != 0.0 || p.longitude != 0.0
+       fun at(d: Double): Pair<Double, Double>? {
+           if (d <= points.first().distance) return points.first().takeIf(::valid)?.let { it.latitude to it.longitude }
+           if (d >= points.last().distance) return points.last().takeIf(::valid)?.let { it.latitude to it.longitude }
+           var lo = 0
+           var hi = points.size - 1
+           while (hi - lo > 1) {
+               val mid = (lo + hi) ushr 1
+               if (points[mid].distance <= d) lo = mid else hi = mid
+           }
+           val a = points[lo]
+           val b = points[hi]
+           if (!valid(a) || !valid(b)) return null
+           val span = (b.distance - a.distance).coerceAtLeast(0.01)
+           val t = ((d - a.distance) / span).coerceIn(0.0, 1.0)
+           return (a.latitude + t * (b.latitude - a.latitude)) to (a.longitude + t * (b.longitude - a.longitude))
+       }
+       val coords = mutableListOf<Pair<Double, Double>>()
+       at(startDist)?.let { coords.add(it) }
+       for (p in points) {
+           if (p.distance <= startDist) continue
+           if (p.distance >= endDist) break
+           if (valid(p)) coords.add(p.latitude to p.longitude)
+       }
+       at(endDist)?.let { coords.add(it) }
+       return coords
     }
 
 
@@ -2419,7 +2430,7 @@ class AltimetriaStrategyCalculator {
             stravaSegmentDistance = stravaRelDist,
             stravaPrGhostDistance = stravaGhostRelDist,
             windEffectIntensity = windEffect,
-            routeCoords = getVisibleRouteCoords(windowStartIndex, routePoints, actualLookahead.toInt()),
+            routeCoords = getVisibleRouteCoords(windowStartDist, routePoints, actualLookahead.toInt()),
             surfaceSegments = routeSurfaceSegments
         )
     }
@@ -2564,7 +2575,7 @@ class AltimetriaStrategyCalculator {
             visibleMaxGrade = trueMaxGrade,
             routeName = climb.category, // Passing category as routeName to display in the header
             routeTotalLength = climb.endDistance,
-            routeCoords = getVisibleRouteCoords(routePoints.indexOfFirst { it.distance >= startDist }.coerceAtLeast(0), routePoints, (endDist - startDist).toInt())
+            routeCoords = getVisibleRouteCoords(startDist, routePoints, (endDist - startDist).toInt())
         )
     }
 }
