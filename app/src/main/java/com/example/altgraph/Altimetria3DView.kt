@@ -1710,7 +1710,7 @@ class Altimetria3DView @JvmOverloads constructor(
             }
             val gearTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = Color.parseColor("#38BDF8")
-                textSize = ((h * 0.15f) * fontScale).coerceIn(36f, 56f)
+                textSize = ((h * 0.075f) * fontScale).coerceIn(18f, 28f)
                 textAlign = Paint.Align.CENTER
                 typeface = android.graphics.Typeface.DEFAULT_BOLD
                 setShadowLayer(3f, 0f, 1f, Color.BLACK)
