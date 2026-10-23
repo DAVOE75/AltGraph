@@ -261,6 +261,9 @@
     <string name="voice_kghost_chase">Le Ghost mène : %1$s devant vous, écart %2$s.</string>
     <string name="voice_kghost_overtake_lead">Attention : Vous avez dépassé le Ghost. Nouveau leader.</string>
     <string name="voice_kghost_overtaken">Attention : Le Ghost vient de vous dépasser.</string>
+    <string name="voice_kghost_finished">Le Ghost a déjà franchi la ligne d\'arrivée.</string>
+    <string name="voice_kghost_finish_before">Arrivée ! Vous avez devancé le Ghost de %1$s.</string>
+    <string name="voice_kghost_finish_after">Arrivée ! Le Ghost vous a devancé de %1$s.</string>
     <string name="voice_poi_water">Point d\'eau dans %1$s mètres.</string>
     <string name="voice_destination_near">Arrivée proche : reste %1$s.</string>
     <string name="elite_voice_surfaces_title">Changements de Type de Surface</string>

@@ -263,7 +263,7 @@ class AltimetriaStrategyCalculator {
     var mapZoomLevel: Double? = null
     var manualPanOffsetMeters: Double = 0.0
     private var pagedWindowStart: Double = -1.0
-    private fun actualLookaheadForPaging(lookahead: Double) = lookahead * 0.95
+    private fun actualLookaheadForPaging(lookahead: Double) = lookahead * 0.88
     var appContext: Context? = null
 
     fun updateLiveGrade(grade: Double) {
@@ -418,9 +418,35 @@ class AltimetriaStrategyCalculator {
             }
             nearestIndex = newNearestIdx
             
-            val computedDist = routePoints[nearestIndex].distance
+            val computedDist = projectedRouteDistance(lat, lng, nearestIndex)
             this.currentRouteDistance = computedDist
         }
+    }
+
+    // Distancia continua: proyecta la posición sobre los segmentos adyacentes al punto más cercano.
+    // Sin esto, con puntos de ruta muy separados (rectas) la baliza se queda parada y luego salta cientos de metros.
+    private fun projectedRouteDistance(lat: Double, lng: Double, idx: Int): Double {
+        var best = routePoints[idx].distance
+        var bestOff = planarDistM(lat to lng, routePoints[idx].latitude to routePoints[idx].longitude)
+        val cosLat = Math.cos(Math.toRadians(lat))
+        for (j in intArrayOf(idx - 1, idx)) {
+            if (j < 0 || j + 1 >= routePoints.size) continue
+            val a = routePoints[j]
+            val b = routePoints[j + 1]
+            val bx = (b.longitude - a.longitude) * 111320.0 * cosLat
+            val by = (b.latitude - a.latitude) * 111320.0
+            val px = (lng - a.longitude) * 111320.0 * cosLat
+            val py = (lat - a.latitude) * 111320.0
+            val len2 = bx * bx + by * by
+            if (len2 < 1e-6) continue
+            val t = ((px * bx + py * by) / len2).coerceIn(0.0, 1.0)
+            val off = Math.hypot(px - t * bx, py - t * by)
+            if (off < bestOff - 0.01) {
+                bestOff = off
+                best = a.distance + t * (b.distance - a.distance)
+            }
+        }
+        return best
     }
 
     /**
@@ -1648,41 +1674,71 @@ class AltimetriaStrategyCalculator {
         this.routePoints = routePoints.map { it.copy(elevation = it.elevation + delta) }
     }
 
+    private fun pointIndexAtDistance(dist: Double): Int {
+        var lo = 0
+        var hi = routePoints.size - 1
+        while (lo < hi) {
+            val mid = (lo + hi) ushr 1
+            if (routePoints[mid].distance < dist) lo = mid + 1 else hi = mid
+        }
+        return lo
+    }
+
+    // Una herradura es un arco redondeado repartido en varios puntos: se mide el cambio de rumbo entre
+    // la trayectoria ~35 m antes y ~35 m después de cada punto, no el giro en un único vértice.
     private fun detectHairpins() {
         absoluteHairpins.clear()
         absoluteHairpinInfos.clear()
-        if (routePoints.size < 3) return
-        
-        var lastP = routePoints[0]
-        for (i in 1 until routePoints.size - 1) {
-            val p1 = routePoints[i]
-            if (p1.distance - lastP.distance < 15.0) continue
-            
-            var p2 = routePoints[i+1]
-            for (j in i+1 until routePoints.size) {
-                if (routePoints[j].distance - p1.distance >= 15.0) {
-                    p2 = routePoints[j]
-                    break
-                }
+        if (routePoints.size < 5) return
+
+        val span = 35.0
+        val gap = 5.0
+        val threshold = 105.0
+        val total = routePoints.last().distance
+
+        var clusterBest = 0.0
+        var clusterDist = 0.0
+        var clusterSigned = 0.0
+        var inCluster = false
+
+        fun flush() {
+            if (!inCluster) return
+            if (absoluteHairpins.isEmpty() || (clusterDist - absoluteHairpins.last() > 40.0)) {
+                absoluteHairpins.add(clusterDist)
+                absoluteHairpinInfos.add(HairpinInfo(clusterDist, clusterSigned > 0.0))
             }
-            
-            val b1 = bearing(lastP.latitude, lastP.longitude, p1.latitude, p1.longitude)
-            val b2 = bearing(p1.latitude, p1.longitude, p2.latitude, p2.longitude)
-            
+            inCluster = false
+            clusterBest = 0.0
+        }
+
+        for (i in 1 until routePoints.size - 1) {
+            val d = routePoints[i].distance
+            if (d < span || d > total - span) { flush(); continue }
+            val a = routePoints[pointIndexAtDistance(d - span)]
+            val b = routePoints[pointIndexAtDistance(d - gap)]
+            val c = routePoints[pointIndexAtDistance(d + gap)]
+            val e = routePoints[pointIndexAtDistance(d + span)]
+            if (a === b || c === e) continue
+
+            val b1 = bearing(a.latitude, a.longitude, b.latitude, b.longitude)
+            val b2 = bearing(c.latitude, c.longitude, e.latitude, e.longitude)
             var signedDiff = b2 - b1
             while (signedDiff > 180.0) signedDiff -= 360.0
             while (signedDiff < -180.0) signedDiff += 360.0
             val absDiff = abs(signedDiff)
-            
-            if (absDiff > 130.0) {
-                if (absoluteHairpins.isEmpty() || (p1.distance - absoluteHairpins.last() > 50.0)) {
-                    val isRight = signedDiff > 0.0
-                    absoluteHairpins.add(p1.distance)
-                    absoluteHairpinInfos.add(HairpinInfo(p1.distance, isRight))
+
+            if (absDiff >= threshold) {
+                if (!inCluster) inCluster = true
+                if (absDiff > clusterBest) {
+                    clusterBest = absDiff
+                    clusterDist = d
+                    clusterSigned = signedDiff
                 }
+            } else if (inCluster && d - clusterDist > 40.0) {
+                flush()
             }
-            lastP = p1
         }
+        flush()
     }
 
     private fun bearing(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {

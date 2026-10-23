@@ -288,6 +288,9 @@
     <string name="voice_kghost_chase">Ghost is leading: %1$s ahead, gap %2$s.</string>
     <string name="voice_kghost_overtake_lead">Attention: You have overtaken the Ghost. New race leader.</string>
     <string name="voice_kghost_overtaken">Attention: The Ghost has overtaken you.</string>
+    <string name="voice_kghost_finished">The Ghost has already reached the finish line.</string>
+    <string name="voice_kghost_finish_before">Finish! You beat the Ghost by %1$s.</string>
+    <string name="voice_kghost_finish_after">Finish! The Ghost beat you by %1$s.</string>
     <string name="voice_poi_water">Water point in %1$s meters.</string>
     <string name="voice_destination_near">Approaching finish line: %1$s remaining.</string>
     <string name="elite_voice_surfaces_title">Terrain Surface Changes</string>

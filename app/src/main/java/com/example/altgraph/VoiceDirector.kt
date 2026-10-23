@@ -27,6 +27,8 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     companion object {
         private const val TAG = "VoiceDirector"
         private const val UTTERANCE_PREFIX = "altgraph_voice_"
+        private const val PRIORITY_MARK = Long.MAX_VALUE
+        private const val STALE_CUE_MS = 25_000L
 
         @Volatile
         private var INSTANCE: VoiceDirector? = null
@@ -48,7 +50,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     private var audioFocusRequest: AudioFocusRequest? = null
 
     // Cola de locuciones pendientes
-    private val speechQueue = ArrayDeque<String>()
+    private val speechQueue = ArrayDeque<Pair<String, Long>>()
     private var isSpeaking = false
 
     // Control anti-spam: marcas de tiempo y distancias para no saturar
@@ -64,6 +66,21 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     private var lastAnnouncedHairpinDistance = -10000.0
     private var lastAnnouncedKGhostDistance = 0.0
     private var lastKGhostWasLeading: Boolean? = null
+    private var ghostFinishAnnounced = false
+    private var riderFinishGhostAnnounced = false
+
+    private fun formatTimeVoice(totalSeconds: Long): String {
+        if (totalSeconds < 60) {
+            val unit = if (totalSeconds == 1L) context.getString(R.string.voice_unit_second) else context.getString(R.string.voice_unit_seconds)
+            return "$totalSeconds $unit"
+        }
+        val mins = totalSeconds / 60
+        val secs = totalSeconds % 60
+        val minUnit = if (mins == 1L) context.getString(R.string.voice_unit_minute) else context.getString(R.string.voice_unit_minutes)
+        if (secs == 0L) return "$mins $minUnit"
+        val secUnit = if (secs == 1L) context.getString(R.string.voice_unit_second) else context.getString(R.string.voice_unit_seconds)
+        return "$mins $minUnit $secs $secUnit"
+    }
     private var lastAnnouncedElevationMilestone = 0
     private var lastPeriodicDistanceKm = 0.0
     private var lastCadenceWarningTimeMs = 0L
@@ -159,24 +176,31 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
         }
     }
 
+    // Los nombres de puertos suelen abreviarse "Pto." y el TTS lo lee como "punto"
+    private val portAbbreviation = Regex("\\bPtos?\\b\\.?", RegexOption.IGNORE_CASE)
+
+    private fun normalizeForSpeech(phrase: String): String =
+        portAbbreviation.replace(phrase) { if (it.value.startsWith("Ptos", ignoreCase = true)) "Puertos" else "Puerto" }
+
     /**
      * Encola una frase para ser leída si las preferencias lo permiten y se supera el filtro de silencio.
      */
-    fun speak(phrase: String, priority: Boolean = false) {
+    fun speak(rawPhrase: String, priority: Boolean = false) {
+        val phrase = normalizeForSpeech(rawPhrase)
         val prefs = AppPreferences.getInstance(context)
         if (!prefs.isEliteUnlocked || !prefs.voiceDirectorEnabled) return
         if (phrase.isBlank()) return
 
         val now = System.currentTimeMillis()
-        if (!priority && (now - lastSpokenTimeMs) < minSilenceBetweenCuesMs) {
-            return
-        }
 
+        // Los avisos no prioritarios ya no se descartan por el silencio mínimo: esperan su turno en la cola
+        // (se purgan si caducan o si se acumulan demasiados).
         synchronized(speechQueue) {
             if (priority) {
-                speechQueue.addFirst(phrase)
+                speechQueue.addFirst(phrase to PRIORITY_MARK)
             } else {
-                speechQueue.addLast(phrase)
+                speechQueue.addLast(phrase to now)
+                while (speechQueue.size > 4) speechQueue.removeLast()
             }
         }
 
@@ -187,8 +211,23 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
 
     private fun processNextInQueue() {
         if (isSpeaking) return
+        val now0 = System.currentTimeMillis()
+        if ((now0 - lastSpokenTimeMs) < minSilenceBetweenCuesMs) {
+            val hasPending = synchronized(speechQueue) { speechQueue.isNotEmpty() }
+            if (hasPending) {
+                val priorityHead = synchronized(speechQueue) { speechQueue.firstOrNull() }
+                // Los prioritarios no esperan; el resto aguarda al fin del silencio mínimo
+                if (priorityHead != null && priorityHead.second == PRIORITY_MARK) {
+                    // continúa
+                } else {
+                    mainHandler.postDelayed({ processNextInQueue() }, minSilenceBetweenCuesMs - (now0 - lastSpokenTimeMs) + 50)
+                    return
+                }
+            }
+        }
         val next = synchronized(speechQueue) {
-            if (speechQueue.isEmpty()) null else speechQueue.removeFirst()
+            while (speechQueue.isNotEmpty() && (now0 - speechQueue.first().second) > STALE_CUE_MS) speechQueue.removeFirst()
+            if (speechQueue.isEmpty()) null else speechQueue.removeFirst().first
         } ?: return
 
         if (!isTtsReady || tts == null) return
@@ -295,7 +334,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
          if (prefs.voiceClimbsEnabled && climbs.isNotEmpty()) {
              for ((idx, climb) in climbs.withIndex()) {
                  val distToClimb = climb.startDistance - currentDist
-                 if (distToClimb in 40.0..300.0 && lastAnnouncedClimbIndex != idx) {
+                 if (distToClimb in -30.0..300.0 && lastAnnouncedClimbIndex != idx) {
                      lastAnnouncedClimbIndex = idx
                      lastAnnouncedKmInClimb = 0
                      val climbName = climb.name ?: (context.getString(R.string.profile_tv_climb_item_prefix) + " " + (idx + 1))
@@ -318,7 +357,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
 
                  // Cima próxima (a 500 metros reales de la cima)
                  val distToSummit = climb.endDistance - currentDist
-                 if (distToSummit <= 520.0 && distToSummit >= 400.0 && currentDist >= climb.startDistance && lastSummit500AnnouncedClimbIndex != idx) {
+                 if (distToSummit <= 540.0 && distToSummit >= 380.0 && currentDist >= climb.startDistance && lastSummit500AnnouncedClimbIndex != idx) {
                      lastSummit500AnnouncedClimbIndex = idx
                      val phrase = context.getString(R.string.voice_climb_summit_near, "500")
                      speak(phrase, priority = true)
@@ -326,7 +365,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                  }
 
                  // Cima inminente (a 100 metros reales de la cima)
-                 if (distToSummit <= 130.0 && distToSummit >= 40.0 && currentDist >= climb.startDistance && lastSummit100AnnouncedClimbIndex != idx) {
+                 if (distToSummit <= 130.0 && distToSummit >= 15.0 && currentDist >= climb.startDistance && lastSummit100AnnouncedClimbIndex != idx) {
                      lastSummit100AnnouncedClimbIndex = idx
                      val phrase = context.getString(R.string.voice_climb_summit_near, "100")
                      speak(phrase, priority = true)
@@ -353,10 +392,15 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
              val threshold = prefs.voiceSteepThreshold
              val subBlockSize = strategy.subBlockSizeMeters.coerceAtLeast(20.0)
              
-             // Miramos los próximos 300m a 500m
+             // Miramos los próximos 300m a 500m desde la posición del ciclista (no desde el inicio de la ventana)
+             val riderIdx = ((strategy.riderProgress * strategy.windowLengthMeters) / subBlockSize).toInt()
+                 .coerceIn(0, subBlocksList.size - 1)
              val lookAheadCount = (500.0 / subBlockSize).toInt().coerceIn(2, subBlocksList.size)
-             val upcomingGrades: List<Float> = subBlocksList.take(lookAheadCount)
-             if (upcomingGrades.isNotEmpty()) {
+             val upcomingGrades: List<Float> = subBlocksList.drop(riderIdx).take(lookAheadCount)
+             // Solo "se endurece" si ya va subiendo: en una bajada seguida de un muro no aplica
+             val currentGradeHere = subBlocksList.subList(maxOf(0, riderIdx - 1), minOf(subBlocksList.size, riderIdx + 1)).average()
+             val isClimbingNow = currentGradeHere > 1.0
+             if (upcomingGrades.size >= 2 && isClimbingNow) {
                  val sum = upcomingGrades.fold(0.0) { acc, g -> acc + g.toDouble() }
                  val avgUpcoming = sum / upcomingGrades.size
                  if (avgUpcoming >= threshold && (currentDist - lastAnnouncedSteepDistance) > 1500.0) {
@@ -383,7 +427,10 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
          // 3. MURO DE DESARROLLO (Rampas >= 15% o muro extremo)
          val subBlocksMaxList: List<Float> = strategy.subBlocksMax
          if (prefs.voiceGearWallEnabled && subBlocksMaxList.isNotEmpty()) {
-             val maxAhead = subBlocksMaxList.take(4).maxByOrNull { it } ?: 0f
+             val wallIdx = if (strategy.subBlockSizeMeters > 0.0)
+                 ((strategy.riderProgress * strategy.windowLengthMeters) / strategy.subBlockSizeMeters).toInt().coerceIn(0, subBlocksMaxList.size - 1)
+             else 0
+             val maxAhead = subBlocksMaxList.drop(wallIdx).take(4).maxByOrNull { it } ?: 0f
              if (maxAhead >= 15.0f && (currentDist - lastAnnouncedWallDistance) > 1200.0) {
                  lastAnnouncedWallDistance = currentDist
                  val gradeFormatted = String.format(Locale.getDefault(), "%.0f", maxAhead.toDouble())
@@ -410,7 +457,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                  dAhead in minLookahead..maxLookahead
              }
 
-             if (nextHairpinDist != null && (nextHairpinDist - lastAnnouncedHairpinDistance) > 300.0) {
+             if (nextHairpinDist != null && (nextHairpinDist - lastAnnouncedHairpinDistance) > 60.0) {
                  lastAnnouncedHairpinDistance = nextHairpinDist
                  val distAhead = (nextHairpinDist - currentDist).toInt()
                  val isRight = nextHairpinInfo?.isRight
@@ -558,25 +605,29 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                     lastKGhostWasLeading = isLeading
                 }
 
+                // El Ghost llega a meta antes que el ciclista (posición del Ghost = ciclista - distM)
+                val routeEnd = snapshot.routeTotalLength
+                if (!ghostFinishAnnounced && routeEnd > 0.0 && !isLeading &&
+                    (currentDist - distM) >= routeEnd && currentDist < routeEnd - 20.0
+                ) {
+                    ghostFinishAnnounced = true
+                    speak(context.getString(R.string.voice_kghost_finished), priority = true)
+                }
+
+                // El ciclista llega a meta: tiempo respecto al Ghost
+                val riderRoute = snapshot.routeTotalLength
+                if (!riderFinishGhostAnnounced && riderRoute > 0.0 && currentDist >= riderRoute - 20.0) {
+                    riderFinishGhostAnnounced = true
+                    val gapStr = formatTimeVoice(Math.abs(Math.round(timeS)))
+                    val resId = if (isLeading) R.string.voice_kghost_finish_before else R.string.voice_kghost_finish_after
+                    speak(context.getString(resId, gapStr), priority = true)
+                }
+
                 // Avisos periódicos por intervalo de distancia (ej. cada 1000m)
                 val interval = prefs.voiceKGhostIntervalMeters.coerceAtLeast(500.0)
                 if ((currentDist - lastAnnouncedKGhostDistance) >= interval) {
                     lastAnnouncedKGhostDistance = currentDist
-                    val absSeconds = Math.abs(Math.round(timeS)).toLong()
-                    val timeStr = if (absSeconds < 60) {
-                        val unit = if (absSeconds == 1L) context.getString(R.string.voice_unit_second) else context.getString(R.string.voice_unit_seconds)
-                        "$absSeconds $unit"
-                    } else {
-                        val mins = absSeconds / 60
-                        val secs = absSeconds % 60
-                        val minUnit = if (mins == 1L) context.getString(R.string.voice_unit_minute) else context.getString(R.string.voice_unit_minutes)
-                        if (secs == 0L) {
-                            "$mins $minUnit"
-                        } else {
-                            val secUnit = if (secs == 1L) context.getString(R.string.voice_unit_second) else context.getString(R.string.voice_unit_seconds)
-                            "$mins $minUnit $secs $secUnit"
-                        }
-                    }
+                    val timeStr = formatTimeVoice(Math.abs(Math.round(timeS)))
                     val distVoiceStr = formatDistanceVoice(meters)
                     val phrase = if (isLeading) {
                         context.getString(R.string.voice_kghost_lead, distVoiceStr, timeStr)
