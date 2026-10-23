@@ -285,6 +285,12 @@ Built on the official `karoo-ext` SDK, installation requires **no root** and is 
 
 ---
 
+#### License
+
+Copyright © 2026 David García Pascual. **All rights reserved.** The ALTGRAPH code and assets are the author's original work and are published for viewing only. Copying, modifying, redistributing or reusing them in other projects is not allowed without prior written permission. See [LICENSE](LICENSE). ELITE features are currently free and will become a paid subscription in the future.
+
+---
+
 ## Support the Project
 
 If you enjoy ALTGRAPH and would like to support ongoing development:

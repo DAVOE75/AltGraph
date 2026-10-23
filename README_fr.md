@@ -236,6 +236,12 @@ Développé sur le SDK officiel `karoo-ext`, l'installation ne requiert **aucun 
 
 ---
 
+#### Licence
+
+Copyright © 2026 David García Pascual. **Tous droits réservés.** Le code et les ressources d'ALTGRAPH sont l'œuvre originale de l'auteur et sont publiés à titre de consultation uniquement. Il est interdit de les copier, modifier, redistribuer ou réutiliser dans d'autres projets sans autorisation écrite préalable. Voir [LICENSE](LICENSE). Les fonctions ELITE sont actuellement gratuites et deviendront payantes par abonnement.
+
+---
+
 ## Soutenir le projet
 
 Si vous appréciez ALTGRAPH et souhaitez encourager son développement continu :

@@ -389,7 +389,7 @@ El proyecto utiliza Gradle y Kotlin. Requiere JDK 17 y Android SDK (Plataforma 3
 
 #### Licencia y Descargo de Responsabilidad
 
-Este proyecto de código abierto se distribuye bajo la licencia **MIT** - Copyright 2026 David García Pascual.
+Copyright © 2026 David García Pascual. **Todos los derechos reservados.** El código y los recursos de ALTGRAPH son obra original del autor y se publican solo para consulta. No se permite copiarlos, modificarlos, redistribuirlos ni reutilizarlos en otros proyectos sin permiso previo por escrito. Consulta el archivo [LICENSE](LICENSE). Las funciones ELITE están actualmente gratuitas y serán de pago por suscripción en el futuro.
 *Descargo de responsabilidad: Esta extensión no está afiliada, respaldada, patrocinada ni soportada por Hammerhead o SRAM. Úsala bajo tu propio riesgo y, por favor, mantén siempre los ojos en la carretera y las manos en el manillar.*
 
 ---

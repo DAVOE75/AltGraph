@@ -236,6 +236,12 @@ Basiert auf dem offiziellen `karoo-ext` SDK, erfordert **kein Root** und ist 100
 
 ---
 
+#### Lizenz
+
+Copyright © 2026 David García Pascual. **Alle Rechte vorbehalten.** Code und Assets von ALTGRAPH sind das Originalwerk des Autors und werden nur zur Einsicht veröffentlicht. Kopieren, Ändern, Weiterverbreiten oder Wiederverwenden in anderen Projekten ist ohne vorherige schriftliche Genehmigung nicht gestattet. Siehe [LICENSE](LICENSE). Die ELITE-Funktionen sind derzeit kostenlos und werden künftig kostenpflichtig (Abo).
+
+---
+
 ## Projekt unterstützen
 
 Wenn dir ALTGRAPH gefällt und du die Weiterentwicklung unterstützen möchtest:
