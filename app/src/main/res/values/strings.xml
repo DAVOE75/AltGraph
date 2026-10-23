@@ -334,4 +334,5 @@
     <string name="setting_gear_desc">Enter your chainring teeth and cassette sprockets, separated by commas, so the recommended gear matches your bike</string>
     <string name="setting_gear_chainrings">Chainrings (e.g. 50,34)</string>
     <string name="setting_gear_cassette">Cassette (e.g. 11,12,13,14,15,17,19,21,24,27,30,34)</string>
+    <string name="label_training_zone_bar">Training zone bar</string>
 </resources>

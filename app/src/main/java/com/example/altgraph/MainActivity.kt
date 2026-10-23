@@ -1583,7 +1583,7 @@ class MainActivity : Activity() {
         powerBarCard.orientation = LinearLayout.VERTICAL
 
         val switchPowerBar = Switch(this).apply {
-            text = "Barra de Zona de Entrenamiento"
+            text = getString(R.string.label_training_zone_bar)
             textSize = 14f
             setTextColor(Color.WHITE)
             isChecked = prefs.elitePowerBarEnabled
