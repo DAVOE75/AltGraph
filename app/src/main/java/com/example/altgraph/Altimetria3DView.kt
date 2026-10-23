@@ -1728,8 +1728,8 @@ class Altimetria3DView @JvmOverloads constructor(
         // Meta / Final de ruta: Bandera de cuadros / Línea de meta en el último bloque
         if (routeTotalLength > 0.0) {
             val finishDistInWindow = routeTotalLength - windowStartMeters
-            if (finishDistInWindow in 0.0..totalMetersAhead) {
-                val frac = (finishDistInWindow / totalMetersAhead).toFloat()
+            if (finishDistInWindow in 0.0..(totalMetersAhead + 1.0)) {
+                val frac = (finishDistInWindow / totalMetersAhead).toFloat().coerceAtMost(1f)
                 val exactIndexF = frac * (totalMicroSamples - 1)
                 val fIdx = exactIndexF.toInt().coerceIn(0, totalMicroSamples - 2)
                 val rem = exactIndexF - fIdx
@@ -1770,27 +1770,26 @@ class Altimetria3DView @JvmOverloads constructor(
                     color = Color.WHITE
                     strokeWidth = 2f
                 }
-                val flagPoleTopY = fyBack - 22f
+                val flagPoleTopY = fyBack - 46f
                 canvas.drawLine(fxBack, fyBack, fxBack, flagPoleTopY, flagPolePaint)
 
-                val flagPath = Path().apply {
-                    moveTo(fxBack, flagPoleTopY)
-                    lineTo(fxBack + 14f, flagPoleTopY + 5f)
-                    lineTo(fxBack, flagPoleTopY + 10f)
-                    close()
+                // Bandera de cuadros 4x3
+                val cell = 7f
+                val cellPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
+                for (r in 0 until 3) {
+                    for (c in 0 until 4) {
+                        cellPaint.color = if ((r + c) % 2 == 0) Color.WHITE else Color.BLACK
+                        val cl = fxBack + 1f + c * cell
+                        val ct = flagPoleTopY + r * cell
+                        canvas.drawRect(cl, ct, cl + cell, ct + cell, cellPaint)
+                    }
                 }
-                val flagPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                    color = Color.parseColor("#F59E0B") // Amarillo dorado
-                    style = Paint.Style.FILL
-                }
-                canvas.drawPath(flagPath, flagPaint)
-
                 val flagBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                     color = Color.WHITE
                     strokeWidth = 1f
                     style = Paint.Style.STROKE
                 }
-                canvas.drawPath(flagPath, flagBorderPaint)
+                canvas.drawRect(fxBack + 1f, flagPoleTopY, fxBack + 1f + 4 * cell, flagPoleTopY + 3 * cell, flagBorderPaint)
             }
         }
     }
