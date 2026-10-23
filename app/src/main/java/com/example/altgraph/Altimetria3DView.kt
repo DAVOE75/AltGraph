@@ -1663,7 +1663,15 @@ class Altimetria3DView @JvmOverloads constructor(
             // 2. Telemetría de Marcha Recomendada y Proyección de Desarrollo en el eje inferior
             val targetCadence = if (currentCadence > 40.0) currentCadence else 75.0
             val speedKmh = (currentSpeedMs * 3.6).coerceAtLeast(3.0)
-            val avgNextGrade = microGrades.take((totalMicroSamples * 0.3f).toInt().coerceAtLeast(1)).average().toFloat()
+            val gearIdxF = if (riderProgress in 0f..1f) {
+                if (profileElevations.size >= 2 && subBlocks.isNotEmpty() && subBlockSizeMeters > 0.0)
+                    ((riderProgress * lookaheadMeters) / subBlockSizeMeters).toFloat()
+                else riderProgress * (totalMicroSamples - 1)
+            } else 0f
+            val gearIdx = gearIdxF.toInt().coerceIn(0, (microGrades.size - 1).coerceAtLeast(0))
+            val gearSpan = if (subBlockSizeMeters > 0.0) (100.0 / subBlockSizeMeters).toInt().coerceAtLeast(1) else 1
+            val gearEnd = (gearIdx + gearSpan).coerceAtMost(microGrades.size)
+            val avgNextGrade = if (microGrades.isEmpty()) 0f else (gearIdx until gearEnd).map { microGrades[it] }.average().toFloat()
             if (showGearBadge) {
             val climbGrade = climbGearGrade
             val recSprocket = GearAdvisor.recommend(climbGrade ?: avgNextGrade.toDouble(), gearChainrings, gearCassette)
@@ -1694,6 +1702,7 @@ class Altimetria3DView @JvmOverloads constructor(
             while (gearTextPaint.measureText(gearLabel) + 28f > (gapR - gapL) && gearTextPaint.textSize > 20f) {
                 gearTextPaint.textSize -= 1f
             }
+            if (rotate90) gearTextPaint.textSize = gearTextPaint.textSize * 0.62f + 1f
             val tb = android.graphics.Rect()
             gearTextPaint.getTextBounds(gearLabel, 0, gearLabel.length, tb)
             val textW = gearTextPaint.measureText(gearLabel)
@@ -1704,7 +1713,7 @@ class Altimetria3DView @JvmOverloads constructor(
             // Vertical (no apaisado): el engranaje va encima de la leyenda de bloques
             val badgeCx = if (rotate90) (gapL + gapR) / 2f else w / 2f
             val badgeCy = if (!rotate90) h - 23f - scaleLegendPaint.textSize - badgeH / 2f - 2f
-                else if (arrowsBottom) h - 38f else h - 26f
+                else if (arrowsBottom) h - 24f else h - 12f
             val badgeL = badgeCx - badgeW / 2f
             val badgeT = badgeCy - badgeH / 2f
             // El texto se centra por sus límites reales para que el rectángulo lo envuelva con margen uniforme
