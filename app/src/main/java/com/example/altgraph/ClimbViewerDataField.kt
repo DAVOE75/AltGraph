@@ -294,6 +294,10 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 altimetria3DView.currentCadence = strategy.currentCadence
                 altimetria3DView.currentSpeedMs = snap.currentSpeed
                 altimetria3DView.gearWallEnabled = prefs.gearWallEnabled
+                altimetria3DView.showGearBadge = climb != null
+                altimetria3DView.climbGearGrade = climb?.avgGrade
+                altimetria3DView.gearChainrings = prefs.gearChainrings
+                altimetria3DView.gearCassette = prefs.gearCassette
                 altimetria3DView.update3DData(
                         blocks = strategy.nextBlocks,
                         elevation = strategy.windowStartElevation,

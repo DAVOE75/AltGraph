@@ -90,6 +90,26 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_SHOW_HAIRPINS, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_HAIRPINS, value).apply()
 
+    var gearChainrings: String
+        get() = prefs.getString(KEY_GEAR_CHAINRINGS, GearAdvisor.DEFAULT_CHAINRINGS) ?: GearAdvisor.DEFAULT_CHAINRINGS
+        set(value) = prefs.edit().putString(KEY_GEAR_CHAINRINGS, value).apply()
+
+    var gearCassette: String
+        get() = prefs.getString(KEY_GEAR_CASSETTE, GearAdvisor.DEFAULT_CASSETTE) ?: GearAdvisor.DEFAULT_CASSETTE
+        set(value) = prefs.edit().putString(KEY_GEAR_CASSETTE, value).apply()
+
+    var beaconColor: Int
+        get() = prefs.getInt(KEY_BEACON_COLOR, 0xFF38BDF8.toInt())
+        set(value) = prefs.edit().putInt(KEY_BEACON_COLOR, value).apply()
+
+    var beaconSize: String
+        get() = prefs.getString(KEY_BEACON_SIZE, "medium") ?: "medium"
+        set(value) = prefs.edit().putString(KEY_BEACON_SIZE, value).apply()
+
+    var beaconShape: String
+        get() = prefs.getString(KEY_BEACON_SHAPE, "circle") ?: "circle"
+        set(value) = prefs.edit().putString(KEY_BEACON_SHAPE, value).apply()
+
     var showPoiTowns: Boolean
         get() = prefs.getBoolean(KEY_SHOW_POI_TOWNS, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_POI_TOWNS, value).apply()
@@ -166,7 +186,7 @@ class AppPreferences(context: Context) {
         set(value) = prefs.edit().putBoolean(KEY_WEATHER_OVERLAY_ENABLED, value).apply()
 
     var stravaSegmentsEnabled: Boolean
-        get() = prefs.getBoolean(KEY_STRAVA_SEGMENTS_ENABLED, true) && isEliteUnlocked
+        get() = prefs.getBoolean(KEY_STRAVA_SEGMENTS_ENABLED, false) && isEliteUnlocked
         set(value) = prefs.edit().putBoolean(KEY_STRAVA_SEGMENTS_ENABLED, value).apply()
 
     var eliteRadarEnabled: Boolean
@@ -183,7 +203,7 @@ class AppPreferences(context: Context) {
         set(value) = prefs.edit().putString(KEY_ELITE_GHOST_STYLE, value).apply()
 
     var eliteEnergyBarEnabled: Boolean
-        get() = prefs.getBoolean(KEY_ELITE_ENERGY_BAR_ENABLED, true) && isEliteUnlocked
+        get() = prefs.getBoolean(KEY_ELITE_ENERGY_BAR_ENABLED, false) && isEliteUnlocked
         set(value) = prefs.edit().putBoolean(KEY_ELITE_ENERGY_BAR_ENABLED, value).apply()
 
     var elitePoiRulerEnabled: Boolean
@@ -195,7 +215,7 @@ class AppPreferences(context: Context) {
         set(value) = prefs.edit().putBoolean(KEY_ELITE_HISTOGRAM_ENABLED, value).apply()
 
     var eliteRadar3dEnabled: Boolean
-        get() = prefs.getBoolean(KEY_ELITE_RADAR_3D_ENABLED, true) && isEliteUnlocked
+        get() = prefs.getBoolean(KEY_ELITE_RADAR_3D_ENABLED, false) && isEliteUnlocked
         set(value) = prefs.edit().putBoolean(KEY_ELITE_RADAR_3D_ENABLED, value).apply()
 
     var eliteRadarTheme: String
@@ -203,7 +223,7 @@ class AppPreferences(context: Context) {
         set(value) = prefs.edit().putString(KEY_ELITE_RADAR_THEME, value).apply()
 
     var elitePowerBarEnabled: Boolean
-        get() = prefs.getBoolean(KEY_ELITE_POWER_BAR_ENABLED, true) && isEliteUnlocked
+        get() = prefs.getBoolean(KEY_ELITE_POWER_BAR_ENABLED, false) && isEliteUnlocked
         set(value) = prefs.edit().putBoolean(KEY_ELITE_POWER_BAR_ENABLED, value).apply()
 
     var eliteRadarAlertsEnabled: Boolean
@@ -219,7 +239,7 @@ class AppPreferences(context: Context) {
         set(value) = prefs.edit().putBoolean(KEY_ELITE_SMOOTH_GRADIENTS_ENABLED, value).apply()
 
     var eliteProfileTv2dRotate: Boolean
-        get() = prefs.getBoolean(KEY_ELITE_PROFILE_TV_2D_ROTATE, false) && isEliteUnlocked
+        get() = prefs.getBoolean(KEY_ELITE_PROFILE_TV_2D_ROTATE, true) && isEliteUnlocked
         set(value) = prefs.edit().putBoolean(KEY_ELITE_PROFILE_TV_2D_ROTATE, value).apply()
 
     var eliteProfileTvColor: String
@@ -227,7 +247,7 @@ class AppPreferences(context: Context) {
         set(value) = prefs.edit().putString(KEY_ELITE_PROFILE_TV_COLOR, value).apply()
 
     var eliteHighlightClimbs: Boolean
-        get() = prefs.getBoolean(KEY_ELITE_HIGHLIGHT_CLIMBS, false) && isEliteUnlocked
+        get() = prefs.getBoolean(KEY_ELITE_HIGHLIGHT_CLIMBS, true) && isEliteUnlocked
         set(value) = prefs.edit().putBoolean(KEY_ELITE_HIGHLIGHT_CLIMBS, value).apply()
 
     var eliteProfileTvShowClimbNames: Boolean
@@ -382,6 +402,11 @@ class AppPreferences(context: Context) {
         private const val KEY_SHOW_POI_VIEWPOINTS = "show_poi_viewpoints"
         private const val KEY_SHOW_POI_SUMMITS = "show_poi_summits"
         private const val KEY_SHOW_3D_ZOOM = "show_3d_zoom_controls"
+        private const val KEY_GEAR_CHAINRINGS = "gear_chainrings"
+        private const val KEY_GEAR_CASSETTE = "gear_cassette"
+        private const val KEY_BEACON_COLOR = "beacon_color"
+        private const val KEY_BEACON_SIZE = "beacon_size"
+        private const val KEY_BEACON_SHAPE = "beacon_shape"
         private const val KEY_PAN_BUTTONS_POSITION = "pan_buttons_position"
         private const val KEY_SHOW_SURFACE_TEXTURES = "show_surface_textures"
         private const val KEY_CUSTOM_MAP_PROVIDER = "custom_map_provider_key"

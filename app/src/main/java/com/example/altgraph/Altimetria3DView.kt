@@ -334,6 +334,49 @@ class Altimetria3DView @JvmOverloads constructor(
         style = Paint.Style.FILL
     }
 
+    private var beaconScale = 1f
+    private var beaconShape = "circle"
+
+    private fun applyBeaconStyle(color: Int, size: String, shape: String) {
+        beaconPaint.color = color
+        beaconHaloPaint.color = Color.argb(0x45, Color.red(color), Color.green(color), Color.blue(color))
+        beaconScale = when (size) { "small" -> 0.7f; "large" -> 1.5f; else -> 1f }
+        beaconShape = shape
+    }
+
+    private fun drawBeaconShape(canvas: Canvas, cx: Float, cy: Float, haloR: Float, mainR: Float, coreR: Float) {
+        val s = beaconScale
+        when (beaconShape) {
+            "diamond" -> {
+                drawBeaconPoly(canvas, cx, cy, haloR * s, beaconHaloPaint, diamond = true)
+                drawBeaconPoly(canvas, cx, cy, mainR * s, beaconPaint, diamond = true)
+                drawBeaconPoly(canvas, cx, cy, coreR * s, beaconCorePaint, diamond = true)
+            }
+            "arrow" -> {
+                drawBeaconPoly(canvas, cx, cy, haloR * s, beaconHaloPaint, diamond = false)
+                drawBeaconPoly(canvas, cx, cy, mainR * s, beaconPaint, diamond = false)
+                drawBeaconPoly(canvas, cx, cy, coreR * s * 0.6f, beaconCorePaint, diamond = false)
+            }
+            else -> {
+                canvas.drawCircle(cx, cy, haloR * s, beaconHaloPaint)
+                canvas.drawCircle(cx, cy, mainR * s, beaconPaint)
+                canvas.drawCircle(cx, cy, coreR * s, beaconCorePaint)
+            }
+        }
+    }
+
+    // Rombo, o triángulo apuntando hacia abajo (marca el punto exacto)
+    private fun drawBeaconPoly(canvas: Canvas, cx: Float, cy: Float, r: Float, paint: Paint, diamond: Boolean) {
+        val p = Path()
+        if (diamond) {
+            p.moveTo(cx, cy - r); p.lineTo(cx + r, cy); p.lineTo(cx, cy + r); p.lineTo(cx - r, cy)
+        } else {
+            p.moveTo(cx - r, cy - r); p.lineTo(cx + r, cy - r); p.lineTo(cx, cy + r)
+        }
+        p.close()
+        canvas.drawPath(p, paint)
+    }
+
     // POIs estilo insignias circulares La Flamme Rouge
     private val poiLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#E2E8F0")
@@ -460,6 +503,11 @@ class Altimetria3DView @JvmOverloads constructor(
     var currentCadence: Double = 0.0
     var currentSpeedMs: Double = 0.0
     var gearWallEnabled: Boolean = true
+    var showGearBadge: Boolean = true
+    // Pendiente media del puerto: si no es null, se recomienda una marcha fija para toda la subida
+    var climbGearGrade: Double? = null
+    var gearChainrings: String = GearAdvisor.DEFAULT_CHAINRINGS
+    var gearCassette: String = GearAdvisor.DEFAULT_CASSETTE
 
     private val stravaPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#FC4C02") // Strava Orange
@@ -529,9 +577,13 @@ class Altimetria3DView @JvmOverloads constructor(
         isHeadingUp: Boolean = false,
         showSurfaceTextures: Boolean = false,
         routeTotalLength: Double = 0.0,
-        panButtonsPosition: String = "bottom"
+        panButtonsPosition: String = "bottom",
+        beaconColor: Int = 0xFF38BDF8.toInt(),
+        beaconSize: String = "medium",
+        beaconShape: String = "circle"
     ) {
         this.panButtonsPosition = panButtonsPosition
+        applyBeaconStyle(beaconColor, beaconSize, beaconShape)
         if (routeTotalLength > 0.0) {
             this.routeTotalLength = routeTotalLength
         }
@@ -1412,10 +1464,7 @@ class Altimetria3DView @JvmOverloads constructor(
         beaconPaint.style = Paint.Style.FILL
 
         // Halo exterior translúcido de alta visibilidad
-        canvas.drawCircle(rx, pinY, 11f, beaconHaloPaint)
-        // Baliza principal cian con núcleo blanco de contraste
-        canvas.drawCircle(rx, pinY, 7.5f, beaconPaint)
-        canvas.drawCircle(rx, pinY, 4.5f, beaconCorePaint)
+        drawBeaconShape(canvas, rx, pinY, 11f, 7.5f, 4.5f)
         }
 
         // ELITE FEATURE: Wind Vectors
@@ -1615,15 +1664,9 @@ class Altimetria3DView @JvmOverloads constructor(
             val targetCadence = if (currentCadence > 40.0) currentCadence else 75.0
             val speedKmh = (currentSpeedMs * 3.6).coerceAtLeast(3.0)
             val avgNextGrade = microGrades.take((totalMicroSamples * 0.3f).toInt().coerceAtLeast(1)).average().toFloat()
-            val recSprocket = when {
-                avgNextGrade >= 15f -> "34x34"
-                avgNextGrade >= 12f -> "34x32"
-                avgNextGrade >= 9f  -> "34x28"
-                avgNextGrade >= 6f  -> "34x24"
-                avgNextGrade >= 3f  -> "34x21"
-                avgNextGrade >= 0f  -> "50x21"
-                else                -> "50x16"
-            }
+            if (showGearBadge) {
+            val climbGrade = climbGearGrade
+            val recSprocket = GearAdvisor.recommend(climbGrade ?: avgNextGrade.toDouble(), gearChainrings, gearCassette)
 
             val gearBadgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = Color.parseColor("#CC111827")
@@ -1636,19 +1679,41 @@ class Altimetria3DView @JvmOverloads constructor(
             }
             val gearTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = Color.parseColor("#38BDF8")
-                textSize = (h * 0.075f).coerceIn(9f, 13f)
-                textAlign = Paint.Align.RIGHT
+                textSize = ((h * 0.15f) * fontScale).coerceIn(32f, 48f)
+                textAlign = Paint.Align.CENTER
                 typeface = android.graphics.Typeface.DEFAULT_BOLD
                 setShadowLayer(3f, 0f, 1f, Color.BLACK)
             }
 
-            val badgeR = baseEndX - 6f
-            val badgeB = h - 14f
-            val badgeL = badgeR - 65f
-            val badgeT = badgeB - 18f
-            canvas.drawRoundRect(badgeL, badgeT, badgeR, badgeB, 6f, 6f, gearBadgePaint)
-            canvas.drawRoundRect(badgeL, badgeT, badgeR, badgeB, 6f, 6f, gearBorderPaint)
-            canvas.drawText("⚙️ $recSprocket", badgeR - 4f, badgeB - 4f, gearTextPaint)
+            // Hueco entre la leyenda de bloques (centro) y la flecha de avance (derecha)
+            val legendHalf = maxOf(scaleLegendPaint.measureText(scaleLegendText), subScaleLegendPaint.measureText(subScaleLegendText)) / 2f
+            val gapL = w / 2f + legendHalf + 8f
+            val arrowsBottom = panButtonsPosition == "bottom"
+            val gapR = if (arrowsBottom) w - 50f - 28f - 8f else w - 8f
+            val gearLabel = if (climbGrade != null) "Rec. ⚙ $recSprocket" else "⚙ $recSprocket"
+            while (gearTextPaint.measureText(gearLabel) + 28f > (gapR - gapL) && gearTextPaint.textSize > 20f) {
+                gearTextPaint.textSize -= 1f
+            }
+            val tb = android.graphics.Rect()
+            gearTextPaint.getTextBounds(gearLabel, 0, gearLabel.length, tb)
+            val textW = gearTextPaint.measureText(gearLabel)
+            val padX = 14f
+            val padY = 10f
+            val badgeW = textW + padX * 2f
+            val badgeH = tb.height() + padY * 2f
+            // Vertical (no apaisado): el engranaje va encima de la leyenda de bloques
+            val badgeCx = if (rotate90) (gapL + gapR) / 2f else w / 2f
+            val badgeCy = if (!rotate90) h - 23f - scaleLegendPaint.textSize - badgeH / 2f - 2f
+                else if (arrowsBottom) h - 38f else h - 26f
+            val badgeL = badgeCx - badgeW / 2f
+            val badgeT = badgeCy - badgeH / 2f
+            // El texto se centra por sus límites reales para que el rectángulo lo envuelva con margen uniforme
+            val baseline = badgeCy - (tb.top + tb.bottom) / 2f
+            gearBorderPaint.strokeWidth = 2f
+            canvas.drawRoundRect(badgeL, badgeT, badgeL + badgeW, badgeT + badgeH, 10f, 10f, gearBadgePaint)
+            canvas.drawRoundRect(badgeL, badgeT, badgeL + badgeW, badgeT + badgeH, 10f, 10f, gearBorderPaint)
+            canvas.drawText(gearLabel, badgeCx, baseline, gearTextPaint)
+            }
         }
 
         // Meta / Final de ruta: Bandera de cuadros / Línea de meta en el último bloque
@@ -2550,9 +2615,7 @@ class Altimetria3DView @JvmOverloads constructor(
         // Baliza del ciclista avanzando por la ruta global (oculta si -1f, fuera de tramo)
         if (riderIdxGlobal >= 0) {
             val pinY = beaconY - 10f
-            canvas.drawCircle(beaconX, pinY, 9f, beaconHaloPaint)
-            canvas.drawCircle(beaconX, pinY, 7f, beaconPaint)
-            canvas.drawCircle(beaconX, pinY, 4f, beaconCorePaint)
+            drawBeaconShape(canvas, beaconX, pinY, 9f, 7f, 4f)
         }
         
         // Draw Legend at bottom right

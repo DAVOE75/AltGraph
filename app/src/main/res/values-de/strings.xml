@@ -286,4 +286,25 @@
     <string name="voice_finish_2km">2 Kilometer</string>
     <string name="voice_finish_1km">1 Kilometer</string>
     <string name="voice_finish_500m">500 Meter</string>
+    <string name="setting_beacon_title">Fahrer-Marker (Global 3D)</string>
+    <string name="setting_beacon_desc">Größe, Form und Farbe des Fahrer-Markers wählen</string>
+    <string name="beacon_label_size">Größe</string>
+    <string name="beacon_size_small">Klein</string>
+    <string name="beacon_size_medium">Mittel</string>
+    <string name="beacon_size_large">Groß</string>
+    <string name="beacon_label_shape">Form</string>
+    <string name="beacon_shape_circle">Kreis</string>
+    <string name="beacon_shape_diamond">Raute</string>
+    <string name="beacon_shape_arrow">Pfeil</string>
+    <string name="beacon_label_color">Farbe</string>
+    <string name="beacon_color_cyan">Cyan</string>
+    <string name="beacon_color_red">Rot</string>
+    <string name="beacon_color_yellow">Gelb</string>
+    <string name="beacon_color_green">Grün</string>
+    <string name="beacon_color_orange">Orange</string>
+    <string name="beacon_color_white">Weiß</string>
+    <string name="setting_gear_title">Schaltung (empfohlener Gang 3D)</string>
+    <string name="setting_gear_desc">Gib die Zähne deiner Kettenblätter und Ritzel der Kassette durch Kommas getrennt ein, damit der empfohlene Gang zu deinem Rad passt</string>
+    <string name="setting_gear_chainrings">Kettenblätter (z. B. 50,34)</string>
+    <string name="setting_gear_cassette">Kassette (z. B. 11,12,13,14,15,17,19,21,24,27,30,34)</string>
 </resources>

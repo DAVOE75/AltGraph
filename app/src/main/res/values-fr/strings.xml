@@ -286,4 +286,25 @@
     <string name="voice_finish_2km">2 kilomètres</string>
     <string name="voice_finish_1km">1 kilomètre</string>
     <string name="voice_finish_500m">500 mètres</string>
+    <string name="setting_beacon_title">Balise du cycliste (3D global)</string>
+    <string name="setting_beacon_desc">Choisissez la taille, la forme et la couleur de la balise du cycliste</string>
+    <string name="beacon_label_size">Taille</string>
+    <string name="beacon_size_small">Petite</string>
+    <string name="beacon_size_medium">Moyenne</string>
+    <string name="beacon_size_large">Grande</string>
+    <string name="beacon_label_shape">Forme</string>
+    <string name="beacon_shape_circle">Cercle</string>
+    <string name="beacon_shape_diamond">Losange</string>
+    <string name="beacon_shape_arrow">Flèche</string>
+    <string name="beacon_label_color">Couleur</string>
+    <string name="beacon_color_cyan">Cyan</string>
+    <string name="beacon_color_red">Rouge</string>
+    <string name="beacon_color_yellow">Jaune</string>
+    <string name="beacon_color_green">Vert</string>
+    <string name="beacon_color_orange">Orange</string>
+    <string name="beacon_color_white">Blanc</string>
+    <string name="setting_gear_title">Transmission (rapport conseillé 3D)</string>
+    <string name="setting_gear_desc">Saisissez les dents de vos plateaux et les pignons de la cassette séparés par des virgules pour adapter le rapport conseillé à votre vélo</string>
+    <string name="setting_gear_chainrings">Plateaux (ex. 50,34)</string>
+    <string name="setting_gear_cassette">Cassette (ex. 11,12,13,14,15,17,19,21,24,27,30,34)</string>
 </resources>

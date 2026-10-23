@@ -313,4 +313,25 @@
     <string name="voice_finish_2km">2 kilometers</string>
     <string name="voice_finish_1km">1 kilometer</string>
     <string name="voice_finish_500m">500 meters</string>
+    <string name="setting_beacon_title">Rider Beacon (Global 3D)</string>
+    <string name="setting_beacon_desc">Choose the size, shape and color of the rider marker</string>
+    <string name="beacon_label_size">Size</string>
+    <string name="beacon_size_small">Small</string>
+    <string name="beacon_size_medium">Medium</string>
+    <string name="beacon_size_large">Large</string>
+    <string name="beacon_label_shape">Shape</string>
+    <string name="beacon_shape_circle">Circle</string>
+    <string name="beacon_shape_diamond">Diamond</string>
+    <string name="beacon_shape_arrow">Arrow</string>
+    <string name="beacon_label_color">Color</string>
+    <string name="beacon_color_cyan">Cyan</string>
+    <string name="beacon_color_red">Red</string>
+    <string name="beacon_color_yellow">Yellow</string>
+    <string name="beacon_color_green">Green</string>
+    <string name="beacon_color_orange">Orange</string>
+    <string name="beacon_color_white">White</string>
+    <string name="setting_gear_title">Gearing (Global 3D gear hint)</string>
+    <string name="setting_gear_desc">Enter your chainring teeth and cassette sprockets, separated by commas, so the recommended gear matches your bike</string>
+    <string name="setting_gear_chainrings">Chainrings (e.g. 50,34)</string>
+    <string name="setting_gear_cassette">Cassette (e.g. 11,12,13,14,15,17,19,21,24,27,30,34)</string>
 </resources>

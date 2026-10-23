@@ -674,8 +674,86 @@ class MainActivity : Activity() {
         panPositionCard.addView(panPosValueText)
         panPositionCard.addView(panPosRow)
 
+        val beaconCard = createCardContainer()
+        beaconCard.addView(createSectionLabel(getString(R.string.setting_beacon_title)))
+        beaconCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_beacon_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 8)
+        })
+        fun <T> beaconRow(label: String, options: List<Pair<T, String>>, current: T, shared: MutableList<Button> = mutableListOf(), onPick: (T) -> Unit) {
+            if (label.isNotEmpty()) beaconCard.addView(createValueText(label))
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            }
+            val btns = shared
+            val base = btns.size
+            options.forEachIndexed { idx, (key, text) ->
+                val btn = createSegmentButton(text, key == current) {
+                    onPick(key)
+                    updateSegmentActiveStates(btns, base + idx)
+                }
+                btns.add(btn)
+                row.addView(btn)
+            }
+            beaconCard.addView(row)
+        }
+        beaconRow(getString(R.string.beacon_label_size), listOf(
+            "small" to getString(R.string.beacon_size_small),
+            "medium" to getString(R.string.beacon_size_medium),
+            "large" to getString(R.string.beacon_size_large)
+        ), prefs.beaconSize) { prefs.beaconSize = it }
+        beaconRow(getString(R.string.beacon_label_shape), listOf(
+            "circle" to getString(R.string.beacon_shape_circle),
+            "diamond" to getString(R.string.beacon_shape_diamond),
+            "arrow" to getString(R.string.beacon_shape_arrow)
+        ), prefs.beaconShape) { prefs.beaconShape = it }
+        val colorBtns = mutableListOf<Button>()
+        beaconRow(getString(R.string.beacon_label_color), listOf(
+            0xFF38BDF8.toInt() to getString(R.string.beacon_color_cyan),
+            0xFFEF4444.toInt() to getString(R.string.beacon_color_red),
+            0xFFFACC15.toInt() to getString(R.string.beacon_color_yellow)
+        ), prefs.beaconColor, colorBtns) { prefs.beaconColor = it }
+        beaconRow("", listOf(
+            0xFF22C55E.toInt() to getString(R.string.beacon_color_green),
+            0xFFF97316.toInt() to getString(R.string.beacon_color_orange),
+            0xFFFFFFFF.toInt() to getString(R.string.beacon_color_white)
+        ), prefs.beaconColor, colorBtns) { prefs.beaconColor = it }
+
+        val gearCard = createCardContainer()
+        gearCard.addView(createSectionLabel(getString(R.string.setting_gear_title)))
+        gearCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_gear_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 8)
+        })
+        fun gearInput(label: String, current: String, onChange: (String) -> Unit) {
+            gearCard.addView(createValueText(label))
+            gearCard.addView(EditText(this).apply {
+                inputType = android.text.InputType.TYPE_CLASS_TEXT
+                setTextColor(Color.WHITE)
+                setText(current)
+                setSingleLine(true)
+                addTextChangedListener(object : android.text.TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                    override fun afterTextChanged(s: android.text.Editable?) {
+                        val txt = s?.toString().orEmpty()
+                        if (GearAdvisor.parseTeeth(txt).isNotEmpty()) onChange(txt)
+                    }
+                })
+            })
+        }
+        gearInput(getString(R.string.setting_gear_chainrings), prefs.gearChainrings) { prefs.gearChainrings = it }
+        gearInput(getString(R.string.setting_gear_cassette), prefs.gearCassette) { prefs.gearCassette = it }
+
         tab3dContainer.addView(lookaheadCard)
         tab3dContainer.addView(panPositionCard)
+        tab3dContainer.addView(gearCard)
+        tab3dContainer.addView(beaconCard)
         tab3dContainer.addView(showCompassCard)
         tab3dContainer.addView(showCotasCard)
         tab3dContainer.addView(showRampsCard)

@@ -199,6 +199,8 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         altimetria3DView.currentCadence = strategy.currentCadence
                         altimetria3DView.currentSpeedMs = snap.currentSpeed
                         altimetria3DView.gearWallEnabled = prefs.gearWallEnabled
+                        altimetria3DView.gearChainrings = prefs.gearChainrings
+                        altimetria3DView.gearCassette = prefs.gearCassette
                         val isHeadingUp = prefs.routeMapHeadingUp
                         val mapRotAngle = if (isHeadingUp) {
                             // Si el heading es 90, la cámara apunta al este, así que rotamos -90 para que apunte arriba
@@ -248,7 +250,10 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             isHeadingUp = isHeadingUp,
                             showSurfaceTextures = prefs.showSurfaceTextures,
                             routeTotalLength = snap.routeTotalLength,
-                            panButtonsPosition = prefs.panButtonsPosition
+                            panButtonsPosition = prefs.panButtonsPosition,
+                            beaconColor = prefs.beaconColor,
+                            beaconSize = prefs.beaconSize,
+                            beaconShape = prefs.beaconShape
                         )
 
                         if (cachedBitmap == null || cachedBitmap?.width != w || cachedBitmap?.height != h) {

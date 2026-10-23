@@ -156,132 +156,126 @@ class RouteBarView(context: Context) : View(context) {
     }
 
     /**
-     * Dibuja un ciclista aerodinámico de competición (posición contrarreloj/sprint aero)
-     * fiel a la iconografía deportiva profesional: postura acoplada, manillar de triatlón/drop,
-     * cuadro de diamante, ruedas con radios/eje y cabeza con casco aerodinámico.
+     * Ciclista con relleno claro y fino borde interior. Dos pasadas: la primera pinta la silueta completa
+     * en el color del borde; la segunda pinta el relleno por dentro, con los trazos más finos y un
+     * contorno interior recortado a cada forma rellena.
      */
     private fun drawCyclistVector(canvas: Canvas, cx: Float, cy: Float, size: Float, color: Int) {
         val s = size / 24f
-        // Sombra sutil para resaltar sobre fondos claros o dinámicos
-        val shadowColor = Color.argb(125, 0, 0, 0)
-        renderCyclistVector(canvas, cx + 0.8f * s, cy + 1.0f * s, size, shadowColor)
-        // Dibujo principal en su color
-        renderCyclistVector(canvas, cx, cy, size, color)
+        val hsv = FloatArray(3)
+        Color.colorToHSV(color, hsv)
+        val isRed = (hsv[0] <= 15f || hsv[0] >= 345f) && hsv[1] > 0.5f && hsv[2] > 0.5f
+        val fillColor = if (isRed) Color.parseColor("#FF3B3B") else Color.WHITE
+        val borderColor = if (isRed) Color.parseColor("#B30000") else Color.BLACK
+        val bw = 0.9f * s
+        renderCyclistVector(canvas, cx, cy, size, borderColor, borderColor, 0f)
+        renderCyclistVector(canvas, cx, cy, size, fillColor, borderColor, bw)
+        ghostWidgetFillPaint.style = Paint.Style.FILL
     }
 
-    private fun renderCyclistVector(canvas: Canvas, cx: Float, cy: Float, size: Float, color: Int) {
-        val s = size / 24f // Escala normalizada en cuadrícula 24x24
+    private val cyclistBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeJoin = Paint.Join.ROUND
+    }
+
+    private fun renderCyclistVector(canvas: Canvas, cx: Float, cy: Float, size: Float, color: Int, borderColor: Int, bw: Float) {
+        val s = size / 24f // Cuadrícula 24x24; silueta de ciclista de carretera en posición aerodinámica
         ghostWidgetStrokePaint.color = color
         ghostWidgetFillPaint.color = color
+        ghostWidgetFillPaint.style = Paint.Style.FILL
+        fun px(x: Float) = cx + x * s
+        fun py(y: Float) = cy + y * s
+        // Grosor del trazo: en la pasada de relleno se reduce para dejar visible el borde interior
+        fun sw(w: Float) = if (bw > 0f) (w * s - 2f * bw).coerceAtLeast(0.4f) else w * s
+        fun fillShape(path: Path) {
+            canvas.drawPath(path, ghostWidgetFillPaint)
+            if (bw > 0f) {
+                cyclistBorderPaint.color = borderColor
+                cyclistBorderPaint.strokeWidth = 2f * bw
+                canvas.save()
+                canvas.clipPath(path)
+                canvas.drawPath(path, cyclistBorderPaint)
+                canvas.restore()
+            }
+        }
+        fun fillCircle(x: Float, y: Float, r: Float) = fillShape(Path().apply { addCircle(px(x), py(y), r * s, Path.Direction.CW) })
 
-        // 1. Ruedas con grosor proporcionado (llanta/cubierta) y eje central
-        val rWheel = 4.3f * s
-        val rearWheelX = cx - 7.2f * s
-        val frontWheelX = cx + 7.2f * s
-        val wheelY = cy + 5.2f * s
+        // Ruedas
+        val rWheel = 4.7f
+        val wheelY = 4.6f
+        ghostWidgetStrokePaint.strokeWidth = sw(1.5f)
+        canvas.drawCircle(px(-7.4f), py(wheelY), rWheel * s, ghostWidgetStrokePaint)
+        canvas.drawCircle(px(7.4f), py(wheelY), rWheel * s, ghostWidgetStrokePaint)
+        fillCircle(-7.4f, wheelY, 1.0f)
+        fillCircle(7.4f, wheelY, 1.0f)
 
-        ghostWidgetStrokePaint.strokeWidth = 1.9f * s
-        canvas.drawCircle(rearWheelX, wheelY, rWheel, ghostWidgetStrokePaint)
-        canvas.drawCircle(frontWheelX, wheelY, rWheel, ghostWidgetStrokePaint)
+        // Cuadro
+        val bbX = -0.2f; val bbY = 4.6f
+        val seatX = -3.2f; val seatY = -2.6f
+        val headX = 5.4f; val headY = -0.8f
+        ghostWidgetStrokePaint.strokeWidth = sw(1.3f)
+        canvas.drawLine(px(-7.4f), py(wheelY), px(bbX), py(bbY), ghostWidgetStrokePaint)
+        canvas.drawLine(px(-7.4f), py(wheelY), px(seatX), py(seatY), ghostWidgetStrokePaint)
+        canvas.drawLine(px(seatX), py(seatY), px(bbX), py(bbY), ghostWidgetStrokePaint)
+        canvas.drawLine(px(bbX), py(bbY), px(headX), py(headY), ghostWidgetStrokePaint)
+        canvas.drawLine(px(seatX), py(seatY), px(headX), py(headY), ghostWidgetStrokePaint)
+        canvas.drawLine(px(headX), py(headY), px(7.4f), py(wheelY), ghostWidgetStrokePaint)
+        // Plato
+        fillCircle(bbX, bbY, 1.5f)
 
-        // Pequeño centro / eje
-        canvas.drawCircle(rearWheelX, wheelY, 0.9f * s, ghostWidgetFillPaint)
-        canvas.drawCircle(frontWheelX, wheelY, 0.9f * s, ghostWidgetFillPaint)
+        // Sillín
+        ghostWidgetStrokePaint.strokeWidth = sw(1.6f)
+        canvas.drawLine(px(-4.6f), py(-3.1f), px(-1.4f), py(-2.9f), ghostWidgetStrokePaint)
 
-        // 2. Geometría del cuadro (Bicicleta de competición)
-        val bbX = cx - 0.8f * s    // Eje pedalier / plato
-        val bbY = cy + 4.2f * s
-        val seatJunctionX = cx - 3.4f * s // Unión tubo sillín y tirante
-        val seatJunctionY = cy - 0.8f * s
-        val headJunctionX = cx + 3.8f * s // Pipa de dirección
-        val headJunctionY = cy - 2.2f * s
-
-        ghostWidgetStrokePaint.strokeWidth = 1.9f * s
-        // Triángulo trasero: eje rueda trasera -> pedalier y eje -> tubo sillín
-        canvas.drawLine(rearWheelX, wheelY, bbX, bbY, ghostWidgetStrokePaint)
-        canvas.drawLine(rearWheelX, wheelY, seatJunctionX, seatJunctionY, ghostWidgetStrokePaint)
-        // Triángulo delantero: tubo de sillín, tubo inferior y tubo horizontal
-        canvas.drawLine(seatJunctionX, seatJunctionY, bbX, bbY, ghostWidgetStrokePaint)
-        canvas.drawLine(bbX, bbY, headJunctionX, headJunctionY, ghostWidgetStrokePaint)
-        canvas.drawLine(seatJunctionX, seatJunctionY, headJunctionX, headJunctionY, ghostWidgetStrokePaint)
-        // Horquilla delantera: dirección a eje rueda delantera
-        canvas.drawLine(headJunctionX, headJunctionY, frontWheelX, wheelY, ghostWidgetStrokePaint)
-
-        // Plato / biela
-        canvas.drawCircle(bbX, bbY, 1.4f * s, ghostWidgetFillPaint)
-
-        // Tija y sillín aero
-        canvas.drawLine(seatJunctionX, seatJunctionY, seatJunctionX - 0.6f * s, seatJunctionY - 2.2f * s, ghostWidgetStrokePaint)
-        val saddlePath = Path().apply {
-            moveTo(seatJunctionX - 2.8f * s, seatJunctionY - 2.5f * s)
-            lineTo(seatJunctionX + 1.2f * s, seatJunctionY - 2.2f * s)
-            lineTo(seatJunctionX - 2.4f * s, seatJunctionY - 1.8f * s)
+        // Torso macizo inclinado hacia delante
+        val torso = Path().apply {
+            moveTo(px(-5.2f), py(-3.6f))
+            cubicTo(px(-4.6f), py(-7.6f), px(0.2f), py(-8.4f), px(3.2f), py(-6.6f))
+            lineTo(px(2.4f), py(-4.4f))
+            cubicTo(px(0.2f), py(-3.6f), px(-1.4f), py(-1.6f), px(-3.0f), py(-1.4f))
             close()
         }
-        canvas.drawPath(saddlePath, ghostWidgetFillPaint)
+        fillShape(torso)
 
-        // Manillar / acoples aerodinámicos (aerobar / drop forward)
-        val barBaseX = headJunctionX + 0.6f * s
-        val barBaseY = headJunctionY - 2.0f * s
-        val barTipX = barBaseX + 3.2f * s
-        val barTipY = barBaseY - 0.2f * s
-
-        canvas.drawLine(headJunctionX, headJunctionY, barBaseX, barBaseY, ghostWidgetStrokePaint)
-        val barPath = Path().apply {
-            moveTo(barBaseX - 0.5f * s, barBaseY + 0.2f * s)
-            lineTo(barTipX, barTipY)
-            lineTo(barTipX + 0.8f * s, barTipY - 1.2f * s) // punta levantada de los acoples
+        // Brazo hasta el manillar y gancho de las manetas
+        ghostWidgetStrokePaint.strokeWidth = sw(2.0f)
+        val arm = Path().apply {
+            moveTo(px(2.8f), py(-5.6f))
+            lineTo(px(4.6f), py(-2.6f))
+            lineTo(px(6.4f), py(-1.6f))
         }
-        ghostWidgetStrokePaint.strokeWidth = 1.6f * s
-        canvas.drawPath(barPath, ghostWidgetStrokePaint)
+        canvas.drawPath(arm, ghostWidgetStrokePaint)
+        ghostWidgetStrokePaint.strokeWidth = sw(1.4f)
+        val drop = Path().apply {
+            moveTo(px(5.6f), py(-2.8f))
+            lineTo(px(7.4f), py(-2.8f))
+            lineTo(px(7.6f), py(-1.0f))
+        }
+        canvas.drawPath(drop, ghostWidgetStrokePaint)
 
-        // 3. Ciclista profesional con postura de máxima aerodinámica (TT / Triatlón)
-        val hipX = seatJunctionX - 0.2f * s
-        val hipY = seatJunctionY - 3.2f * s
-        val shoulderX = cx + 2.0f * s
-        val shoulderY = cy - 4.4f * s
+        // Pierna: muslo, espinilla y pie
+        val kneeX = 2.6f; val kneeY = -0.6f
+        ghostWidgetStrokePaint.strokeWidth = sw(3.0f)
+        canvas.drawLine(px(-3.6f), py(-2.6f), px(kneeX), py(kneeY), ghostWidgetStrokePaint)
+        ghostWidgetStrokePaint.strokeWidth = sw(2.3f)
+        canvas.drawLine(px(kneeX), py(kneeY), px(0.6f), py(4.2f), ghostWidgetStrokePaint)
+        fillShape(Path().apply { addOval(android.graphics.RectF(px(-0.8f), py(3.9f), px(2.6f), py(5.6f)), Path.Direction.CW) })
 
-        // Torso plano, aerodinámico e inclinado hacia delante
-        val torsoPath = Path().apply {
-            moveTo(hipX - 1.0f * s, hipY)
-            quadTo(cx - 0.8f * s, cy - 4.8f * s, shoulderX, shoulderY)
-            lineTo(shoulderX - 0.2f * s, shoulderY + 2.2f * s)
-            quadTo(cx - 0.4f * s, cy - 2.6f * s, hipX + 0.8f * s, hipY + 1.2f * s)
+        // Casco
+        val helmet = Path().apply {
+            moveTo(px(3.6f), py(-6.8f))
+            cubicTo(px(4.4f), py(-9.0f), px(7.6f), py(-9.2f), px(8.4f), py(-7.0f))
+            cubicTo(px(8.8f), py(-5.8f), px(7.6f), py(-5.0f), px(6.2f), py(-5.2f))
+            cubicTo(px(5.0f), py(-5.4f), px(4.0f), py(-5.8f), px(3.6f), py(-6.8f))
             close()
         }
-        canvas.drawPath(torsoPath, ghostWidgetFillPaint)
+        fillShape(helmet)
 
-        // Brazo apoyado en acople aerodinámico (hombro -> codo -> manos en la punta)
-        val elbowX = cx + 2.8f * s
-        val elbowY = cy - 2.4f * s
-        val armPath = Path().apply {
-            moveTo(shoulderX, shoulderY + 0.6f * s)
-            lineTo(elbowX, elbowY)
-            lineTo(barTipX + 0.4f * s, barTipY - 0.4f * s)
-        }
-        ghostWidgetStrokePaint.strokeWidth = 2.2f * s
-        canvas.drawPath(armPath, ghostWidgetStrokePaint)
-
-        // Pierna atlética pedaleando (cadera -> rodilla hacia delante -> pie en el pedalier)
-        val kneeX = cx + 1.8f * s
-        val kneeY = cy + 0.8f * s
-        ghostWidgetStrokePaint.strokeWidth = 2.4f * s
-        canvas.drawLine(hipX, hipY + 0.5f * s, kneeX, kneeY, ghostWidgetStrokePaint) // Muslo
-        ghostWidgetStrokePaint.strokeWidth = 2.0f * s
-        canvas.drawLine(kneeX, kneeY, bbX, bbY, ghostWidgetStrokePaint)              // Espinilla y pie al pedalier
-
-        // 4. Cabeza con casco aerodinámico de gota / contrarreloj alargado hacia atrás
-        val headCx = shoulderX + 2.2f * s
-        val headCy = shoulderY - 1.8f * s
-
-        val helmetPath = Path().apply {
-            moveTo(headCx - 2.8f * s, headCy + 0.3f * s) // Cola aerodinámica pegada a la espalda
-            cubicTo(headCx - 1.5f * s, headCy - 2.2f * s, headCx + 1.2f * s, headCy - 2.2f * s, headCx + 2.4f * s, headCy - 0.4f * s) // Cúpula
-            cubicTo(headCx + 2.8f * s, headCy + 0.6f * s, headCx + 1.6f * s, headCy + 1.4f * s, headCx + 0.5f * s, headCy + 1.4f * s) // Visera y barbilla
-            cubicTo(headCx - 0.8f * s, headCy + 1.2f * s, headCx - 1.8f * s, headCy + 0.9f * s, headCx - 2.8f * s, headCy + 0.3f * s)
-            close()
-        }
-        canvas.drawPath(helmetPath, ghostWidgetFillPaint)
+        // Líneas de velocidad
+        ghostWidgetStrokePaint.strokeWidth = sw(1.1f)
+        canvas.drawLine(px(-12.0f), py(-6.8f), px(-8.2f), py(-6.8f), ghostWidgetStrokePaint)
+        canvas.drawLine(px(-12.8f), py(-4.6f), px(-7.6f), py(-4.6f), ghostWidgetStrokePaint)
+        canvas.drawLine(px(-12.0f), py(-2.4f), px(-8.2f), py(-2.4f), ghostWidgetStrokePaint)
     }
 
     private fun drawThemedBand(
@@ -1361,19 +1355,19 @@ class RouteBarView(context: Context) : View(context) {
 
                         // Flecha superior que conecta a ambos ciclistas
                         val arrowY = top + barH * 0.22f
-                        val arrowStartX = leftCyclistX + cyclistSize * 0.52f
-                        val arrowEndX = rightCyclistX - cyclistSize * 0.52f
+                        val arrowStartX = leftCyclistX + cyclistSize * 0.8f
+                        val arrowEndX = rightCyclistX - cyclistSize * 0.8f
 
                         if (arrowEndX > arrowStartX + 20f) {
                             ghostWidgetStrokePaint.color = Color.BLACK
-                            ghostWidgetStrokePaint.strokeWidth = 2.5f
+                            ghostWidgetStrokePaint.strokeWidth = 2.0f
                             canvas.drawLine(arrowStartX, arrowY, arrowEndX, arrowY, ghostWidgetStrokePaint)
 
                             val arrowHeadSize = (barH * 0.16f).coerceIn(7f, 13f)
                             val arrowHead = Path().apply {
                                 moveTo(arrowEndX, arrowY)
-                                lineTo(arrowEndX - arrowHeadSize, arrowY - arrowHeadSize * 0.6f)
-                                lineTo(arrowEndX - arrowHeadSize, arrowY + arrowHeadSize * 0.6f)
+                                lineTo(arrowEndX - arrowHeadSize, arrowY - arrowHeadSize * 0.48f)
+                                lineTo(arrowEndX - arrowHeadSize, arrowY + arrowHeadSize * 0.48f)
                                 close()
                             }
                             ghostWidgetFillPaint.color = Color.BLACK
@@ -1498,19 +1492,19 @@ class RouteBarView(context: Context) : View(context) {
                         drawCyclistVector(canvas, cx, topCyclistY, cyclistSize, topColor)
 
                         // Flecha vertical ascendente
-                        val arrowStartY = bottomCyclistY - cyclistSize * 0.58f
-                        val arrowEndY = topCyclistY + cyclistSize * 0.58f
+                        val arrowStartY = bottomCyclistY - cyclistSize * 0.85f
+                        val arrowEndY = topCyclistY + cyclistSize * 0.85f
 
                         if (arrowStartY > arrowEndY + 20f) {
                             ghostWidgetStrokePaint.color = Color.BLACK
-                            ghostWidgetStrokePaint.strokeWidth = 2.5f
+                            ghostWidgetStrokePaint.strokeWidth = 2.0f
                             canvas.drawLine(cx, arrowStartY, cx, arrowEndY, ghostWidgetStrokePaint)
 
                             val arrowHeadSize = (barW * 0.16f).coerceIn(6f, 10f)
                             val arrowHead = Path().apply {
                                 moveTo(cx, arrowEndY)
-                                lineTo(cx - arrowHeadSize * 0.6f, arrowEndY + arrowHeadSize)
-                                lineTo(cx + arrowHeadSize * 0.6f, arrowEndY + arrowHeadSize)
+                                lineTo(cx - arrowHeadSize * 0.48f, arrowEndY + arrowHeadSize)
+                                lineTo(cx + arrowHeadSize * 0.48f, arrowEndY + arrowHeadSize)
                                 close()
                             }
                             ghostWidgetFillPaint.color = Color.BLACK

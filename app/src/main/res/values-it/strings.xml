@@ -286,4 +286,25 @@
     <string name="voice_finish_2km">2 chilometri</string>
     <string name="voice_finish_1km">1 chilometro</string>
     <string name="voice_finish_500m">500 metri</string>
+    <string name="setting_beacon_title">Segnalino del ciclista (3D globale)</string>
+    <string name="setting_beacon_desc">Scegli dimensione, tipo e colore del segnalino del ciclista</string>
+    <string name="beacon_label_size">Dimensione</string>
+    <string name="beacon_size_small">Piccolo</string>
+    <string name="beacon_size_medium">Medio</string>
+    <string name="beacon_size_large">Grande</string>
+    <string name="beacon_label_shape">Tipo</string>
+    <string name="beacon_shape_circle">Cerchio</string>
+    <string name="beacon_shape_diamond">Rombo</string>
+    <string name="beacon_shape_arrow">Freccia</string>
+    <string name="beacon_label_color">Colore</string>
+    <string name="beacon_color_cyan">Ciano</string>
+    <string name="beacon_color_red">Rosso</string>
+    <string name="beacon_color_yellow">Giallo</string>
+    <string name="beacon_color_green">Verde</string>
+    <string name="beacon_color_orange">Arancione</string>
+    <string name="beacon_color_white">Bianco</string>
+    <string name="setting_gear_title">Trasmissione (rapporto consigliato 3D)</string>
+    <string name="setting_gear_desc">Inserisci i denti delle corone e dei pignoni della cassetta separati da virgole per adattare il rapporto consigliato alla tua bici</string>
+    <string name="setting_gear_chainrings">Corone (es. 50,34)</string>
+    <string name="setting_gear_cassette">Cassetta (es. 11,12,13,14,15,17,19,21,24,27,30,34)</string>
 </resources>

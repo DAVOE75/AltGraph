@@ -286,4 +286,25 @@
     <string name="voice_finish_2km">2 quilómetros</string>
     <string name="voice_finish_1km">1 quilómetro</string>
     <string name="voice_finish_500m">500 metros</string>
+    <string name="setting_beacon_title">Baliza do ciclista (3D global)</string>
+    <string name="setting_beacon_desc">Escolha o tamanho, tipo e cor da baliza do ciclista</string>
+    <string name="beacon_label_size">Tamanho</string>
+    <string name="beacon_size_small">Pequena</string>
+    <string name="beacon_size_medium">Média</string>
+    <string name="beacon_size_large">Grande</string>
+    <string name="beacon_label_shape">Tipo</string>
+    <string name="beacon_shape_circle">Círculo</string>
+    <string name="beacon_shape_diamond">Losango</string>
+    <string name="beacon_shape_arrow">Seta</string>
+    <string name="beacon_label_color">Cor</string>
+    <string name="beacon_color_cyan">Ciano</string>
+    <string name="beacon_color_red">Vermelho</string>
+    <string name="beacon_color_yellow">Amarelo</string>
+    <string name="beacon_color_green">Verde</string>
+    <string name="beacon_color_orange">Laranja</string>
+    <string name="beacon_color_white">Branco</string>
+    <string name="setting_gear_title">Transmissão (marcha recomendada 3D)</string>
+    <string name="setting_gear_desc">Introduza os dentes das coroas e as roldanas da cassete separados por vírgulas para adaptar a marcha recomendada à sua bicicleta</string>
+    <string name="setting_gear_chainrings">Coroas (ex. 50,34)</string>
+    <string name="setting_gear_cassette">Cassete (ex. 11,12,13,14,15,17,19,21,24,27,30,34)</string>
 </resources>

@@ -313,4 +313,25 @@
     <string name="voice_finish_2km">2 kilómetros</string>
     <string name="voice_finish_1km">1 kilómetro</string>
     <string name="voice_finish_500m">500 metros</string>
+    <string name="setting_beacon_title">Baliza del ciclista (3D global)</string>
+    <string name="setting_beacon_desc">Elige el tamaño, tipo y color de la baliza del ciclista</string>
+    <string name="beacon_label_size">Tamaño</string>
+    <string name="beacon_size_small">Pequeña</string>
+    <string name="beacon_size_medium">Media</string>
+    <string name="beacon_size_large">Grande</string>
+    <string name="beacon_label_shape">Tipo</string>
+    <string name="beacon_shape_circle">Círculo</string>
+    <string name="beacon_shape_diamond">Rombo</string>
+    <string name="beacon_shape_arrow">Flecha</string>
+    <string name="beacon_label_color">Color</string>
+    <string name="beacon_color_cyan">Cian</string>
+    <string name="beacon_color_red">Rojo</string>
+    <string name="beacon_color_yellow">Amarillo</string>
+    <string name="beacon_color_green">Verde</string>
+    <string name="beacon_color_orange">Naranja</string>
+    <string name="beacon_color_white">Blanco</string>
+    <string name="setting_gear_title">Transmisión (marcha recomendada 3D)</string>
+    <string name="setting_gear_desc">Introduce los dientes de tus platos y los piñones del cassette separados por comas para que la marcha recomendada se adapte a tu bici</string>
+    <string name="setting_gear_chainrings">Platos (ej. 50,34)</string>
+    <string name="setting_gear_cassette">Cassette (ej. 11,12,13,14,15,17,19,21,24,27,30,34)</string>
 </resources>
