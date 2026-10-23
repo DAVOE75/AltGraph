@@ -1481,15 +1481,15 @@ class Altimetria3DView @JvmOverloads constructor(
             canvas.drawPath(headlightPath, headlightPaint)
         }
 
-        val pinY = ry - 18f
+        val pinY = ry - 26f
         // Mástil vertical luminoso que conecta la carretera con la baliza
-        beaconPaint.strokeWidth = 2.0f
+        beaconPaint.strokeWidth = 2.5f
         beaconPaint.style = Paint.Style.STROKE
         canvas.drawLine(rx, ry, rx, pinY, beaconPaint)
         beaconPaint.style = Paint.Style.FILL
 
         // Halo exterior translúcido de alta visibilidad
-        drawBeaconShape(canvas, rx, pinY, 11f, 7.5f, 4.5f)
+        drawBeaconShape(canvas, rx, pinY, 16f, 11f, 6.5f)
         }
 
         // ELITE FEATURE: Wind Vectors

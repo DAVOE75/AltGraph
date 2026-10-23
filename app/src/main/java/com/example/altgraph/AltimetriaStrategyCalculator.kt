@@ -143,6 +143,9 @@ data class StrategyData(
     val surfaceSegments: List<SurfaceSegment> = emptyList()
 )
 
+// Posición fija de la baliza en la ventana (fracción desde el borde izquierdo): 200 m con zoom de 1 km
+private const val BEACON_ANCHOR_FRACTION = 0.2
+
 class AltimetriaStrategyCalculator {
     // Tramo GPS exacto [startDist, startDist+range], interpolando los extremos: con puntos de ruta muy separados
     // empezar en el punto anterior desplazaría el mapa respecto a la baliza (que se calcula por distancia).
@@ -277,9 +280,6 @@ class AltimetriaStrategyCalculator {
     var currentHeading: Double = 0.0
     var mapZoomLevel: Double? = null
     var manualPanOffsetMeters: Double = 0.0
-    private var pageStartDist = 0.0
-    private var pageLengthDist = 0.0
-    private var pageBaseLookahead = -1.0
     var appContext: Context? = null
 
     fun updateLiveGrade(grade: Double) {
@@ -1964,33 +1964,11 @@ class AltimetriaStrategyCalculator {
         // 1. Usar la distancia reportada y suavizada
         val currentRiderDistance = currentRouteDistance
 
-        // Páginas contiguas: la ventana n cubre [n*lookahead, (n+1)*lookahead). Los bloques terminan en el borde derecho
-        // y la página siguiente empieza justo con el bloque siguiente, para cualquier zoom. Solo depende de la posición
-        // (sin estado), así el salto es inmediato en cuanto cambia la distancia.
+        // Baliza ancla: avanza desde el inicio de la ruta hasta BEACON_ANCHOR_FRACTION de la ventana y a partir de
+        // ahí queda fija en pantalla mientras la ruta se desplaza. Depende solo de la posición (sin estado).
         val riderNow = currentRiderDistance.coerceAtLeast(0.0)
-        var windowStartDist = if (lookaheadDist > 0.0) Math.floor(riderNow / lookaheadDist) * lookaheadDist else 0.0
-        var pagedLookahead = lookaheadDist
-        // El zoom inteligente cambia lookaheadDist en cada tick: con paginación sin estado la baliza se quedaba
-        // "pillada" porque la página se movía con ella. La longitud de página se congela hasta que el ciclista la completa.
-        if (mapZoomLevel == null && lookaheadDist > 0.0) {
-            var pStart = pageStartDist
-            var pLen = pageLengthDist
-            if (pageBaseLookahead != baseLookahead || (!smartZoomEnabled && pLen != lookaheadDist)) {
-                pLen = 0.0
-                pageLengthDist = 0.0
-                if (advance) pageBaseLookahead = baseLookahead
-            }
-            val inPage = pLen > 0.0 && riderNow >= pStart && riderNow < pStart + pLen
-            if (!inPage) {
-                val prevEnd = pStart + pLen
-                pLen = lookaheadDist
-                pStart = if (pageLengthDist > 0.0 && riderNow >= prevEnd && riderNow < prevEnd + pLen) prevEnd
-                         else Math.floor(riderNow / pLen) * pLen
-            }
-            if (advance) { pageStartDist = pStart; pageLengthDist = pLen }
-            windowStartDist = pStart
-            pagedLookahead = pLen
-        }
+        val pagedLookahead = lookaheadDist
+        var windowStartDist = (riderNow - pagedLookahead * BEACON_ANCHOR_FRACTION).coerceAtLeast(0.0)
 
         // Aplicamos el pan manual DESPUÉS del cálculo base para que funcione instantáneamente
         windowStartDist = (windowStartDist + manualPanOffsetMeters).coerceAtLeast(0.0)
