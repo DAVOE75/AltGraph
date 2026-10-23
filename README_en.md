@@ -16,7 +16,7 @@
 It revolutionizes traditional cycling elevation profiles by featuring a **Suite of 7 Altimetry 3D Visualization Models**, biomechanical telemetry, real-time metabolic pacing analysis, and spoken audio cues.
 
 <p align="center">
- <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
+ <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
 ## VERSION 2.8: CUSTOMIZABLE BEACON, DRIVETRAIN & RECOMMENDED GEAR
