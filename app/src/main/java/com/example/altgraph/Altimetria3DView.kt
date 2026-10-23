@@ -1366,7 +1366,13 @@ class Altimetria3DView @JvmOverloads constructor(
         // 10. Baliza del ciclista en 3D: avanza limpiamente por la cresta frontal de la pendiente
         if (riderProgress >= 0f && riderProgress <= 1f) {
             val progressClamped = riderProgress
-            val exactIndexF = progressClamped * (totalMicroSamples - 1)
+            // Con perfil real, la muestra i está a i*subBlockSize metros del inicio de la ventana (incluye bloques extra de margen):
+            // se posiciona por distancia, no por fracción de la ventana, para no adelantar la baliza.
+            val exactIndexF = if (profileElevations.size >= 2 && subBlocks.isNotEmpty() && subBlockSizeMeters > 0.0) {
+                ((progressClamped * lookaheadMeters) / subBlockSizeMeters).toFloat().coerceIn(0f, (totalMicroSamples - 1).toFloat())
+            } else {
+                progressClamped * (totalMicroSamples - 1)
+            }
             val idx = exactIndexF.toInt().coerceIn(0, totalMicroSamples - 2)
             val rem = exactIndexF - idx
             val rx = xFront[idx] + rem * (xFront[idx + 1] - xFront[idx])
@@ -2436,7 +2442,11 @@ class Altimetria3DView @JvmOverloads constructor(
         var beaconX = 0f
         var beaconY = 0f
         if (riderProgress in 0f..1f) {
-            val riderIndexF = riderProgress * (n - 1)
+            val riderIndexF = if (subBlockSizeMeters > 0.0) {
+                ((riderProgress * lookaheadMeters) / subBlockSizeMeters).toFloat().coerceIn(0f, (n - 1).toFloat())
+            } else {
+                riderProgress * (n - 1)
+            }
             riderIdxGlobal = riderIndexF.toInt().coerceIn(0, n - 2)
             riderRemGlobal = riderIndexF - riderIdxGlobal
             val rxRaw = path[riderIdxGlobal].first + riderRemGlobal * (path[riderIdxGlobal + 1].first - path[riderIdxGlobal].first)
