@@ -1896,7 +1896,7 @@ class AltimetriaStrategyCalculator {
         val totalRouteLength = routeElevationProfile.lastOrNull()?.distance ?: (routePoints.lastOrNull()?.distance ?: 0.0)
 
         // Limitar desplazamiento manual (pan) para no arrastrar más allá del final de la ruta (evitar bloques al 0% irreales)
-        if (totalRouteLength > 0.0 && manualPanOffsetMeters > 0.0) {
+        if (totalRouteLength > 0.0 && (manualPanOffsetMeters > 0.0 || riderNow >= totalRouteLength - actualLookahead)) {
             val maxWindowStart = (totalRouteLength - actualLookahead).coerceAtLeast(0.0)
             windowStartDist = windowStartDist.coerceAtMost(maxWindowStart)
         }

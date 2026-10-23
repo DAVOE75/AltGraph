@@ -21,6 +21,26 @@ class RouteProfile2DView(context: Context) : View(context) {
     var highlightClimbs: Boolean = false
     var showClimbNames: Boolean = true
     
+    private fun climbMaxGrade(climb: RouteClimb): Double {
+        val n = profileElevations.size
+        if (n < 2 || totalDistance <= 0) return climb.avgGrade
+        val step = totalDistance / (n - 1)
+        val window = (100.0 / step).toInt().coerceAtLeast(1)
+        val s = (climb.startDistance / step).toInt().coerceIn(0, n - 1)
+        val e = (climb.endDistance / step).toInt().coerceIn(0, n - 1)
+        var max = climb.avgGrade
+        var i = s
+        while (i + window <= e) {
+            val g = (profileElevations[i + window] - profileElevations[i]) / (window * step) * 100.0
+            if (g > max) max = g
+            i++
+        }
+        return max
+    }
+
+    private fun climbDetailText(climb: RouteClimb): String =
+        String.format("%.1f km | %.1f%% | max %.1f%%", climb.length / 1000.0, climb.avgGrade, climbMaxGrade(climb))
+
     private val pathLine = Path()
     private val pathFill = Path()
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -371,13 +391,12 @@ class RouteProfile2DView(context: Context) : View(context) {
             val maxItemWidth = catClimbs.maxOfOrNull { item ->
                 val climb = item.first
                 val cat = item.second
-                val ptoStr = if (!climb.name.isNullOrBlank()) "${climb.name} " else "$ptoPrefix 9 "
-                val catStr = "($cat)"
-                val startKm = climb.startDistance / 1000.0
-                val lenKm = climb.length / 1000.0
-                val avg = climb.avgGrade
-                val startStr = String.format(" km %.1f | %.1f km al %.1f%%", startKm, lenKm, avg)
-                climbListPaint.measureText(ptoStr) + climbListCatPaint.measureText(catStr) + climbListPaint.measureText(startStr)
+                val named = showClimbNames && !climb.name.isNullOrBlank()
+                val ptoStr = if (named) "${climb.name} " else "$ptoPrefix 99 "
+                val line1W = climbListPaint.measureText(ptoStr) + climbListCatPaint.measureText("(H.C.)") +
+                    climbListPaint.measureText(String.format(" · km %.1f", climb.startDistance / 1000.0))
+                val line2W = climbListPaint.measureText(climbDetailText(climb)) * 0.85f
+                maxOf(line1W, line2W)
             } ?: (drawW - listStartX - 10f)
             val listWidth = maxItemWidth.coerceAtMost(drawW - 10f - listStartX)
             val headerCenterX = listStartX + listWidth / 2f
@@ -392,12 +411,17 @@ class RouteProfile2DView(context: Context) : View(context) {
 
             var climbY = 90f // Below the header
 
+            // Con más de 3 puertos la lista avanza sola: los superados salen por arriba
+            val firstPending = catClimbs.indexOfFirst { it.first.endDistance > currentDistance }
+            val firstShown = if (catClimbs.size > 3) {
+                (if (firstPending < 0) catClimbs.size - 3 else firstPending).coerceAtMost(catClimbs.size - 3)
+            } else 0
+
             for ((i, item) in catClimbs.withIndex()) {
+                if (i < firstShown) continue
                 val climb = item.first
                 val cat = item.second
                 val startKm = climb.startDistance / 1000.0
-                val lenKm = climb.length / 1000.0
-                val avg = climb.avgGrade
                 
                 // Dim primary color if passed, normal if not
                 val isPassed = climb.endDistance <= currentDistance
@@ -409,7 +433,7 @@ class RouteProfile2DView(context: Context) : View(context) {
                     climbListCatPaint.color = Color.parseColor("#F59E0B")
                 }
 
-                // Line 1: Pto 1 [Nombre] (3ª) km 3.5 | 0.5 km al 6.5%
+                // Línea 1: nombre (o Pto N), categoría y km de inicio
                 val showName = showClimbNames && !climb.name.isNullOrBlank()
                 val ptoStr = if (showName) "${climb.name} " else "$ptoPrefix ${i + 1} "
                 canvas.drawText(ptoStr, listStartX, climbY, climbListPaint)
@@ -418,9 +442,14 @@ class RouteProfile2DView(context: Context) : View(context) {
                 val catStr = "($cat)"
                 canvas.drawText(catStr, listStartX + ptoWidth, climbY, climbListCatPaint)
                 val catWidth = climbListCatPaint.measureText(catStr)
-                
-                val startStr = String.format(" km %.1f | %.1f km al %.1f%%", startKm, lenKm, avg)
-                canvas.drawText(startStr, listStartX + ptoWidth + catWidth, climbY, climbListPaint)
+                canvas.drawText(String.format(" · km %.1f", startKm), listStartX + ptoWidth + catWidth, climbY, climbListPaint)
+
+                // Línea 2: longitud, pendiente media y máxima, alineada a la izquierda con el nombre
+                val baseSize = climbListPaint.textSize
+                climbListPaint.textSize = baseSize * 0.85f
+                climbY += 22f * fontSizeScale
+                canvas.drawText(climbDetailText(climb), listStartX, climbY, climbListPaint)
+                climbListPaint.textSize = baseSize
 
                 climbY += 25f * fontSizeScale
                 if (climbY > drawH - 20f) break // Avoid drawing out of bounds
