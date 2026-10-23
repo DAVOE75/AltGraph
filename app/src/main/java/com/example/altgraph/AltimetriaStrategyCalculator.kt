@@ -273,8 +273,6 @@ class AltimetriaStrategyCalculator {
     var currentHeading: Double = 0.0
     var mapZoomLevel: Double? = null
     var manualPanOffsetMeters: Double = 0.0
-    private var pagedWindowStart: Double = -1.0
-    private fun actualLookaheadForPaging(lookahead: Double) = lookahead * 0.96
     var appContext: Context? = null
 
     fun updateLiveGrade(grade: Double) {
@@ -1941,20 +1939,11 @@ class AltimetriaStrategyCalculator {
         // 1. Usar la distancia reportada y suavizada
         val currentRiderDistance = currentRouteDistance
 
-        // 2. Ventana deslizante en bloques cuánticos de 50 metros (avance gradual y continuo)
-        val quantumMeters = 50.0
-        // Ventana por páginas: la baliza avanza hasta el borde derecho (95%) y entonces el perfil salta hacia delante,
-        // dejándola de nuevo a la izquierda. La página solo cambia en el tick (advance), así no depende de zooms intermedios.
-        val pageEdge = actualLookaheadForPaging(lookaheadDist)
+        // Páginas contiguas: la ventana n cubre [n*lookahead, (n+1)*lookahead). Los bloques terminan en el borde derecho
+        // y la página siguiente empieza justo con el bloque siguiente, para cualquier zoom. Solo depende de la posición
+        // (sin estado), así el salto es inmediato en cuanto cambia la distancia.
         val riderNow = currentRiderDistance.coerceAtLeast(0.0)
-        if (advance && (pagedWindowStart < 0.0 || riderNow < pagedWindowStart || riderNow > pagedWindowStart + pageEdge)) {
-            pagedWindowStart = (Math.floor((riderNow - lookaheadDist * 0.03) / quantumMeters) * quantumMeters).coerceAtLeast(0.0)
-        }
-        var windowStartDist = if (pagedWindowStart >= 0.0 && riderNow >= pagedWindowStart && riderNow <= pagedWindowStart + pageEdge) {
-            pagedWindowStart
-        } else {
-            (Math.floor((riderNow - lookaheadDist * 0.03) / quantumMeters) * quantumMeters).coerceAtLeast(0.0)
-        }
+        var windowStartDist = if (lookaheadDist > 0.0) Math.floor(riderNow / lookaheadDist) * lookaheadDist else 0.0
 
         // Aplicamos el pan manual DESPUÉS del cálculo base para que funcione instantáneamente
         windowStartDist = (windowStartDist + manualPanOffsetMeters).coerceAtLeast(0.0)
@@ -2121,7 +2110,7 @@ class AltimetriaStrategyCalculator {
         // Reserva a la derecha medida en distancia (no en nº de bloques): cubre el desfase de la ventana
         // cuantizada a 50 m y la inclinación del efecto 3D, para que nunca asome un hueco sin datos.
         // En vista de ruta completa no añadimos buffer a la derecha para no mostrar tramos planos irreales.
-        val rightBufferMeters = if (isFullRouteView) 0.0 else (quantumMeters + actualLookahead * 0.4)
+        val rightBufferMeters = if (isFullRouteView) 0.0 else (50.0 + actualLookahead * 0.4)
         val rightBufferCount = if (isFullRouteView) 0 else Math.ceil(rightBufferMeters / subBlockSize).toInt().coerceIn(2, 500)
         val rightBufferBlocks = ArrayList<Float>(rightBufferCount)
         if (!isFullRouteView) {

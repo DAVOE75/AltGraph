@@ -998,7 +998,14 @@ class Altimetria3DView @JvmOverloads constructor(
         val depth3dY = (h * 0.015f).coerceIn(5f, 9f)
 
         val totalSpanX = (baseEndX - startX) * zoomScale
-        val microStepX = totalSpanX / (totalMicroSamples - 1).coerceAtLeast(1)
+        // La ventana real mide lookaheadMeters; los bloques extra de margen quedan fuera de pantalla a la derecha.
+        // Así la baliza (riderProgress=1) y el último bloque coinciden con el borde derecho.
+        val windowSamples = if (profileElevations.size >= 2 && subBlocks.isNotEmpty() && subBlockSizeMeters > 0.0) {
+            (lookaheadMeters / subBlockSizeMeters).toFloat().coerceIn(1f, (totalMicroSamples - 1).toFloat())
+        } else {
+            (totalMicroSamples - 1).coerceAtLeast(1).toFloat()
+        }
+        val microStepX = totalSpanX / windowSamples
 
         val xFront = FloatArray(totalMicroSamples)
         val yFront = FloatArray(totalMicroSamples)
@@ -1027,7 +1034,7 @@ class Altimetria3DView @JvmOverloads constructor(
 
             var curveOffset = 0f
             if (showHairpins && hairpins.isNotEmpty()) {
-                val dist = windowStartMeters + (i.toDouble() / totalMicroSamples.coerceAtLeast(1)) * lookaheadMeters
+                val dist = windowStartMeters + (i.toDouble() / windowSamples) * lookaheadMeters
                 for (hp in hairpins) {
                     val diff = dist - hp
                     if (Math.abs(diff) < 25.0) {
