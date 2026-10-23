@@ -594,7 +594,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
 
                 // Detectar Sorpasso / Cambio de líder
                 val previousState = lastKGhostWasLeading
-                if (previousState != null && previousState != isLeading && meters > 10) {
+                if (previousState != null && previousState != isLeading && meters > 10 && !ghostFinishAnnounced) {
                     lastKGhostWasLeading = isLeading
                     if (isLeading) {
                         speak(context.getString(R.string.voice_kghost_overtake_lead), priority = true)
@@ -607,12 +607,12 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
 
                 // El Ghost llega a meta antes que el ciclista (posición del Ghost = ciclista - distM)
                 val routeEnd = snapshot.routeTotalLength
-                if (!ghostFinishAnnounced && routeEnd > 0.0 && !isLeading &&
-                    (currentDist - distM) >= routeEnd && currentDist < routeEnd - 20.0
-                ) {
+                val ghostAtFinish = routeEnd > 0.0 && (currentDist - distM) >= routeEnd
+                if (!ghostFinishAnnounced && ghostAtFinish && !isLeading && currentDist < routeEnd - 20.0) {
                     ghostFinishAnnounced = true
                     speak(context.getString(R.string.voice_kghost_finished), priority = true)
                 }
+                if (ghostAtFinish) ghostFinishAnnounced = true
 
                 // El ciclista llega a meta: tiempo respecto al Ghost
                 val riderRoute = snapshot.routeTotalLength
@@ -623,9 +623,10 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                     speak(context.getString(resId, gapStr), priority = true)
                 }
 
+                // Con el Ghost ya en meta no hay más avisos de ventaja/persecución
                 // Avisos periódicos por intervalo de distancia (ej. cada 1000m)
                 val interval = prefs.voiceKGhostIntervalMeters.coerceAtLeast(500.0)
-                if ((currentDist - lastAnnouncedKGhostDistance) >= interval) {
+                if (!ghostFinishAnnounced && (currentDist - lastAnnouncedKGhostDistance) >= interval) {
                     lastAnnouncedKGhostDistance = currentDist
                     val timeStr = formatTimeVoice(Math.abs(Math.round(timeS)))
                     val distVoiceStr = formatDistanceVoice(meters)
