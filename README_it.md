@@ -18,6 +18,9 @@ Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **S
 * **Nuova icona ciclista KGhost**: bianca con bordo nero interno per il rivale virtuale, riempimento rosso con bordo rosso intenso per il ciclista; freccia più sottile e corta.
 * **Nuovi valori predefiniti**: rotazione TV 2D ed evidenziazione delle salite attive; barra potenza, barra in prospettiva isometrica, barra energia e segmenti Strava disattivati.
 * Etichetta «Barra zona di allenamento» tradotta in tutte e 6 le lingue.
+* **Comportamento del segnalino in 3D**: scegli tra segnalino fisso (al 20%, il grafico scorre; predefinito) o segnalino mobile con salto di pagina. I blocchi sono ancorati al percorso, quindi percentuali e colori non cambiano più durante l'avanzamento.
+* **Distanza del percorso**: totale e rimanente nel grafico 3D. Se nascondi il rapporto consigliato, il profilo scende e diventa più alto.
+* **Profilo più pulito (opzionale)**: unisce i blocchi vicini dello stesso colore e nasconde le percentuali in un intervallo (es. da -2 a 2).
 
 ---
 

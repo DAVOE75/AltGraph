@@ -140,7 +140,9 @@ data class StrategyData(
     // Pendientes de los bloques posteriores a subBlocks: reserva a la derecha de la RouteBar (solo la RouteBar la usa)
     val rightBufferBlocks: List<Float> = emptyList(),
     // Tramos de superficie (Asfalto / Grava / Sendero-MTB)
-    val surfaceSegments: List<SurfaceSegment> = emptyList()
+    val surfaceSegments: List<SurfaceSegment> = emptyList(),
+    // Metros que la ventana visible se adelanta al primer bloque de subBlocks (rejilla anclada a la ruta); 0 si no se alinea
+    val gridOffsetMeters: Double = 0.0
 )
 
 // Posición fija de la baliza en la ventana (fracción desde el borde izquierdo): 200 m con zoom de 1 km
@@ -280,6 +282,9 @@ class AltimetriaStrategyCalculator {
     var currentHeading: Double = 0.0
     var mapZoomLevel: Double? = null
     var manualPanOffsetMeters: Double = 0.0
+    private var pageStartDist = 0.0
+    private var pageLengthDist = 0.0
+    private var pageBaseLookahead = -1.0
     var appContext: Context? = null
 
     fun updateLiveGrade(grade: Double) {
@@ -1813,7 +1818,9 @@ class AltimetriaStrategyCalculator {
     }
 
     // advance=false: calcula la estrategia con el estado actual SIN mutarlo (EMA, integración, clima, Strava, APM)
-    fun calculateStrategy(context: Context? = null, advance: Boolean = true): StrategyData {
+    // alignGrid=true: los bloques se anclan a múltiplos del bloque mayor de la ruta (no se recalculan al avanzar);
+    // la ventana real queda gridOffsetMeters por delante del primer bloque y la vista lo compensa
+    fun calculateStrategy(context: Context? = null, advance: Boolean = true, alignGrid: Boolean = false): StrategyData {
         if (context != null && appContext == null) {
             appContext = context.applicationContext
         }
@@ -1964,11 +1971,38 @@ class AltimetriaStrategyCalculator {
         // 1. Usar la distancia reportada y suavizada
         val currentRiderDistance = currentRouteDistance
 
-        // Baliza ancla: avanza desde el inicio de la ruta hasta BEACON_ANCHOR_FRACTION de la ventana y a partir de
-        // ahí queda fija en pantalla mientras la ruta se desplaza. Depende solo de la posición (sin estado).
         val riderNow = currentRiderDistance.coerceAtLeast(0.0)
-        val pagedLookahead = lookaheadDist
-        var windowStartDist = (riderNow - pagedLookahead * BEACON_ANCHOR_FRACTION).coerceAtLeast(0.0)
+        var pagedLookahead = lookaheadDist
+        var windowStartDist: Double
+        if (prefs?.beaconMode3d == AppPreferences.BEACON_MODE_PAGED) {
+            // Baliza móvil con páginas contiguas: la ventana n cubre [n*lookahead, (n+1)*lookahead) y salta a la
+            // siguiente al llegar la baliza al borde derecho.
+            windowStartDist = if (lookaheadDist > 0.0) Math.floor(riderNow / lookaheadDist) * lookaheadDist else 0.0
+            // El zoom inteligente cambia lookaheadDist en cada tick: la longitud de página se congela hasta que el ciclista la completa.
+            if (mapZoomLevel == null && lookaheadDist > 0.0) {
+                var pStart = pageStartDist
+                var pLen = pageLengthDist
+                if (pageBaseLookahead != baseLookahead || (!smartZoomEnabled && pLen != lookaheadDist)) {
+                    pLen = 0.0
+                    pageLengthDist = 0.0
+                    if (advance) pageBaseLookahead = baseLookahead
+                }
+                val inPage = pLen > 0.0 && riderNow >= pStart && riderNow < pStart + pLen
+                if (!inPage) {
+                    val prevEnd = pStart + pLen
+                    pLen = lookaheadDist
+                    pStart = if (pageLengthDist > 0.0 && riderNow >= prevEnd && riderNow < prevEnd + pLen) prevEnd
+                             else Math.floor(riderNow / pLen) * pLen
+                }
+                if (advance) { pageStartDist = pStart; pageLengthDist = pLen }
+                windowStartDist = pStart
+                pagedLookahead = pLen
+            }
+        } else {
+            // Baliza ancla: avanza desde el inicio de la ruta hasta BEACON_ANCHOR_FRACTION de la ventana y a partir de
+            // ahí queda fija en pantalla mientras la ruta se desplaza. Depende solo de la posición (sin estado).
+            windowStartDist = (riderNow - pagedLookahead * BEACON_ANCHOR_FRACTION).coerceAtLeast(0.0)
+        }
 
         // Aplicamos el pan manual DESPUÉS del cálculo base para que funcione instantáneamente
         windowStartDist = (windowStartDist + manualPanOffsetMeters).coerceAtLeast(0.0)
@@ -2049,15 +2083,24 @@ class AltimetriaStrategyCalculator {
         // Add extra blocks (+ 2) to buffer the right edge during local rolling window. 
         // When viewing the entire route (actualLookahead == totalRouteLength), cap exactly at route end so no flat ground appears.
         val isFullRouteView = totalRouteLength > 500.0 && actualLookahead >= (totalRouteLength - 1.0)
+
+        // Rejilla anclada a la ruta: el bloque mayor (si es múltiplo del sub-bloque) para que también los bloques mayores
+        // queden fijos; sin ella los porcentajes y colores se recalculaban en cada avance.
+        val gridQuantum = if (majorBlockSize / subBlockSize >= 1.0 &&
+            Math.abs(majorBlockSize / subBlockSize - Math.rint(majorBlockSize / subBlockSize)) < 1e-6) majorBlockSize else subBlockSize
+        val gridActive = alignGrid && !isFullRouteView
+        val gridStartDist = if (gridActive) Math.floor(windowStartDist / gridQuantum) * gridQuantum else windowStartDist
+        val gridOffset = if (gridActive) windowStartDist - gridStartDist else 0.0
+        val gridExtraBlocks = if (gridActive) Math.ceil(gridQuantum / subBlockSize).toInt() else 0
         val numSubBlocks = if (isFullRouteView) {
             (actualLookahead / subBlockSize).roundToInt().coerceIn(2, 2000)
         } else {
-            (actualLookahead / subBlockSize).roundToInt().coerceIn(2, 2000) + 2
+            (actualLookahead / subBlockSize).roundToInt().coerceIn(2, 2000) + 2 + gridExtraBlocks
         }
         val routeSubBlocks = mutableListOf<Float>()
         val routeSubBlocksMax = mutableListOf<Float>()
         val routeElevations = mutableListOf<Float>()
-        routeElevations.add(windowStartElevation.toFloat())
+        routeElevations.add((if (gridActive) getElevationAtDistance(gridStartDist) else windowStartElevation).toFloat())
 
         var attack = false
         var accumulatedHardness = 0.0
@@ -2074,8 +2117,8 @@ class AltimetriaStrategyCalculator {
         val hasTrueProfile = routeElevationProfile.isNotEmpty()
 
         for (j in 0 until numSubBlocks) {
-            val sDistStart = windowStartDist + (j * subBlockSize)
-            val sDistEnd = windowStartDist + ((j + 1) * subBlockSize)
+            val sDistStart = gridStartDist + (j * subBlockSize)
+            val sDistEnd = gridStartDist + ((j + 1) * subBlockSize)
 
             val sElevStart: Double
             val sElevEnd: Double
@@ -2140,7 +2183,7 @@ class AltimetriaStrategyCalculator {
         val rightBufferBlocks = ArrayList<Float>(rightBufferCount)
         if (!isFullRouteView) {
             for (j in numSubBlocks until numSubBlocks + rightBufferCount) {
-                val bStart = windowStartDist + (j * subBlockSize)
+                val bStart = gridStartDist + (j * subBlockSize)
                 val bEnd = bStart + subBlockSize
                 val bElevDiff = getElevationAtDistance(bEnd) - getElevationAtDistance(bStart)
                 val bGrade = if (useTopographicCalculation) {
@@ -2446,7 +2489,8 @@ class AltimetriaStrategyCalculator {
             stravaPrGhostDistance = stravaGhostRelDist,
             windEffectIntensity = windEffect,
             routeCoords = getVisibleRouteCoords(windowStartDist, routePoints, actualLookahead.toInt()),
-            surfaceSegments = routeSurfaceSegments
+            surfaceSegments = routeSurfaceSegments,
+            gridOffsetMeters = gridOffset
         )
     }
 

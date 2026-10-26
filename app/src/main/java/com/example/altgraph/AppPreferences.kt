@@ -375,7 +375,40 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_SHOW_SURFACE_TEXTURES, false)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_SURFACE_TEXTURES, value).apply()
 
+    // "anchor": baliza fija al 20% y la gráfica se desplaza. "paged": la baliza se mueve y la gráfica salta de página.
+    var beaconMode3d: String
+        get() = prefs.getString(KEY_BEACON_MODE_3D, BEACON_MODE_ANCHOR) ?: BEACON_MODE_ANCHOR
+        set(value) = prefs.edit().putString(KEY_BEACON_MODE_3D, value).apply()
+
+    var showRouteDistances3d: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_ROUTE_DISTANCES_3D, true)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_ROUTE_DISTANCES_3D, value).apply()
+
+    var mergeSimilarBlocks3d: Boolean
+        get() = prefs.getBoolean(KEY_MERGE_SIMILAR_BLOCKS_3D, false)
+        set(value) = prefs.edit().putBoolean(KEY_MERGE_SIMILAR_BLOCKS_3D, value).apply()
+
+    var hideGradeRangeEnabled3d: Boolean
+        get() = prefs.getBoolean(KEY_HIDE_GRADE_RANGE_ENABLED_3D, false)
+        set(value) = prefs.edit().putBoolean(KEY_HIDE_GRADE_RANGE_ENABLED_3D, value).apply()
+
+    var hideGradeMin3d: Float
+        get() = prefs.getFloat(KEY_HIDE_GRADE_MIN_3D, -2f)
+        set(value) = prefs.edit().putFloat(KEY_HIDE_GRADE_MIN_3D, value).apply()
+
+    var hideGradeMax3d: Float
+        get() = prefs.getFloat(KEY_HIDE_GRADE_MAX_3D, 2f)
+        set(value) = prefs.edit().putFloat(KEY_HIDE_GRADE_MAX_3D, value).apply()
+
     companion object {
+        const val BEACON_MODE_ANCHOR = "anchor"
+        const val BEACON_MODE_PAGED = "paged"
+        private const val KEY_BEACON_MODE_3D = "beacon_mode_3d"
+        private const val KEY_SHOW_ROUTE_DISTANCES_3D = "show_route_distances_3d"
+        private const val KEY_MERGE_SIMILAR_BLOCKS_3D = "merge_similar_blocks_3d"
+        private const val KEY_HIDE_GRADE_RANGE_ENABLED_3D = "hide_grade_range_enabled_3d"
+        private const val KEY_HIDE_GRADE_MIN_3D = "hide_grade_min_3d"
+        private const val KEY_HIDE_GRADE_MAX_3D = "hide_grade_max_3d"
         private const val PREFS_NAME = "altgraph_settings"
         private const val KEY_FONT_FAMILY = "font_family_key"
         private const val KEY_BLOCK_SIZE = "block_size_meters"

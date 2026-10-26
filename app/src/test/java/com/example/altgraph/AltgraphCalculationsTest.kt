@@ -153,8 +153,8 @@ class AltgraphCalculationsTest {
         assertEquals(50.0, calculator.getSubBlockSize(500.0), 0.1)
         assertEquals(100.0, calculator.getMajorBlockSize(500.0), 0.1)
 
-        // 2. Escala 500m a 5km: bloques de 100 en 100 metros
-        assertEquals(100.0, calculator.getSubBlockSize(1000.0), 0.1)
+        // 2. Escala 500m a 1km: bloques de 150m; hasta 5km, de 100 en 100 metros
+        assertEquals(150.0, calculator.getSubBlockSize(1000.0), 0.1)
         assertEquals(100.0, calculator.getSubBlockSize(2000.0), 0.1)
         assertEquals(100.0, calculator.getSubBlockSize(5000.0), 0.1)
         assertEquals(500.0, calculator.getMajorBlockSize(5000.0), 0.1)

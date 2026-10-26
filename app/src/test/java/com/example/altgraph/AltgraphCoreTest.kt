@@ -106,25 +106,43 @@ class AltgraphCoreTest {
     }
 
     @Test
-    fun riderStaysInsideWindowAndPagesForward() {
+    fun anchoredBeaconStaysAtFixedFractionOfWindow() {
         val core = AltgraphCore()
         withRoute(core.calculator)
         val snap = core.tick(null)
-        var lastStart = -1.0
-        var jumps = 0
+        var checked = 0
         for (d in 0..5000 step 25) {
             core.calculator.currentRouteDistance = d.toDouble()
             val s = core.calculator.calculateStrategy(null)
             assertEquals("d=$d", true, s.riderProgress in 0f..0.96f)
-            if (s.windowStartMeters > lastStart && lastStart >= 0.0) {
-                jumps++
-                // Tras cada salto la baliza reaparece en el lado izquierdo de la ventana
-                assertEquals("d=$d", true, s.riderProgress < 0.2f)
+            if (s.windowStartMeters > 0.0 && s.windowStartMeters + s.windowLengthMeters < 4900.0) {
+                // Con la ventana en movimiento la baliza queda fija en pantalla (20% por defecto)
+                assertEquals("d=$d", 0.2, s.riderProgress.toDouble(), 1e-3)
+                checked++
             }
-            lastStart = s.windowStartMeters
         }
         assertEquals(snap.strategy.riderProgress >= 0f, true)
-        assertEquals(true, jumps >= 1)
+        assertEquals(true, checked >= 1)
+    }
+
+    @Test
+    fun alignedGridDoesNotDependOnRiderPosition() {
+        val core = AltgraphCore()
+        withRoute(core.calculator)
+        core.tick(null)
+        for (d in 1000..3000 step 37) {
+            core.calculator.currentRouteDistance = d.toDouble()
+            val plain = core.calculator.calculateStrategy(null, advance = false)
+            val s = core.calculator.calculateStrategy(null, advance = false, alignGrid = true)
+            assertEquals("d=$d", 0.0, plain.gridOffsetMeters, 0.0)
+            assertEquals("d=$d", plain.windowStartMeters, s.windowStartMeters, 1e-6)
+            val gridStart = s.windowStartMeters - s.gridOffsetMeters
+            val steps = gridStart / s.subBlockSizeMeters
+            assertEquals("d=$d", 0.0, steps - Math.rint(steps), 1e-6)
+            assertEquals("d=$d", true, s.gridOffsetMeters >= 0.0 && s.gridOffsetMeters < s.majorBlockSizeMeters + 1e-6)
+            // La rejilla alineada incluye bloques extra a la izquierda: la baliza sigue en su sitio relativo a la ventana
+            assertEquals("d=$d", plain.riderProgress.toDouble(), s.riderProgress.toDouble(), 1e-6)
+        }
     }
 
     @Test

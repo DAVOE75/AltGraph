@@ -140,10 +140,12 @@ class AltgraphCore(val calculator: AltimetriaStrategyCalculator = AltimetriaStra
     }
 
     fun strategyFor3D(context: Context?, base: Snapshot): StrategyData {
-        if (pan3dMeters == 0.0) return base.strategy
+        val navigating = calculator.isNavigatingRoute &&
+            (calculator.routePoints.isNotEmpty() || calculator.routeElevationProfile.isNotEmpty())
+        if (pan3dMeters == 0.0 && !navigating) return base.strategy
         calculator.manualPanOffsetMeters = pan3dMeters
         try {
-            return calculator.calculateStrategy(context, advance = false)
+            return calculator.calculateStrategy(context, advance = false, alignGrid = true)
         } finally {
             calculator.manualPanOffsetMeters = 0.0
         }

@@ -199,6 +199,11 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         altimetria3DView.currentCadence = strategy.currentCadence
                         altimetria3DView.currentSpeedMs = snap.currentSpeed
                         altimetria3DView.showGearBadge = prefs.showGearBadge
+                        altimetria3DView.mergeSimilarBlocks = prefs.mergeSimilarBlocks3d
+                        altimetria3DView.hideGradeRangeEnabled = prefs.hideGradeRangeEnabled3d
+                        altimetria3DView.hideGradeMin = prefs.hideGradeMin3d
+                        altimetria3DView.hideGradeMax = prefs.hideGradeMax3d
+                        altimetria3DView.showRouteDistances = prefs.showRouteDistances3d
                         altimetria3DView.gearWallEnabled = prefs.gearWallEnabled
                         altimetria3DView.gearChainrings = prefs.gearChainrings
                         altimetria3DView.gearCassette = prefs.gearCassette
@@ -254,7 +259,8 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             panButtonsPosition = prefs.panButtonsPosition,
                             beaconColor = prefs.beaconColor,
                             beaconSize = prefs.beaconSize,
-                            beaconShape = prefs.beaconShape
+                            beaconShape = prefs.beaconShape,
+                            gridOffsetMeters = strategy.gridOffsetMeters
                         )
 
                         if (cachedBitmap == null || cachedBitmap?.width != w || cachedBitmap?.height != h) {

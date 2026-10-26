@@ -757,7 +757,97 @@ class MainActivity : Activity() {
         gearInput(getString(R.string.setting_gear_chainrings), prefs.gearChainrings) { prefs.gearChainrings = it }
         gearInput(getString(R.string.setting_gear_cassette), prefs.gearCassette) { prefs.gearCassette = it }
 
+        // Comportamiento de la baliza: gráfica que se desplaza (baliza fija al 20%) o baliza que se mueve y salta de página
+        val beaconModeCard = createCardContainer()
+        beaconModeCard.addView(createSectionLabel(getString(R.string.setting_beacon_mode_title)))
+        beaconModeCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_beacon_mode_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 8)
+        })
+        val beaconModes = listOf(
+            AppPreferences.BEACON_MODE_ANCHOR to getString(R.string.beacon_mode_anchor),
+            AppPreferences.BEACON_MODE_PAGED to getString(R.string.beacon_mode_paged)
+        )
+        val beaconModeBtns = mutableListOf<Button>()
+        val beaconModeRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        }
+        beaconModes.forEachIndexed { idx, (modeKey, modeLabel) ->
+            val btn = createSegmentButton(modeLabel, prefs.beaconMode3d == modeKey) {
+                prefs.beaconMode3d = modeKey
+                updateSegmentActiveStates(beaconModeBtns, idx)
+            }
+            beaconModeBtns.add(btn)
+            beaconModeRow.addView(btn)
+        }
+        beaconModeCard.addView(beaconModeRow)
+
+        val routeDistancesCard = createCardContainer()
+        routeDistancesCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_show_route_distances)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.showRouteDistances3d
+            setOnCheckedChangeListener { _, isChecked -> prefs.showRouteDistances3d = isChecked }
+        })
+
+        // Limpieza del perfil: fusionar bloques vecinos del mismo color y ocultar porcentajes en un rango
+        val blockCleanCard = createCardContainer()
+        blockCleanCard.addView(createSectionLabel(getString(R.string.setting_block_clean_title)))
+        blockCleanCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_merge_similar_blocks)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.mergeSimilarBlocks3d
+            setOnCheckedChangeListener { _, isChecked -> prefs.mergeSimilarBlocks3d = isChecked }
+        })
+        blockCleanCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_merge_similar_blocks_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 12)
+        })
+        blockCleanCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_hide_grade_range)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.hideGradeRangeEnabled3d
+            setOnCheckedChangeListener { _, isChecked -> prefs.hideGradeRangeEnabled3d = isChecked }
+        })
+        blockCleanCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_hide_grade_range_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 8)
+        })
+        fun gradeInput(label: String, current: Float, onChange: (Float) -> Unit) {
+            blockCleanCard.addView(createValueText(label))
+            blockCleanCard.addView(EditText(this).apply {
+                inputType = android.text.InputType.TYPE_CLASS_NUMBER or
+                    android.text.InputType.TYPE_NUMBER_FLAG_SIGNED or
+                    android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+                setTextColor(Color.WHITE)
+                setText(current.toString())
+                setSingleLine(true)
+                addTextChangedListener(object : android.text.TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                    override fun afterTextChanged(s: android.text.Editable?) {
+                        s?.toString()?.replace(',', '.')?.toFloatOrNull()?.let(onChange)
+                    }
+                })
+            })
+        }
+        gradeInput(getString(R.string.setting_hide_grade_min), prefs.hideGradeMin3d) { prefs.hideGradeMin3d = it }
+        gradeInput(getString(R.string.setting_hide_grade_max), prefs.hideGradeMax3d) { prefs.hideGradeMax3d = it }
+
         tab3dContainer.addView(lookaheadCard)
+        tab3dContainer.addView(beaconModeCard)
+        tab3dContainer.addView(routeDistancesCard)
+        tab3dContainer.addView(blockCleanCard)
         tab3dContainer.addView(panPositionCard)
         tab3dContainer.addView(gearCard)
         tab3dContainer.addView(beaconCard)

@@ -296,6 +296,10 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 altimetria3DView.gearWallEnabled = prefs.gearWallEnabled
                 altimetria3DView.showGearBadge = prefs.showGearBadge && climb != null
                 altimetria3DView.climbGearGrade = climb?.avgGrade
+                altimetria3DView.mergeSimilarBlocks = prefs.mergeSimilarBlocks3d
+                altimetria3DView.hideGradeRangeEnabled = prefs.hideGradeRangeEnabled3d
+                altimetria3DView.hideGradeMin = prefs.hideGradeMin3d
+                altimetria3DView.hideGradeMax = prefs.hideGradeMax3d
                 altimetria3DView.gearChainrings = prefs.gearChainrings
                 altimetria3DView.gearCassette = prefs.gearCassette
                 altimetria3DView.update3DData(

@@ -18,6 +18,9 @@ Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 7 3D-Höhenv
 * **Neues KGhost-Radfahrer-Symbol**: weiß mit schwarzem Innenrand für den virtuellen Rivalen, rote Füllung mit kräftig rotem Rand für den Fahrer; schmalerer, kürzerer Pfeil.
 * **Neue Standardwerte**: TV-2D-Rotation und Anstiegshervorhebung aktiv; Leistungsbalken, isometrischer Perspektivbalken, Energiebalken und Strava-Segmente deaktiviert.
 * Bezeichnung „Trainingszonen-Balken“ in alle 6 Sprachen übersetzt.
+* **Verhalten des Markers im 3D**: Wähle zwischen festem Marker (bei 20 %, das Diagramm scrollt; Standard) oder bewegtem Marker mit Seitensprung. Die Blöcke sind an der Strecke verankert, sodass sich Prozentwerte und Farben beim Fahren nicht mehr ändern.
+* **Streckendistanz**: Gesamt- und Restdistanz im 3D-Diagramm. Wird der empfohlene Gang ausgeblendet, rutscht das Profil nach unten und wird höher.
+* **Übersichtlicheres Profil (optional)**: fasst benachbarte Blöcke gleicher Farbe zusammen und blendet Prozentwerte in einem Bereich aus (z. B. -2 bis 2).
 
 ---
 

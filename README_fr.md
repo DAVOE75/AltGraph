@@ -18,6 +18,9 @@ Elle révolutionne le concept traditionnel de l'altimétrie cycliste en intégra
 * **Nouvelle icône de cycliste KGhost** : blanche avec bord noir intérieur pour le rival virtuel, remplissage rouge et bord rouge intense pour le cycliste ; flèche plus fine et plus courte.
 * **Nouvelles valeurs par défaut** : rotation TV 2D et mise en évidence des montées activées ; barre de puissance, barre en perspective isométrique, barre d'énergie et segments Strava désactivés.
 * Libellé « Barre de zone d'entraînement » traduit dans les 6 langues.
+* **Comportement de la balise en 3D** : choisissez une balise fixe (à 20 %, le graphique défile ; par défaut) ou une balise mobile avec saut de page. Les blocs sont ancrés à l'itinéraire : leurs pourcentages et couleurs ne changent plus pendant la progression.
+* **Distance de l'itinéraire** : totale et restante sur le graphique 3D. Si vous masquez le rapport conseillé, le profil descend et gagne en hauteur.
+* **Profil plus lisible (optionnel)** : fusionne les blocs voisins de même couleur et masque les pourcentages dans une plage (ex. de -2 à 2).
 
 ---
 

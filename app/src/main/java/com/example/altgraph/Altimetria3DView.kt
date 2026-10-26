@@ -97,6 +97,19 @@ class Altimetria3DView @JvmOverloads constructor(
         style = Paint.Style.FILL
     }
 
+    private val routeInfoLabelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#CBD5E1")
+        textAlign = Paint.Align.RIGHT
+        setShadowLayer(3f, 0f, 1f, Color.BLACK)
+    }
+
+    private val routeInfoValuePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
+        textAlign = Paint.Align.RIGHT
+        typeface = Typeface.DEFAULT_BOLD
+        setShadowLayer(3f, 0f, 1f, Color.BLACK)
+    }
+
     private val pctBadgeBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.TRANSPARENT
         strokeWidth = 0f
@@ -509,6 +522,15 @@ class Altimetria3DView @JvmOverloads constructor(
     var currentSpeedMs: Double = 0.0
     var gearWallEnabled: Boolean = true
     var showGearBadge: Boolean = true
+    var mergeSimilarBlocks: Boolean = false
+    var hideGradeRangeEnabled: Boolean = false
+    var hideGradeMin: Float = -2f
+    var hideGradeMax: Float = 2f
+    var showRouteDistances: Boolean = false
+    // Metros entre el inicio de la ventana y el primer bloque (rejilla anclada a la ruta)
+    private var gridOffsetMeters: Double = 0.0
+    // Uniones entre columnas fusionadas (índice de muestra): no se dibuja su separador
+    private var mergedJoint: BooleanArray = BooleanArray(0)
     // Pendiente media del puerto: si no es null, se recomienda una marcha fija para toda la subida
     var climbGearGrade: Double? = null
     var gearChainrings: String = GearAdvisor.DEFAULT_CHAINRINGS
@@ -585,8 +607,10 @@ class Altimetria3DView @JvmOverloads constructor(
         panButtonsPosition: String = "bottom",
         beaconColor: Int = 0xFF38BDF8.toInt(),
         beaconSize: String = "medium",
-        beaconShape: String = "circle"
+        beaconShape: String = "circle",
+        gridOffsetMeters: Double = 0.0
     ) {
+        this.gridOffsetMeters = gridOffsetMeters
         this.panButtonsPosition = panButtonsPosition
         applyBeaconStyle(beaconColor, beaconSize, beaconShape)
         if (routeTotalLength > 0.0) {
@@ -839,6 +863,37 @@ class Altimetria3DView @JvmOverloads constructor(
         } else {
             draw3DStraightRibbon(canvas, w, h)
         }
+
+        if (showRouteDistances) drawRouteDistances(canvas, w, h)
+    }
+
+    // Distancia total de la ruta y distancia que queda, arriba a la derecha de la gráfica
+    private fun drawRouteDistances(canvas: Canvas, w: Float, h: Float) {
+        if (routeTotalLength <= 0.0) return
+        val left = if (remainingDistance > 0.0) remainingDistance.coerceAtMost(routeTotalLength) else 0.0
+        val textSize = ((h * 0.050f) * fontScale).coerceIn(10f, 15f)
+        routeInfoLabelPaint.textSize = textSize
+        routeInfoValuePaint.textSize = textSize * 1.15f
+        val lines = listOf(
+            context.getString(R.string.label_route_total) to formatRouteKm(routeTotalLength),
+            context.getString(R.string.label_route_left) to formatRouteKm(left)
+        )
+        val right = w - 16f
+        val lineH = textSize * 1.45f
+        // Con cabecera la franja superior está ocupada: se coloca justo encima del perfil
+        val firstBaseline = if (showHeaderStats) h * 0.33f else (h * 0.15f).coerceIn(28f, 44f) + 22f
+        for ((idx, line) in lines.withIndex()) {
+            val y = firstBaseline + idx * lineH
+            canvas.drawText(line.second, right, y, routeInfoValuePaint)
+            val valueW = routeInfoValuePaint.measureText(line.second)
+            canvas.drawText(line.first, right - valueW - 6f, y, routeInfoLabelPaint)
+        }
+    }
+
+    private fun formatRouteKm(meters: Double): String = when {
+        meters < 1000.0 -> "${meters.toInt()}m"
+        meters < 100000.0 -> String.format("%.1fkm", meters / 1000.0)
+        else -> String.format("%.0fkm", meters / 1000.0)
     }
 
     private fun drawZoomOverlay(canvas: Canvas, w: Float, h: Float) {
@@ -985,18 +1040,31 @@ class Altimetria3DView @JvmOverloads constructor(
 
         val majorSamples = majorBlocksCount + 1
 
+        val profileMode = profileElevations.size >= 2 && subBlocks.isNotEmpty() && subBlockSizeMeters > 0.0
+        val gearBadgeShown = gearWallEnabled && showGearBadge
+
         val startX = (w * 0.10f)
         val baseEndX = (w * 0.98f)
-        val baseGroundY = when {
+        val defaultGroundY = when {
             showHeaderStats -> h * 0.82f
             isClimbMode && !rotate90 -> h * 0.81f
             else -> h * 0.77f
         }
-        val maxPeakHeight = when {
+        val defaultPeakHeight = when {
             showHeaderStats -> h * 0.48f
             isClimbMode && !rotate90 -> h * 0.48f
             else -> h * 0.60f
         }
+        // Sin la marcha recomendada debajo del perfil, la gráfica baja y el hueco se usa para un perfil más alto
+        val freedBottom = if (!gearBadgeShown && !rotate90) {
+            val legendSize = ((h * 0.075f) * fontScale).coerceIn(16f, 23f)
+            val legendTop = h - 23f - legendSize * 0.8f
+            val barH0 = (h * 0.09f).coerceIn(20f, 32f)
+            val gearRoom = ((h * 0.075f) * fontScale).coerceIn(18f, 28f) * 0.75f + 24f
+            minOf(gearRoom, legendTop - 4f - barH0 - defaultGroundY).coerceAtLeast(0f)
+        } else 0f
+        val baseGroundY = defaultGroundY + freedBottom
+        val maxPeakHeight = defaultPeakHeight + freedBottom
 
         // Desplazamiento oblicuo 3D sutil y elegante (profundidad reducida a petición del usuario)
         val depth3dX = (w * 0.012f).coerceIn(4f, 8f)
@@ -1005,12 +1073,15 @@ class Altimetria3DView @JvmOverloads constructor(
         val totalSpanX = (baseEndX - startX) * zoomScale
         // La ventana real mide lookaheadMeters; los bloques extra de margen quedan fuera de pantalla a la derecha.
         // Así la baliza (riderProgress=1) y el último bloque coinciden con el borde derecho.
-        val windowSamples = if (profileElevations.size >= 2 && subBlocks.isNotEmpty() && subBlockSizeMeters > 0.0) {
+        val windowSamples = if (profileMode) {
             (lookaheadMeters / subBlockSizeMeters).toFloat().coerceIn(1f, (totalMicroSamples - 1).toFloat())
         } else {
             (totalMicroSamples - 1).coerceAtLeast(1).toFloat()
         }
         val microStepX = totalSpanX / windowSamples
+        // La rejilla de bloques queda anclada a la ruta: la muestra 0 está gridOffsetMeters antes del inicio de la ventana
+        val gridShiftSamples = if (profileMode) (gridOffsetMeters / subBlockSizeMeters).toFloat() else 0f
+        val gridShiftPx = gridShiftSamples * microStepX
 
         val xFront = FloatArray(totalMicroSamples)
         val yFront = FloatArray(totalMicroSamples)
@@ -1018,8 +1089,20 @@ class Altimetria3DView @JvmOverloads constructor(
         val yBack = FloatArray(totalMicroSamples)
         val yBase = FloatArray(totalMicroSamples)
 
-        var rawMinElev = microElevations.minOrNull() ?: currentElevation.toFloat()
-        var rawMaxElev = microElevations.maxOrNull() ?: (rawMinElev + 50f)
+        // Escala vertical solo con las muestras de la ventana (más un margen a la derecha): los bloques de la rejilla
+        // que quedan a la izquierda no deben alterar la escala
+        val scaleFrom = if (gridShiftSamples > 0f) gridShiftSamples.toInt().coerceIn(0, totalMicroSamples - 1) else 0
+        val scaleTo = if (gridShiftSamples > 0f) (Math.ceil((gridShiftSamples + windowSamples).toDouble()).toInt() + 2).coerceIn(scaleFrom, totalMicroSamples - 1) else totalMicroSamples - 1
+        var rawMinElev = Float.MAX_VALUE
+        var rawMaxElev = -Float.MAX_VALUE
+        for (si in scaleFrom..scaleTo) {
+            if (microElevations[si] < rawMinElev) rawMinElev = microElevations[si]
+            if (microElevations[si] > rawMaxElev) rawMaxElev = microElevations[si]
+        }
+        if (rawMinElev == Float.MAX_VALUE) {
+            rawMinElev = currentElevation.toFloat()
+            rawMaxElev = rawMinElev + 50f
+        }
         val actualRange = (rawMaxElev - rawMinElev).coerceAtLeast(0f)
 
         // Escala visual proporcional: un 15% de pendiente debe ocupar todo el alto.
@@ -1033,7 +1116,7 @@ class Altimetria3DView @JvmOverloads constructor(
 
         // GRÁFICA RECTA: xFront avanza de forma estrictamente lineal, sin zigzagueo de carretera
         for (i in 0 until totalMicroSamples) {
-            val px = startX + (i * microStepX) - panOffsetX
+            val px = startX + (i * microStepX) - panOffsetX - gridShiftPx
             val normalizedHeight = ((microElevations[i] - displayMinElev) / finalElevRange).coerceIn(0f, 1f)
             val pYFront = baseGroundY - (normalizedHeight * maxPeakHeight)
 
@@ -1084,25 +1167,58 @@ class Altimetria3DView @JvmOverloads constructor(
             canvas.drawText("${elevMark}m", 6f, yIso + 4f, axisTextPaint)
         }
 
+        // Fusión opcional de bloques vecinos del mismo color: una sola columna con la pendiente media del tramo
+        val displayGrades: FloatArray
+        val mergedRuns = ArrayList<IntRange>()
+        if (mergeSimilarBlocks && profileMode && microGrades.size > 1) {
+            displayGrades = microGrades.copyOf()
+            mergedJoint = BooleanArray(totalMicroSamples)
+            var s = 0
+            while (s < microGrades.size) {
+                val key = getGradeColor(microGrades[s].toDouble())
+                var e = s + 1
+                while (e < microGrades.size && getGradeColor(microGrades[e].toDouble()) == key) e++
+                if (e - s > 1) {
+                    var sum = 0.0
+                    for (k in s until e) sum += microGrades[k]
+                    val avg = (sum / (e - s)).toFloat()
+                    for (k in s until e) displayGrades[k] = avg
+                    for (j in s + 1 until e) mergedJoint[j] = true
+                }
+                mergedRuns.add(s until e)
+                s = e
+            }
+        } else {
+            displayGrades = microGrades
+            mergedJoint = BooleanArray(0)
+        }
+
+        // Los bloques de la rejilla situados a la izquierda de la ventana no deben invadir el eje de altitudes
+        val clipLeftBlocks = gridShiftPx > 0f
+        if (clipLeftBlocks) {
+            canvas.save()
+            canvas.clipRect(startX - depth3dX - 1f, 0f, w, h)
+        }
+
         // 2. RENDERIZADO DEL PERFIL SEGÚN EL MODELO SELECCIONADO
         when (altimetriaStyle) {
             AltimetriaStyle.CLASSIC -> {
-                drawClassicRibbon(canvas, totalMicroSamples, microGrades, xFront, yFront, xBack, yBack, yBase, depth3dY)
+                drawClassicRibbon(canvas, totalMicroSamples, displayGrades, xFront, yFront, xBack, yBack, yBase, depth3dY)
             }
             AltimetriaStyle.HORIZON_ISOMETRIC -> {
-                drawHorizonIsometricRibbon(canvas, w, h, totalMicroSamples, microGrades, xFront, yFront, xBack, yBack, yBase)
+                drawHorizonIsometricRibbon(canvas, w, h, totalMicroSamples, displayGrades, xFront, yFront, xBack, yBack, yBase)
             }
             AltimetriaStyle.TACTICAL_OASES -> {
-                drawTacticalOasesRibbon(canvas, w, h, totalMicroSamples, microGrades, xFront, yFront, xBack, yBack, yBase, depth3dY)
+                drawTacticalOasesRibbon(canvas, w, h, totalMicroSamples, displayGrades, xFront, yFront, xBack, yBack, yBase, depth3dY)
             }
             AltimetriaStyle.DYNAMIC_FORCE_FIELD -> {
-                drawDynamicForceFieldRibbon(canvas, w, h, totalMicroSamples, microGrades, xFront, yFront, xBack, yBack, yBase, depth3dY, startX, baseEndX, baseGroundY)
+                drawDynamicForceFieldRibbon(canvas, w, h, totalMicroSamples, displayGrades, xFront, yFront, xBack, yBack, yBase, depth3dY, startX, baseEndX, baseGroundY)
             }
             AltimetriaStyle.MONOLITHIC_OBSIDIAN -> {
-                drawMonolithicObsidianRibbon(canvas, w, h, totalMicroSamples, microGrades, xFront, yFront, xBack, yBack, yBase, startX, baseEndX, baseGroundY, maxPeakHeight)
+                drawMonolithicObsidianRibbon(canvas, w, h, totalMicroSamples, displayGrades, xFront, yFront, xBack, yBack, yBase, startX, baseEndX, baseGroundY, maxPeakHeight)
             }
             AltimetriaStyle.HILLSHADE_APEX -> {
-                drawHillshadeApexRibbon(canvas, w, h, totalMicroSamples, microGrades, xFront, yFront, xBack, yBack, yBase, depth3dY)
+                drawHillshadeApexRibbon(canvas, w, h, totalMicroSamples, displayGrades, xFront, yFront, xBack, yBack, yBase, depth3dY)
             }
             else -> {}
         }
@@ -1147,23 +1263,36 @@ class Altimetria3DView @JvmOverloads constructor(
             val badgeBorder = if (isObsidian) holoBadgeBorderPaint else pctBadgeBorderPaint
 
             val blockW = abs(xFront[1] - xFront[0])
-            val canDrawSubBlocks = blockW >= 28f
+            val useRuns = mergedRuns.isNotEmpty()
+            val canDrawSubBlocks = blockW >= 28f || useRuns
 
             if (canDrawSubBlocks) {
-                // Dibujar porcentaje grande y horizontal dentro de cada columna/bloque individual
-                for (i in 0 until totalMicroSamples - 1) {
-                    val g = if (i < microGrades.size) microGrades[i] else 4.0f
-                    val colMidX = (xFront[i] + xFront[i + 1]) / 2f
-                    val colTopY = (yFront[i] + yFront[i + 1]) / 2f
+                // Dibujar porcentaje grande y horizontal dentro de cada columna (o de cada tramo fusionado)
+                val groups: List<IntRange> = if (useRuns) mergedRuns else (0 until totalMicroSamples - 1).map { it..it }
+                for (grp in groups) {
+                    val a = grp.first
+                    val b = (grp.last + 1).coerceAtMost(totalMicroSamples - 1)
+                    val g = if (a < displayGrades.size) displayGrades[a] else 4.0f
+                    if (isGradeLabelHidden(g)) continue
+
+                    // Un tramo fusionado centra su etiqueta en la parte visible
+                    val leftX = if (useRuns) maxOf(xFront[a], startX) else xFront[a]
+                    val rightX = if (useRuns) minOf(xFront[b], baseEndX) else xFront[b]
+                    val groupW = abs(rightX - leftX)
+                    if (useRuns && groupW < 28f) continue
+                    val colMidX = (leftX + rightX) / 2f
+                    var sumY = 0f
+                    for (k in a..b) sumY += yFront[k]
+                    val colTopY = sumY / (b - a + 1)
                     val colH = baseGroundY - colTopY
 
-                    val pctStr = if (blockW >= 52f) {
+                    val pctStr = if (groupW >= 52f) {
                         if (abs(g - g.roundToInt()) < 0.15f) "%.0f%%".format(g) else "%.1f%%".format(g)
                     } else {
                         "%.0f%%".format(g)
                     }
 
-                    val calcFontSize = (blockW * 0.40f * fontScale).coerceIn(14f, 24f)
+                    val calcFontSize = (groupW * 0.40f * fontScale).coerceIn(14f, 24f)
                     percentTextPaint.textSize = calcFontSize
 
                     val isInsideBlock = colH >= (calcFontSize * 2.2f)
@@ -1203,6 +1332,7 @@ class Altimetria3DView @JvmOverloads constructor(
                         }
                     }
                     val avgGrade = if (countG > 0) (sumG / countG).toFloat() else (if (k < nextBlocks.size) nextBlocks[k] else 4.0f)
+                    if (isGradeLabelHidden(avgGrade)) continue
                     val pctStr = if (abs(avgGrade - avgGrade.roundToInt()) < 0.15f) "%.0f%%".format(avgGrade) else "%.1f%%".format(avgGrade)
 
                     val midX = (xFront[microIdx1] + xFront[microIdx2]) / 2f
@@ -1258,7 +1388,7 @@ class Altimetria3DView @JvmOverloads constructor(
                     }
                 }
 
-                if (maxIdx >= 0) {
+                if (maxIdx >= 0 && !isGradeLabelHidden(maxG)) {
                     val mx = xFront[maxIdx]
                     val my = yBack[maxIdx]
 
@@ -1286,8 +1416,7 @@ class Altimetria3DView @JvmOverloads constructor(
             for (hp in hairpins) {
                 if (hp !in 0.0..totalMetersAhead) continue
 
-                val progress = (hp / totalMetersAhead).toFloat()
-                val exactIndexF = progress * (totalMicroSamples - 1)
+                val exactIndexF = distToSampleIdx(hp, totalMetersAhead, totalMicroSamples)
                 val idx = exactIndexF.toInt().coerceIn(0, totalMicroSamples - 2)
                 val rem = exactIndexF - idx
 
@@ -1308,8 +1437,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 val relDist = poi.relativeDistance
                 if (relDist !in 0.0..totalMetersAhead) continue
 
-                val progress = (relDist / totalMetersAhead).toFloat()
-                val exactIndexF = progress * (totalMicroSamples - 1)
+                val exactIndexF = distToSampleIdx(relDist, totalMetersAhead, totalMicroSamples)
                 val idx = exactIndexF.toInt().coerceIn(0, totalMicroSamples - 2)
                 val rem = exactIndexF - idx
 
@@ -1336,6 +1464,8 @@ class Altimetria3DView @JvmOverloads constructor(
             }
         }
 
+        if (clipLeftBlocks) canvas.restore()
+
         // 9. Barra inferior de distancia
         val barH = (h * 0.09f).coerceIn(20f, 32f)
         baseBarRect.set(startX, baseGroundY, baseEndX, baseGroundY + barH)
@@ -1357,13 +1487,14 @@ class Altimetria3DView @JvmOverloads constructor(
         val majorDistMeters = if (profileElevations.isNotEmpty()) majorBlockSizeMeters else (totalMetersAhead / majorBlocksCount)
 
         for (k in 0 until majorSamples) {
-            val m = (windowStartMeters + (k * majorDistMeters)).toLong()
+            val m = (windowStartMeters - gridOffsetMeters + (k * majorDistMeters)).toLong()
             val distLabel = if (m < 1000) {
                 "${m}m"
             } else {
                 if (m % 1000L == 0L) "${m / 1000}km" else "${m / 1000}.${(m % 1000L) / 100}km"
             }
             val px = majorX[k]
+            if (px < startX - depth3dX) continue
             canvas.drawText(distLabel, px, baseGroundY + (barH * 0.75f), baseDistTextPaint)
         }
 
@@ -1433,7 +1564,7 @@ class Altimetria3DView @JvmOverloads constructor(
             // Con perfil real, la muestra i está a i*subBlockSize metros del inicio de la ventana (incluye bloques extra de margen):
             // se posiciona por distancia, no por fracción de la ventana, para no adelantar la baliza.
             val exactIndexF = if (profileElevations.size >= 2 && subBlocks.isNotEmpty() && subBlockSizeMeters > 0.0) {
-                ((progressClamped * lookaheadMeters) / subBlockSizeMeters).toFloat().coerceIn(0f, (totalMicroSamples - 1).toFloat())
+                (((progressClamped * lookaheadMeters) + gridOffsetMeters) / subBlockSizeMeters).toFloat().coerceIn(0f, (totalMicroSamples - 1).toFloat())
             } else {
                 progressClamped * (totalMicroSamples - 1)
             }
@@ -1640,7 +1771,7 @@ class Altimetria3DView @JvmOverloads constructor(
                         var hx = xFront[wStart]
                         val limitX = xFront[wEnd]
                         while (hx <= limitX) {
-                            val sIdx = ((hx - startX + panOffsetX) / microStepX).toInt().coerceIn(0, totalMicroSamples - 1)
+                            val sIdx = ((hx - startX + panOffsetX + gridShiftPx) / microStepX).toInt().coerceIn(0, totalMicroSamples - 1)
                             val topY = yFront[sIdx]
                             val botY = yBase[sIdx]
                             canvas.drawLine(hx, topY, hx + 12f, botY, gearWallHatchPaint)
@@ -1675,7 +1806,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 var hx = xFront[wStart]
                 val limitX = xFront[wEnd]
                 while (hx <= limitX) {
-                    val sIdx = ((hx - startX + panOffsetX) / microStepX).toInt().coerceIn(0, totalMicroSamples - 1)
+                    val sIdx = ((hx - startX + panOffsetX + gridShiftPx) / microStepX).toInt().coerceIn(0, totalMicroSamples - 1)
                     val topY = yFront[sIdx]
                     val botY = yBase[sIdx]
                     canvas.drawLine(hx, topY, hx + 12f, botY, gearWallHatchPaint)
@@ -1688,7 +1819,7 @@ class Altimetria3DView @JvmOverloads constructor(
             val speedKmh = (currentSpeedMs * 3.6).coerceAtLeast(3.0)
             val gearIdxF = if (riderProgress in 0f..1f) {
                 if (profileElevations.size >= 2 && subBlocks.isNotEmpty() && subBlockSizeMeters > 0.0)
-                    ((riderProgress * lookaheadMeters) / subBlockSizeMeters).toFloat()
+                    (((riderProgress * lookaheadMeters) + gridOffsetMeters) / subBlockSizeMeters).toFloat()
                 else riderProgress * (totalMicroSamples - 1)
             } else 0f
             val gearIdx = gearIdxF.toInt().coerceIn(0, (microGrades.size - 1).coerceAtLeast(0))
@@ -1753,8 +1884,7 @@ class Altimetria3DView @JvmOverloads constructor(
         if (routeTotalLength > 0.0) {
             val finishDistInWindow = routeTotalLength - windowStartMeters
             if (finishDistInWindow in 0.0..(totalMetersAhead + 1.0)) {
-                val frac = (finishDistInWindow / totalMetersAhead).toFloat().coerceAtMost(1f)
-                val exactIndexF = frac * (totalMicroSamples - 1)
+                val exactIndexF = distToSampleIdx(finishDistInWindow, totalMetersAhead, totalMicroSamples)
                 val fIdx = exactIndexF.toInt().coerceIn(0, totalMicroSamples - 2)
                 val rem = exactIndexF - fIdx
                 val fxFront = xFront[fIdx] + rem * (xFront[fIdx + 1] - xFront[fIdx])
@@ -1852,7 +1982,7 @@ class Altimetria3DView @JvmOverloads constructor(
             wallPaint.shader = wallShader
             canvas.drawPath(wallPath, wallPaint)
             val paint = if (i % currentMicroSubDivisions == 0) majorSliceSeparatorPaint else sliceSeparatorPaint
-            canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], paint)
+            if (!isMergedJoint(i)) canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], paint)
         }
         val lastIdx = totalMicroSamples - 1
         val lastPaint = if (lastIdx % currentMicroSubDivisions == 0) majorSliceSeparatorPaint else sliceSeparatorPaint
@@ -1930,7 +2060,7 @@ class Altimetria3DView @JvmOverloads constructor(
             wallPaint.shader = wallShader
             canvas.drawPath(wallPath, wallPaint)
             val paint = if (i % currentMicroSubDivisions == 0) majorSliceSeparatorPaint else sliceSeparatorPaint
-            canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], paint)
+            if (!isMergedJoint(i)) canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], paint)
         }
         val lastIdx = totalMicroSamples - 1
         val lastPaint = if (lastIdx % currentMicroSubDivisions == 0) majorSliceSeparatorPaint else sliceSeparatorPaint
@@ -2281,7 +2411,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 canvas.drawLine(xFront[i], yFront[i], xFront[i] + (w * 0.04f), yBase[i], obsidianFacetPaint)
             }
             val paint = if (i % currentMicroSubDivisions == 0) majorSliceSeparatorPaint else sliceSeparatorPaint
-            canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], paint)
+            if (!isMergedJoint(i)) canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], paint)
         }
         val lastIdx = totalMicroSamples - 1
         val lastPaint = if (lastIdx % currentMicroSubDivisions == 0) majorSliceSeparatorPaint else sliceSeparatorPaint
@@ -2338,6 +2468,22 @@ class Altimetria3DView @JvmOverloads constructor(
         for (i in 0 until totalMicroSamples - 1) {
             canvas.drawLine(xFront[i], yFront[i], xFront[i + 1], yFront[i + 1], neonGlowPaint)
             canvas.drawLine(xFront[i], yFront[i], xFront[i + 1], yFront[i + 1], neonCorePaint)
+        }
+    }
+
+    private fun isMergedJoint(i: Int): Boolean = i < mergedJoint.size && mergedJoint[i]
+
+    // Rango de pendientes sin etiqueta de porcentaje (opción del usuario); los colores no cambian
+    private fun isGradeLabelHidden(grade: Float): Boolean =
+        hideGradeRangeEnabled && grade >= minOf(hideGradeMin, hideGradeMax) && grade <= maxOf(hideGradeMin, hideGradeMax)
+
+    // Índice (fraccionario) de muestra del perfil para una distancia relativa al inicio de la ventana
+    private fun distToSampleIdx(relDist: Double, totalMetersAhead: Double, totalMicroSamples: Int): Float {
+        val maxIdx = (totalMicroSamples - 1).toFloat()
+        return if (profileElevations.size >= 2 && subBlocks.isNotEmpty() && subBlockSizeMeters > 0.0) {
+            ((relDist + gridOffsetMeters) / subBlockSizeMeters).toFloat().coerceIn(0f, maxIdx)
+        } else {
+            ((relDist / totalMetersAhead).toFloat() * maxIdx).coerceIn(0f, maxIdx)
         }
     }
 
@@ -2797,7 +2943,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 strokeWidth = if (i % currentMicroSubDivisions == 0) 1.2f else 0.6f
                 style = Paint.Style.STROKE
             }
-            canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], sepPaint)
+            if (!isMergedJoint(i)) canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], sepPaint)
         }
 
         // Cap izquierdo

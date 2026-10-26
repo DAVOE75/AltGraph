@@ -26,6 +26,9 @@ It revolutionizes traditional cycling elevation profiles by featuring a **Suite 
 * **New KGhost cyclist icon**: white with inner black border for the virtual rival, red fill with deep red border for the rider; slimmer, shorter arrow between both.
 * **New defaults**: TV 2D rotation and climb highlighting enabled; power bar, isometric perspective bar, energy bar and Strava segments disabled.
 * "Training Zone Bar" label translated into all 6 languages.
+* **3D beacon behaviour**: choose a fixed beacon (at 20%, the graph scrolls; default) or a moving beacon with page jumps. Blocks are now anchored to the route, so their percentages and colours no longer change as you ride.
+* **Route distance**: total and remaining distance on the 3D graph. Hiding the recommended gear moves the profile down and makes it taller.
+* **Cleaner profile (optional)**: merge neighbouring blocks of the same colour and hide percentages within a range (e.g. -2 to 2).
 
 ---
 

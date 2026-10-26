@@ -69,9 +69,11 @@ class MapOverlayManager(
         }
 
         // Just use polyline hash as routeId since NavigatingRoute doesn't expose routeId natively here
-        val routeId = state.routePolyline.take(30)
+        // La clave incluye los ajustes: al cambiarlos hay que redibujar la ruta aunque sea la misma
+        val routeId = state.routePolyline.take(30) +
+            "|$mode|${prefs.eliteSmoothMapOverlayEnabled}|${prefs.eliteRadarResolution}"
         Log.d("MapOverlayManager", "updateOverlay: routeId=$routeId, last=$lastRouteId")
-        if (routeId.isEmpty()) {
+        if (state.routePolyline.isEmpty()) {
             clearPolylines(emitter)
             lastRouteId = null
             return
