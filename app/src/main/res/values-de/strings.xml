@@ -316,6 +316,8 @@
     <string name="setting_merge_similar_blocks">Benachbarte Blöcke gleicher Farbe zusammenfassen</string>
     <string name="setting_merge_similar_blocks_desc">Aufeinanderfolgende Blöcke gleicher Farbe werden als ein Block mit durchschnittlicher Steigung angezeigt. Auto fasst nur zusammen, wenn die Blöcke schmal sind (wenig Zoom), mit größeren, übersichtlichen Beschriftungen</string>
     <string name="merge_mode_off">Aus</string>
+    <string name="setting_merge_margin">Blöcke innerhalb einer Spanne zusammenfassen (%)</string>
+    <string name="setting_merge_margin_desc">Benachbarte Blöcke, deren Steigung um weniger als diese Spanne abweicht, werden auch bei unterschiedlicher Farbe zusammengefasst (z. B. 1 fasst 2,9 und 3,1 zusammen). Der Block zeigt die mittlere Steigung und deren Farbe. 0 = aus</string>
     <string name="setting_pct_label_style">Stil der Steigungsbeschriftung (3D-Profildiagramme)</string>
     <string name="setting_pct_label_style_desc">Mit Rahmen zeigt ein dunkles Feld; Sauber zeigt eine hohe weiße Zahl mit feinem Rand und Schatten sowie ein kleines % wie ein Gradzeichen. Verwendet die im Stil gewählte Schriftart</string>
     <string name="pct_style_pill">Mit Rahmen</string>

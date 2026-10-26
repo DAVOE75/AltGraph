@@ -316,6 +316,8 @@
     <string name="setting_merge_similar_blocks">Unisci i blocchi vicini dello stesso colore</string>
     <string name="setting_merge_similar_blocks_desc">I blocchi consecutivi dello stesso colore vengono mostrati come un unico blocco con una pendenza media. Auto unisce solo quando i blocchi sono stretti (poco zoom), con etichette più grandi e pulite</string>
     <string name="merge_mode_off">No</string>
+    <string name="setting_merge_margin">Unisci i blocchi entro un margine (%)</string>
+    <string name="setting_merge_margin_desc">I blocchi vicini la cui pendenza differisce meno di questo margine vengono uniti anche se il colore cambia (es. 1 unisce 2,9 e 3,1). Il blocco usa la pendenza media e il suo colore. 0 = disattivato</string>
     <string name="setting_pct_label_style">Stile dell\'etichetta di pendenza (grafici di profilo 3D)</string>
     <string name="setting_pct_label_style_desc">Con riquadro mostra un riquadro scuro; Pulito mostra un numero bianco alto con un sottile contorno e ombra, e un piccolo % come simbolo dei gradi. Usa il carattere scelto in Stile</string>
     <string name="pct_style_pill">Con riquadro</string>

@@ -343,6 +343,8 @@
     <string name="setting_merge_similar_blocks">Fusionar bloques vecinos del mismo color</string>
     <string name="setting_merge_similar_blocks_desc">Los bloques consecutivos del mismo color se muestran como un solo bloque con una pendiente media. Auto fusiona solo cuando los bloques son estrechos (poco zoom), con etiquetas más grandes y limpias</string>
     <string name="merge_mode_off">No</string>
+    <string name="setting_merge_margin">Fusionar bloques dentro de un margen (%)</string>
+    <string name="setting_merge_margin_desc">Los bloques vecinos cuya pendiente difiere menos que este margen se fusionan aunque cambien de color (p. ej. 1 une 2,9 y 3,1). El bloque fusionado usa la pendiente media y su color. 0 = desactivado</string>
     <string name="setting_pct_label_style">Estilo de la etiqueta de pendiente (gráficos de perfil 3D)</string>
     <string name="setting_pct_label_style_desc">Con recuadro muestra un cuadro oscuro; Limpio muestra un número blanco alargado con borde fino y sombra, y un % pequeño como el símbolo de grados. Usa el tipo de letra elegido en Estilo</string>
     <string name="pct_style_pill">Con recuadro</string>

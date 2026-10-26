@@ -407,7 +407,12 @@ class AppPreferences(context: Context) {
         get() = prefs.getString(KEY_PCT_LABEL_STYLE_3D, PCT_STYLE_PILL) ?: PCT_STYLE_PILL
         set(value) = prefs.edit().putString(KEY_PCT_LABEL_STYLE_3D, value).apply()
 
+    var mergeMarginPct3d: Float
+        get() = prefs.getFloat(KEY_MERGE_MARGIN_3D, 0f)
+        set(value) = prefs.edit().putFloat(KEY_MERGE_MARGIN_3D, value.coerceIn(0f, 10f)).apply()
+
     companion object {
+        private const val KEY_MERGE_MARGIN_3D = "merge_margin_pct_3d"
         const val PCT_STYLE_PILL = "pill"
         const val PCT_STYLE_CLEAN = "clean"
         private const val KEY_PCT_LABEL_STYLE_3D = "pct_label_style_3d"

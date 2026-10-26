@@ -126,6 +126,16 @@ class AltgraphCoreTest {
     }
 
     @Test
+    fun gearGradeComesFromRouteAheadOfRider() {
+        val core = AltgraphCore()
+        withRoute(core.calculator)
+        core.tick(null)
+        core.calculator.currentRouteDistance = 1500.0
+        val s = core.calculator.calculateStrategy(null, advance = false)
+        assertEquals(true, s.gearGrade != null)
+    }
+
+    @Test
     fun alignedGridDoesNotDependOnRiderPosition() {
         val core = AltgraphCore()
         withRoute(core.calculator)

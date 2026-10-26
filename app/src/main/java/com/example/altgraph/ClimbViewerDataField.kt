@@ -298,6 +298,7 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 altimetria3DView.climbGearGrade = climb?.avgGrade
                 altimetria3DView.pctLabelStyle = prefs.pctLabelStyle3d
                 altimetria3DView.mergeBlocksMode = prefs.mergeBlocksMode3d
+                altimetria3DView.mergeMarginPct = prefs.mergeMarginPct3d
                 altimetria3DView.hideGradeRangeEnabled = prefs.hideGradeRangeEnabled3d
                 altimetria3DView.hideGradeMin = prefs.hideGradeMin3d
                 altimetria3DView.hideGradeMax = prefs.hideGradeMax3d

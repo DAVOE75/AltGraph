@@ -32,6 +32,7 @@ It revolutionizes traditional cycling elevation profiles by featuring a **Suite 
 * **"Clean" gradient label (optional)**: tall white number with no box, a thin outer border and shadow, and a small % like a degree symbol. Uses your font and applies to Global 3D and the climb viewer.
 * **3D improvements**: gradient labels stay above the ridden-section shading, the label grows with zoom, the ruler shows sub-block distances at high zoom, and hairpins get a small vertical line on the graph.
 * **Map**: the gradient overlay and its smoothing are redrawn when you change the setting.
+* **Version 2.9.2**: recommended gear now uses the real gradient just ahead of the rider (no lag versus the blocks); with no header, the gear badge moves under the zoom buttons and the graph moves down and grows taller; "Route/Left" is larger, below the elevation line and uses your font; percentages of already-ridden blocks are dimmed; new option to merge neighbouring blocks within a gradient margin (0 = off, the block uses the average and its colour).
 
 ---
 

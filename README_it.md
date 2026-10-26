@@ -24,6 +24,7 @@ Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **S
 * **Etichetta di pendenza «Pulita» (opzionale)**: numero bianco alto senza riquadro, con un sottile contorno esterno e ombra, e un piccolo % come simbolo dei gradi. Usa il tuo carattere e vale per il 3D globale e il visualizzatore dei passi.
 * **Miglioramenti 3D**: le etichette di pendenza restano sopra l'ombreggiatura del tratto percorso, l'etichetta cresce con lo zoom, il righello mostra le distanze dei sotto-blocchi con zoom alto e i tornanti hanno una piccola linea verticale sul grafico.
 * **Mappa**: la sovrapposizione della pendenza e la sua sfumatura vengono ridisegnate quando cambi l'impostazione.
+* **Versione 2.9.2**: il rapporto consigliato usa la pendenza reale subito davanti al ciclista (senza sfasamento con i blocchi); senza intestazione, l'indicatore del rapporto passa sotto lo zoom e il grafico scende e cresce; «Percorso/Mancano» è più grande, sotto la linea di altitudine e con il tuo carattere; le percentuali dei blocchi già percorsi sono attenuate; nuova opzione per unire i blocchi vicini entro un margine di pendenza (0 = disattivato, il blocco usa la media e il suo colore).
 
 ---
 

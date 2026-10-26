@@ -200,7 +200,9 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         altimetria3DView.currentSpeedMs = snap.currentSpeed
                         altimetria3DView.showGearBadge = prefs.showGearBadge
                         altimetria3DView.pctLabelStyle = prefs.pctLabelStyle3d
+                        altimetria3DView.liveGearGrade = strategy.gearGrade
                         altimetria3DView.mergeBlocksMode = prefs.mergeBlocksMode3d
+                        altimetria3DView.mergeMarginPct = prefs.mergeMarginPct3d
                         altimetria3DView.hideGradeRangeEnabled = prefs.hideGradeRangeEnabled3d
                         altimetria3DView.hideGradeMin = prefs.hideGradeMin3d
                         altimetria3DView.hideGradeMax = prefs.hideGradeMax3d

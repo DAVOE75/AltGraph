@@ -142,7 +142,9 @@ data class StrategyData(
     // Tramos de superficie (Asfalto / Grava / Sendero-MTB)
     val surfaceSegments: List<SurfaceSegment> = emptyList(),
     // Metros que la ventana visible se adelanta al primer bloque de subBlocks (rejilla anclada a la ruta); 0 si no se alinea
-    val gridOffsetMeters: Double = 0.0
+    val gridOffsetMeters: Double = 0.0,
+    // Pendiente real (%) justo delante del ciclista (próximos ~60 m) para recomendar la marcha; null = sin perfil
+    val gearGrade: Double? = null
 )
 
 // Posición fija de la baliza en la ventana (fracción desde el borde izquierdo): 200 m con zoom de 1 km
@@ -2490,7 +2492,12 @@ class AltimetriaStrategyCalculator {
             windEffectIntensity = windEffect,
             routeCoords = getVisibleRouteCoords(windowStartDist, routePoints, actualLookahead.toInt()),
             surfaceSegments = routeSurfaceSegments,
-            gridOffsetMeters = gridOffset
+            gridOffsetMeters = gridOffset,
+            gearGrade = if (routeElevationProfile.isNotEmpty() || routePoints.size >= 2) {
+                val gSpan = 60.0
+                val gStart = currentRiderDistance.coerceAtLeast(0.0)
+                ((getElevationAtDistance(gStart + gSpan) - getElevationAtDistance(gStart)) / gSpan * 100.0).coerceIn(-30.0, 40.0)
+            } else null
         )
     }
 

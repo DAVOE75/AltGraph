@@ -843,6 +843,27 @@ class MainActivity : Activity() {
             mergeRow.addView(btn)
         }
         blockCleanCard.addView(mergeRow)
+        blockCleanCard.addView(createValueText(getString(R.string.setting_merge_margin)))
+        blockCleanCard.addView(EditText(this).apply {
+            inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+            setTextColor(Color.WHITE)
+            setText(prefs.mergeMarginPct3d.toString())
+            setSingleLine(true)
+            addTextChangedListener(object : android.text.TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: android.text.Editable?) {
+                    val v = s?.toString()?.replace(',', '.')?.toFloatOrNull()
+                    prefs.mergeMarginPct3d = v ?: 0f
+                }
+            })
+        })
+        blockCleanCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_merge_margin_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 12)
+        })
         blockCleanCard.addView(TextView(this).apply {
             text = getString(R.string.setting_merge_similar_blocks_desc)
             textSize = 12f

@@ -24,6 +24,7 @@ Revoluciona o conceito tradicional de altimetria de ciclismo incorporando um **C
 * **Etiqueta de inclinação «Limpa» (opcional)**: número branco alto sem caixa, com contorno exterior fino e sombra, e um pequeno % como símbolo de graus. Usa o seu tipo de letra e aplica-se ao 3D global e ao visualizador de subidas.
 * **Melhorias 3D**: as etiquetas de inclinação ficam sobre o sombreado do troço percorrido, a etiqueta cresce com o zoom, a régua mostra as distâncias dos sub-blocos com zoom alto e as curvas em ferradura têm uma pequena linha vertical no gráfico.
 * **Mapa**: a sobreposição de inclinação e a sua suavização são redesenhadas ao mudar a definição.
+* **Versão 2.9.2**: a marcha recomendada usa a inclinação real logo à frente do ciclista (sem desfasamento com os blocos); sem cabeçalho, o indicador da marcha passa para baixo do zoom e o gráfico desce e cresce; «Rota/Faltam» é maior, abaixo da linha de altitude e com o seu tipo de letra; as percentagens dos blocos já percorridos são atenuadas; nova opção para unir blocos vizinhos dentro de uma margem de inclinação (0 = desativado, o bloco usa a média e a sua cor).
 
 ---
 

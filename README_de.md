@@ -24,6 +24,7 @@ Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 7 3D-Höhenv
 * **Steigungsbeschriftung „Sauber“ (optional)**: hohe weiße Zahl ohne Rahmen, mit feinem Außenrand und Schatten sowie einem kleinen % wie ein Gradzeichen. Nutzt deine Schriftart und gilt für Global 3D und den Anstiegs-Viewer.
 * **3D-Verbesserungen**: Steigungsbeschriftungen liegen über der Schattierung des gefahrenen Abschnitts, die Beschriftung wächst mit dem Zoom, das Lineal zeigt bei hohem Zoom die Distanzen der Unterblöcke, und Kehren haben eine kleine vertikale Linie im Diagramm.
 * **Karte**: Die Steigungsüberlagerung und ihre Glättung werden beim Ändern der Einstellung neu gezeichnet.
+* **Version 2.9.2**: Der empfohlene Gang nutzt die tatsächliche Steigung direkt vor dem Fahrer (kein Versatz zu den Blöcken); ohne Kopfzeile rutscht die Gang-Anzeige unter den Zoom und das Diagramm wird tiefer und höher; „Route/Übrig“ ist größer, unter der Höhenlinie und in deiner Schriftart; Prozentwerte bereits gefahrener Blöcke werden abgedunkelt; neue Option, benachbarte Blöcke innerhalb einer Steigungsspanne zusammenzufassen (0 = aus, der Block nutzt den Mittelwert und dessen Farbe).
 
 ---
 

@@ -32,6 +32,7 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 * **Etiqueta de pendiente «Limpia» (opcional)**: número blanco alargado sin recuadro, con borde exterior fino y sombra, y un % pequeño como el símbolo de grados. Usa tu tipo de letra y se aplica al 3D global y al visor de puertos.
 * **Mejoras 3D**: las etiquetas de pendiente quedan sobre el sombreado del tramo recorrido, el recuadro crece con el zoom, la regla muestra las distancias de los sub-bloques con zoom alto y las herraduras llevan una pequeña línea vertical sobre la gráfica.
 * **Mapa**: la superposición de pendiente y su suavizado se redibujan al cambiar el ajuste.
+* **Versión 2.9.2**: marcha recomendada calculada con la pendiente real justo delante del ciclista (sin desfase con los bloques); sin cabecera, el engranaje sube bajo el zoom y la gráfica baja y crece; «Ruta/Quedan» más grande, bajo la línea de altitud y con tu tipo de letra; los porcentajes de los bloques ya recorridos se atenúan; nueva opción para fusionar bloques vecinos dentro de un margen de pendiente (0 = desactivado, el bloque usa la media y su color).
 
 ---
 
