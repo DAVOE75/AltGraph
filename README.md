@@ -28,7 +28,10 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 * Etiqueta «Barra de Zona de Entrenamiento» traducida a los 6 idiomas.
 * **Comportamiento de la baliza en 3D**: elige entre baliza fija (al 20 %, la gráfica se desplaza; por defecto) o baliza móvil con salto de página. Los bloques quedan anclados a la ruta, así que sus porcentajes y colores ya no cambian al avanzar.
 * **Distancia de ruta**: total y restante en la gráfica 3D. Si ocultas la marcha recomendada, el perfil baja y gana altura.
-* **Perfil más limpio (opcional)**: fusiona bloques vecinos del mismo color y oculta los porcentajes dentro de un rango (p. ej. de -2 a 2).
+* **Perfil más limpio (opcional)**: fusiona bloques vecinos del mismo color (No / Auto según el zoom / Siempre) y oculta los porcentajes dentro de un rango (p. ej. de -2 a 2).
+* **Etiqueta de pendiente «Limpia» (opcional)**: número blanco alargado sin recuadro, con borde exterior fino y sombra, y un % pequeño como el símbolo de grados. Usa tu tipo de letra y se aplica al 3D global y al visor de puertos.
+* **Mejoras 3D**: las etiquetas de pendiente quedan sobre el sombreado del tramo recorrido, el recuadro crece con el zoom, la regla muestra las distancias de los sub-bloques con zoom alto y las herraduras llevan una pequeña línea vertical sobre la gráfica.
+* **Mapa**: la superposición de pendiente y su suavizado se redibujan al cambiar el ajuste.
 
 ---
 

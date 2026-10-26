@@ -341,7 +341,14 @@
     <string name="setting_show_route_distances">Show total and remaining route distance</string>
     <string name="setting_block_clean_title">Cleaner profile</string>
     <string name="setting_merge_similar_blocks">Merge neighbouring blocks of the same colour</string>
-    <string name="setting_merge_similar_blocks_desc">Consecutive blocks with the same colour are shown as one block with a single average gradient</string>
+    <string name="setting_merge_similar_blocks_desc">Consecutive blocks with the same colour are shown as one block with a single average gradient. Auto merges only when blocks are narrow (zoomed out), keeping labels large and clean</string>
+    <string name="merge_mode_off">Off</string>
+    <string name="setting_pct_label_style">Gradient label style (3D profile graphs)</string>
+    <string name="setting_pct_label_style_desc">Boxed shows a dark box; Clean shows a tall white number with a thin outline and shadow, and a small % like a degree symbol. Uses the font selected in Style</string>
+    <string name="pct_style_pill">Boxed</string>
+    <string name="pct_style_clean">Clean</string>
+    <string name="merge_mode_auto">Auto</string>
+    <string name="merge_mode_always">Always</string>
     <string name="setting_hide_grade_range">Hide percentages within a range</string>
     <string name="setting_hide_grade_range_desc">Gradients inside this range keep their colour but their percentage is not shown (e.g. -2 to 2)</string>
     <string name="setting_hide_grade_min">Range from (%)</string>

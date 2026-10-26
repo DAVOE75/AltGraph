@@ -314,7 +314,14 @@
     <string name="setting_show_route_distances">Mostrar distância total e restante da rota</string>
     <string name="setting_block_clean_title">Perfil mais limpo</string>
     <string name="setting_merge_similar_blocks">Unir blocos vizinhos da mesma cor</string>
-    <string name="setting_merge_similar_blocks_desc">Blocos consecutivos da mesma cor são mostrados como um único bloco com inclinação média</string>
+    <string name="setting_merge_similar_blocks_desc">Blocos consecutivos da mesma cor são mostrados como um único bloco com inclinação média. Auto une apenas quando os blocos são estreitos (pouco zoom), com etiquetas maiores e mais limpas</string>
+    <string name="merge_mode_off">Não</string>
+    <string name="setting_pct_label_style">Estilo da etiqueta de inclinação (gráficos de perfil 3D)</string>
+    <string name="setting_pct_label_style_desc">Com caixa mostra uma caixa escura; Limpo mostra um número branco alto com contorno fino e sombra, e um pequeno % como símbolo de graus. Usa o tipo de letra escolhido em Estilo</string>
+    <string name="pct_style_pill">Com caixa</string>
+    <string name="pct_style_clean">Limpo</string>
+    <string name="merge_mode_auto">Auto</string>
+    <string name="merge_mode_always">Sempre</string>
     <string name="setting_hide_grade_range">Ocultar percentagens dentro de um intervalo</string>
     <string name="setting_hide_grade_range_desc">As inclinações dentro deste intervalo mantêm a cor mas não mostram a percentagem (ex. de -2 a 2)</string>
     <string name="setting_hide_grade_min">Intervalo de (%)</string>

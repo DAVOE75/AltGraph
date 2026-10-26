@@ -341,7 +341,14 @@
     <string name="setting_show_route_distances">Mostrar distancia total y restante de la ruta</string>
     <string name="setting_block_clean_title">Perfil más limpio</string>
     <string name="setting_merge_similar_blocks">Fusionar bloques vecinos del mismo color</string>
-    <string name="setting_merge_similar_blocks_desc">Los bloques consecutivos del mismo color se muestran como un solo bloque con una pendiente media</string>
+    <string name="setting_merge_similar_blocks_desc">Los bloques consecutivos del mismo color se muestran como un solo bloque con una pendiente media. Auto fusiona solo cuando los bloques son estrechos (poco zoom), con etiquetas más grandes y limpias</string>
+    <string name="merge_mode_off">No</string>
+    <string name="setting_pct_label_style">Estilo de la etiqueta de pendiente (gráficos de perfil 3D)</string>
+    <string name="setting_pct_label_style_desc">Con recuadro muestra un cuadro oscuro; Limpio muestra un número blanco alargado con borde fino y sombra, y un % pequeño como el símbolo de grados. Usa el tipo de letra elegido en Estilo</string>
+    <string name="pct_style_pill">Con recuadro</string>
+    <string name="pct_style_clean">Limpio</string>
+    <string name="merge_mode_auto">Auto</string>
+    <string name="merge_mode_always">Siempre</string>
     <string name="setting_hide_grade_range">Ocultar porcentajes dentro de un rango</string>
     <string name="setting_hide_grade_range_desc">Las pendientes dentro de este rango conservan su color pero no muestran el porcentaje (p. ej. de -2 a 2)</string>
     <string name="setting_hide_grade_min">Rango desde (%)</string>

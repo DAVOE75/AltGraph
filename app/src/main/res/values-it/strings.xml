@@ -314,7 +314,14 @@
     <string name="setting_show_route_distances">Mostra distanza totale e rimanente del percorso</string>
     <string name="setting_block_clean_title">Profilo più pulito</string>
     <string name="setting_merge_similar_blocks">Unisci i blocchi vicini dello stesso colore</string>
-    <string name="setting_merge_similar_blocks_desc">I blocchi consecutivi dello stesso colore vengono mostrati come un unico blocco con una pendenza media</string>
+    <string name="setting_merge_similar_blocks_desc">I blocchi consecutivi dello stesso colore vengono mostrati come un unico blocco con una pendenza media. Auto unisce solo quando i blocchi sono stretti (poco zoom), con etichette più grandi e pulite</string>
+    <string name="merge_mode_off">No</string>
+    <string name="setting_pct_label_style">Stile dell\'etichetta di pendenza (grafici di profilo 3D)</string>
+    <string name="setting_pct_label_style_desc">Con riquadro mostra un riquadro scuro; Pulito mostra un numero bianco alto con un sottile contorno e ombra, e un piccolo % come simbolo dei gradi. Usa il carattere scelto in Stile</string>
+    <string name="pct_style_pill">Con riquadro</string>
+    <string name="pct_style_clean">Pulito</string>
+    <string name="merge_mode_auto">Auto</string>
+    <string name="merge_mode_always">Sempre</string>
     <string name="setting_hide_grade_range">Nascondi le percentuali in un intervallo</string>
     <string name="setting_hide_grade_range_desc">Le pendenze in questo intervallo mantengono il colore ma non mostrano la percentuale (es. da -2 a 2)</string>
     <string name="setting_hide_grade_min">Intervallo da (%)</string>

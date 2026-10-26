@@ -28,7 +28,10 @@ It revolutionizes traditional cycling elevation profiles by featuring a **Suite 
 * "Training Zone Bar" label translated into all 6 languages.
 * **3D beacon behaviour**: choose a fixed beacon (at 20%, the graph scrolls; default) or a moving beacon with page jumps. Blocks are now anchored to the route, so their percentages and colours no longer change as you ride.
 * **Route distance**: total and remaining distance on the 3D graph. Hiding the recommended gear moves the profile down and makes it taller.
-* **Cleaner profile (optional)**: merge neighbouring blocks of the same colour and hide percentages within a range (e.g. -2 to 2).
+* **Cleaner profile (optional)**: merge neighbouring blocks of the same colour (Off / Auto by zoom / Always) and hide percentages within a range (e.g. -2 to 2).
+* **"Clean" gradient label (optional)**: tall white number with no box, a thin outer border and shadow, and a small % like a degree symbol. Uses your font and applies to Global 3D and the climb viewer.
+* **3D improvements**: gradient labels stay above the ridden-section shading, the label grows with zoom, the ruler shows sub-block distances at high zoom, and hairpins get a small vertical line on the graph.
+* **Map**: the gradient overlay and its smoothing are redrawn when you change the setting.
 
 ---
 

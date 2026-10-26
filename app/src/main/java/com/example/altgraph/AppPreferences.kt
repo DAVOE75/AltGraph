@@ -384,9 +384,11 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_SHOW_ROUTE_DISTANCES_3D, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_ROUTE_DISTANCES_3D, value).apply()
 
-    var mergeSimilarBlocks3d: Boolean
-        get() = prefs.getBoolean(KEY_MERGE_SIMILAR_BLOCKS_3D, false)
-        set(value) = prefs.edit().putBoolean(KEY_MERGE_SIMILAR_BLOCKS_3D, value).apply()
+    // "auto": fusiona solo cuando los bloques son estrechos; "always"; "off". El ajuste booleano anterior (true) equivale a "always".
+    var mergeBlocksMode3d: String
+        get() = prefs.getString(KEY_MERGE_MODE_3D, null)
+            ?: if (prefs.getBoolean(KEY_MERGE_SIMILAR_BLOCKS_3D, false)) MERGE_ALWAYS else MERGE_AUTO
+        set(value) = prefs.edit().putString(KEY_MERGE_MODE_3D, value).apply()
 
     var hideGradeRangeEnabled3d: Boolean
         get() = prefs.getBoolean(KEY_HIDE_GRADE_RANGE_ENABLED_3D, false)
@@ -400,12 +402,24 @@ class AppPreferences(context: Context) {
         get() = prefs.getFloat(KEY_HIDE_GRADE_MAX_3D, 2f)
         set(value) = prefs.edit().putFloat(KEY_HIDE_GRADE_MAX_3D, value).apply()
 
+    // "pill": recuadro negro (actual); "clean": número alargado sin recuadro con el % pequeño como un símbolo de grados
+    var pctLabelStyle3d: String
+        get() = prefs.getString(KEY_PCT_LABEL_STYLE_3D, PCT_STYLE_PILL) ?: PCT_STYLE_PILL
+        set(value) = prefs.edit().putString(KEY_PCT_LABEL_STYLE_3D, value).apply()
+
     companion object {
+        const val PCT_STYLE_PILL = "pill"
+        const val PCT_STYLE_CLEAN = "clean"
+        private const val KEY_PCT_LABEL_STYLE_3D = "pct_label_style_3d"
         const val BEACON_MODE_ANCHOR = "anchor"
         const val BEACON_MODE_PAGED = "paged"
         private const val KEY_BEACON_MODE_3D = "beacon_mode_3d"
         private const val KEY_SHOW_ROUTE_DISTANCES_3D = "show_route_distances_3d"
         private const val KEY_MERGE_SIMILAR_BLOCKS_3D = "merge_similar_blocks_3d"
+        private const val KEY_MERGE_MODE_3D = "merge_blocks_mode_3d"
+        const val MERGE_OFF = "off"
+        const val MERGE_AUTO = "auto"
+        const val MERGE_ALWAYS = "always"
         private const val KEY_HIDE_GRADE_RANGE_ENABLED_3D = "hide_grade_range_enabled_3d"
         private const val KEY_HIDE_GRADE_MIN_3D = "hide_grade_min_3d"
         private const val KEY_HIDE_GRADE_MAX_3D = "hide_grade_max_3d"

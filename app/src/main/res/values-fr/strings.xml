@@ -314,7 +314,14 @@
     <string name="setting_show_route_distances">Afficher la distance totale et restante de l\'itinéraire</string>
     <string name="setting_block_clean_title">Profil plus lisible</string>
     <string name="setting_merge_similar_blocks">Fusionner les blocs voisins de même couleur</string>
-    <string name="setting_merge_similar_blocks_desc">Les blocs consécutifs de même couleur sont affichés comme un seul bloc avec une pente moyenne</string>
+    <string name="setting_merge_similar_blocks_desc">Les blocs consécutifs de même couleur sont affichés comme un seul bloc avec une pente moyenne. Auto ne fusionne que si les blocs sont étroits (peu de zoom), avec des étiquettes plus grandes et lisibles</string>
+    <string name="merge_mode_off">Non</string>
+    <string name="setting_pct_label_style">Style de l\'étiquette de pente (graphiques de profil 3D)</string>
+    <string name="setting_pct_label_style_desc">Encadré affiche un cadre sombre ; Épuré affiche un grand chiffre blanc avec un fin contour et une ombre, et un petit % comme un symbole de degré. Utilise la police choisie dans Style</string>
+    <string name="pct_style_pill">Encadré</string>
+    <string name="pct_style_clean">Épuré</string>
+    <string name="merge_mode_auto">Auto</string>
+    <string name="merge_mode_always">Toujours</string>
     <string name="setting_hide_grade_range">Masquer les pourcentages dans une plage</string>
     <string name="setting_hide_grade_range_desc">Les pentes dans cette plage gardent leur couleur mais n\'affichent pas leur pourcentage (ex. de -2 à 2)</string>
     <string name="setting_hide_grade_min">Plage de (%)</string>

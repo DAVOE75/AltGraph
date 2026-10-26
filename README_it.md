@@ -20,7 +20,10 @@ Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **S
 * Etichetta «Barra zona di allenamento» tradotta in tutte e 6 le lingue.
 * **Comportamento del segnalino in 3D**: scegli tra segnalino fisso (al 20%, il grafico scorre; predefinito) o segnalino mobile con salto di pagina. I blocchi sono ancorati al percorso, quindi percentuali e colori non cambiano più durante l'avanzamento.
 * **Distanza del percorso**: totale e rimanente nel grafico 3D. Se nascondi il rapporto consigliato, il profilo scende e diventa più alto.
-* **Profilo più pulito (opzionale)**: unisce i blocchi vicini dello stesso colore e nasconde le percentuali in un intervallo (es. da -2 a 2).
+* **Profilo più pulito (opzionale)**: unisce i blocchi vicini dello stesso colore (No / Auto in base allo zoom / Sempre) e nasconde le percentuali in un intervallo (es. da -2 a 2).
+* **Etichetta di pendenza «Pulita» (opzionale)**: numero bianco alto senza riquadro, con un sottile contorno esterno e ombra, e un piccolo % come simbolo dei gradi. Usa il tuo carattere e vale per il 3D globale e il visualizzatore dei passi.
+* **Miglioramenti 3D**: le etichette di pendenza restano sopra l'ombreggiatura del tratto percorso, l'etichetta cresce con lo zoom, il righello mostra le distanze dei sotto-blocchi con zoom alto e i tornanti hanno una piccola linea verticale sul grafico.
+* **Mappa**: la sovrapposizione della pendenza e la sua sfumatura vengono ridisegnate quando cambi l'impostazione.
 
 ---
 

@@ -314,7 +314,14 @@
     <string name="setting_show_route_distances">Gesamt- und Restdistanz der Route anzeigen</string>
     <string name="setting_block_clean_title">Übersichtlicheres Profil</string>
     <string name="setting_merge_similar_blocks">Benachbarte Blöcke gleicher Farbe zusammenfassen</string>
-    <string name="setting_merge_similar_blocks_desc">Aufeinanderfolgende Blöcke gleicher Farbe werden als ein Block mit durchschnittlicher Steigung angezeigt</string>
+    <string name="setting_merge_similar_blocks_desc">Aufeinanderfolgende Blöcke gleicher Farbe werden als ein Block mit durchschnittlicher Steigung angezeigt. Auto fasst nur zusammen, wenn die Blöcke schmal sind (wenig Zoom), mit größeren, übersichtlichen Beschriftungen</string>
+    <string name="merge_mode_off">Aus</string>
+    <string name="setting_pct_label_style">Stil der Steigungsbeschriftung (3D-Profildiagramme)</string>
+    <string name="setting_pct_label_style_desc">Mit Rahmen zeigt ein dunkles Feld; Sauber zeigt eine hohe weiße Zahl mit feinem Rand und Schatten sowie ein kleines % wie ein Gradzeichen. Verwendet die im Stil gewählte Schriftart</string>
+    <string name="pct_style_pill">Mit Rahmen</string>
+    <string name="pct_style_clean">Sauber</string>
+    <string name="merge_mode_auto">Auto</string>
+    <string name="merge_mode_always">Immer</string>
     <string name="setting_hide_grade_range">Prozentwerte in einem Bereich ausblenden</string>
     <string name="setting_hide_grade_range_desc">Steigungen in diesem Bereich behalten ihre Farbe, zeigen aber keinen Prozentwert (z. B. -2 bis 2)</string>
     <string name="setting_hide_grade_min">Bereich von (%)</string>

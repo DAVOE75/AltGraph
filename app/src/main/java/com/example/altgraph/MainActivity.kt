@@ -797,13 +797,52 @@ class MainActivity : Activity() {
         // Limpieza del perfil: fusionar bloques vecinos del mismo color y ocultar porcentajes en un rango
         val blockCleanCard = createCardContainer()
         blockCleanCard.addView(createSectionLabel(getString(R.string.setting_block_clean_title)))
-        blockCleanCard.addView(Switch(this).apply {
-            text = getString(R.string.setting_merge_similar_blocks)
-            textSize = 15f
-            setTextColor(Color.WHITE)
-            isChecked = prefs.mergeSimilarBlocks3d
-            setOnCheckedChangeListener { _, isChecked -> prefs.mergeSimilarBlocks3d = isChecked }
+        // Estilo de la etiqueta de pendiente en el 3D global (prueba)
+        blockCleanCard.addView(createValueText(getString(R.string.setting_pct_label_style)))
+        val pctStyles = listOf(
+            AppPreferences.PCT_STYLE_PILL to getString(R.string.pct_style_pill),
+            AppPreferences.PCT_STYLE_CLEAN to getString(R.string.pct_style_clean)
+        )
+        val pctStyleBtns = mutableListOf<Button>()
+        val pctStyleRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        }
+        pctStyles.forEachIndexed { idx, (styleKey, styleLabel) ->
+            val btn = createSegmentButton(styleLabel, prefs.pctLabelStyle3d == styleKey) {
+                prefs.pctLabelStyle3d = styleKey
+                updateSegmentActiveStates(pctStyleBtns, idx)
+            }
+            pctStyleBtns.add(btn)
+            pctStyleRow.addView(btn)
+        }
+        blockCleanCard.addView(pctStyleRow)
+        blockCleanCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_pct_label_style_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 12)
         })
+        blockCleanCard.addView(createValueText(getString(R.string.setting_merge_similar_blocks)))
+        val mergeModes = listOf(
+            AppPreferences.MERGE_OFF to getString(R.string.merge_mode_off),
+            AppPreferences.MERGE_AUTO to getString(R.string.merge_mode_auto),
+            AppPreferences.MERGE_ALWAYS to getString(R.string.merge_mode_always)
+        )
+        val mergeBtns = mutableListOf<Button>()
+        val mergeRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        }
+        mergeModes.forEachIndexed { idx, (modeKey, modeLabel) ->
+            val btn = createSegmentButton(modeLabel, prefs.mergeBlocksMode3d == modeKey) {
+                prefs.mergeBlocksMode3d = modeKey
+                updateSegmentActiveStates(mergeBtns, idx)
+            }
+            mergeBtns.add(btn)
+            mergeRow.addView(btn)
+        }
+        blockCleanCard.addView(mergeRow)
         blockCleanCard.addView(TextView(this).apply {
             text = getString(R.string.setting_merge_similar_blocks_desc)
             textSize = 12f

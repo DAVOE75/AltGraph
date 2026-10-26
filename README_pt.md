@@ -20,7 +20,10 @@ Revoluciona o conceito tradicional de altimetria de ciclismo incorporando um **C
 * Etiqueta «Barra de Zona de Treino» traduzida nos 6 idiomas.
 * **Comportamento da baliza em 3D**: escolha entre baliza fixa (a 20%, o gráfico desloca-se; predefinição) ou baliza móvel com salto de página. Os blocos ficam ancorados à rota, pelo que as percentagens e cores já não mudam ao avançar.
 * **Distância da rota**: total e restante no gráfico 3D. Se ocultar a marcha recomendada, o perfil desce e ganha altura.
-* **Perfil mais limpo (opcional)**: une blocos vizinhos da mesma cor e oculta percentagens dentro de um intervalo (ex. de -2 a 2).
+* **Perfil mais limpo (opcional)**: une blocos vizinhos da mesma cor (Não / Auto conforme o zoom / Sempre) e oculta percentagens dentro de um intervalo (ex. de -2 a 2).
+* **Etiqueta de inclinação «Limpa» (opcional)**: número branco alto sem caixa, com contorno exterior fino e sombra, e um pequeno % como símbolo de graus. Usa o seu tipo de letra e aplica-se ao 3D global e ao visualizador de subidas.
+* **Melhorias 3D**: as etiquetas de inclinação ficam sobre o sombreado do troço percorrido, a etiqueta cresce com o zoom, a régua mostra as distâncias dos sub-blocos com zoom alto e as curvas em ferradura têm uma pequena linha vertical no gráfico.
+* **Mapa**: a sobreposição de inclinação e a sua suavização são redesenhadas ao mudar a definição.
 
 ---
 

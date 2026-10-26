@@ -17,6 +17,9 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
+// Anchura de sub-bloque (px) por debajo de la cual el modo "auto" fusiona bloques vecinos del mismo color
+private const val MERGE_AUTO_MAX_BLOCK_PX = 56f
+
 class Altimetria3DView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -265,6 +268,18 @@ class Altimetria3DView @JvmOverloads constructor(
         strokeWidth = 1.5f
         style = Paint.Style.STROKE
     }
+    private val hairpinMarkPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.BLACK
+        strokeWidth = 3f
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+    }
+    private val hairpinMarkBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
+        strokeWidth = 5f
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+    }
 
     // Barra de distancia inferior 3D
     private val baseBarPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -281,6 +296,11 @@ class Altimetria3DView @JvmOverloads constructor(
     private val baseDistTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
         typeface = Typeface.create("sans-serif-condensed", Typeface.BOLD)
+        textAlign = Paint.Align.CENTER
+    }
+
+    private val subDistTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#94A3B8")
         textAlign = Paint.Align.CENTER
     }
 
@@ -329,6 +349,88 @@ class Altimetria3DView @JvmOverloads constructor(
         typeface = Typeface.DEFAULT_BOLD
         textAlign = Paint.Align.CENTER
         setShadowLayer(4f, 0f, 0f, Color.BLACK)
+    }
+
+    // Estilo "limpio" de la etiqueta de pendiente: sin recuadro, mismo tipo de letra que percentTextPaint
+    private val cleanPctPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textAlign = Paint.Align.LEFT
+    }
+    var pctLabelStyle: String = AppPreferences.PCT_STYLE_PILL
+
+    // Número alargado en altura, blanco, con borde fino interior y sombra paralela; el % pequeño arriba a la derecha como un símbolo de grados
+    private fun drawCleanGradeLabel(canvas: Canvas, pctStr: String, cx: Float, centerY: Float, fontSize: Float) {
+        val number = pctStr.removeSuffix("%")
+        cleanPctPaint.typeface = percentTextPaint.typeface
+        cleanPctPaint.textScaleX = percentTextPaint.textScaleX
+
+        val numSize = fontSize * 1.1f
+        val pctSize = numSize * 0.45f
+        val stretch = 1.4f
+        cleanPctPaint.textSize = numSize
+        val numW = cleanPctPaint.measureText(number)
+        cleanPctPaint.textSize = pctSize
+        val pctW = cleanPctPaint.measureText("%")
+        val gap = numSize * 0.04f
+        val left = cx - (numW + gap + pctW) / 2f
+        val baseline = centerY + numSize * 0.35f
+        val numTop = baseline - numSize * 0.72f
+        val shadowOff = (numSize * 0.07f).coerceIn(1.5f, 3.5f)
+        val strokeW = (numSize * 0.045f).coerceIn(1f, 2f)
+
+        canvas.save()
+        canvas.scale(1f, stretch, cx, centerY)
+        for (pass in 0..2) {
+            for (part in 0..1) {
+                val isNumber = part == 0
+                cleanPctPaint.textSize = if (isNumber) numSize else pctSize
+                val x = if (isNumber) left else left + numW + gap
+                val y = if (isNumber) baseline else numTop + pctSize * 0.8f
+                val text = if (isNumber) number else "%"
+                when (pass) {
+                    0 -> {
+                        cleanPctPaint.style = Paint.Style.FILL
+                        cleanPctPaint.color = Color.argb(170, 0, 0, 0)
+                        canvas.drawText(text, x + shadowOff, y + shadowOff / stretch, cleanPctPaint)
+                    }
+                    1 -> {
+                        // Borde exterior: el trazo va bajo el relleno y solo asoma su mitad externa
+                        cleanPctPaint.style = Paint.Style.STROKE
+                        cleanPctPaint.strokeJoin = Paint.Join.ROUND
+                        cleanPctPaint.strokeWidth = strokeW * 2f
+                        cleanPctPaint.color = Color.parseColor("#1E293B")
+                        canvas.drawText(text, x, y, cleanPctPaint)
+                    }
+                    else -> {
+                        cleanPctPaint.style = Paint.Style.FILL
+                        cleanPctPaint.color = Color.WHITE
+                        canvas.drawText(text, x, y, cleanPctPaint)
+                    }
+                }
+            }
+        }
+        canvas.restore()
+        cleanPctPaint.style = Paint.Style.FILL
+    }
+
+    private fun drawGradeLabel(
+        canvas: Canvas, pctStr: String, cx: Float, centerY: Float, fontSize: Float,
+        padX: Float, padY: Float, badgeBg: Paint, badgeBorder: Paint
+    ) {
+        if (pctLabelStyle == AppPreferences.PCT_STYLE_CLEAN) {
+            drawCleanGradeLabel(canvas, pctStr, cx, centerY, fontSize)
+            return
+        }
+        percentTextPaint.textSize = fontSize
+        val textW = percentTextPaint.measureText(pctStr)
+        val pillRect = RectF(
+            cx - (textW / 2f) - padX,
+            centerY - (fontSize * 0.50f) - padY,
+            cx + (textW / 2f) + padX,
+            centerY + (fontSize * 0.50f) + padY
+        )
+        canvas.drawRoundRect(pillRect, 6f, 6f, badgeBg)
+        canvas.drawRoundRect(pillRect, 6f, 6f, badgeBorder)
+        canvas.drawText(pctStr, cx, centerY + (fontSize * 0.35f), percentTextPaint)
     }
 
     // Baliza del ciclista
@@ -522,7 +624,7 @@ class Altimetria3DView @JvmOverloads constructor(
     var currentSpeedMs: Double = 0.0
     var gearWallEnabled: Boolean = true
     var showGearBadge: Boolean = true
-    var mergeSimilarBlocks: Boolean = false
+    var mergeBlocksMode: String = AppPreferences.MERGE_AUTO
     var hideGradeRangeEnabled: Boolean = false
     var hideGradeMin: Float = -2f
     var hideGradeMax: Float = 2f
@@ -1170,7 +1272,13 @@ class Altimetria3DView @JvmOverloads constructor(
         // Fusión opcional de bloques vecinos del mismo color: una sola columna con la pendiente media del tramo
         val displayGrades: FloatArray
         val mergedRuns = ArrayList<IntRange>()
-        if (mergeSimilarBlocks && profileMode && microGrades.size > 1) {
+        // Con bloques estrechos (poco zoom) los vecinos del mismo color se unen para etiquetas más grandes y limpias
+        val mergeNow = profileMode && when (mergeBlocksMode) {
+            AppPreferences.MERGE_ALWAYS -> true
+            AppPreferences.MERGE_AUTO -> microStepX < MERGE_AUTO_MAX_BLOCK_PX
+            else -> false
+        }
+        if (mergeNow && microGrades.size > 1) {
             displayGrades = microGrades.copyOf()
             mergedJoint = BooleanArray(totalMicroSamples)
             var s = 0
@@ -1221,6 +1329,31 @@ class Altimetria3DView @JvmOverloads constructor(
                 drawHillshadeApexRibbon(canvas, w, h, totalMicroSamples, displayGrades, xFront, yFront, xBack, yBack, yBase, depth3dY)
             }
             else -> {}
+        }
+
+        // Atenúa suavemente el tramo ya recorrido (a la izquierda de la baliza). Se dibuja antes de cotas y
+        // porcentajes para que las etiquetas, incluida la del bloque actual, queden por encima del sombreado.
+        if (riderProgress >= 0f && riderProgress <= 1f) {
+            val dimIdxF = if (profileElevations.size >= 2 && subBlocks.isNotEmpty() && subBlockSizeMeters > 0.0) {
+                (((riderProgress * lookaheadMeters) + gridOffsetMeters) / subBlockSizeMeters).toFloat().coerceIn(0f, (totalMicroSamples - 1).toFloat())
+            } else {
+                riderProgress * (totalMicroSamples - 1)
+            }
+            val dIdx = dimIdxF.toInt().coerceIn(0, totalMicroSamples - 2)
+            val dRem = dimIdxF - dIdx
+            if (dIdx > 0) {
+                val dx = xFront[dIdx] + dRem * (xFront[dIdx + 1] - xFront[dIdx])
+                val dy = yFront[dIdx] + dRem * (yFront[dIdx + 1] - yFront[dIdx])
+                val dBase = yBase[dIdx] + dRem * (yBase[dIdx + 1] - yBase[dIdx])
+                riddenDimPath.reset()
+                riddenDimPath.moveTo(xFront[0], yFront[0])
+                for (i in 1..dIdx) riddenDimPath.lineTo(xFront[i], yFront[i])
+                riddenDimPath.lineTo(dx, dy)
+                riddenDimPath.lineTo(dx, dBase)
+                for (i in dIdx downTo 0) riddenDimPath.lineTo(xFront[i], yBase[i])
+                riddenDimPath.close()
+                canvas.drawPath(riddenDimPath, riddenDimPaint)
+            }
         }
 
         // 5. DIVISORES DE BLOQUE MAYOR VERTICALES CON COTAS DE ALTITUD
@@ -1292,7 +1425,9 @@ class Altimetria3DView @JvmOverloads constructor(
                         "%.0f%%".format(g)
                     }
 
-                    val calcFontSize = (groupW * 0.40f * fontScale).coerceIn(14f, 24f)
+                    // Con zoom el bloque se ensancha: el recuadro crece con él (sin pasar de ~30% del ancho del bloque)
+                    val maxFont = maxOf(24f, minOf(groupW * 0.30f, ((h * 0.09f) * fontScale).coerceIn(24f, 48f)))
+                    val calcFontSize = (groupW * 0.40f * fontScale).coerceIn(14f, maxFont)
                     percentTextPaint.textSize = calcFontSize
 
                     val isInsideBlock = colH >= (calcFontSize * 2.2f)
@@ -1303,18 +1438,9 @@ class Altimetria3DView @JvmOverloads constructor(
                     }
 
                     val textW = percentTextPaint.measureText(pctStr)
-                    val padX = (calcFontSize * 0.26f).coerceIn(4f, 8f)
-                    val padY = (calcFontSize * 0.18f).coerceIn(3f, 6f)
-                    val pillRect = RectF(
-                        colMidX - (textW / 2f) - padX,
-                        centerY - (calcFontSize * 0.50f) - padY,
-                        colMidX + (textW / 2f) + padX,
-                        centerY + (calcFontSize * 0.50f) + padY
-                    )
-
-                    canvas.drawRoundRect(pillRect, 6f, 6f, badgeBg)
-                    canvas.drawRoundRect(pillRect, 6f, 6f, badgeBorder)
-                    canvas.drawText(pctStr, colMidX, centerY + (calcFontSize * 0.35f), percentTextPaint)
+                    val padX = (calcFontSize * 0.26f).coerceIn(4f, 14f)
+                    val padY = (calcFontSize * 0.18f).coerceIn(3f, 10f)
+                    drawGradeLabel(canvas, pctStr, colMidX, centerY, calcFontSize, padX, padY, badgeBg, badgeBorder)
                 }
             } else {
                 // Si la escala es muy amplia (>5km con muchas micro-columnas), dibujar porcentaje en cada bloque mayor
@@ -1350,19 +1476,9 @@ class Altimetria3DView @JvmOverloads constructor(
                         midTopY - (calcFontSize * 0.85f)
                     }
 
-                    val textW = percentTextPaint.measureText(pctStr)
                     val padX = (calcFontSize * 0.28f).coerceIn(5f, 9f)
                     val padY = (calcFontSize * 0.18f).coerceIn(3f, 6f)
-                    val pillRect = RectF(
-                        midX - (textW / 2f) - padX,
-                        centerY - (calcFontSize * 0.50f) - padY,
-                        midX + (textW / 2f) + padX,
-                        centerY + (calcFontSize * 0.50f) + padY
-                    )
-
-                    canvas.drawRoundRect(pillRect, 6f, 6f, badgeBg)
-                    canvas.drawRoundRect(pillRect, 6f, 6f, badgeBorder)
-                    canvas.drawText(pctStr, midX, centerY + (calcFontSize * 0.35f), percentTextPaint)
+                    drawGradeLabel(canvas, pctStr, midX, centerY, calcFontSize, padX, padY, badgeBg, badgeBorder)
                 }
             }
         }
@@ -1428,6 +1544,12 @@ class Altimetria3DView @JvmOverloads constructor(
                 // Dibujar línea transversal sobre la calzada (asfalto 3D)
                 canvas.drawLine(xF, yF, xB, yB, hairpinLineBorderPaint)
                 canvas.drawLine(xF, yF, xB, yB, hairpinLinePaint)
+
+                // Marca vertical corta sobre la gráfica: baja por la pared del bloque desde el borde del perfil
+                val markH = (h * 0.07f).coerceIn(12f, 22f)
+                val markBottom = minOf(yF + markH, yBase[idx])
+                canvas.drawLine(xF, yF, xF, markBottom, hairpinMarkBorderPaint)
+                canvas.drawLine(xF, yF, xF, markBottom, hairpinMarkPaint)
             }
         }
 
@@ -1496,6 +1618,20 @@ class Altimetria3DView @JvmOverloads constructor(
             val px = majorX[k]
             if (px < startX - depth3dX) continue
             canvas.drawText(distLabel, px, baseGroundY + (barH * 0.75f), baseDistTextPaint)
+        }
+
+        // Con mucho zoom los sub-bloques son anchos: también se rotulan sus distancias en la regla
+        if (profileMode && microSubDivisions > 1 && microStepX >= 60f) {
+            subDistTextPaint.textSize = baseDistTextPaint.textSize * 0.85f
+            subDistTextPaint.typeface = baseDistTextPaint.typeface
+            for (i in 1 until totalMicroSamples) {
+                if (i % microSubDivisions == 0) continue
+                val px = xFront[i]
+                if (px < startX + 12f || px > baseEndX - 12f) continue
+                val m = (windowStartMeters - gridOffsetMeters + i * subBlockSizeMeters).toLong()
+                val subLabel = if (m < 1000) "${m}m" else if (m % 1000L == 0L) "${m / 1000}km" else "${m / 1000}.${(m % 1000L) / 100}km"
+                canvas.drawText(subLabel, px, baseGroundY + (barH * 0.75f), subDistTextPaint)
+            }
         }
 
         // Leyenda de escala debajo de la gráfica
@@ -1572,19 +1708,6 @@ class Altimetria3DView @JvmOverloads constructor(
             val rem = exactIndexF - idx
             val rx = xFront[idx] + rem * (xFront[idx + 1] - xFront[idx])
             val ry = yFront[idx] + rem * (yFront[idx + 1] - yFront[idx])
-
-            // Atenúa suavemente el tramo ya recorrido (a la izquierda de la baliza)
-            if (idx > 0) {
-                val ryBase = yBase[idx] + rem * (yBase[idx + 1] - yBase[idx])
-                riddenDimPath.reset()
-                riddenDimPath.moveTo(xFront[0], yFront[0])
-                for (i in 1..idx) riddenDimPath.lineTo(xFront[i], yFront[i])
-                riddenDimPath.lineTo(rx, ry)
-                riddenDimPath.lineTo(rx, ryBase)
-                for (i in idx downTo 0) riddenDimPath.lineTo(xFront[i], yBase[i])
-                riddenDimPath.close()
-                canvas.drawPath(riddenDimPath, riddenDimPaint)
-            }
             
             // Haz de luz frontal en Horizonte Isométrico (orientado según la pendiente que sube el ciclista)
         if (altimetriaStyle == AltimetriaStyle.HORIZON_ISOMETRIC) {
