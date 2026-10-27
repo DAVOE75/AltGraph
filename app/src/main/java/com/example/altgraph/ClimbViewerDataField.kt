@@ -292,6 +292,11 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 altimetria3DView.wbalFailureMeters = snap.wbalFailureMeters
                 altimetria3DView.wPrime = prefs.userWPrime
                 altimetria3DView.currentCadence = strategy.currentCadence
+                altimetria3DView.gearEffortEnabled = prefs.gearEffortEnabled
+                altimetria3DView.gearFtp = prefs.userFtp
+                altimetria3DView.gearWeightKg = prefs.riderWeightKg.toDouble()
+                altimetria3DView.gearMaxHr = prefs.maxHeartRate
+                altimetria3DView.gearHeartRate = snap.strategy.currentHeartRate
                 altimetria3DView.currentSpeedMs = snap.currentSpeed
                 altimetria3DView.gearWallEnabled = prefs.gearWallEnabled
                 altimetria3DView.showGearBadge = prefs.showGearBadge && climb != null

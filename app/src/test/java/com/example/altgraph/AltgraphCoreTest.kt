@@ -126,6 +126,20 @@ class AltgraphCoreTest {
     }
 
     @Test
+    fun routeAscentCountsOnlyClimbing() {
+        val c = AltimetriaStrategyCalculator()
+        c.routeElevationProfile = listOf(
+            ElevationPolylineDecoder.ElevationPoint(0.0, 0.0),
+            ElevationPolylineDecoder.ElevationPoint(100.0, 10.0),
+            ElevationPolylineDecoder.ElevationPoint(200.0, 5.0),
+            ElevationPolylineDecoder.ElevationPoint(300.0, 15.0)
+        )
+        assertEquals(20.0, c.routeAscentBetween(0.0, 300.0)!!, 1e-9)
+        assertEquals(10.0, c.routeAscentBetween(150.0, 300.0)!!, 1e-9)
+        assertEquals(0.0, c.routeAscentBetween(300.0, 300.0)!!, 1e-9)
+    }
+
+    @Test
     fun gearGradeComesFromRouteAheadOfRider() {
         val core = AltgraphCore()
         withRoute(core.calculator)

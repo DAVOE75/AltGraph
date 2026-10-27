@@ -343,6 +343,14 @@
     <string name="setting_merge_similar_blocks">Merge neighbouring blocks of the same colour</string>
     <string name="setting_merge_similar_blocks_desc">Consecutive blocks with the same colour are shown as one block with a single average gradient. Auto merges only when blocks are narrow (zoomed out), keeping labels large and clean</string>
     <string name="merge_mode_off">Off</string>
+    <string name="setting_route_info_side">Position of Route / Left data</string>
+    <string name="route_info_right">Right</string>
+    <string name="route_info_left">Left</string>
+    <string name="setting_gear_effort">Gear by effort (cadence target)</string>
+    <string name="setting_gear_effort_desc">Recommends the gear for a target cadence: climbs 70-85 rpm, flat 85-95 rpm, descents 90-100 rpm. The speed is estimated from your FTP, weight and heart rate (high heart rate eases the gear, low heart rate allows a harder one)</string>
+    <string name="setting_gear_ftp">FTP (W)</string>
+    <string name="setting_gear_weight">Rider weight (kg)</string>
+    <string name="setting_gear_maxhr">Max heart rate (bpm)</string>
     <string name="setting_merge_margin">Merge blocks within a margin (%)</string>
     <string name="setting_merge_margin_desc">Neighbouring blocks whose gradient differs by less than this margin are merged even if their colour differs (e.g. 1 merges 2.9 and 3.1). The merged block uses the average gradient and its colour. 0 = off</string>
     <string name="setting_pct_label_style">Gradient label style (3D profile graphs)</string>

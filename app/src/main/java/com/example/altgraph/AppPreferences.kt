@@ -274,6 +274,19 @@ class AppPreferences(context: Context) {
         get() = prefs.getInt(KEY_USER_FTP, 250)
         set(value) = prefs.edit().putInt(KEY_USER_FTP, value).apply()
 
+    // Marcha según esfuerzo (FTP, peso y FC máxima); apagado vuelve a la tabla por pendiente
+    var gearEffortEnabled: Boolean
+        get() = prefs.getBoolean(KEY_GEAR_EFFORT, true)
+        set(value) = prefs.edit().putBoolean(KEY_GEAR_EFFORT, value).apply()
+
+    var riderWeightKg: Int
+        get() = prefs.getInt(KEY_RIDER_WEIGHT, 75)
+        set(value) = prefs.edit().putInt(KEY_RIDER_WEIGHT, value.coerceIn(30, 200)).apply()
+
+    var maxHeartRate: Int
+        get() = prefs.getInt(KEY_MAX_HR, 185)
+        set(value) = prefs.edit().putInt(KEY_MAX_HR, value.coerceIn(100, 230)).apply()
+
     var userWPrime: Int
         get() = prefs.getInt(KEY_USER_WPRIME, 20000)
         set(value) = prefs.edit().putInt(KEY_USER_WPRIME, value).apply()
@@ -411,7 +424,14 @@ class AppPreferences(context: Context) {
         get() = prefs.getFloat(KEY_MERGE_MARGIN_3D, 0f)
         set(value) = prefs.edit().putFloat(KEY_MERGE_MARGIN_3D, value.coerceIn(0f, 10f)).apply()
 
+    var routeInfoSide3d: String
+        get() = prefs.getString(KEY_ROUTE_INFO_SIDE_3D, ROUTE_INFO_RIGHT) ?: ROUTE_INFO_RIGHT
+        set(value) = prefs.edit().putString(KEY_ROUTE_INFO_SIDE_3D, value).apply()
+
     companion object {
+        const val ROUTE_INFO_RIGHT = "right"
+        const val ROUTE_INFO_LEFT = "left"
+        private const val KEY_ROUTE_INFO_SIDE_3D = "route_info_side_3d"
         private const val KEY_MERGE_MARGIN_3D = "merge_margin_pct_3d"
         const val PCT_STYLE_PILL = "pill"
         const val PCT_STYLE_CLEAN = "clean"
@@ -428,6 +448,9 @@ class AppPreferences(context: Context) {
         private const val KEY_HIDE_GRADE_RANGE_ENABLED_3D = "hide_grade_range_enabled_3d"
         private const val KEY_HIDE_GRADE_MIN_3D = "hide_grade_min_3d"
         private const val KEY_HIDE_GRADE_MAX_3D = "hide_grade_max_3d"
+        private const val KEY_GEAR_EFFORT = "gear_effort_enabled"
+        private const val KEY_RIDER_WEIGHT = "rider_weight_kg"
+        private const val KEY_MAX_HR = "max_heart_rate"
         private const val PREFS_NAME = "altgraph_settings"
         private const val KEY_FONT_FAMILY = "font_family_key"
         private const val KEY_BLOCK_SIZE = "block_size_meters"

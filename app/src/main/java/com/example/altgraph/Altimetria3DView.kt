@@ -412,6 +412,43 @@ class Altimetria3DView @JvmOverloads constructor(
         cleanPctPaint.style = Paint.Style.FILL
     }
 
+    private class LabelFit(val fontSize: Float, val centerY: Float)
+
+    // Ajusta la etiqueta de pendiente para que quepa entera dentro del bloque: reduce el tamaño según el ancho del
+    // bloque y la altura libre bajo el punto más bajo del perfil en el ancho de la etiqueta. Null si no cabe (queda encima).
+    private fun fitLabelInside(
+        xFront: FloatArray, yFront: FloatArray, a: Int, b: Int, cx: Float, baseY: Float,
+        pctStr: String, startSize: Float, maxWidth: Float, preferredCy: Float
+    ): LabelFit? {
+        fun surfaceAt(x: Float): Float {
+            if (x <= xFront[a]) return yFront[a]
+            for (i in a until b) {
+                if (x <= xFront[i + 1]) {
+                    val span = xFront[i + 1] - xFront[i]
+                    val t = if (abs(span) < 0.01f) 0f else (x - xFront[i]) / span
+                    return yFront[i] + t * (yFront[i + 1] - yFront[i])
+                }
+            }
+            return yFront[b]
+        }
+        var size = startSize
+        repeat(8) {
+            percentTextPaint.textSize = size
+            val w = percentTextPaint.measureText(pctStr) * 1.1f + size * 0.6f
+            val labelH = size * 1.4f
+            var lowest = -Float.MAX_VALUE
+            for (s in 0..8) lowest = maxOf(lowest, surfaceAt(cx - w / 2f + w * s / 8f))
+            val room = baseY - lowest - 6f
+            if (w <= maxWidth && room >= labelH) {
+                return LabelFit(size, preferredCy.coerceIn(lowest + 3f + labelH / 2f, baseY - 3f - labelH / 2f))
+            }
+            val k = minOf(if (w > maxWidth) maxWidth / w else 1f, if (room < labelH) room / labelH else 1f) * 0.97f
+            size *= k.coerceIn(0.5f, 0.97f)
+            if (size < 9f) return null
+        }
+        return null
+    }
+
     private fun drawGradeLabel(
         canvas: Canvas, pctStr: String, cx: Float, centerY: Float, fontSize: Float,
         padX: Float, padY: Float, badgeBg: Paint, badgeBorder: Paint, dimmed: Boolean = false
@@ -652,6 +689,17 @@ class Altimetria3DView @JvmOverloads constructor(
     var climbGearGrade: Double? = null
     // Pendiente real delante del ciclista (la marcha no depende de la resolución de los bloques mostrados)
     var liveGearGrade: Double? = null
+    // Marcha según esfuerzo: FTP, peso, FC máxima y FC en directo
+    var gearEffortEnabled: Boolean = true
+    var gearFtp: Int = 250
+    var gearWeightKg: Double = 75.0
+    var gearMaxHr: Int = 185
+    var gearHeartRate: Double = 0.0
+    // Desnivel positivo de la ruta y el que queda (m); null = sin dato
+    var routeTotalAscent: Double? = null
+    // Lado de los datos Ruta/Quedan: true = izquierda, false = derecha
+    var routeInfoOnLeft: Boolean = false
+    var routeRemainingAscent: Double? = null
     var gearChainrings: String = GearAdvisor.DEFAULT_CHAINRINGS
     var gearCassette: String = GearAdvisor.DEFAULT_CASSETTE
 
@@ -1000,15 +1048,34 @@ class Altimetria3DView @JvmOverloads constructor(
         val textSize = ((h * 0.034f) * fontScale).coerceIn(15f, 24f)
         routeInfoLabelPaint.textSize = textSize
         routeInfoValuePaint.textSize = textSize * 1.15f
+        val total = routeTotalAscent
+        val remaining = routeRemainingAscent
         val lines = listOf(
-            context.getString(R.string.label_route_total) to formatRouteKm(routeTotalLength),
-            context.getString(R.string.label_route_left) to formatRouteKm(left)
+            context.getString(R.string.label_route_total) to
+                (formatRouteKm(routeTotalLength) + if (total != null) " / ${total.roundToInt()}m" else ""),
+            context.getString(R.string.label_route_left) to
+                (formatRouteKm(left) + if (remaining != null) " / ${remaining.roundToInt()}m" else "")
         )
-        val right = w - 16f
         val lineH = textSize * 1.4f
         // Debajo de la línea de altitud más alta del perfil, que sirve de referencia
         val firstBaseline = if (profileTopLineY > 0f) profileTopLineY + textSize * 1.15f + 6f
             else if (showHeaderStats) h * 0.33f else (h * 0.15f).coerceIn(28f, 44f) + 22f
+        if (routeInfoOnLeft) {
+            // A la izquierda, tras el eje de altitudes: etiquetas alineadas y valores en columna
+            val leftX = w * 0.10f + 8f
+            val labelW = lines.maxOf { routeInfoLabelPaint.measureText(it.first) }
+            routeInfoLabelPaint.textAlign = Paint.Align.LEFT
+            routeInfoValuePaint.textAlign = Paint.Align.LEFT
+            for ((idx, line) in lines.withIndex()) {
+                val y = firstBaseline + idx * lineH
+                canvas.drawText(line.first, leftX, y, routeInfoLabelPaint)
+                canvas.drawText(line.second, leftX + labelW + 8f, y, routeInfoValuePaint)
+            }
+            routeInfoLabelPaint.textAlign = Paint.Align.RIGHT
+            routeInfoValuePaint.textAlign = Paint.Align.RIGHT
+            return
+        }
+        val right = w - 16f
         for ((idx, line) in lines.withIndex()) {
             val y = firstBaseline + idx * lineH
             canvas.drawText(line.second, right, y, routeInfoValuePaint)
@@ -1170,7 +1237,7 @@ class Altimetria3DView @JvmOverloads constructor(
         val profileMode = profileElevations.size >= 2 && subBlocks.isNotEmpty() && subBlockSizeMeters > 0.0
         val gearBadgeShown = gearWallEnabled && showGearBadge
         // Sin cabecera (ni título ni datos de pendiente) el engranaje sube justo debajo de los botones de zoom
-        val gearOnTop = gearBadgeShown && !showHeaderStats && !isClimbMode && !rotate90
+        val gearOnTop = gearBadgeShown && !showHeaderStats && !isClimbMode
         val zoomBottomY = 64f * resources.displayMetrics.density + 6f
         val gearTopTextSize = ((h * 0.085f) * fontScale).coerceIn(22f, 32f)
         val gearTopBadgeH = gearTopTextSize * 0.85f + 20f
@@ -1188,15 +1255,21 @@ class Altimetria3DView @JvmOverloads constructor(
             else -> h * 0.60f
         }
         // Si el engranaje no ocupa el hueco inferior (oculto o movido arriba), la gráfica baja hasta la leyenda de bloques
-        val freedBottom = if ((!gearBadgeShown || gearOnTop) && !rotate90) {
+        val freedBottom = if (gearOnTop || (!gearBadgeShown && !rotate90)) {
             val legendSize = ((h * 0.075f) * fontScale).coerceIn(16f, 23f)
             val legendTop = h - 23f - legendSize * 0.8f
             val barH0 = (h * 0.09f).coerceIn(20f, 32f)
-            (legendTop - 4f - barH0 - defaultGroundY).coerceAtLeast(0f)
+            // En apaisado hay poca altura: el hueco entre la barra y la leyenda se reduce al mínimo
+            val gap = if (rotate90) 0f else 4f
+            (legendTop - gap - barH0 - defaultGroundY).coerceAtLeast(0f)
         } else 0f
-        val baseGroundY = defaultGroundY + freedBottom
+        // El perfil sube 1 mm respecto al borde inferior (3 mm menos los 2 mm que se bajaron) para no tapar los botones de paso si van abajo
+        val liftPx = if (freedBottom > 0f) android.util.TypedValue.applyDimension(
+            android.util.TypedValue.COMPLEX_UNIT_MM, 1f, resources.displayMetrics
+        ) else 0f
+        val baseGroundY = defaultGroundY + freedBottom - liftPx
         val maxPeakHeight = if (gearOnTop) {
-            (baseGroundY - (zoomBottomY + gearTopBadgeH + 12f)).coerceAtLeast(h * 0.3f)
+            (baseGroundY - (zoomBottomY + gearTopBadgeH + (if (rotate90) 6f else 12f))).coerceAtLeast(h * 0.3f)
         } else defaultPeakHeight + freedBottom
         profileTopLineY = baseGroundY - maxPeakHeight
 
@@ -1476,16 +1549,22 @@ class Altimetria3DView @JvmOverloads constructor(
                     percentTextPaint.textSize = calcFontSize
 
                     val isInsideBlock = colH >= (calcFontSize * 2.2f)
-                    val centerY = if (isInsideBlock) {
+                    var labelSize = calcFontSize
+                    var centerY = if (isInsideBlock) {
                         colTopY + (colH * 0.50f)
                     } else {
                         colTopY - (calcFontSize * 0.85f)
                     }
+                    // Que la etiqueta no se salga del perfil: se reduce o se recoloca para que quepa
+                    fitLabelInside(xFront, yFront, a, b, colMidX, baseGroundY, pctStr, calcFontSize, groupW - 4f, centerY)?.let {
+                        labelSize = it.fontSize
+                        centerY = it.centerY
+                    }
 
                     val textW = percentTextPaint.measureText(pctStr)
-                    val padX = (calcFontSize * 0.26f).coerceIn(4f, 14f)
-                    val padY = (calcFontSize * 0.18f).coerceIn(3f, 10f)
-                    drawGradeLabel(canvas, pctStr, colMidX, centerY, calcFontSize, padX, padY, badgeBg, badgeBorder, riddenIdx >= 0 && b <= riddenIdx)
+                    val padX = (labelSize * 0.26f).coerceIn(4f, 14f)
+                    val padY = (labelSize * 0.18f).coerceIn(3f, 10f)
+                    drawGradeLabel(canvas, pctStr, colMidX, centerY, labelSize, padX, padY, badgeBg, badgeBorder, riddenIdx >= 0 && b <= riddenIdx)
                 }
             } else {
                 // Si la escala es muy amplia (>5km con muchas micro-columnas), dibujar porcentaje en cada bloque mayor
@@ -1515,15 +1594,20 @@ class Altimetria3DView @JvmOverloads constructor(
                     percentTextPaint.textSize = calcFontSize
 
                     val isInsideBlock = blockH >= (calcFontSize * 2.2f)
-                    val centerY = if (isInsideBlock) {
+                    var labelSize = calcFontSize
+                    var centerY = if (isInsideBlock) {
                         midTopY + (blockH * 0.50f)
                     } else {
                         midTopY - (calcFontSize * 0.85f)
                     }
+                    fitLabelInside(xFront, yFront, microIdx1, microIdx2, midX, baseGroundY, pctStr, calcFontSize, bW - 4f, centerY)?.let {
+                        labelSize = it.fontSize
+                        centerY = it.centerY
+                    }
 
-                    val padX = (calcFontSize * 0.28f).coerceIn(5f, 9f)
-                    val padY = (calcFontSize * 0.18f).coerceIn(3f, 6f)
-                    drawGradeLabel(canvas, pctStr, midX, centerY, calcFontSize, padX, padY, badgeBg, badgeBorder, riddenIdx >= 0 && microIdx2 <= riddenIdx)
+                    val padX = (labelSize * 0.28f).coerceIn(5f, 9f)
+                    val padY = (labelSize * 0.18f).coerceIn(3f, 6f)
+                    drawGradeLabel(canvas, pctStr, midX, centerY, labelSize, padX, padY, badgeBg, badgeBorder, riddenIdx >= 0 && microIdx2 <= riddenIdx)
                 }
             }
         }
@@ -1996,7 +2080,13 @@ class Altimetria3DView @JvmOverloads constructor(
             val avgNextGrade = if (microGrades.isEmpty()) 0f else (gearIdx until gearEnd).map { microGrades[it] }.average().toFloat()
             if (showGearBadge) {
             val climbGrade = climbGearGrade
-            val recSprocket = GearAdvisor.recommend(climbGrade ?: liveGearGrade ?: avgNextGrade.toDouble(), gearChainrings, gearCassette)
+            val gearGradeNow = climbGrade ?: liveGearGrade ?: avgNextGrade.toDouble()
+            val recSprocket = if (gearEffortEnabled && gearFtp > 0) {
+                val hrFrac = if (gearHeartRate > 30.0 && gearMaxHr > 0) gearHeartRate / gearMaxHr else null
+                GearAdvisor.recommendForEffort(gearGradeNow, gearFtp, gearWeightKg, hrFrac, gearChainrings, gearCassette)
+            } else {
+                GearAdvisor.recommend(gearGradeNow, gearChainrings, gearCassette)
+            }
 
             val gearBadgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = Color.parseColor("#CC111827")
@@ -2021,11 +2111,11 @@ class Altimetria3DView @JvmOverloads constructor(
             val arrowsBottom = panButtonsPosition == "bottom"
             val gapR = if (arrowsBottom) w - 50f - 28f - 8f else w - 8f
             val gearLabel = if (climbGrade != null) "Rec. ⚙ $recSprocket" else "⚙ $recSprocket"
-            val gearMaxW = if (rotate90) (gapR - gapL) else (w - 40f)
+            val gearMaxW = if (rotate90 && !gearOnTop) (gapR - gapL) else (w - 40f)
             while (gearTextPaint.measureText(gearLabel) + 28f > gearMaxW && gearTextPaint.textSize > 20f) {
                 gearTextPaint.textSize -= 1f
             }
-            if (rotate90) gearTextPaint.textSize = gearTextPaint.textSize * 0.62f + 1f
+            if (rotate90 && !gearOnTop) gearTextPaint.textSize = gearTextPaint.textSize * 0.62f + 1f
             // El icono ⚙ conserva la fuente por defecto; solo el texto usa la fuente elegida
             val gearIconPaint = Paint(gearTextPaint).apply {
                 typeface = android.graphics.Typeface.DEFAULT_BOLD
@@ -2046,7 +2136,7 @@ class Altimetria3DView @JvmOverloads constructor(
             val badgeW = textW + padX * 2f
             val badgeH = tb.height() + padY * 2f
             // Vertical (no apaisado): el engranaje va encima de la leyenda de bloques
-            val badgeCx = if (rotate90) (gapL + gapR) / 2f else w / 2f
+            val badgeCx = if (rotate90 && !gearOnTop) (gapL + gapR) / 2f else w / 2f
             val badgeCy = if (gearOnTop) zoomBottomY + badgeH / 2f
                 else if (!rotate90) h - 23f - scaleLegendPaint.textSize - badgeH / 2f - 2f
                 else if (arrowsBottom) h - 24f else h - 12f

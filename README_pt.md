@@ -25,6 +25,7 @@ Revoluciona o conceito tradicional de altimetria de ciclismo incorporando um **C
 * **Melhorias 3D**: as etiquetas de inclinação ficam sobre o sombreado do troço percorrido, a etiqueta cresce com o zoom, a régua mostra as distâncias dos sub-blocos com zoom alto e as curvas em ferradura têm uma pequena linha vertical no gráfico.
 * **Mapa**: a sobreposição de inclinação e a sua suavização são redesenhadas ao mudar a definição.
 * **Versão 2.9.2**: a marcha recomendada usa a inclinação real logo à frente do ciclista (sem desfasamento com os blocos); sem cabeçalho, o indicador da marcha passa para baixo do zoom e o gráfico desce e cresce; «Rota/Faltam» é maior, abaixo da linha de altitude e com o seu tipo de letra; as percentagens dos blocos já percorridos são atenuadas; nova opção para unir blocos vizinhos dentro de uma margem de inclinação (0 = desativado, o bloco usa a média e a sua cor).
+* **Versão 2.9.3**: marcha recomendada por esforço (cadência alvo: subidas 70-85, plano 85-95, descidas 90-100 rpm; velocidade estimada com FTP, peso e FC); desnível total e restante junto a «Rota/Faltam», com opção esquerda ou direita; a percentagem de cada bloco cabe sempre dentro do perfil; indicador da marcha sob o zoom também na horizontal, com o gráfico mais abaixo.
 
 ---
 

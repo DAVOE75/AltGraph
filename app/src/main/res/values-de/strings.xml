@@ -316,6 +316,14 @@
     <string name="setting_merge_similar_blocks">Benachbarte Blöcke gleicher Farbe zusammenfassen</string>
     <string name="setting_merge_similar_blocks_desc">Aufeinanderfolgende Blöcke gleicher Farbe werden als ein Block mit durchschnittlicher Steigung angezeigt. Auto fasst nur zusammen, wenn die Blöcke schmal sind (wenig Zoom), mit größeren, übersichtlichen Beschriftungen</string>
     <string name="merge_mode_off">Aus</string>
+    <string name="setting_route_info_side">Position der Daten Route / Übrig</string>
+    <string name="route_info_right">Rechts</string>
+    <string name="route_info_left">Links</string>
+    <string name="setting_gear_effort">Gang nach Belastung (Zielkadenz)</string>
+    <string name="setting_gear_effort_desc">Empfiehlt den Gang für eine Zielkadenz: Anstiege 70-85 U/min, flach 85-95 U/min, Abfahrten 90-100 U/min. Die Geschwindigkeit wird aus FTP, Gewicht und Herzfrequenz geschätzt (hohe Herzfrequenz erleichtert den Gang, niedrige erlaubt einen härteren)</string>
+    <string name="setting_gear_ftp">FTP (W)</string>
+    <string name="setting_gear_weight">Fahrergewicht (kg)</string>
+    <string name="setting_gear_maxhr">Maximale Herzfrequenz (bpm)</string>
     <string name="setting_merge_margin">Blöcke innerhalb einer Spanne zusammenfassen (%)</string>
     <string name="setting_merge_margin_desc">Benachbarte Blöcke, deren Steigung um weniger als diese Spanne abweicht, werden auch bei unterschiedlicher Farbe zusammengefasst (z. B. 1 fasst 2,9 und 3,1 zusammen). Der Block zeigt die mittlere Steigung und deren Farbe. 0 = aus</string>
     <string name="setting_pct_label_style">Stil der Steigungsbeschriftung (3D-Profildiagramme)</string>

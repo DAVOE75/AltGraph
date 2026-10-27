@@ -197,16 +197,24 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         altimetria3DView.wbalFailureMeters = snap.wbalFailureMeters
                         altimetria3DView.wPrime = prefs.userWPrime
                         altimetria3DView.currentCadence = strategy.currentCadence
+                        altimetria3DView.gearEffortEnabled = prefs.gearEffortEnabled
+                        altimetria3DView.gearFtp = prefs.userFtp
+                        altimetria3DView.gearWeightKg = prefs.riderWeightKg.toDouble()
+                        altimetria3DView.gearMaxHr = prefs.maxHeartRate
+                        altimetria3DView.gearHeartRate = strategy.currentHeartRate
                         altimetria3DView.currentSpeedMs = snap.currentSpeed
                         altimetria3DView.showGearBadge = prefs.showGearBadge
                         altimetria3DView.pctLabelStyle = prefs.pctLabelStyle3d
                         altimetria3DView.liveGearGrade = strategy.gearGrade
+                        altimetria3DView.routeTotalAscent = strategy.routeTotalAscent
+                        altimetria3DView.routeRemainingAscent = strategy.routeRemainingAscent
                         altimetria3DView.mergeBlocksMode = prefs.mergeBlocksMode3d
                         altimetria3DView.mergeMarginPct = prefs.mergeMarginPct3d
                         altimetria3DView.hideGradeRangeEnabled = prefs.hideGradeRangeEnabled3d
                         altimetria3DView.hideGradeMin = prefs.hideGradeMin3d
                         altimetria3DView.hideGradeMax = prefs.hideGradeMax3d
                         altimetria3DView.showRouteDistances = prefs.showRouteDistances3d
+                        altimetria3DView.routeInfoOnLeft = prefs.routeInfoSide3d == AppPreferences.ROUTE_INFO_LEFT
                         altimetria3DView.gearWallEnabled = prefs.gearWallEnabled
                         altimetria3DView.gearChainrings = prefs.gearChainrings
                         altimetria3DView.gearCassette = prefs.gearCassette

@@ -19,6 +19,7 @@ object NavigationSync {
         DataType.Type.ELEVATION_GRADE,
         DataType.Type.POWER,
         DataType.Type.CADENCE,
+        DataType.Type.HEART_RATE,
         DataType.Type.DISTANCE_TO_TOP,
         DataType.Type.ELEVATION_TO_TOP,
         DataType.Type.DISTANCE_FROM_BOTTOM,
@@ -104,6 +105,10 @@ object NavigationSync {
             DataType.Type.CADENCE -> {
                 val cad = values[DataType.Field.CADENCE] ?: single ?: 0.0
                 calc.setCadence(cad)
+            }
+            DataType.Type.HEART_RATE -> {
+                val hr = values[DataType.Field.HEART_RATE] ?: single ?: 0.0
+                calc.setHeartRate(hr)
             }
             DataType.Type.DISTANCE_TO_TOP -> {
                 val dist = values[DataType.Field.DISTANCE_TO_TOP] ?: single ?: 0.0

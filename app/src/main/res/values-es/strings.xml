@@ -343,6 +343,14 @@
     <string name="setting_merge_similar_blocks">Fusionar bloques vecinos del mismo color</string>
     <string name="setting_merge_similar_blocks_desc">Los bloques consecutivos del mismo color se muestran como un solo bloque con una pendiente media. Auto fusiona solo cuando los bloques son estrechos (poco zoom), con etiquetas más grandes y limpias</string>
     <string name="merge_mode_off">No</string>
+    <string name="setting_route_info_side">Posición de los datos Ruta / Quedan</string>
+    <string name="route_info_right">Derecha</string>
+    <string name="route_info_left">Izquierda</string>
+    <string name="setting_gear_effort">Marcha según esfuerzo (cadencia objetivo)</string>
+    <string name="setting_gear_effort_desc">Recomienda la marcha para una cadencia objetivo: subidas 70-85 rpm, llano 85-95 rpm, bajadas 90-100 rpm. La velocidad se estima con tu FTP, peso y frecuencia cardiaca (con FC alta aligera la marcha, con FC baja permite una más dura)</string>
+    <string name="setting_gear_ftp">FTP (W)</string>
+    <string name="setting_gear_weight">Peso del ciclista (kg)</string>
+    <string name="setting_gear_maxhr">FC máxima (lpm)</string>
     <string name="setting_merge_margin">Fusionar bloques dentro de un margen (%)</string>
     <string name="setting_merge_margin_desc">Los bloques vecinos cuya pendiente difiere menos que este margen se fusionan aunque cambien de color (p. ej. 1 une 2,9 y 3,1). El bloque fusionado usa la pendiente media y su color. 0 = desactivado</string>
     <string name="setting_pct_label_style">Estilo de la etiqueta de pendiente (gráficos de perfil 3D)</string>

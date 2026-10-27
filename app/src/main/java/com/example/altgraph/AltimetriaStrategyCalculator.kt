@@ -144,7 +144,11 @@ data class StrategyData(
     // Metros que la ventana visible se adelanta al primer bloque de subBlocks (rejilla anclada a la ruta); 0 si no se alinea
     val gridOffsetMeters: Double = 0.0,
     // Pendiente real (%) justo delante del ciclista (próximos ~60 m) para recomendar la marcha; null = sin perfil
-    val gearGrade: Double? = null
+    val gearGrade: Double? = null,
+    // Desnivel positivo (m) de toda la ruta y el que queda desde la posición del ciclista; null = sin perfil
+    val routeTotalAscent: Double? = null,
+    val routeRemainingAscent: Double? = null,
+    val currentHeartRate: Double = 0.0
 )
 
 // Posición fija de la baliza en la ventana (fracción desde el borde izquierdo): 200 m con zoom de 1 km
@@ -243,6 +247,13 @@ class AltimetriaStrategyCalculator {
 
     fun setCadence(cadence: Double) {
         currentCadence = cadence
+    }
+
+    // Frecuencia cardiaca en directo (lpm); 0 = sin sensor
+    var currentHeartRate: Double = 0.0
+
+    fun setHeartRate(hr: Double) {
+        currentHeartRate = hr
     }
 
     // ── Datos del Climber nativo de Karoo (DISTANCE_TO_TOP, ELEVATION_TO_TOP, …) ──
@@ -1486,6 +1497,35 @@ class AltimetriaStrategyCalculator {
         this.routePoints = newPoints
     }
 
+    private var ascentCacheSource: List<ElevationPolylineDecoder.ElevationPoint>? = null
+    private var ascentCum = DoubleArray(0)
+
+    // Desnivel positivo acumulado entre dos distancias de la ruta, a partir del perfil de altitud
+    fun routeAscentBetween(from: Double, to: Double): Double? {
+        val p = routeElevationProfile
+        if (p.size < 2) return null
+        if (ascentCacheSource !== p) {
+            val cum = DoubleArray(p.size)
+            for (i in 1 until p.size) cum[i] = cum[i - 1] + (p[i].elevation - p[i - 1].elevation).coerceAtLeast(0.0)
+            ascentCum = cum
+            ascentCacheSource = p
+        }
+        fun cumAt(d: Double): Double {
+            if (d <= p.first().distance) return 0.0
+            if (d >= p.last().distance) return ascentCum.last()
+            var lo = 0
+            var hi = p.size - 1
+            while (hi - lo > 1) {
+                val mid = (lo + hi) ushr 1
+                if (p[mid].distance <= d) lo = mid else hi = mid
+            }
+            val span = p[hi].distance - p[lo].distance
+            val t = if (span > 0.0) (d - p[lo].distance) / span else 0.0
+            return ascentCum[lo] + t * (ascentCum[hi] - ascentCum[lo])
+        }
+        return (cumAt(to) - cumAt(from)).coerceAtLeast(0.0)
+    }
+
     private fun getTrueElevationAtDistance(dist: Double): Double {
         if (routeElevationProfile.isNotEmpty()) {
             if (dist <= routeElevationProfile.first().distance) return routeElevationProfile.first().elevation
@@ -2497,7 +2537,10 @@ class AltimetriaStrategyCalculator {
                 val gSpan = 60.0
                 val gStart = currentRiderDistance.coerceAtLeast(0.0)
                 ((getElevationAtDistance(gStart + gSpan) - getElevationAtDistance(gStart)) / gSpan * 100.0).coerceIn(-30.0, 40.0)
-            } else null
+            } else null,
+            routeTotalAscent = routeElevationProfile.lastOrNull()?.distance?.let { routeAscentBetween(0.0, it) },
+            routeRemainingAscent = routeElevationProfile.lastOrNull()?.distance?.let { routeAscentBetween(currentRiderDistance.coerceAtLeast(0.0), it) },
+            currentHeartRate = currentHeartRate
         )
     }
 

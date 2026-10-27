@@ -33,6 +33,7 @@ It revolutionizes traditional cycling elevation profiles by featuring a **Suite 
 * **3D improvements**: gradient labels stay above the ridden-section shading, the label grows with zoom, the ruler shows sub-block distances at high zoom, and hairpins get a small vertical line on the graph.
 * **Map**: the gradient overlay and its smoothing are redrawn when you change the setting.
 * **Version 2.9.2**: recommended gear now uses the real gradient just ahead of the rider (no lag versus the blocks); with no header, the gear badge moves under the zoom buttons and the graph moves down and grows taller; "Route/Left" is larger, below the elevation line and uses your font; percentages of already-ridden blocks are dimmed; new option to merge neighbouring blocks within a gradient margin (0 = off, the block uses the average and its colour).
+* **Version 2.9.3**: recommended gear by effort (target cadence: climbs 70-85, flat 85-95, descents 90-100 rpm; speed estimated from FTP, weight and heart rate); total and remaining elevation gain next to "Route/Left", with an option to place them on the left or right; each block's percentage always fits inside the profile; gear badge under the zoom buttons in landscape too, with the graph lower.
 
 ---
 

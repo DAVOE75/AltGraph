@@ -757,6 +757,41 @@ class MainActivity : Activity() {
         gearInput(getString(R.string.setting_gear_chainrings), prefs.gearChainrings) { prefs.gearChainrings = it }
         gearInput(getString(R.string.setting_gear_cassette), prefs.gearCassette) { prefs.gearCassette = it }
 
+        // Marcha según esfuerzo: cadencia objetivo por terreno con la velocidad esperada según FTP, peso y FC
+        gearCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_gear_effort)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.gearEffortEnabled
+            setPadding(0, 16, 0, 0)
+            setOnCheckedChangeListener { _, isChecked -> prefs.gearEffortEnabled = isChecked }
+        })
+        gearCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_gear_effort_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 8)
+        })
+        fun gearNumber(label: String, current: Int, onChange: (Int) -> Unit) {
+            gearCard.addView(createValueText(label))
+            gearCard.addView(EditText(this).apply {
+                inputType = android.text.InputType.TYPE_CLASS_NUMBER
+                setTextColor(Color.WHITE)
+                setText(current.toString())
+                setSingleLine(true)
+                addTextChangedListener(object : android.text.TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                    override fun afterTextChanged(s: android.text.Editable?) {
+                        s?.toString()?.toIntOrNull()?.let { if (it > 0) onChange(it) }
+                    }
+                })
+            })
+        }
+        gearNumber(getString(R.string.setting_gear_ftp), prefs.userFtp) { prefs.userFtp = it }
+        gearNumber(getString(R.string.setting_gear_weight), prefs.riderWeightKg) { prefs.riderWeightKg = it }
+        gearNumber(getString(R.string.setting_gear_maxhr), prefs.maxHeartRate) { prefs.maxHeartRate = it }
+
         // Comportamiento de la baliza: gráfica que se desplaza (baliza fija al 20%) o baliza que se mueve y salta de página
         val beaconModeCard = createCardContainer()
         beaconModeCard.addView(createSectionLabel(getString(R.string.setting_beacon_mode_title)))
@@ -793,6 +828,25 @@ class MainActivity : Activity() {
             isChecked = prefs.showRouteDistances3d
             setOnCheckedChangeListener { _, isChecked -> prefs.showRouteDistances3d = isChecked }
         })
+        routeDistancesCard.addView(createValueText(getString(R.string.setting_route_info_side)))
+        val routeInfoSides = listOf(
+            AppPreferences.ROUTE_INFO_RIGHT to getString(R.string.route_info_right),
+            AppPreferences.ROUTE_INFO_LEFT to getString(R.string.route_info_left)
+        )
+        val routeInfoBtns = mutableListOf<Button>()
+        val routeInfoRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        }
+        routeInfoSides.forEachIndexed { idx, (sideKey, sideLabel) ->
+            val btn = createSegmentButton(sideLabel, prefs.routeInfoSide3d == sideKey) {
+                prefs.routeInfoSide3d = sideKey
+                updateSegmentActiveStates(routeInfoBtns, idx)
+            }
+            routeInfoBtns.add(btn)
+            routeInfoRow.addView(btn)
+        }
+        routeDistancesCard.addView(routeInfoRow)
 
         // Limpieza del perfil: fusionar bloques vecinos del mismo color y ocultar porcentajes en un rango
         val blockCleanCard = createCardContainer()

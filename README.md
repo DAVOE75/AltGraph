@@ -33,6 +33,7 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 * **Mejoras 3D**: las etiquetas de pendiente quedan sobre el sombreado del tramo recorrido, el recuadro crece con el zoom, la regla muestra las distancias de los sub-bloques con zoom alto y las herraduras llevan una pequeña línea vertical sobre la gráfica.
 * **Mapa**: la superposición de pendiente y su suavizado se redibujan al cambiar el ajuste.
 * **Versión 2.9.2**: marcha recomendada calculada con la pendiente real justo delante del ciclista (sin desfase con los bloques); sin cabecera, el engranaje sube bajo el zoom y la gráfica baja y crece; «Ruta/Quedan» más grande, bajo la línea de altitud y con tu tipo de letra; los porcentajes de los bloques ya recorridos se atenúan; nueva opción para fusionar bloques vecinos dentro de un margen de pendiente (0 = desactivado, el bloque usa la media y su color).
+* **Versión 2.9.3**: marcha recomendada según esfuerzo (cadencia objetivo: subidas 70-85, llano 85-95, bajadas 90-100 rpm; velocidad estimada con FTP, peso y FC); desnivel total y restante junto a «Ruta/Quedan», con opción de ponerlos a la izquierda o a la derecha; el porcentaje de cada bloque siempre cabe dentro del perfil; engranaje bajo el zoom también en apaisado y gráfica más baja.
 
 ---
 

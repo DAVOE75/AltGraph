@@ -316,6 +316,14 @@
     <string name="setting_merge_similar_blocks">Unisci i blocchi vicini dello stesso colore</string>
     <string name="setting_merge_similar_blocks_desc">I blocchi consecutivi dello stesso colore vengono mostrati come un unico blocco con una pendenza media. Auto unisce solo quando i blocchi sono stretti (poco zoom), con etichette più grandi e pulite</string>
     <string name="merge_mode_off">No</string>
+    <string name="setting_route_info_side">Posizione dei dati Percorso / Mancano</string>
+    <string name="route_info_right">Destra</string>
+    <string name="route_info_left">Sinistra</string>
+    <string name="setting_gear_effort">Rapporto in base allo sforzo (cadenza obiettivo)</string>
+    <string name="setting_gear_effort_desc">Consiglia il rapporto per una cadenza obiettivo: salite 70-85 rpm, pianura 85-95 rpm, discese 90-100 rpm. La velocità è stimata con FTP, peso e frequenza cardiaca (FC alta: rapporto più agile, FC bassa: più duro)</string>
+    <string name="setting_gear_ftp">FTP (W)</string>
+    <string name="setting_gear_weight">Peso del ciclista (kg)</string>
+    <string name="setting_gear_maxhr">FC massima (bpm)</string>
     <string name="setting_merge_margin">Unisci i blocchi entro un margine (%)</string>
     <string name="setting_merge_margin_desc">I blocchi vicini la cui pendenza differisce meno di questo margine vengono uniti anche se il colore cambia (es. 1 unisce 2,9 e 3,1). Il blocco usa la pendenza media e il suo colore. 0 = disattivato</string>
     <string name="setting_pct_label_style">Stile dell\'etichetta di pendenza (grafici di profilo 3D)</string>

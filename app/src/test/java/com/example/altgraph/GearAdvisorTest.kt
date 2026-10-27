@@ -29,4 +29,39 @@ class GearAdvisorTest {
     fun emptyConfigFallsBackToDefaults() {
         assertTrue(GearAdvisor.recommend(5.0, "", "").contains("x"))
     }
+
+    @Test
+    fun cadenceTargetsFollowTerrain() {
+        assertEquals(77.5, GearAdvisor.targetCadence(8.0), 1e-9)
+        assertEquals(90.0, GearAdvisor.targetCadence(0.5), 1e-9)
+        assertEquals(95.0, GearAdvisor.targetCadence(-6.0), 1e-9)
+    }
+
+    @Test
+    fun effortGearUsesBigRingOnFlatAndSmallRingOnRamp() {
+        val rings = GearAdvisor.DEFAULT_CHAINRINGS
+        val cogs = GearAdvisor.DEFAULT_CASSETTE
+        val flat = GearAdvisor.recommendForEffort(0.0, 250, 75.0, null, rings, cogs)
+        val ramp = GearAdvisor.recommendForEffort(7.0, 250, 75.0, null, rings, cogs)
+        assertTrue(flat, flat.startsWith("50x"))
+        assertTrue(ramp, ramp.startsWith("34x"))
+    }
+
+    @Test
+    fun effortGearEasesWhenHeartRateIsHigh() {
+        fun ratio(g: String): Double { val p = g.split("x"); return p[0].toDouble() / p[1].toDouble() }
+        val rings = GearAdvisor.DEFAULT_CHAINRINGS
+        val cogs = GearAdvisor.DEFAULT_CASSETTE
+        val rested = GearAdvisor.recommendForEffort(0.0, 250, 75.0, 0.60, rings, cogs)
+        val tired = GearAdvisor.recommendForEffort(0.0, 250, 75.0, 0.95, rings, cogs)
+        assertTrue("$rested vs $tired", ratio(tired) <= ratio(rested))
+    }
+
+    @Test
+    fun expectedSpeedDropsOnSteeperGrades() {
+        val flat = GearAdvisor.expectedSpeed(200.0, 0.0, 75.0)
+        val ramp = GearAdvisor.expectedSpeed(200.0, 8.0, 75.0)
+        assertTrue(flat > ramp)
+        assertTrue(ramp > 1.0)
+    }
 }

@@ -316,6 +316,14 @@
     <string name="setting_merge_similar_blocks">Unir blocos vizinhos da mesma cor</string>
     <string name="setting_merge_similar_blocks_desc">Blocos consecutivos da mesma cor são mostrados como um único bloco com inclinação média. Auto une apenas quando os blocos são estreitos (pouco zoom), com etiquetas maiores e mais limpas</string>
     <string name="merge_mode_off">Não</string>
+    <string name="setting_route_info_side">Posição dos dados Rota / Faltam</string>
+    <string name="route_info_right">Direita</string>
+    <string name="route_info_left">Esquerda</string>
+    <string name="setting_gear_effort">Mudança por esforço (cadência alvo)</string>
+    <string name="setting_gear_effort_desc">Recomenda a mudança para uma cadência alvo: subidas 70-85 rpm, plano 85-95 rpm, descidas 90-100 rpm. A velocidade é estimada com o FTP, o peso e a frequência cardíaca (FC alta alivia a mudança, FC baixa permite uma mais dura)</string>
+    <string name="setting_gear_ftp">FTP (W)</string>
+    <string name="setting_gear_weight">Peso do ciclista (kg)</string>
+    <string name="setting_gear_maxhr">FC máxima (bpm)</string>
     <string name="setting_merge_margin">Unir blocos dentro de uma margem (%)</string>
     <string name="setting_merge_margin_desc">Blocos vizinhos cuja inclinação difere menos do que esta margem são unidos mesmo que a cor mude (ex. 1 une 2,9 e 3,1). O bloco usa a inclinação média e a sua cor. 0 = desativado</string>
     <string name="setting_pct_label_style">Estilo da etiqueta de inclinação (gráficos de perfil 3D)</string>
