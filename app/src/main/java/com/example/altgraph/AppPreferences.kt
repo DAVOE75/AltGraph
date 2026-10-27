@@ -428,7 +428,12 @@ class AppPreferences(context: Context) {
         get() = prefs.getString(KEY_ROUTE_INFO_SIDE_3D, ROUTE_INFO_RIGHT) ?: ROUTE_INFO_RIGHT
         set(value) = prefs.edit().putString(KEY_ROUTE_INFO_SIDE_3D, value).apply()
 
+    var showRouteElevation3d: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_ROUTE_ELEVATION_3D, false)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_ROUTE_ELEVATION_3D, value).apply()
+
     companion object {
+        private const val KEY_SHOW_ROUTE_ELEVATION_3D = "show_route_elevation_3d"
         const val ROUTE_INFO_RIGHT = "right"
         const val ROUTE_INFO_LEFT = "left"
         private const val KEY_ROUTE_INFO_SIDE_3D = "route_info_side_3d"

@@ -344,6 +344,7 @@
     <string name="setting_merge_similar_blocks_desc">Consecutive blocks with the same colour are shown as one block with a single average gradient. Auto merges only when blocks are narrow (zoomed out), keeping labels large and clean</string>
     <string name="merge_mode_off">Off</string>
     <string name="setting_route_info_side">Position of Route / Left data</string>
+    <string name="setting_show_route_elevation">Also show elevation gain (total and remaining)</string>
     <string name="route_info_right">Right</string>
     <string name="route_info_left">Left</string>
     <string name="setting_gear_effort">Gear by effort (cadence target)</string>

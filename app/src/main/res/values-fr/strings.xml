@@ -317,6 +317,7 @@
     <string name="setting_merge_similar_blocks_desc">Les blocs consécutifs de même couleur sont affichés comme un seul bloc avec une pente moyenne. Auto ne fusionne que si les blocs sont étroits (peu de zoom), avec des étiquettes plus grandes et lisibles</string>
     <string name="merge_mode_off">Non</string>
     <string name="setting_route_info_side">Position des données Parcours / Reste</string>
+    <string name="setting_show_route_elevation">Afficher aussi le dénivelé (total et restant)</string>
     <string name="route_info_right">Droite</string>
     <string name="route_info_left">Gauche</string>
     <string name="setting_gear_effort">Rapport selon l\'effort (cadence cible)</string>

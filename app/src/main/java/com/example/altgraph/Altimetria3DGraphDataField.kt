@@ -222,6 +222,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         altimetria3DView.hideGradeMax = prefs.hideGradeMax3d
                         altimetria3DView.showRouteDistances = prefs.showRouteDistances3d
                         altimetria3DView.routeInfoOnLeft = prefs.routeInfoSide3d == AppPreferences.ROUTE_INFO_LEFT
+                        altimetria3DView.routeShowElevation = prefs.showRouteElevation3d
                         altimetria3DView.gearWallEnabled = prefs.gearWallEnabled
                         altimetria3DView.gearChainrings = prefs.gearChainrings
                         altimetria3DView.gearCassette = prefs.gearCassette

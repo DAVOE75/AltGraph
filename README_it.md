@@ -27,6 +27,7 @@ Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **S
 * **Versione 2.9.2**: il rapporto consigliato usa la pendenza reale subito davanti al ciclista (senza sfasamento con i blocchi); senza intestazione, l'indicatore del rapporto passa sotto lo zoom e il grafico scende e cresce; «Percorso/Mancano» è più grande, sotto la linea di altitudine e con il tuo carattere; le percentuali dei blocchi già percorsi sono attenuate; nuova opzione per unire i blocchi vicini entro un margine di pendenza (0 = disattivato, il blocco usa la media e il suo colore).
 * **Versione 2.9.3**: rapporto consigliato in base allo sforzo (cadenza obiettivo: salite 70-85, pianura 85-95, discese 90-100 rpm; velocità stimata con FTP, peso e FC); dislivello totale e rimanente accanto a «Percorso/Mancano», con opzione sinistra o destra; la percentuale di ogni blocco sta sempre dentro il profilo; indicatore del rapporto sotto lo zoom anche in orizzontale, con il grafico più in basso.
 * **Versione 2.9.4**: corretti i pulsanti di zoom e di scorrimento pagina nel grafico globale 3D (quelli di scorrimento coprivano lo zoom); pulsanti di scorrimento più piccoli e della stessa dimensione del cerchio visibile; ridisegno immediato a ogni pressione.
+* **Versione 2.9.5**: il dislivello accanto a «Percorso/Mancano» diventa opzionale (disattivato di default) e i dati salgono sulla riga dei pulsanti di zoom; il righello mostra più decimali (9,95 km); le strade percorse due volte vengono sdoppiate sulla mappa (andata e ritorno, una per lato).
 
 ---
 

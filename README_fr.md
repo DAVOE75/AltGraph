@@ -27,6 +27,7 @@ Elle révolutionne le concept traditionnel de l'altimétrie cycliste en intégra
 * **Version 2.9.2** : le rapport conseillé utilise la pente réelle juste devant le cycliste (sans décalage avec les blocs) ; sans en-tête, l'indicateur de rapport passe sous le zoom et le graphique descend et grandit ; « Parcours/Reste » est plus grand, sous la ligne d'altitude et avec votre police ; les pourcentages des blocs déjà parcourus sont atténués ; nouvelle option pour fusionner les blocs voisins dans une marge de pente (0 = désactivé, le bloc utilise la moyenne et sa couleur).
 * **Version 2.9.3** : rapport conseillé selon l'effort (cadence cible : montées 70-85, plat 85-95, descentes 90-100 tr/min ; vitesse estimée avec FTP, poids et FC) ; dénivelé total et restant à côté de « Parcours/Reste », avec option gauche ou droite ; le pourcentage de chaque bloc tient toujours dans le profil ; indicateur de rapport sous le zoom aussi en paysage, avec le graphique plus bas.
 * **Version 2.9.4** : correction des boutons de zoom et de page de la vue globale 3D (les boutons de page recouvraient le zoom) ; boutons de page plus petits et de la même taille que le cercle affiché ; redessin immédiat à chaque appui.
+* **Version 2.9.5** : le dénivelé à côté de « Parcours/Reste » devient optionnel (désactivé par défaut) et les données remontent sur la ligne des boutons de zoom ; la règle affiche plus de décimales (9,95 km) ; les routes parcourues deux fois sont dédoublées sur la carte (aller et retour, chacun d'un côté).
 
 ---
 

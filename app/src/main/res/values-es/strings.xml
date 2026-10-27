@@ -344,6 +344,7 @@
     <string name="setting_merge_similar_blocks_desc">Los bloques consecutivos del mismo color se muestran como un solo bloque con una pendiente media. Auto fusiona solo cuando los bloques son estrechos (poco zoom), con etiquetas más grandes y limpias</string>
     <string name="merge_mode_off">No</string>
     <string name="setting_route_info_side">Posición de los datos Ruta / Quedan</string>
+    <string name="setting_show_route_elevation">Mostrar también el desnivel (total y restante)</string>
     <string name="route_info_right">Derecha</string>
     <string name="route_info_left">Izquierda</string>
     <string name="setting_gear_effort">Marcha según esfuerzo (cadencia objetivo)</string>

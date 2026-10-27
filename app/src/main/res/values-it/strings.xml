@@ -317,6 +317,7 @@
     <string name="setting_merge_similar_blocks_desc">I blocchi consecutivi dello stesso colore vengono mostrati come un unico blocco con una pendenza media. Auto unisce solo quando i blocchi sono stretti (poco zoom), con etichette più grandi e pulite</string>
     <string name="merge_mode_off">No</string>
     <string name="setting_route_info_side">Posizione dei dati Percorso / Mancano</string>
+    <string name="setting_show_route_elevation">Mostra anche il dislivello (totale e rimanente)</string>
     <string name="route_info_right">Destra</string>
     <string name="route_info_left">Sinistra</string>
     <string name="setting_gear_effort">Rapporto in base allo sforzo (cadenza obiettivo)</string>

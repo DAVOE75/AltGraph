@@ -317,6 +317,7 @@
     <string name="setting_merge_similar_blocks_desc">Blocos consecutivos da mesma cor são mostrados como um único bloco com inclinação média. Auto une apenas quando os blocos são estreitos (pouco zoom), com etiquetas maiores e mais limpas</string>
     <string name="merge_mode_off">Não</string>
     <string name="setting_route_info_side">Posição dos dados Rota / Faltam</string>
+    <string name="setting_show_route_elevation">Mostrar também o desnível (total e restante)</string>
     <string name="route_info_right">Direita</string>
     <string name="route_info_left">Esquerda</string>
     <string name="setting_gear_effort">Mudança por esforço (cadência alvo)</string>

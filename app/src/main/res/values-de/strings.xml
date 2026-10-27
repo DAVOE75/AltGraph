@@ -317,6 +317,7 @@
     <string name="setting_merge_similar_blocks_desc">Aufeinanderfolgende Blöcke gleicher Farbe werden als ein Block mit durchschnittlicher Steigung angezeigt. Auto fasst nur zusammen, wenn die Blöcke schmal sind (wenig Zoom), mit größeren, übersichtlichen Beschriftungen</string>
     <string name="merge_mode_off">Aus</string>
     <string name="setting_route_info_side">Position der Daten Route / Übrig</string>
+    <string name="setting_show_route_elevation">Auch Höhenmeter anzeigen (gesamt und verbleibend)</string>
     <string name="route_info_right">Rechts</string>
     <string name="route_info_left">Links</string>
     <string name="setting_gear_effort">Gang nach Belastung (Zielkadenz)</string>

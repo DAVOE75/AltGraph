@@ -27,6 +27,7 @@ Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 7 3D-Höhenv
 * **Version 2.9.2**: Der empfohlene Gang nutzt die tatsächliche Steigung direkt vor dem Fahrer (kein Versatz zu den Blöcken); ohne Kopfzeile rutscht die Gang-Anzeige unter den Zoom und das Diagramm wird tiefer und höher; „Route/Übrig“ ist größer, unter der Höhenlinie und in deiner Schriftart; Prozentwerte bereits gefahrener Blöcke werden abgedunkelt; neue Option, benachbarte Blöcke innerhalb einer Steigungsspanne zusammenzufassen (0 = aus, der Block nutzt den Mittelwert und dessen Farbe).
 * **Version 2.9.3**: empfohlener Gang nach Belastung (Zielkadenz: Anstiege 70-85, flach 85-95, Abfahrten 90-100 U/min; Geschwindigkeit aus FTP, Gewicht und Herzfrequenz geschätzt); Gesamt- und Resthöhenmeter neben „Route/Übrig“, wahlweise links oder rechts; der Prozentwert jedes Blocks passt immer ins Profil; Gang-Anzeige auch im Querformat unter dem Zoom, mit tieferem Diagramm.
 * **Version 2.9.4**: Zoom- und Seitenwechsel-Tasten im globalen 3D-Diagramm repariert (die Seitentasten verdeckten den Zoom); kleinere Seitentasten in der Größe des sichtbaren Kreises; sofortiges Neuzeichnen bei jedem Tastendruck.
+* **Version 2.9.5**: Die Höhenmeter neben „Route/Übrig“ sind jetzt optional (standardmäßig aus) und die Daten rücken in die Zeile der Zoom-Tasten; das Lineal zeigt mehr Nachkommastellen (9,95 km); zweimal befahrene Straßen werden auf der Karte getrennt dargestellt (Hin- und Rückweg, je auf einer Seite).
 
 ---
 

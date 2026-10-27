@@ -702,6 +702,8 @@ class Altimetria3DView @JvmOverloads constructor(
     var routeTotalAscent: Double? = null
     // Lado de los datos Ruta/Quedan: true = izquierda, false = derecha
     var routeInfoOnLeft: Boolean = false
+    // Mostrar también el desnivel junto a Ruta/Quedan (opcional)
+    var routeShowElevation: Boolean = false
     var routeRemainingAscent: Double? = null
     var gearChainrings: String = GearAdvisor.DEFAULT_CHAINRINGS
     var gearCassette: String = GearAdvisor.DEFAULT_CASSETTE
@@ -1048,24 +1050,42 @@ class Altimetria3DView @JvmOverloads constructor(
     private fun drawRouteDistances(canvas: Canvas, w: Float, h: Float) {
         if (routeTotalLength <= 0.0) return
         val left = if (remainingDistance > 0.0) remainingDistance.coerceAtMost(routeTotalLength) else 0.0
-        val textSize = ((h * 0.034f) * fontScale).coerceIn(15f, 24f)
-        routeInfoLabelPaint.textSize = textSize
-        routeInfoValuePaint.textSize = textSize * 1.15f
+        val textSize0 = ((h * 0.034f) * fontScale).coerceIn(15f, 24f)
         val total = routeTotalAscent
         val remaining = routeRemainingAscent
         val lines = listOf(
             context.getString(R.string.label_route_total) to
-                (formatRouteKm(routeTotalLength) + if (total != null) " / ${total.roundToInt()}m" else ""),
+                (formatRouteKm(routeTotalLength) + if (routeShowElevation && total != null) " / ${total.roundToInt()}m" else ""),
             context.getString(R.string.label_route_left) to
-                (formatRouteKm(left) + if (remaining != null) " / ${remaining.roundToInt()}m" else "")
+                (formatRouteKm(left) + if (routeShowElevation && remaining != null) " / ${remaining.roundToInt()}m" else "")
         )
+        // Sin cabecera y con las flechas de paso abajo, los datos suben a la fila de los botones de zoom (entre las esquinas y el zoom)
+        val inZoomRow = !showHeaderStats && !rotate90 && !isClimbMode && panButtonsPosition != "top"
+        val dp = resources.displayMetrics.density
+        val zoomHalfW = 54f * dp
+        var textSize = textSize0
+        if (inZoomRow) {
+            val room = w / 2f - zoomHalfW - 12f
+            while (textSize > 11f) {
+                routeInfoLabelPaint.textSize = textSize
+                routeInfoValuePaint.textSize = textSize * 1.15f
+                val rowW = lines.maxOf { routeInfoLabelPaint.measureText(it.first) + 8f + routeInfoValuePaint.measureText(it.second) }
+                if (rowW <= room) break
+                textSize -= 1f
+            }
+        }
+        routeInfoLabelPaint.textSize = textSize
+        routeInfoValuePaint.textSize = textSize * 1.15f
         val lineH = textSize * 1.4f
         // Debajo de la línea de altitud más alta del perfil, que sirve de referencia
-        val firstBaseline = if (profileTopLineY > 0f) profileTopLineY + textSize * 1.15f + 6f
+        val firstBaseline = if (inZoomRow) {
+            val rowCenter = 16f * dp + 24f * dp
+            rowCenter - (lineH + textSize) / 2f + textSize
+        } else if (profileTopLineY > 0f) profileTopLineY + textSize * 1.15f + 6f
             else if (showHeaderStats) h * 0.33f else (h * 0.15f).coerceIn(28f, 44f) + 22f
         if (routeInfoOnLeft) {
             // A la izquierda, tras el eje de altitudes: etiquetas alineadas y valores en columna
-            val leftX = w * 0.10f + 8f
+            val leftX = if (inZoomRow) 8f else w * 0.10f + 8f
             val labelW = lines.maxOf { routeInfoLabelPaint.measureText(it.first) }
             routeInfoLabelPaint.textAlign = Paint.Align.LEFT
             routeInfoValuePaint.textAlign = Paint.Align.LEFT
@@ -1078,7 +1098,7 @@ class Altimetria3DView @JvmOverloads constructor(
             routeInfoValuePaint.textAlign = Paint.Align.RIGHT
             return
         }
-        val right = w - 16f
+        val right = if (inZoomRow) w - 8f else w - 16f
         for ((idx, line) in lines.withIndex()) {
             val y = firstBaseline + idx * lineH
             canvas.drawText(line.second, right, y, routeInfoValuePaint)

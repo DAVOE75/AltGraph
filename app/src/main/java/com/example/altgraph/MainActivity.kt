@@ -828,6 +828,14 @@ class MainActivity : Activity() {
             isChecked = prefs.showRouteDistances3d
             setOnCheckedChangeListener { _, isChecked -> prefs.showRouteDistances3d = isChecked }
         })
+        routeDistancesCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_show_route_elevation)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.showRouteElevation3d
+            setPadding(0, 12, 0, 0)
+            setOnCheckedChangeListener { _, isChecked -> prefs.showRouteElevation3d = isChecked }
+        })
         routeDistancesCard.addView(createValueText(getString(R.string.setting_route_info_side)))
         val routeInfoSides = listOf(
             AppPreferences.ROUTE_INFO_RIGHT to getString(R.string.route_info_right),
