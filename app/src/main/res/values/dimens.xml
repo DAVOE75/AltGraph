@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tamaño de los botones de paso < > (el dibujo del círculo y la zona táctil usan la misma medida) -->
+    <dimen name="pan_btn_size">34dp</dimen>
+</resources>

@@ -32,39 +32,43 @@
     <!-- Pan Left (<) at visual bottom-left -> physical top-start -->
     <Button
         android:id="@+id/btn_pan_left"
-        android:layout_width="90dp"
-        android:layout_height="140dp"
+        android:layout_width="@dimen/pan_btn_size"
+        android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="top|start"
-        android:layout_marginStart="0dp"
+        android:layout_marginTop="2dp"
+        android:stateListAnimator="@null"
         android:background="#01000000" />
 
     <!-- Pan Right (>) at visual bottom-right -> physical bottom-start -->
     <Button
         android:id="@+id/btn_pan_right"
-        android:layout_width="90dp"
-        android:layout_height="140dp"
+        android:layout_width="@dimen/pan_btn_size"
+        android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="bottom|start"
-        android:layout_marginStart="0dp"
+        android:layout_marginBottom="2dp"
+        android:stateListAnimator="@null"
         android:background="#01000000" />
 
     <!-- Pan Left (<) at visual top-left -> physical top-end -->
     <Button
         android:id="@+id/btn_pan_left_top"
-        android:layout_width="90dp"
-        android:layout_height="140dp"
+        android:layout_width="@dimen/pan_btn_size"
+        android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="top|end"
-        android:layout_marginEnd="0dp"
+        android:layout_marginTop="2dp"
         android:visibility="gone"
+        android:stateListAnimator="@null"
         android:background="#01000000" />
 
     <!-- Pan Right (>) at visual top-right -> physical bottom-end -->
     <Button
         android:id="@+id/btn_pan_right_top"
-        android:layout_width="90dp"
-        android:layout_height="140dp"
+        android:layout_width="@dimen/pan_btn_size"
+        android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="bottom|end"
-        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="2dp"
         android:visibility="gone"
+        android:stateListAnimator="@null"
         android:background="#01000000" />
 
     <!-- Zoom buttons at visual right / side -> physical bottom -->

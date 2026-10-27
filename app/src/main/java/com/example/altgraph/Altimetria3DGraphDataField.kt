@@ -24,6 +24,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.withTimeoutOrNull
 
 class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "altimetria_3d") {
 
@@ -32,6 +34,9 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
     private val zoomReceiverRef = RefCounted<Pair<Context, BroadcastReceiver>> { (ctx, r) ->
         try { ctx.unregisterReceiver(r) } catch (e: Exception) {}
     }
+
+    // Despierta el bucle de dibujo al pulsar zoom o paso de página
+    private val refreshChannel = Channel<Unit>(Channel.CONFLATED)
 
     companion object {
         const val ACTION_CYCLE_3D_ZOOM = "com.example.altgraph.ACTION_CYCLE_3D_ZOOM"
@@ -86,6 +91,8 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
         zoomReceiverRef.acquire(emitter) {
             val zoomReceiver = object : BroadcastReceiver() {
                 override fun onReceive(ctx: Context?, intent: Intent?) {
+                    // Redibujar en cuanto llega la pulsación, sin esperar al siguiente ciclo de 1 s
+                    refreshChannel.trySend(Unit)
                     val routeMaxMeters = AltgraphRepository.snapshot.value?.routeTotalLength?.takeIf { it > 500.0 }?.toInt()
                     if (intent?.action == ACTION_ZOOM_IN && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
@@ -450,7 +457,8 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         lastFrame = frame
                     }
                 }
-                delay(1000)
+                // Espera 1 s o hasta que llegue una pulsación de zoom/paso
+                withTimeoutOrNull(1000) { refreshChannel.receive() }
             }
         }
         // Siempre libera el token al terminar el bucle (excepción, parada del repositorio...); es idempotente

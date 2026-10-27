@@ -31,36 +31,40 @@
 
     <Button
         android:id="@+id/btn_pan_left"
-        android:layout_width="140dp"
-        android:layout_height="90dp"
+        android:layout_width="@dimen/pan_btn_size"
+        android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="bottom|start"
-        android:layout_marginBottom="0dp"
+        android:layout_marginStart="2dp"
+        android:stateListAnimator="@null"
         android:background="#01000000" />
 
     <Button
         android:id="@+id/btn_pan_right"
-        android:layout_width="140dp"
-        android:layout_height="90dp"
+        android:layout_width="@dimen/pan_btn_size"
+        android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="0dp"
+        android:layout_marginEnd="2dp"
+        android:stateListAnimator="@null"
         android:background="#01000000" />
 
     <Button
         android:id="@+id/btn_pan_left_top"
-        android:layout_width="140dp"
-        android:layout_height="90dp"
+        android:layout_width="@dimen/pan_btn_size"
+        android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="top|start"
-        android:layout_marginTop="0dp"
+        android:layout_marginStart="2dp"
         android:visibility="gone"
+        android:stateListAnimator="@null"
         android:background="#01000000" />
 
     <Button
         android:id="@+id/btn_pan_right_top"
-        android:layout_width="140dp"
-        android:layout_height="90dp"
+        android:layout_width="@dimen/pan_btn_size"
+        android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="top|end"
-        android:layout_marginTop="0dp"
+        android:layout_marginEnd="2dp"
         android:visibility="gone"
+        android:stateListAnimator="@null"
         android:background="#01000000" />
 
     <!-- Controles de Zoom en el lateral (posición estándar cuando el encabezado está activo) -->

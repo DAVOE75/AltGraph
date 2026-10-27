@@ -17,6 +17,7 @@
         android:layout_width="80dp"
         android:layout_height="90dp"
         android:layout_gravity="top|end"
+        android:stateListAnimator="@null"
         android:background="#01000000" />
 
     <!-- Next Climb Button (>) : Visual Right side of landscape header = physical bottom-end -->
@@ -25,22 +26,27 @@
         android:layout_width="80dp"
         android:layout_height="90dp"
         android:layout_gravity="bottom|end"
+        android:stateListAnimator="@null"
         android:background="#01000000" />
 
     <!-- Pan Left (<) : Physical top-start -->
     <Button
         android:id="@+id/btn_pan_left"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="@dimen/pan_btn_size"
+        android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="top|start"
+        android:layout_marginTop="2dp"
+        android:stateListAnimator="@null"
         android:background="#01000000" />
 
     <!-- Pan Right (>) : Physical bottom-start -->
     <Button
         android:id="@+id/btn_pan_right"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="@dimen/pan_btn_size"
+        android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="bottom|start"
+        android:layout_marginBottom="2dp"
+        android:stateListAnimator="@null"
         android:background="#01000000" />
 
     <!-- Zoom controls (A la izquierda del todo y arriba en apaisado: physical top|end, con + visualmente arriba y - abajo) -->

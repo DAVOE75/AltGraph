@@ -17,6 +17,9 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
+// Separación de los botones de paso < > respecto al borde en dp; su tamaño está en R.dimen.pan_btn_size
+private const val PAN_BTN_EDGE_DP = 2f
+
 // Anchura de sub-bloque (px) por debajo de la cual el modo "auto" fusiona bloques vecinos del mismo color
 private const val MERGE_AUTO_MAX_BLOCK_PX = 56f
 
@@ -1809,10 +1812,12 @@ class Altimetria3DView @JvmOverloads constructor(
         }
         
         if (panButtonsPosition != "none") {
-            val radius = 28f // Flechas más grandes y fáciles de pulsar (antes 22f)
-            val cy = if (panButtonsPosition == "top") 45f else (h - 38f)
-            val cxLeft = 50f
-            val cxRight = w - 50f
+            // Mismas medidas que los botones del layout XML (44 dp, pegados a la esquina): lo que se ve es lo que se pulsa
+            val dp = resources.displayMetrics.density
+            val radius = resources.getDimension(R.dimen.pan_btn_size) / 2f
+            val cy = if (panButtonsPosition == "top") radius else (h - radius)
+            val cxLeft = PAN_BTN_EDGE_DP * dp + radius
+            val cxRight = w - cxLeft
             
             canvas.drawCircle(cxLeft, cy, radius, btnPaint)
             canvas.drawCircle(cxLeft, cy, radius, btnStrokePaint)
