@@ -31,6 +31,81 @@ class RoutePath private constructor(
         return result
     }
 
+    // Puntos por los que la ruta pasa más de una vez (misma carretera de ida y vuelta o repetida)
+    private val shared: BooleanArray by lazy { computeShared() }
+
+    private fun computeShared(): BooleanArray {
+        val result = BooleanArray(points.size)
+        val cell = 0.0002
+        val grid = HashMap<Long, MutableList<Int>>()
+        fun key(la: Int, lo: Int) = la.toLong() * 4_000_000L + lo.toLong()
+        for (i in points.indices) {
+            val la = Math.floor(points[i].first / cell).toInt()
+            val lo = Math.floor(points[i].second / cell).toInt()
+            grid.getOrPut(key(la, lo)) { mutableListOf() }.add(i)
+        }
+        for (i in points.indices) {
+            val (lat, lng) = points[i]
+            val mPerLng = 111320.0 * cos(Math.toRadians(lat))
+            val la = Math.floor(lat / cell).toInt()
+            val lo = Math.floor(lng / cell).toInt()
+            loop@ for (dla in -1..1) for (dlo in -1..1) {
+                val list = grid[key(la + dla, lo + dlo)] ?: continue
+                for (j in list) {
+                    if (Math.abs(cumulative[j] - cumulative[i]) < SHARED_MIN_ROUTE_GAP_M) continue
+                    val dy = (points[j].first - lat) * 111320.0
+                    val dx = (points[j].second - lng) * mPerLng
+                    if (dx * dx + dy * dy < SHARED_RADIUS_M * SHARED_RADIUS_M) { result[i] = true; break@loop }
+                }
+            }
+        }
+        return result
+    }
+
+    /**
+     * Igual que subPath, pero los puntos de carretera repetida se desplazan offsetMeters hacia la derecha del sentido
+     * de marcha: la ida y la vuelta por la misma carretera quedan una a cada lado en vez de pintarse una encima de otra.
+     */
+    fun subPathOffset(from: Double, to: Double, offsetMeters: Double): List<Pair<Double, Double>> {
+        val f = from.coerceIn(0.0, total)
+        val t = to.coerceIn(0.0, total)
+        if (t <= f) return listOf(pointAt(f))
+        val pts = mutableListOf(pointAt(f))
+        val flags = mutableListOf(shared[segmentIndex(f)])
+        var i = segmentIndex(f) + 1
+        while (i < points.size && cumulative[i] < t) {
+            pts.add(points[i])
+            flags.add(shared[i])
+            i++
+        }
+        pts.add(pointAt(t))
+        flags.add(flags.last())
+        if (pts.size < 2 || flags.none { it }) return pts
+
+        // El desplazamiento entra y sale con suavidad (media con los vecinos) para no dejar escalones
+        val weight = DoubleArray(pts.size) { k ->
+            val a = if (flags[k]) 1.0 else 0.0
+            val b = if (k > 0 && flags[k - 1]) 1.0 else 0.0
+            val c = if (k < pts.size - 1 && flags[k + 1]) 1.0 else 0.0
+            (a * 2 + b + c) / 4.0
+        }
+        return pts.mapIndexed { k, p ->
+            val prev = pts[maxOf(k - 1, 0)]
+            val next = pts[minOf(k + 1, pts.size - 1)]
+            val mPerLng = 111320.0 * cos(Math.toRadians(p.first))
+            val n = (next.first - prev.first) * 111320.0
+            val e = (next.second - prev.second) * mPerLng
+            val len = sqrt(n * n + e * e)
+            if (len < 0.01 || weight[k] == 0.0) p
+            else {
+                val off = offsetMeters * weight[k]
+                val rightN = -e / len
+                val rightE = n / len
+                (p.first + rightN * off / 111320.0) to (p.second + rightE * off / mPerLng)
+            }
+        }
+    }
+
     private fun segmentIndex(d: Double): Int {
         var lo = 0
         var hi = points.size - 1
@@ -52,6 +127,9 @@ class RoutePath private constructor(
     }
 
     companion object {
+        // Dos puntos de la ruta cuentan como "misma carretera" si están a menos de 12 m y a más de 60 m de ruta de distancia
+        private const val SHARED_RADIUS_M = 12.0
+        private const val SHARED_MIN_ROUTE_GAP_M = 60.0
         private const val EARTH_RADIUS = 6371000.0
         private const val ROUTE_POLYLINE_FACTOR = 1e5
 

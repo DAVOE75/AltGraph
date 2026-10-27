@@ -1,4 +1,4 @@
-package com.example.altgraph
+﻿package com.example.altgraph
 
 import android.content.Context
 import android.graphics.Color
@@ -126,6 +126,8 @@ class MapOverlayManager(
             clearPolylines(emitter)
 
             var polylineCount = 0
+            // Carretera repetida (ida y vuelta): cada sentido se dibuja desplazado a su derecha para que se vean los dos colores
+            fun offsetPath(a: Double, b: Double) = path.subPathOffset(a, b, 5.0)
             for (i in finalSegments.indices) {
                 if (stopped) return
                 val seg = finalSegments[i]
@@ -141,7 +143,7 @@ class MapOverlayManager(
                     val solidEnd = seg.endDist - blendZoneM
 
                     // Tramo principal con color base
-                    val mainSubPath = path.subPath(seg.startDist, solidEnd)
+                    val mainSubPath = offsetPath(seg.startDist, solidEnd)
                     if (mainSubPath.size >= 2) {
                         val encoded = PolylineCodec.encode(mainSubPath, 1e5)
                         val polylineId = "altgraph-grade-${polylineCount++}"
@@ -158,7 +160,7 @@ class MapOverlayManager(
                         val pEnd = solidEnd + (s + 1) * stepDist
                         val t = (s + 0.5f) / steps.toFloat()
                         val blendedColor = blendColors(c1, c2, t)
-                        val blendSubPath = path.subPath(pStart, pEnd)
+                        val blendSubPath = offsetPath(pStart, pEnd)
                         if (blendSubPath.size >= 2) {
                             val encoded = PolylineCodec.encode(blendSubPath, 1e5)
                             val polylineId = "altgraph-grade-${polylineCount++}"
@@ -167,7 +169,7 @@ class MapOverlayManager(
                         }
                     }
                 } else {
-                    val subPath = path.subPath(seg.startDist, seg.endDist)
+                    val subPath = offsetPath(seg.startDist, seg.endDist)
                     if (subPath.size >= 2) {
                         val encoded = PolylineCodec.encode(subPath, 1e5)
                         val polylineId = "altgraph-grade-${polylineCount++}"

@@ -1087,6 +1087,15 @@ class Altimetria3DView @JvmOverloads constructor(
         }
     }
 
+    // Distancia en la regla: añade decimales solo cuando hacen falta (9.9km, 9.95km, 10km)
+    private fun formatRulerDist(m: Long): String = when {
+        m < 1000 -> "${m}m"
+        m % 1000L == 0L -> "${m / 1000}km"
+        m % 100L == 0L -> "${m / 1000}.${(m % 1000L) / 100}km"
+        m % 10L == 0L -> "${m / 1000}.${String.format("%02d", (m % 1000L) / 10)}km"
+        else -> "${m / 1000}.${String.format("%03d", m % 1000L)}km"
+    }
+
     private fun formatRouteKm(meters: Double): String = when {
         meters < 1000.0 -> "${meters.toInt()}m"
         meters < 100000.0 -> String.format("%.1fkm", meters / 1000.0)
@@ -1741,12 +1750,8 @@ class Altimetria3DView @JvmOverloads constructor(
         val majorDistMeters = if (profileElevations.isNotEmpty()) majorBlockSizeMeters else (totalMetersAhead / majorBlocksCount)
 
         for (k in 0 until majorSamples) {
-            val m = (windowStartMeters - gridOffsetMeters + (k * majorDistMeters)).toLong()
-            val distLabel = if (m < 1000) {
-                "${m}m"
-            } else {
-                if (m % 1000L == 0L) "${m / 1000}km" else "${m / 1000}.${(m % 1000L) / 100}km"
-            }
+            val m = Math.round(windowStartMeters - gridOffsetMeters + (k * majorDistMeters))
+            val distLabel = formatRulerDist(m)
             val px = majorX[k]
             if (px < startX - depth3dX) continue
             canvas.drawText(distLabel, px, baseGroundY + (barH * 0.75f), baseDistTextPaint)
@@ -1760,8 +1765,8 @@ class Altimetria3DView @JvmOverloads constructor(
                 if (i % microSubDivisions == 0) continue
                 val px = xFront[i]
                 if (px < startX + 12f || px > baseEndX - 12f) continue
-                val m = (windowStartMeters - gridOffsetMeters + i * subBlockSizeMeters).toLong()
-                val subLabel = if (m < 1000) "${m}m" else if (m % 1000L == 0L) "${m / 1000}km" else "${m / 1000}.${(m % 1000L) / 100}km"
+                val m = Math.round(windowStartMeters - gridOffsetMeters + i * subBlockSizeMeters)
+                val subLabel = formatRulerDist(m)
                 canvas.drawText(subLabel, px, baseGroundY + (barH * 0.75f), subDistTextPaint)
             }
         }

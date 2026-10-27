@@ -31,6 +31,27 @@ class RoutePathTest {
     }
 
     @Test
+    fun outAndBackRoadIsSplitIntoTwoSides() {
+        // Sube 1,2 km por la misma carretera norte y vuelve por ella
+        val out = listOf(40.000 to -3.0, 40.004 to -3.0, 40.008 to -3.0, 40.011 to -3.0)
+        val outAndBack = out + out.reversed().drop(1)
+        val p = RoutePath.fromPolyline(PolylineCodec.encode(outAndBack, 1e5), null)!!
+        val total = 2 * 1220.0
+        val goingOut = p.subPathOffset(300.0, 600.0, 5.0)
+        val coming = p.subPathOffset(total - 600.0, total - 300.0, 5.0)
+        // Misma latitud, pero cada sentido a un lado de la carretera (este al ir al norte, oeste al volver)
+        assertTrue(goingOut.first().second > -3.0)
+        assertTrue(coming.first().second < -3.0)
+    }
+
+    @Test
+    fun roadVisitedOnceIsNotOffset() {
+        val p = RoutePath.fromPolyline(encoded, 3000.0)!!
+        val sub = p.subPathOffset(100.0, 2500.0, 5.0)
+        sub.forEach { assertEquals(-3.0, it.second, 1e-9) }
+    }
+
+    @Test
     fun emptyOrDegenerateInput() {
         assertNull(RoutePath.fromPolyline("", 1000.0))
         val path = RoutePath.fromPolyline(encoded, null)!!
