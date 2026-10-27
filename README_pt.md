@@ -28,6 +28,7 @@ Revoluciona o conceito tradicional de altimetria de ciclismo incorporando um **C
 * **Versão 2.9.3**: marcha recomendada por esforço (cadência alvo: subidas 70-85, plano 85-95, descidas 90-100 rpm; velocidade estimada com FTP, peso e FC); desnível total e restante junto a «Rota/Faltam», com opção esquerda ou direita; a percentagem de cada bloco cabe sempre dentro do perfil; indicador da marcha sob o zoom também na horizontal, com o gráfico mais abaixo.
 * **Versão 2.9.4**: corrigidos os botões de zoom e de passagem de página no gráfico global 3D (os de passagem tapavam o zoom); botões de passagem mais pequenos e do mesmo tamanho que o círculo visível; redesenho imediato a cada toque.
 * **Versão 2.9.5**: o desnível junto a «Rota/Faltam» passa a ser opcional (desativado por predefinição) e os dados sobem para a linha dos botões de zoom; a régua mostra mais casas decimais (9,95 km); as estradas percorridas duas vezes são desdobradas no mapa (ida e volta, cada uma de um lado).
+* **Versão 2.9.6**: os botões de zoom sobem para cima sempre que «Mostrar dados no cabeçalho» está desativado, mesmo que «Mostrar inclinação máxima» continue ativa.
 
 ---
 

@@ -393,7 +393,8 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             // Si el usuario deselecciona "Mostrar Pendiente Máxima" Y "Mostrar Datos en Encabezado",
                             // el espacio superior queda completamente despejado. En ese caso colocamos los botones centrados arriba
                             // para no estorbar a la gráfica lateralmente. Si cualquiera está activa, los botones van al lateral.
-                            val isHeaderClean = !prefs.showMaxGradient && !prefs.show3dHeaderStats
+                            // La pendiente máxima solo se dibuja dentro del encabezado: sin encabezado el espacio superior está libre
+                            val isHeaderClean = !prefs.show3dHeaderStats
                             if (isHeaderClean) {
                                 remoteViews.setViewVisibility(R.id.zoom_controls_top, android.view.View.VISIBLE)
                                 remoteViews.setViewVisibility(R.id.zoom_controls_side, android.view.View.GONE)

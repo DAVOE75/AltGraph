@@ -36,6 +36,7 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 * **Versión 2.9.3**: marcha recomendada según esfuerzo (cadencia objetivo: subidas 70-85, llano 85-95, bajadas 90-100 rpm; velocidad estimada con FTP, peso y FC); desnivel total y restante junto a «Ruta/Quedan», con opción de ponerlos a la izquierda o a la derecha; el porcentaje de cada bloque siempre cabe dentro del perfil; engranaje bajo el zoom también en apaisado y gráfica más baja.
 * **Versión 2.9.4**: corregidos los botones de zoom y de paso de página en la gráfica global 3D (los de paso tapaban al zoom); botones de paso más pequeños y del mismo tamaño que el círculo que se ve; redibujado inmediato al pulsar.
 * **Versión 2.9.5**: el desnivel junto a «Ruta/Quedan» pasa a ser opcional (desactivado por defecto) y los datos suben a la fila de los botones de zoom; la regla muestra más decimales (9,95 km); las carreteras recorridas dos veces se desdoblan en el mapa (ida y vuelta, cada una a un lado).
+* **Versión 2.9.6**: los botones de zoom suben arriba siempre que se desactiva «Mostrar datos en el encabezado», aunque «Mostrar pendiente máxima» siga marcada.
 
 ---
 
