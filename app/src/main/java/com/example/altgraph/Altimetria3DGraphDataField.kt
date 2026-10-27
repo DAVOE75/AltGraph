@@ -193,7 +193,6 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         val frame = listOf(strategy, startElev, snap.instantBarometricGrade, snap.currentHeading, prefs.snapshot)
                         if (frame == lastFrame) return@safeUpdate
                         altimetria3DView.oasisDistanceToNextCrucible = strategy.oasisDistanceToNextCrucible
-                        altimetria3DView.virtualPacerRelativeDistance = strategy.virtualPacerRelativeDistance
                         altimetria3DView.energyBatteryLevel = strategy.energyBatteryLevel
                 
                         // ELITE & W'bal

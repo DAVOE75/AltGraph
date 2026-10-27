@@ -84,7 +84,6 @@
     <!-- Pro Features -->
     <string name="setting_smart_zoom">Enable Tactical Smart Zoom (Auto-Scale)</string>
     <string name="setting_oasis_tracking">Enable Tactical Oasis Tracking (Recovery Zones)</string>
-    <string name="setting_virtual_pacer">Enable APM Virtual Pacer (Hologram Ghost)</string>
     <string name="setting_switchback_rendering">Enable 3D Switchback Dynamics</string>
     <string name="setting_energy_management">Enable Energy Management System (Human Battery)</string>
     <string name="font_normal">Normal</string>
@@ -125,6 +124,7 @@
     <string name="tab_elite">Elite</string>
     <string name="label_vista_global">ALTIMETRY VIEW AND MODEL (GLOBAL ROUTE)</string>
     <string name="label_vista_puertos">ALTIMETRY VIEW AND MODEL (CLIMB VIEWER)</string>
+    <string name="label_climb_viewer_section">CLIMB VIEWER</string>
     <string name="suffix_global"> (GLOBAL ROUTE)</string>
     <string name="suffix_puertos"> (CLIMB VIEWER)</string>
     <string name="btn_reduce">- Reduce</string>
@@ -344,12 +344,17 @@
     <string name="setting_merge_similar_blocks_desc">Consecutive blocks with the same colour are shown as one block with a single average gradient. Auto merges only when blocks are narrow (zoomed out), keeping labels large and clean</string>
     <string name="merge_mode_off">Off</string>
     <string name="setting_route_info_side">Position of Route / Left data</string>
+    <string name="panel_theme_dark">Dark</string>
+    <string name="panel_theme_light">Light</string>
+    <string name="setting_climb_alert">Climb alert in the ride</string>
+    <string name="setting_climb_alert_desc">Shows a banner on the ride screen when a climb is about to start (400 m before): name, length, average gradient, category and elevation gain. Useful if you turn off the Hammerhead climber</string>
     <string name="setting_show_route_elevation">Also show elevation gain (total and remaining)</string>
     <string name="route_info_right">Right</string>
     <string name="route_info_left">Left</string>
     <string name="setting_gear_effort">Gear by effort (cadence target)</string>
     <string name="setting_gear_effort_desc">Recommends the gear for a target cadence: climbs 70-85 rpm, flat 85-95 rpm, descents 90-100 rpm. The speed is estimated from your FTP, weight and heart rate (high heart rate eases the gear, low heart rate allows a harder one)</string>
     <string name="setting_gear_ftp">FTP (W)</string>
+    <string name="elite_ftp_from_3d">Uses the FTP set in the 3D tab: %1$d W</string>
     <string name="setting_gear_weight">Rider weight (kg)</string>
     <string name="setting_gear_maxhr">Max heart rate (bpm)</string>
     <string name="setting_merge_margin">Merge blocks within a margin (%)</string>

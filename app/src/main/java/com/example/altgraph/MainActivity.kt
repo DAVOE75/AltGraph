@@ -17,6 +17,7 @@ import android.widget.Spinner
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.Toast
 import java.util.Locale
 import kotlin.math.abs
@@ -26,13 +27,15 @@ class MainActivity : Activity() {
     private lateinit var prefs: AppPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        prefs = AppPreferences.getInstance(this)
+        PanelTheme.init(this, prefs.panelTheme)
+        setTheme(if (PanelTheme.isLight) R.style.Theme_ALTGRAPH_Panel_Light else R.style.Theme_ALTGRAPH_Panel_Dark)
         super.onCreate(savedInstanceState)
 
         FontHelper.init(this)
-        prefs = AppPreferences.getInstance(this)
 
         val scrollView = ScrollView(this).apply {
-            setBackgroundColor(Color.parseColor("#09090B"))
+            setBackgroundColor(PanelTheme.colors.bg)
             isFillViewport = true
         }
 
@@ -110,16 +113,17 @@ class MainActivity : Activity() {
                 container.visibility = if (idx == activeIdx) View.VISIBLE else View.GONE
             }
             tabButtons.forEachIndexed { idx, btn ->
+                val pc = PanelTheme.colors
                 if (idx == activeIdx) {
-                    btn.setTextColor(Color.BLACK)
+                    btn.setTextColor(pc.onAccent)
                     btn.background = GradientDrawable().apply {
-                        setColor(Color.parseColor("#38BDF8"))
+                        setColor(pc.accent)
                         cornerRadius = 18f
                     }
                 } else {
-                    btn.setTextColor(Color.WHITE)
+                    btn.setTextColor(pc.onChip)
                     btn.background = GradientDrawable().apply {
-                        setColor(Color.parseColor("#27272A"))
+                        setColor(pc.chip)
                         cornerRadius = 18f
                     }
                 }
@@ -129,9 +133,14 @@ class MainActivity : Activity() {
         tabTitles.forEachIndexed { idx, titleStr ->
             val btn = Button(this).apply {
                 text = titleStr
-                textSize = 12f
+                textSize = 10f
                 typeface = Typeface.DEFAULT_BOLD
-                setPadding(4, 12, 4, 12)
+                // Mismo tamaño en todas las pestañas, en una sola línea y sin ancho mínimo que recorte la palabra
+                tag = PanelTheme.KEEP
+                maxLines = 1
+                minWidth = 0
+                minimumWidth = 0
+                setPadding(0, 12, 0, 12)
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f).apply {
                     leftMargin = 3
                     rightMargin = 3
@@ -139,7 +148,31 @@ class MainActivity : Activity() {
                 setOnClickListener { selectTab(idx) }
             }
             tabButtons.add(btn)
-            tabBar.addView(btn)
+            if (idx == tabTitles.lastIndex) {
+                // Pestaña premium: corona dorada en la esquina superior derecha
+                val density = resources.displayMetrics.density
+                val crownSize = (14 * density).toInt()
+                val crownInset = (3 * density).toInt()
+                val frame = FrameLayout(this).apply { layoutParams = btn.layoutParams }
+                btn.layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                )
+                frame.addView(btn)
+                frame.addView(ImageView(this).apply {
+                    setImageResource(R.drawable.ic_crown)
+                    importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+                    // El botón tiene elevación propia; sin esto la corona queda dibujada por debajo
+                    elevation = 12 * density
+                    layoutParams = FrameLayout.LayoutParams(crownSize, crownSize, Gravity.TOP or Gravity.END).apply {
+                        topMargin = crownInset
+                        rightMargin = crownInset
+                    }
+                })
+                tabBar.addView(frame)
+            } else {
+                tabBar.addView(btn)
+            }
         }
 
         // ==========================================
@@ -371,12 +404,12 @@ class MainActivity : Activity() {
         tabEstiloContainer.addView(styleCard)
         tabEstiloContainer.addView(climbStyleCard)
         tabEstiloContainer.addView(fontCard)
+        tabEstiloContainer.addView(font3dCard)
         tabEstiloContainer.addView(rotate90Card)
+        tabEstiloContainer.addView(createSectionLabel(getString(R.string.label_climb_viewer_section)))
         tabEstiloContainer.addView(climbRotate90Card)
         tabEstiloContainer.addView(climbNameCard)
         tabEstiloContainer.addView(climbZoomTopCard)
-        tabEstiloContainer.addView(font3dCard)
-        tabEstiloContainer.addView(showZoomCard)
 
         // ==========================================
         // PESTAÑA 2: ALTIMETRÍA 3D
@@ -772,6 +805,7 @@ class MainActivity : Activity() {
             setTextColor(Color.LTGRAY)
             setPadding(0, 4, 0, 8)
         })
+        var eliteFtpInfo: TextView? = null
         fun gearNumber(label: String, current: Int, onChange: (Int) -> Unit) {
             gearCard.addView(createValueText(label))
             gearCard.addView(EditText(this).apply {
@@ -788,7 +822,10 @@ class MainActivity : Activity() {
                 })
             })
         }
-        gearNumber(getString(R.string.setting_gear_ftp), prefs.userFtp) { prefs.userFtp = it }
+        gearNumber(getString(R.string.setting_gear_ftp), prefs.userFtp) {
+            prefs.userFtp = it
+            eliteFtpInfo?.text = getString(R.string.elite_ftp_from_3d, it)
+        }
         gearNumber(getString(R.string.setting_gear_weight), prefs.riderWeightKg) { prefs.riderWeightKg = it }
         gearNumber(getString(R.string.setting_gear_maxhr), prefs.maxHeartRate) { prefs.maxHeartRate = it }
 
@@ -966,10 +1003,27 @@ class MainActivity : Activity() {
         gradeInput(getString(R.string.setting_hide_grade_min), prefs.hideGradeMin3d) { prefs.hideGradeMin3d = it }
         gradeInput(getString(R.string.setting_hide_grade_max), prefs.hideGradeMax3d) { prefs.hideGradeMax3d = it }
 
+        val climbAlertCard = createCardContainer()
+        climbAlertCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_climb_alert)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.climbAlertEnabled
+            setOnCheckedChangeListener { _, isChecked -> prefs.climbAlertEnabled = isChecked }
+        })
+        climbAlertCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_climb_alert_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 8)
+        })
+
         tab3dContainer.addView(lookaheadCard)
+        tab3dContainer.addView(climbAlertCard)
         tab3dContainer.addView(beaconModeCard)
         tab3dContainer.addView(routeDistancesCard)
         tab3dContainer.addView(blockCleanCard)
+        tab3dContainer.addView(showZoomCard)
         tab3dContainer.addView(panPositionCard)
         tab3dContainer.addView(gearCard)
         tab3dContainer.addView(beaconCard)
@@ -1204,18 +1258,6 @@ class MainActivity : Activity() {
         oasisCard.addView(switchOasis)
         tabProContainer.addView(oasisCard)
 
-        // Virtual Pacer
-        val pacerCard = createCardContainer()
-        val switchPacer = Switch(this).apply {
-            text = getString(R.string.setting_virtual_pacer)
-            textSize = 15f
-            setTextColor(Color.WHITE)
-            isChecked = prefs.virtualPacerEnabled
-            setOnCheckedChangeListener { _, isChecked -> prefs.virtualPacerEnabled = isChecked }
-        }
-        pacerCard.addView(switchPacer)
-        tabProContainer.addView(pacerCard)
-
         // Switchback Dynamics
         val switchbackCard = createCardContainer()
         val switchSwitchback = Switch(this).apply {
@@ -1273,6 +1315,7 @@ class MainActivity : Activity() {
         val activateBtn = Button(this).apply {
             text = getString(R.string.elite_btn_activate)
             textSize = 12f
+            tag = PanelTheme.KEEP
             setTextColor(Color.WHITE)
             background = GradientDrawable().apply {
                 setColor(Color.parseColor("#2563EB")) // Blue
@@ -1811,39 +1854,13 @@ class MainActivity : Activity() {
         }
         powerBarCard.addView(switchPowerBar)
 
-        val ftpLayout = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(0, 10, 0, 0)
-        }
-        
-        val ftpLabel = TextView(this).apply {
-            text = "Tu FTP (W): "
+        eliteFtpInfo = TextView(this).apply {
+            text = getString(R.string.elite_ftp_from_3d, prefs.userFtp)
+            textSize = 12f
             setTextColor(Color.LTGRAY)
-            textSize = 14f
+            setPadding(0, 4, 0, 0)
         }
-        ftpLayout.addView(ftpLabel)
-
-        val ftpInput = EditText(this).apply {
-            inputType = android.text.InputType.TYPE_CLASS_NUMBER
-            setTextColor(Color.WHITE)
-            setHintTextColor(Color.DKGRAY)
-            setText(prefs.userFtp.toString())
-            isEnabled = prefs.isEliteUnlocked
-            layoutParams = LinearLayout.LayoutParams(150, LinearLayout.LayoutParams.WRAP_CONTENT)
-            addTextChangedListener(object : android.text.TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: android.text.Editable?) {
-                    s?.toString()?.toIntOrNull()?.let {
-                        if (it > 0) prefs.userFtp = it
-                    }
-                }
-            })
-        }
-        ftpLayout.addView(ftpInput)
-        
-        powerBarCard.addView(ftpLayout)
+        powerBarCard.addView(eliteFtpInfo)
         tabEliteContainer.addView(powerBarCard)
 
         // ── Voice Copilot Alerts (Elite) ───────────────────────────────────────
@@ -2220,7 +2237,6 @@ class MainActivity : Activity() {
             switchProfileTvClimbNames.isEnabled = unlocked
             switchCustomClimbs.isEnabled = unlocked
             colorButtons.forEach { it.isEnabled = unlocked }
-            ftpInput.isEnabled = unlocked
             radarResSpinner.isEnabled = unlocked
             mapOverlaySpinner.isEnabled = unlocked
             switchSmoothMap.isEnabled = unlocked
@@ -2298,9 +2314,9 @@ class MainActivity : Activity() {
             text = getString(R.string.btn_save_and_exit)
             textSize = 16f
             typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Color.BLACK)
+            setTextColor(PanelTheme.colors.onSave)
             background = GradientDrawable().apply {
-                setColor(Color.parseColor("#22C55E"))
+                setColor(PanelTheme.colors.save)
                 cornerRadius = 22f
             }
             setPadding(28, 20, 28, 20)
@@ -2317,7 +2333,36 @@ class MainActivity : Activity() {
             }
         }
 
-        rootLayout.addView(headerCard)
+        // Selector de modo en la esquina del logo: luna en modo claro (pulsar = oscuro), sol en modo oscuro (pulsar = claro)
+        val headerFrame = FrameLayout(this).apply { layoutParams = headerCard.layoutParams }
+        headerCard.layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
+        )
+        headerFrame.addView(headerCard)
+        val themeToggleDensity = resources.displayMetrics.density
+        val themeToggleSize = (44 * themeToggleDensity).toInt()
+        val themeTogglePad = (10 * themeToggleDensity).toInt()
+        val themeToggle = ImageView(this).apply {
+            val toLight = !PanelTheme.isLight
+            setImageResource(if (toLight) R.drawable.ic_theme_sun else R.drawable.ic_theme_moon)
+            setColorFilter(if (toLight) Color.parseColor("#FBBF24") else PanelTheme.colors.accent)
+            contentDescription = getString(if (toLight) R.string.panel_theme_light else R.string.panel_theme_dark)
+            setPadding(themeTogglePad, themeTogglePad, themeTogglePad, themeTogglePad)
+            tag = PanelTheme.KEEP
+            // La tarjeta tiene elevación propia; sin esto el icono quedaría por debajo
+            elevation = 12 * themeToggleDensity
+            layoutParams = FrameLayout.LayoutParams(themeToggleSize, themeToggleSize, Gravity.TOP or Gravity.END).apply {
+                topMargin = (6 * themeToggleDensity).toInt()
+                rightMargin = (6 * themeToggleDensity).toInt()
+            }
+            setOnClickListener {
+                prefs.panelTheme = if (PanelTheme.isLight) PanelTheme.DARK else PanelTheme.LIGHT
+                recreate()
+            }
+        }
+        headerFrame.addView(themeToggle)
+        rootLayout.addView(headerFrame)
         rootLayout.addView(tabBar)
         rootLayout.addView(tabEstiloContainer)
         rootLayout.addView(tab3dContainer)
@@ -2330,6 +2375,9 @@ class MainActivity : Activity() {
         scrollView.addView(rootLayout)
         setContentView(scrollView)
 
+        // Una sola escala tipográfica y los colores del tema en todo el panel
+        PanelTheme.apply(scrollView)
+
         // Seleccionar pestaña por defecto (Tab 0: Estilo)
         selectTab(0)
     }
@@ -2339,8 +2387,8 @@ class MainActivity : Activity() {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
             background = GradientDrawable().apply {
-                setColor(Color.parseColor("#18181B"))
-                setStroke(2, Color.parseColor("#27272A"))
+                setColor(PanelTheme.colors.card)
+                setStroke(2, PanelTheme.colors.stroke)
                 cornerRadius = 20f
             }
             setPadding(20, 16, 20, 16)
@@ -2356,9 +2404,9 @@ class MainActivity : Activity() {
     private fun createSectionLabel(textStr: String): TextView {
         return TextView(this).apply {
             text = textStr
-            textSize = 13f
+            textSize = PanelTheme.SECTION
             typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Color.parseColor("#38BDF8"))
+            setTextColor(PanelTheme.colors.accent)
             gravity = Gravity.CENTER
             setPadding(0, 0, 0, 4)
         }
@@ -2367,9 +2415,9 @@ class MainActivity : Activity() {
     private fun createValueText(textStr: String): TextView {
         return TextView(this).apply {
             text = textStr
-            textSize = 18f
+            textSize = PanelTheme.VALUE
             typeface = Typeface.DEFAULT_BOLD
-            setTextColor(Color.WHITE)
+            setTextColor(PanelTheme.colors.text)
             gravity = Gravity.CENTER
             setPadding(0, 0, 0, 10)
         }
@@ -2378,7 +2426,7 @@ class MainActivity : Activity() {
     private fun createSegmentButton(textStr: String, isActive: Boolean, onClick: () -> Unit): Button {
         return Button(this).apply {
             text = textStr
-            textSize = 11f
+            textSize = PanelTheme.BUTTON
             typeface = Typeface.DEFAULT_BOLD
             setPadding(6, 10, 6, 10)
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f).apply {
@@ -2393,7 +2441,7 @@ class MainActivity : Activity() {
     private fun createActionButton(textStr: String, onClick: () -> Unit): Button {
         return Button(this).apply {
             text = textStr
-            textSize = 13f
+            textSize = PanelTheme.BUTTON
             typeface = Typeface.DEFAULT_BOLD
             setPadding(12, 12, 12, 12)
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f).apply {
@@ -2412,16 +2460,17 @@ class MainActivity : Activity() {
     }
 
     private fun applyButtonStyle(btn: Button, isActive: Boolean) {
+        val pc = PanelTheme.colors
         if (isActive) {
-            btn.setTextColor(Color.BLACK)
+            btn.setTextColor(pc.onAccent)
             btn.background = GradientDrawable().apply {
-                setColor(Color.parseColor("#38BDF8"))
+                setColor(pc.accent)
                 cornerRadius = 14f
             }
         } else {
-            btn.setTextColor(Color.WHITE)
+            btn.setTextColor(pc.onChip)
             btn.background = GradientDrawable().apply {
-                setColor(Color.parseColor("#27272A"))
+                setColor(pc.chip)
                 cornerRadius = 14f
             }
         }

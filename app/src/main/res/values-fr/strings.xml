@@ -67,7 +67,6 @@
     <string name="setting_custom_maps_desc">Permet de détecter et d\'importer des cartes vectorielles hors ligne haute définition (.mbtiles / .map) pour Karoo</string>
     <string name="setting_smart_zoom">Activer Smart Zoom tactique (auto-échelle)</string>
     <string name="setting_oasis_tracking">Activer Oasis Tracking (zones de récupération)</string>
-    <string name="setting_virtual_pacer">Activer Virtual Pacer biomécanique (fantôme)</string>
     <string name="setting_switchback_rendering">Activer dynamique des virages 3D</string>
     <string name="setting_energy_management">Gestion bioénergétique (W\'Bal / Glycogène)</string>
     <string name="font_normal">Normale</string>
@@ -104,6 +103,7 @@
     <string name="tab_elite">Elite</string>
     <string name="label_vista_global">VUE ALTIMÉTRIQUE (ITINÉRAIRE GLOBAL)</string>
     <string name="label_vista_puertos">VUE ALTIMÉTRIQUE (VISIONNEUR DE COLS)</string>
+    <string name="label_climb_viewer_section">VISIONNEUR DE COLS</string>
     <string name="suffix_global"> (ITINÉRAIRE GLOBAL)</string>
     <string name="suffix_puertos"> (VISIONNEUR DE COLS)</string>
     <string name="btn_reduce">- Réduire</string>
@@ -317,12 +317,17 @@
     <string name="setting_merge_similar_blocks_desc">Les blocs consécutifs de même couleur sont affichés comme un seul bloc avec une pente moyenne. Auto ne fusionne que si les blocs sont étroits (peu de zoom), avec des étiquettes plus grandes et lisibles</string>
     <string name="merge_mode_off">Non</string>
     <string name="setting_route_info_side">Position des données Parcours / Reste</string>
+    <string name="panel_theme_dark">Sombre</string>
+    <string name="panel_theme_light">Clair</string>
+    <string name="setting_climb_alert">Alerte de col pendant la sortie</string>
+    <string name="setting_climb_alert_desc">Affiche une bannière sur l\'écran de la sortie quand un col est sur le point de commencer (400 m avant) : nom, longueur, pente moyenne, catégorie et dénivelé. Utile si vous désactivez le Climber de Hammerhead</string>
     <string name="setting_show_route_elevation">Afficher aussi le dénivelé (total et restant)</string>
     <string name="route_info_right">Droite</string>
     <string name="route_info_left">Gauche</string>
     <string name="setting_gear_effort">Rapport selon l\'effort (cadence cible)</string>
     <string name="setting_gear_effort_desc">Recommande le rapport pour une cadence cible : montées 70-85 tr/min, plat 85-95 tr/min, descentes 90-100 tr/min. La vitesse est estimée avec votre FTP, votre poids et votre fréquence cardiaque (FC élevée : rapport plus léger, FC basse : plus dur)</string>
     <string name="setting_gear_ftp">FTP (W)</string>
+    <string name="elite_ftp_from_3d">Utilise la FTP définie dans l\'onglet 3D : %1$d W</string>
     <string name="setting_gear_weight">Poids du cycliste (kg)</string>
     <string name="setting_gear_maxhr">FC maximale (bpm)</string>
     <string name="setting_merge_margin">Fusionner les blocs dans une marge (%)</string>

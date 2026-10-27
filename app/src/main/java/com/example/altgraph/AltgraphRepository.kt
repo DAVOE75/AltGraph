@@ -5,6 +5,7 @@ import android.os.SystemClock
 import android.util.Log
 import io.hammerhead.karooext.KarooSystemService
 import io.hammerhead.karooext.models.DataType
+import io.hammerhead.karooext.models.InRideAlert
 import io.hammerhead.karooext.models.OnLocationChanged
 import io.hammerhead.karooext.models.OnMapZoomLevel
 import io.hammerhead.karooext.models.OnNavigationState
@@ -233,6 +234,34 @@ object AltgraphRepository {
     private fun dispatcher(): ExecutorCoroutineDispatcher =
         if (scope != null) repoDispatcher else throw CancellationException("AltgraphRepository detenido")
 
+    private val climbAlerts = ClimbAlertTracker()
+
+    private fun showClimbAlert(ctx: Context, alert: ClimbAlertTracker.Alert) {
+        val system = karooSystem ?: return
+        if (!system.connected) return
+        val c = alert.climb
+        val name = c.name?.takeIf { it.isNotBlank() }
+            ?: "${ctx.getString(R.string.profile_tv_climb_item_prefix)} ${alert.index + 1}"
+        val parts = mutableListOf(
+            String.format(java.util.Locale.getDefault(), "%.1f km", c.length / 1000.0),
+            String.format(java.util.Locale.getDefault(), "%.1f%%", c.avgGrade)
+        )
+        if (c.category.isNotBlank()) parts.add(c.category.trim())
+        if (c.totalElevation > 0.0) parts.add("+${Math.round(c.totalElevation)} m")
+        val sent = system.dispatch(
+            InRideAlert(
+                id = "altgraph-climb-${Math.round(c.startDistance)}",
+                icon = R.drawable.ic_climb_alert,
+                title = name,
+                detail = parts.joinToString(" · "),
+                autoDismissMs = 8000L,
+                backgroundColor = R.color.climb_alert_bg,
+                textColor = R.color.white
+            )
+        )
+        Log.i(TAG, "Climb alert '$name' dispatched=$sent")
+    }
+
     private fun launchTick(s: CoroutineScope): Job = s.launch {
         while (isActive) {
             // Un tick que falla se registra y el bucle sigue (tick no es suspend: no traga cancelaciones)
@@ -243,6 +272,15 @@ object AltgraphRepository {
                 val wPrime = prefs?.userWPrime ?: 20000
                 val snap = core.tick(ctx, ftp, wPrime)
                 _snapshot.value = snap
+
+                // Aviso de puerto en el ride (no es Elite: sustituye al Climber de Hammerhead si el usuario lo desactiva)
+                if (ctx != null && prefs != null) {
+                    if (prefs.climbAlertEnabled && snap.isNavigatingRoute) {
+                        climbAlerts.next(snap.currentRouteDistance, snap.routeClimbs)?.let { showClimbAlert(ctx, it) }
+                    } else if (!snap.isNavigatingRoute) {
+                        climbAlerts.reset()
+                    }
+                }
 
                 // Voice Copilot (Elite)
                 if (ctx != null && prefs != null && prefs.voiceDirectorEnabled && prefs.isEliteUnlocked) {

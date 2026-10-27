@@ -83,7 +83,6 @@
     <!-- Pro Features -->
     <string name="setting_smart_zoom">Habilitar Smart Zoom Táctico (Auto-Escala)</string>
     <string name="setting_oasis_tracking">Habilitar Oasis Tracking (Zonas de Recuperación)</string>
-    <string name="setting_virtual_pacer">Habilitar Virtual Pacer Biomecánico (Holograma Fantasma)</string>
     <string name="setting_switchback_rendering">Habilitar Dinámica de Herraduras 3D</string>
     <string name="setting_energy_management">Habilitar Energy Management System (Batería Humana)</string>
 
@@ -125,6 +124,7 @@
     <string name="tab_elite">Elite</string>
     <string name="label_vista_global">VISTA Y MODELO DE ALTIMETRÍA (RUTA GLOBAL)</string>
     <string name="label_vista_puertos">VISTA Y MODELO DE ALTIMETRÍA (VISOR DE PUERTOS)</string>
+    <string name="label_climb_viewer_section">VISOR DE PUERTOS</string>
     <string name="suffix_global"> (RUTA GLOBAL)</string>
     <string name="suffix_puertos"> (VISOR PUERTOS)</string>
     <string name="btn_reduce">- Reducir</string>
@@ -344,12 +344,17 @@
     <string name="setting_merge_similar_blocks_desc">Los bloques consecutivos del mismo color se muestran como un solo bloque con una pendiente media. Auto fusiona solo cuando los bloques son estrechos (poco zoom), con etiquetas más grandes y limpias</string>
     <string name="merge_mode_off">No</string>
     <string name="setting_route_info_side">Posición de los datos Ruta / Quedan</string>
+    <string name="panel_theme_dark">Oscuro</string>
+    <string name="panel_theme_light">Claro</string>
+    <string name="setting_climb_alert">Aviso de puerto en el ride</string>
+    <string name="setting_climb_alert_desc">Muestra un aviso en la pantalla del ride cuando un puerto está a punto de empezar (400 m antes): nombre, longitud, pendiente media, categoría y desnivel. Útil si desactivas el Climber de Hammerhead</string>
     <string name="setting_show_route_elevation">Mostrar también el desnivel (total y restante)</string>
     <string name="route_info_right">Derecha</string>
     <string name="route_info_left">Izquierda</string>
     <string name="setting_gear_effort">Marcha según esfuerzo (cadencia objetivo)</string>
     <string name="setting_gear_effort_desc">Recomienda la marcha para una cadencia objetivo: subidas 70-85 rpm, llano 85-95 rpm, bajadas 90-100 rpm. La velocidad se estima con tu FTP, peso y frecuencia cardiaca (con FC alta aligera la marcha, con FC baja permite una más dura)</string>
     <string name="setting_gear_ftp">FTP (W)</string>
+    <string name="elite_ftp_from_3d">Usa el FTP definido en la pestaña 3D: %1$d W</string>
     <string name="setting_gear_weight">Peso del ciclista (kg)</string>
     <string name="setting_gear_maxhr">FC máxima (lpm)</string>
     <string name="setting_merge_margin">Fusionar bloques dentro de un margen (%)</string>

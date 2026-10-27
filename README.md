@@ -37,6 +37,7 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 * **Versión 2.9.4**: corregidos los botones de zoom y de paso de página en la gráfica global 3D (los de paso tapaban al zoom); botones de paso más pequeños y del mismo tamaño que el círculo que se ve; redibujado inmediato al pulsar.
 * **Versión 2.9.5**: el desnivel junto a «Ruta/Quedan» pasa a ser opcional (desactivado por defecto) y los datos suben a la fila de los botones de zoom; la regla muestra más decimales (9,95 km); las carreteras recorridas dos veces se desdoblan en el mapa (ida y vuelta, cada una a un lado).
 * **Versión 2.9.6**: los botones de zoom suben arriba siempre que se desactiva «Mostrar datos en el encabezado», aunque «Mostrar pendiente máxima» siga marcada.
+* **Versión 2.9.7**: aviso de puerto (un banner durante la ruta 400 m antes de cada subida con su nombre, longitud, pendiente y categoría), panel en modo oscuro y claro con interruptor sol/luna, un único FTP compartido por toda la app y ajustes mejor ordenados. Se elimina la opción inacabada del virtual pacer.
 
 ---
 

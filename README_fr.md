@@ -29,6 +29,7 @@ Elle révolutionne le concept traditionnel de l'altimétrie cycliste en intégra
 * **Version 2.9.4** : correction des boutons de zoom et de page de la vue globale 3D (les boutons de page recouvraient le zoom) ; boutons de page plus petits et de la même taille que le cercle affiché ; redessin immédiat à chaque appui.
 * **Version 2.9.5** : le dénivelé à côté de « Parcours/Reste » devient optionnel (désactivé par défaut) et les données remontent sur la ligne des boutons de zoom ; la règle affiche plus de décimales (9,95 km) ; les routes parcourues deux fois sont dédoublées sur la carte (aller et retour, chacun d'un côté).
 * **Version 2.9.6** : les boutons de zoom remontent en haut dès que « Afficher les données dans l'en-tête » est désactivé, même si « Afficher la pente maximale » reste cochée.
+* **Version 2.9.7** : alerte de col (une bannière pendant la sortie 400 m avant chaque montée avec son nom, sa longueur, sa pente et sa catégorie), panneau en mode sombre et clair avec interrupteur soleil/lune, une seule FTP partagée par toute l'application et des réglages mieux organisés. L'option inachevée du virtual pacer a été supprimée.
 
 ---
 

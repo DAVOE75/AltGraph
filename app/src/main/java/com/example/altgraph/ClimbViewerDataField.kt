@@ -281,7 +281,6 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                     }
                     
                     altimetria3DView.oasisDistanceToNextCrucible = strategy.oasisDistanceToNextCrucible
-                altimetria3DView.virtualPacerRelativeDistance = strategy.virtualPacerRelativeDistance
                 altimetria3DView.energyBatteryLevel = strategy.energyBatteryLevel
                 
                 // ELITE & W'bal

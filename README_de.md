@@ -29,6 +29,7 @@ Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 7 3D-Höhenv
 * **Version 2.9.4**: Zoom- und Seitenwechsel-Tasten im globalen 3D-Diagramm repariert (die Seitentasten verdeckten den Zoom); kleinere Seitentasten in der Größe des sichtbaren Kreises; sofortiges Neuzeichnen bei jedem Tastendruck.
 * **Version 2.9.5**: Die Höhenmeter neben „Route/Übrig“ sind jetzt optional (standardmäßig aus) und die Daten rücken in die Zeile der Zoom-Tasten; das Lineal zeigt mehr Nachkommastellen (9,95 km); zweimal befahrene Straßen werden auf der Karte getrennt dargestellt (Hin- und Rückweg, je auf einer Seite).
 * **Version 2.9.6**: Die Zoom-Tasten wandern nach oben, sobald „Daten in der Kopfzeile anzeigen“ aus ist, auch wenn „Maximale Steigung anzeigen“ noch aktiv ist.
+* **Version 2.9.7**: Anstiegsalarm (ein Banner während der Fahrt 400 m vor jedem Anstieg mit Name, Länge, Steigung und Kategorie), dunkles und helles Panel mit Sonne/Mond-Schalter, eine gemeinsame FTP-Einstellung für die ganze App und übersichtlichere Einstellungen. Die unfertige Virtual-Pacer-Option wurde entfernt.
 
 ---
 

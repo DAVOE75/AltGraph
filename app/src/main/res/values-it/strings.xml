@@ -67,7 +67,6 @@
     <string name="setting_custom_maps_desc">Rileva e importa mappe vettoriali offline ad alta definizione (.mbtiles / .map) per Karoo</string>
     <string name="setting_smart_zoom">Attiva Smart Zoom Tattico (Auto-Scala)</string>
     <string name="setting_oasis_tracking">Attiva Oasis Tracking (Zone di Recupero)</string>
-    <string name="setting_virtual_pacer">Attiva Virtual Pacer Biomeccanico (Fantasma)</string>
     <string name="setting_switchback_rendering">Attiva Dinamica delle Curve 3D</string>
     <string name="setting_energy_management">Gestione Bioenergetica (W\'Bal / Glicogeno)</string>
     <string name="font_normal">Normale</string>
@@ -104,6 +103,7 @@
     <string name="tab_elite">Elite</string>
     <string name="label_vista_global">VISTA ALTIMETRIA (PERCORSO GLOBALE)</string>
     <string name="label_vista_puertos">VISTA ALTIMETRIA (VISORE SALITE)</string>
+    <string name="label_climb_viewer_section">VISORE SALITE</string>
     <string name="suffix_global"> (PERCORSO GLOBALE)</string>
     <string name="suffix_puertos"> (VISORE SALITE)</string>
     <string name="btn_reduce">- Riduci</string>
@@ -317,12 +317,17 @@
     <string name="setting_merge_similar_blocks_desc">I blocchi consecutivi dello stesso colore vengono mostrati come un unico blocco con una pendenza media. Auto unisce solo quando i blocchi sono stretti (poco zoom), con etichette più grandi e pulite</string>
     <string name="merge_mode_off">No</string>
     <string name="setting_route_info_side">Posizione dei dati Percorso / Mancano</string>
+    <string name="panel_theme_dark">Scuro</string>
+    <string name="panel_theme_light">Chiaro</string>
+    <string name="setting_climb_alert">Avviso di salita durante l\'uscita</string>
+    <string name="setting_climb_alert_desc">Mostra un avviso sullo schermo dell\'uscita quando una salita sta per iniziare (400 m prima): nome, lunghezza, pendenza media, categoria e dislivello. Utile se disattivi il Climber di Hammerhead</string>
     <string name="setting_show_route_elevation">Mostra anche il dislivello (totale e rimanente)</string>
     <string name="route_info_right">Destra</string>
     <string name="route_info_left">Sinistra</string>
     <string name="setting_gear_effort">Rapporto in base allo sforzo (cadenza obiettivo)</string>
     <string name="setting_gear_effort_desc">Consiglia il rapporto per una cadenza obiettivo: salite 70-85 rpm, pianura 85-95 rpm, discese 90-100 rpm. La velocità è stimata con FTP, peso e frequenza cardiaca (FC alta: rapporto più agile, FC bassa: più duro)</string>
     <string name="setting_gear_ftp">FTP (W)</string>
+    <string name="elite_ftp_from_3d">Usa l\'FTP impostato nella scheda 3D: %1$d W</string>
     <string name="setting_gear_weight">Peso del ciclista (kg)</string>
     <string name="setting_gear_maxhr">FC massima (bpm)</string>
     <string name="setting_merge_margin">Unisci i blocchi entro un margine (%)</string>

@@ -128,7 +128,6 @@ data class StrategyData(
     val routeTotalLength: Double = 0.0,
     // PRO Features
     val oasisDistanceToNextCrucible: Double? = null,
-    val virtualPacerRelativeDistance: Double? = null,
     val energyBatteryLevel: Double = 100.0,
     val currentPower: Double = 0.0,
     val currentCadence: Double = 0.0,
@@ -210,7 +209,6 @@ class AltimetriaStrategyCalculator {
     
     // PRO Feature States
     private var smartLookahead: Double = 350.0
-    private var virtualPacerDistance: Double = 0.0
     private var energyBatteryLevel: Double = 100.0
     private var currentPower: Double = 0.0
     private var currentCadence: Double = 0.0
@@ -1879,7 +1877,6 @@ class AltimetriaStrategyCalculator {
         // PRO Features Settings
         val smartZoomEnabled = prefs?.smartZoomEnabled ?: true
         val oasisTrackingEnabled = prefs?.oasisTrackingEnabled ?: true
-        val virtualPacerEnabled = prefs?.virtualPacerEnabled ?: true
         val energyManagementEnabled = prefs?.energyManagementEnabled ?: true
 
         // SMART ZOOM LOGIC
@@ -2440,9 +2437,6 @@ class AltimetriaStrategyCalculator {
             }
         }
 
-        // Virtual pacer init logic for route mode
-        if (advance && virtualPacerDistance == 0.0) virtualPacerDistance = currentRiderDistance
-
         // ELITE FEATURE: Wind Overlay
         var windEffect: Double? = null
         var stravaRelDist: Double? = null
@@ -2523,7 +2517,6 @@ class AltimetriaStrategyCalculator {
             routeName = activeRouteName,
             routeTotalLength = if (routePoints.isNotEmpty()) routePoints.last().distance else 0.0,
             oasisDistanceToNextCrucible = oasisDistance,
-            virtualPacerRelativeDistance = if (virtualPacerEnabled) virtualPacerDistance - currentRiderDistance else null,
             energyBatteryLevel = energyBatteryLevel,
             currentPower = currentPower,
             currentCadence = currentCadence,

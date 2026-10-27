@@ -29,6 +29,7 @@ Revoluciona o conceito tradicional de altimetria de ciclismo incorporando um **C
 * **Versão 2.9.4**: corrigidos os botões de zoom e de passagem de página no gráfico global 3D (os de passagem tapavam o zoom); botões de passagem mais pequenos e do mesmo tamanho que o círculo visível; redesenho imediato a cada toque.
 * **Versão 2.9.5**: o desnível junto a «Rota/Faltam» passa a ser opcional (desativado por predefinição) e os dados sobem para a linha dos botões de zoom; a régua mostra mais casas decimais (9,95 km); as estradas percorridas duas vezes são desdobradas no mapa (ida e volta, cada uma de um lado).
 * **Versão 2.9.6**: os botões de zoom sobem para cima sempre que «Mostrar dados no cabeçalho» está desativado, mesmo que «Mostrar inclinação máxima» continue ativa.
+* **Versão 2.9.7**: aviso de subida (um banner durante o percurso 400 m antes de cada subida com nome, comprimento, inclinação e categoria), painel em modo escuro e claro com interruptor sol/lua, um único FTP partilhado por toda a app e definições mais bem organizadas. A opção inacabada do virtual pacer foi removida.
 
 ---
 

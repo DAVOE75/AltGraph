@@ -324,11 +324,6 @@ class Altimetria3DView @JvmOverloads constructor(
         textAlign = Paint.Align.CENTER
         setShadowLayer(6f, 0f, 0f, Color.parseColor("#800284C7"))
     }
-    private val virtualPacerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#8022D3EE") // Semi-transparent Cyan
-        style = Paint.Style.FILL
-        setShadowLayer(10f, 0f, 0f, Color.parseColor("#22D3EE"))
-    }
 
 
     private val liveGradePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -661,7 +656,6 @@ class Altimetria3DView @JvmOverloads constructor(
     private var routeCoords: List<Pair<Double, Double>> = emptyList()
     var routeTotalLength: Double = 0.0
     var oasisDistanceToNextCrucible: Double? = null
-    var virtualPacerRelativeDistance: Double? = null
     var energyBatteryLevel: Double = 100.0
     
     // ELITE Feature States

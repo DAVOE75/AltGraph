@@ -37,6 +37,7 @@ It revolutionizes traditional cycling elevation profiles by featuring a **Suite 
 * **Version 2.9.4**: fixed the zoom and page-step buttons in the Global 3D graph (the page buttons were covering the zoom); smaller page buttons that match the visible circle; instant redraw on every press.
 * **Version 2.9.5**: the elevation gain next to "Route/Left" is now optional (off by default) and the data moves up into the zoom-button row; the ruler shows more decimals (9.95 km); roads ridden twice are split on the map (out and back, one on each side).
 * **Version 2.9.6**: the zoom buttons now move to the top whenever "Show data in header" is off, even if "Show max gradient" is still on.
+* **Version 2.9.7**: climb alert (an in-ride banner 400 m before each climb with its name, length, grade and category), dark and light panel with a sun/moon switch, one FTP setting shared by the whole app, and a tidier settings layout. The unfinished virtual pacer option was removed.
 
 ---
 

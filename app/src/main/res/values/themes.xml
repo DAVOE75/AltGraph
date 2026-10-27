@@ -13,4 +13,8 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <!-- Temas del panel de ajustes: oscuro (el de siempre) y claro -->
+    <style name="Theme.ALTGRAPH.Panel.Dark" parent="Theme.AppCompat" />
+    <style name="Theme.ALTGRAPH.Panel.Light" parent="Theme.AppCompat.Light" />
 </resources>

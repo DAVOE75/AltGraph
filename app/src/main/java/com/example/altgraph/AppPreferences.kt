@@ -165,10 +165,6 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_OASIS_TRACKING_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_OASIS_TRACKING_ENABLED, value).apply()
 
-    var virtualPacerEnabled: Boolean
-        get() = prefs.getBoolean(KEY_VIRTUAL_PACER_ENABLED, true)
-        set(value) = prefs.edit().putBoolean(KEY_VIRTUAL_PACER_ENABLED, value).apply()
-
     var switchbackRenderingEnabled: Boolean
         get() = prefs.getBoolean(KEY_SWITCHBACK_RENDERING_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_SWITCHBACK_RENDERING_ENABLED, value).apply()
@@ -432,7 +428,19 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_SHOW_ROUTE_ELEVATION_3D, false)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_ROUTE_ELEVATION_3D, value).apply()
 
+    // Aviso en el ride al acercarte a un puerto (InRideAlert de Karoo)
+    var climbAlertEnabled: Boolean
+        get() = prefs.getBoolean(KEY_CLIMB_ALERT, true)
+        set(value) = prefs.edit().putBoolean(KEY_CLIMB_ALERT, value).apply()
+
+    // Tema del panel de ajustes: "dark" (por defecto), "light" o "auto" (sigue al sistema)
+    var panelTheme: String
+        get() = prefs.getString(KEY_PANEL_THEME, PanelTheme.DARK) ?: PanelTheme.DARK
+        set(value) = prefs.edit().putString(KEY_PANEL_THEME, value).apply()
+
     companion object {
+        private const val KEY_PANEL_THEME = "panel_theme"
+        private const val KEY_CLIMB_ALERT = "climb_alert_enabled"
         private const val KEY_SHOW_ROUTE_ELEVATION_3D = "show_route_elevation_3d"
         const val ROUTE_INFO_RIGHT = "right"
         const val ROUTE_INFO_LEFT = "left"
@@ -500,7 +508,6 @@ class AppPreferences(context: Context) {
 
         private const val KEY_SMART_ZOOM_ENABLED = "smart_zoom_enabled"
         private const val KEY_OASIS_TRACKING_ENABLED = "oasis_tracking_enabled"
-        private const val KEY_VIRTUAL_PACER_ENABLED = "virtual_pacer_enabled"
         private const val KEY_SWITCHBACK_RENDERING_ENABLED = "switchback_rendering_enabled"
         private const val KEY_ENERGY_MANAGEMENT_ENABLED = "energy_management_enabled"
 

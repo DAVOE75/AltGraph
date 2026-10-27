@@ -67,7 +67,6 @@
     <string name="setting_custom_maps_desc">Hochauflösende Offline-Vektorkarten (.mbtiles / .map) für Karoo erkennen und importieren</string>
     <string name="setting_smart_zoom">Taktischen Smart Zoom aktivieren (Auto-Skalierung)</string>
     <string name="setting_oasis_tracking">Oasis Tracking aktivieren (Erholungszonen)</string>
-    <string name="setting_virtual_pacer">Biomechanischen Virtual Pacer (Geist) aktivieren</string>
     <string name="setting_switchback_rendering">Dynamische 3D-Kurven visualisieren</string>
     <string name="setting_energy_management">Bioenergetisches Management (W\'Bal / Glykogen)</string>
     <string name="font_normal">Normal</string>
@@ -104,6 +103,7 @@
     <string name="tab_elite">Elite</string>
     <string name="label_vista_global">HÖHENPROFIL-ANSICHT (GESAMTSTRECKE)</string>
     <string name="label_vista_puertos">HÖHENPROFIL-ANSICHT (PÄSSE-VIEWER)</string>
+    <string name="label_climb_viewer_section">PÄSSE-VIEWER</string>
     <string name="suffix_global"> (GESAMTSTRECKE)</string>
     <string name="suffix_puertos"> (PÄSSE-VIEWER)</string>
     <string name="btn_reduce">- Verringern</string>
@@ -317,12 +317,17 @@
     <string name="setting_merge_similar_blocks_desc">Aufeinanderfolgende Blöcke gleicher Farbe werden als ein Block mit durchschnittlicher Steigung angezeigt. Auto fasst nur zusammen, wenn die Blöcke schmal sind (wenig Zoom), mit größeren, übersichtlichen Beschriftungen</string>
     <string name="merge_mode_off">Aus</string>
     <string name="setting_route_info_side">Position der Daten Route / Übrig</string>
+    <string name="panel_theme_dark">Dunkel</string>
+    <string name="panel_theme_light">Hell</string>
+    <string name="setting_climb_alert">Anstiegshinweis im Ride</string>
+    <string name="setting_climb_alert_desc">Zeigt einen Hinweis auf dem Ride-Bildschirm, kurz bevor ein Anstieg beginnt (400 m vorher): Name, Länge, durchschnittliche Steigung, Kategorie und Höhenmeter. Nützlich, wenn du den Hammerhead-Climber ausschaltest</string>
     <string name="setting_show_route_elevation">Auch Höhenmeter anzeigen (gesamt und verbleibend)</string>
     <string name="route_info_right">Rechts</string>
     <string name="route_info_left">Links</string>
     <string name="setting_gear_effort">Gang nach Belastung (Zielkadenz)</string>
     <string name="setting_gear_effort_desc">Empfiehlt den Gang für eine Zielkadenz: Anstiege 70-85 U/min, flach 85-95 U/min, Abfahrten 90-100 U/min. Die Geschwindigkeit wird aus FTP, Gewicht und Herzfrequenz geschätzt (hohe Herzfrequenz erleichtert den Gang, niedrige erlaubt einen härteren)</string>
     <string name="setting_gear_ftp">FTP (W)</string>
+    <string name="elite_ftp_from_3d">Verwendet die FTP aus dem 3D-Tab: %1$d W</string>
     <string name="setting_gear_weight">Fahrergewicht (kg)</string>
     <string name="setting_gear_maxhr">Maximale Herzfrequenz (bpm)</string>
     <string name="setting_merge_margin">Blöcke innerhalb einer Spanne zusammenfassen (%)</string>
