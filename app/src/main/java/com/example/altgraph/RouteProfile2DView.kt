@@ -133,18 +133,21 @@ class RouteProfile2DView(context: Context) : View(context) {
             drawH = w
         }
 
+        // Layout adaptation based on whether the view is rendered in vertical/tall layout
+        val isVerticalLayout = !isRotated && (drawH > drawW * 1.15f)
+
         // Apply fonts dynamically
         FontHelper.applyFontToPaint(textPaint, fontFamilyKey, Typeface.BOLD)
-        textPaint.textSize = 24f * fontSizeScale
+        textPaint.textSize = (if (isVerticalLayout) 21f else 24f) * fontSizeScale
         
         FontHelper.applyFontToPaint(subTextPaint, fontFamilyKey, Typeface.NORMAL)
-        subTextPaint.textSize = 18f * fontSizeScale
+        subTextPaint.textSize = (if (isVerticalLayout) 15f else 18f) * fontSizeScale
         
         FontHelper.applyFontToPaint(climbListPaint, fontFamilyKey, Typeface.NORMAL)
-        climbListPaint.textSize = 20f * fontSizeScale
+        climbListPaint.textSize = (if (isVerticalLayout) 16f else 20f) * fontSizeScale
         
         FontHelper.applyFontToPaint(climbListCatPaint, fontFamilyKey, Typeface.BOLD)
-        climbListCatPaint.textSize = 20f * fontSizeScale
+        climbListCatPaint.textSize = (if (isVerticalLayout) 16f else 20f) * fontSizeScale
         
         // Theme colors for TV profile (Green, White, Blue, Yellow, Red, Purple)
         val (primaryColor, gradientBottomColor, dimmedColor) = when (tvColor) {
@@ -160,28 +163,28 @@ class RouteProfile2DView(context: Context) : View(context) {
         linePaint.color = primaryColor
         kmDoneTextPaint.color = primaryColor
         FontHelper.applyFontToPaint(kmDoneTextPaint, fontFamilyKey, Typeface.BOLD)
-        kmDoneTextPaint.textSize = 21f * fontSizeScale
+        kmDoneTextPaint.textSize = (if (isVerticalLayout) 18f else 21f) * fontSizeScale
         
         FontHelper.applyFontToPaint(kmRemainTextPaint, fontFamilyKey, Typeface.BOLD)
-        kmRemainTextPaint.textSize = 21f * fontSizeScale
+        kmRemainTextPaint.textSize = (if (isVerticalLayout) 18f else 21f) * fontSizeScale
 
         elevDoneTextPaint.color = primaryColor
         FontHelper.applyFontToPaint(elevDoneTextPaint, fontFamilyKey, Typeface.BOLD)
-        elevDoneTextPaint.textSize = 15f * fontSizeScale
+        elevDoneTextPaint.textSize = (if (isVerticalLayout) 13f else 15f) * fontSizeScale
         
         FontHelper.applyFontToPaint(elevRemainTextPaint, fontFamilyKey, Typeface.BOLD)
-        elevRemainTextPaint.textSize = 15f * fontSizeScale
+        elevRemainTextPaint.textSize = (if (isVerticalLayout) 13f else 15f) * fontSizeScale
         
         FontHelper.applyFontToPaint(peakTextPaint, fontFamilyKey, Typeface.BOLD)
-        peakTextPaint.textSize = 16f * fontSizeScale
+        peakTextPaint.textSize = (if (isVerticalLayout) 14f else 16f) * fontSizeScale
         
         FontHelper.applyFontToPaint(gridTextPaint, fontFamilyKey, Typeface.NORMAL)
-        gridTextPaint.textSize = 14f * fontSizeScale
+        gridTextPaint.textSize = (if (isVerticalLayout) 12f else 14f) * fontSizeScale
 
         val minElev = profileElevations.minOrNull() ?: 0f
         val maxElev = profileElevations.maxOrNull() ?: 0f
         // Add padding to elevRange to avoid exaggerating the Y axis
-        val elevRange = (maxElev - minElev).coerceAtLeast(10f) * 2.5f
+        val elevRange = (maxElev - minElev).coerceAtLeast(10f) * (if (isVerticalLayout) 1.6f else 2.5f)
 
         val ptsCount = profileElevations.size
         
@@ -190,8 +193,8 @@ class RouteProfile2DView(context: Context) : View(context) {
         
         val startX = 0f
         val endX = drawW
-        val bottomY = drawH - 20f
-        val topY = 100f // leave more space for text
+        val bottomY = drawH - 15f
+        val topY = if (isVerticalLayout) (drawH * 0.44f) else 100f // In vertical, lower the profile so top half is dedicated to minimap & climb list
 
         // Draw Y-Axis Grid
         val gridStep = when {
@@ -336,15 +339,11 @@ class RouteProfile2DView(context: Context) : View(context) {
                     drawFlag(canvas, px, py, "#F59E0B", 0.7f)
                     val textW = peakTextPaint.measureText(label)
                     val safePx = px.coerceIn(textW / 2f + 10f, drawW - textW / 2f - 10f)
-                    val textY = (py - 26f).coerceAtLeast(35f)
+                    val textY = (py - 24f).coerceAtLeast(topY - 10f)
                     canvas.drawText(label, safePx, textY, peakTextPaint)
                 }
             }
         }
-        
-
-        
-
 
         // Draw icon or dot at current position
         val currentElevIndex = (progress * (ptsCount - 1)).toInt().coerceIn(0, ptsCount - 1)
@@ -362,12 +361,8 @@ class RouteProfile2DView(context: Context) : View(context) {
         drawFlag(canvas, startX + 10f, firstY, primaryHex) // Start Flag (Primary Neon)
         drawFlag(canvas, endX - 10f, lastY, "#FFFFFF") // End Flag (White/Checkered)
 
-        // Draw Top Texts
-        val titleText = routeName.ifEmpty { "RUTA" }.uppercase()
-        canvas.drawText(titleText, 20f, 30f, textPaint)
-        
-        val distText = String.format("Total %.1f km - %s", totalDistance / 1000.0, altitudeGainText)
-        canvas.drawText(distText, 20f, 55f, subTextPaint)
+        // Top Header Base Y: In vertical layout, avoid cutting into top margin / system bar
+        val headerBaseY = if (isVerticalLayout) 36f else 30f
 
         // Draw Classified Climbs List on the Right
         val catClimbs = distinctClimbs.mapNotNull { climb ->
@@ -388,7 +383,7 @@ class RouteProfile2DView(context: Context) : View(context) {
         }.sortedBy { it.first.startDistance }
 
         if (catClimbs.isNotEmpty()) {
-            val listStartX = drawW * 0.50f // Moved slightly to the left (50%) to give more room for larger text
+            val listStartX = if (isVerticalLayout) (drawW * 0.44f) else (drawW * 0.50f)
 
             // Title: LISTA DE PUERTOS centered above the climb list (localized)
             val listTitle = try {
@@ -417,13 +412,14 @@ class RouteProfile2DView(context: Context) : View(context) {
 
             val climbHeaderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = Color.WHITE
-                textSize = 17f * fontSizeScale
+                textSize = (if (isVerticalLayout) 15f else 17f) * fontSizeScale
                 textAlign = Paint.Align.CENTER
             }
             FontHelper.applyFontToPaint(climbHeaderPaint, fontFamilyKey, Typeface.BOLD)
-            canvas.drawText(listTitle, headerCenterX, 62f, climbHeaderPaint)
+            val headerTitleY = if (isVerticalLayout) (headerBaseY + 34f) else 62f
+            canvas.drawText(listTitle, headerCenterX, headerTitleY, climbHeaderPaint)
 
-            var climbY = 90f // Below the header
+            var climbY = headerTitleY + (if (isVerticalLayout) 24f else 28f)
 
             // Con más de 3 puertos la lista avanza sola: los superados salen por arriba
             val firstPending = catClimbs.indexOfFirst { it.first.endDistance > currentDistance }
@@ -468,12 +464,13 @@ class RouteProfile2DView(context: Context) : View(context) {
                 // Línea 2: longitud, pendiente media y máxima, alineada a la izquierda con el nombre
                 val baseSize = climbListPaint.textSize
                 climbListPaint.textSize = baseSize * 0.85f
-                climbY += 22f * fontSizeScale
+                climbY += (if (isVerticalLayout) 18f else 22f) * fontSizeScale
                 canvas.drawText(climbDetailText(climb), listStartX, climbY, climbListPaint)
                 climbListPaint.textSize = baseSize
 
-                climbY += 25f * fontSizeScale
-                if (climbY > drawH - 20f) break // Avoid drawing out of bounds
+                climbY += (if (isVerticalLayout) 22f else 25f) * fontSizeScale
+                val maxListY = if (isVerticalLayout) (topY - 15f) else (drawH - 20f)
+                if (climbY > maxListY) break // Avoid colliding with profile in vertical layout
             }
         }
 
@@ -491,12 +488,12 @@ class RouteProfile2DView(context: Context) : View(context) {
             }
             
             val mapBoxLeft = 10f
-            val mapBoxTop = 75f
-            val mapBoxRight = drawW * 0.45f
-            val mapBoxBottom = topY + 180f
+            val mapBoxTop = if (isVerticalLayout) (headerBaseY + 45f) else 75f
+            val mapBoxRight = if (isVerticalLayout) (drawW * 0.40f) else (drawW * 0.45f)
+            val mapBoxBottom = if (isVerticalLayout) (topY - 15f) else (topY + 180f)
             
-            val mapW = mapBoxRight - mapBoxLeft
-            val mapH = mapBoxBottom - mapBoxTop
+            val mapW = (mapBoxRight - mapBoxLeft).coerceAtLeast(10f)
+            val mapH = (mapBoxBottom - mapBoxTop).coerceAtLeast(10f)
             
             // Draw faint concentric lines as "contour" background extending all the way to the right below the climb list
             val contourBgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -649,6 +646,15 @@ class RouteProfile2DView(context: Context) : View(context) {
             drawFlag(canvas, pxEnd, pyEnd, "#FFFFFF", 0.6f) // End Flag (White, smaller)
         }
 
+        // Draw Top Texts (Title & Distance/Gain) AFTER minimap so it's always clean and crisp on top
+        val titleText = routeName.ifEmpty { "RUTA" }.uppercase()
+        val titleY = headerBaseY
+        canvas.drawText(titleText, 14f, titleY, textPaint)
+        
+        val distText = String.format("Total %.1f km - %s", totalDistance / 1000.0, altitudeGainText)
+        val distY = titleY + (if (isVerticalLayout) 20f else 25f)
+        canvas.drawText(distText, 14f, distY, subTextPaint)
+
         // --- DRAW KM & ELEVATION TEXTS AND CYCLIST LINE LAST SO THEY ARE ON TOP OF EVERYTHING ---
         val kmDoneText = String.format("%.1f km", currentDistance / 1000.0)
         val remainDist = (totalDistance - currentDistance).coerceAtLeast(0.0)
@@ -678,42 +684,43 @@ class RouteProfile2DView(context: Context) : View(context) {
         val needPushLeft = (currentX + 50f > drawW)
         val needPushRight = (currentX - 50f < 0f)
 
-        canvas.save()
-        // Cut down vertical cyclist line so it doesn't shoot across the entire screen
-        val lineTopY = (currY - 50f).coerceAtLeast(topY - 15f)
-        val textCenterY = (lineTopY + 45f).coerceAtMost(bottomY - 40f)
+        // Cyclist vertical line top: in vertical layout extend all the way to topY (the minimap/chart boundary)
+        val lineTopY = if (isVerticalLayout) topY else (currY - 50f).coerceAtLeast(topY - 15f)
+        // Text center: place labels just below the cyclist dot, constrained within the profile area
+        val textCenterY = (currY - (if (isVerticalLayout) 35f else 45f)).coerceIn(topY + 40f, bottomY - 35f)
 
+        canvas.save()
         canvas.translate(currentX, textCenterY)
         canvas.rotate(-90f) // from bottom to top
 
         val bgPaint = Paint().apply { color = Color.BLACK; style = Paint.Style.FILL }
-        val maxHalfWidth = maxOf(doneWidth, remainWidth) / 2f + 14f
+        val maxHalfWidth = maxOf(doneWidth, remainWidth) / 2f + 12f
 
         if (needPushLeft) {
             // Both Done and Remaining are drawn on the left side of the vertical line
-            canvas.drawRect(-maxHalfWidth, -80f, maxHalfWidth, 0f, bgPaint)
-            canvas.drawText(kmDoneText, 0f, -48f, kmDoneTextPaint)
-            canvas.drawText(elevDoneText, 0f, -32f, elevDoneTextPaint)
-            canvas.drawText(kmRemainText, 0f, -14f, kmRemainTextPaint)
-            canvas.drawText(elevRemainText, 0f, 0f, elevRemainTextPaint)
+            canvas.drawRect(-maxHalfWidth, -75f, maxHalfWidth, 0f, bgPaint)
+            canvas.drawText(kmDoneText, 0f, -44f, kmDoneTextPaint)
+            canvas.drawText(elevDoneText, 0f, -28f, elevDoneTextPaint)
+            canvas.drawText(kmRemainText, 0f, -12f, kmRemainTextPaint)
+            canvas.drawText(elevRemainText, 0f, 2f, elevRemainTextPaint)
         } else if (needPushRight) {
             // Both drawn on the right side if at the very beginning
-            canvas.drawRect(-maxHalfWidth, 0f, maxHalfWidth, 80f, bgPaint)
-            canvas.drawText(kmDoneText, 0f, 18f, kmDoneTextPaint)
-            canvas.drawText(elevDoneText, 0f, 34f, elevDoneTextPaint)
-            canvas.drawText(kmRemainText, 0f, 52f, kmRemainTextPaint)
-            canvas.drawText(elevRemainText, 0f, 68f, elevRemainTextPaint)
+            canvas.drawRect(-maxHalfWidth, 0f, maxHalfWidth, 75f, bgPaint)
+            canvas.drawText(kmDoneText, 0f, 16f, kmDoneTextPaint)
+            canvas.drawText(elevDoneText, 0f, 32f, elevDoneTextPaint)
+            canvas.drawText(kmRemainText, 0f, 48f, kmRemainTextPaint)
+            canvas.drawText(elevRemainText, 0f, 64f, elevRemainTextPaint)
         } else {
             // Normal: Done on the left (negative Y rotated), Remaining on the right (positive Y rotated)
-            canvas.drawRect(-maxHalfWidth, -48f, maxHalfWidth, 48f, bgPaint)
+            canvas.drawRect(-maxHalfWidth, -44f, maxHalfWidth, 44f, bgPaint)
             
             // Left side (Done)
-            canvas.drawText(kmDoneText, 0f, -28f, kmDoneTextPaint)
+            canvas.drawText(kmDoneText, 0f, -26f, kmDoneTextPaint)
             canvas.drawText(elevDoneText, 0f, -10f, elevDoneTextPaint)
             
             // Right side (Remaining)
-            canvas.drawText(kmRemainText, 0f, 24f, kmRemainTextPaint)
-            canvas.drawText(elevRemainText, 0f, 42f, elevRemainTextPaint)
+            canvas.drawText(kmRemainText, 0f, 22f, kmRemainTextPaint)
+            canvas.drawText(elevRemainText, 0f, 38f, elevRemainTextPaint)
         }
         
         canvas.restore()

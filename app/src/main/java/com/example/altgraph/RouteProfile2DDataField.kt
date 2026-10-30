@@ -143,6 +143,13 @@ class RouteProfile2DDataField(extension: String) : DataTypeImpl(extension, "prof
                             routeProfileView.highlightClimbs = prefs.eliteHighlightClimbs
                             routeProfileView.showClimbNames = prefs.eliteProfileTvShowClimbNames
 
+                            routeProfileView.layoutParams = android.view.ViewGroup.LayoutParams(w, h)
+                            routeProfileView.measure(
+                                View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY),
+                                View.MeasureSpec.makeMeasureSpec(h, View.MeasureSpec.EXACTLY)
+                            )
+                            routeProfileView.layout(0, 0, w, h)
+
                             // Draw view
                             routeProfileView.draw(currentCanvas)
                         } else {

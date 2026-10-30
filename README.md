@@ -44,6 +44,9 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
   * **Desnivel completado y restante**: se muestra debajo de los km recorridos (`+Xm`) y restantes (`-Ym`).
   * **Ajuste inteligente de km/desnivel restantes**: cuando el ciclista se acerca al final de la ruta y los datos restantes se quedan sin espacio en el margen derecho, se desplazan automáticamente a la izquierda de la línea vertical evitando que se corten.
   * **Lista de puertos (*Climb List*) de alto contraste y estado completado**: nombres y categorías en blanco nítido y ámbar brillante; al coronar un puerto, se marca con check y etiqueta verde (`✓ Superado` / `✓ Done`).
+* **Versión 2.9.9**: mejoras de legibilidad al sol en el **Perfil TV 2D** (modo vertical):
+  * **Línea vertical del ciclista extendida hasta el borde superior del perfil de elevación**: en orientación vertical, la línea blanca ahora sube hasta la línea de cota que separa el minimapa de la gráfica, quedando perfectamente centrada y visible bajo el sol a lo largo de toda la zona de la gráfica.
+  * Posición de los textos de km completados y restantes ancada junto al punto del ciclista para mejor legibilidad en todas las posiciones de la ruta.
 
 ---
 
