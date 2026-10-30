@@ -197,6 +197,7 @@
     <string name="pref_elite_custom_climbs_desc">Von POIs definierte Pässe haben Vorrang vor der automatischen Erkennung mit offizieller Kategorisierung</string>
     <string name="profile_tv_climb_list_title">Pässeliste</string>
     <string name="profile_tv_climb_item_prefix">Pass</string>
+    <string name="profile_tv_climb_completed">Geschafft</string>
     <string name="setting_show_climb_name_title">Passnamen im Viewer anzeigen</string>
     <string name="setting_show_climb_name_desc">Zeigt den Passnamen über dem 3D-Höhenprofil anstelle nur des Icons</string>
     <string name="pref_elite_profile_tv_show_climb_names_title">Passnamen im TV-Profil anzeigen</string>

@@ -197,6 +197,7 @@
     <string name="pref_elite_custom_climbs_desc">I passi contrassegnati dai POI prevalgono su quelli rilevati automaticamente con categorizzazione ufficiale</string>
     <string name="profile_tv_climb_list_title">Elenco salite</string>
     <string name="profile_tv_climb_item_prefix">Salita</string>
+    <string name="profile_tv_climb_completed">Superato</string>
     <string name="setting_show_climb_name_title">Mostra nome della salita nel visualizzatore</string>
     <string name="setting_show_climb_name_desc">Mostra il nome del colle sopra il grafico 3D invece della semplice icona</string>
     <string name="pref_elite_profile_tv_show_climb_names_title">Mostra i nomi delle salite nel Profilo TV</string>

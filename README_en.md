@@ -38,6 +38,12 @@ It revolutionizes traditional cycling elevation profiles by featuring a **Suite 
 * **Version 2.9.5**: the elevation gain next to "Route/Left" is now optional (off by default) and the data moves up into the zoom-button row; the ruler shows more decimals (9.95 km); roads ridden twice are split on the map (out and back, one on each side).
 * **Version 2.9.6**: the zoom buttons now move to the top whenever "Show data in header" is off, even if "Show max gradient" is still on.
 * **Version 2.9.7**: climb alert (an in-ride banner 400 m before each climb with its name, length, grade and category), dark and light panel with a sun/moon switch, one FTP setting shared by the whole app, and a tidier settings layout. The unfinished virtual pacer option was removed.
+* **Version 2.9.8**: display & sunlight visibility enhancements for **TV 2D Profile**:
+  * **Remaining profile line in high-contrast white** (`#E0E0E0`), making upcoming elevation profiles sharp and clear under bright sunlight and polarized sunglasses.
+  * **Cut-down vertical cyclist line**: bounded to the elevation profile height so it no longer crosses the entire screen or overlays the minimap.
+  * **Elevation gain completed and remaining**: displayed directly underneath completed distance (`+Xm`) and remaining distance (`-Ym`).
+  * **Smart edge detection for remaining metrics**: when approaching the route end and remaining figures run out of margin space, they automatically shift to the left of the cyclist line to prevent text clipping.
+  * **High-contrast climb list & completed status**: passes rendered in crisp white and vivid amber; completed summits feature a checkmark badge (`✓ Done` / `✓ Superado`).
 
 ---
 

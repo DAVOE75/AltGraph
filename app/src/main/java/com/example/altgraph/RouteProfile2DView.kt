@@ -49,8 +49,8 @@ class RouteProfile2DView(context: Context) : View(context) {
         style = Paint.Style.STROKE
     }
     private val futureLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#444444") // Dark grey
-        strokeWidth = 3f
+        color = Color.parseColor("#E0E0E0") // High visibility white / very light grey under bright sun
+        strokeWidth = 2.5f
         style = Paint.Style.STROKE
     }
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -76,9 +76,17 @@ class RouteProfile2DView(context: Context) : View(context) {
         color = Color.WHITE
         textAlign = Paint.Align.CENTER
     }
+    private val elevDoneTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#00E676")
+        textAlign = Paint.Align.CENTER
+    }
+    private val elevRemainTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
+        textAlign = Paint.Align.CENTER
+    }
     private val dashLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
-        strokeWidth = 1f
+        strokeWidth = 1.5f
         style = Paint.Style.STROKE
     }
     private val peakTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -152,10 +160,17 @@ class RouteProfile2DView(context: Context) : View(context) {
         linePaint.color = primaryColor
         kmDoneTextPaint.color = primaryColor
         FontHelper.applyFontToPaint(kmDoneTextPaint, fontFamilyKey, Typeface.BOLD)
-        kmDoneTextPaint.textSize = 22f * fontSizeScale
+        kmDoneTextPaint.textSize = 21f * fontSizeScale
         
         FontHelper.applyFontToPaint(kmRemainTextPaint, fontFamilyKey, Typeface.BOLD)
-        kmRemainTextPaint.textSize = 22f * fontSizeScale
+        kmRemainTextPaint.textSize = 21f * fontSizeScale
+
+        elevDoneTextPaint.color = primaryColor
+        FontHelper.applyFontToPaint(elevDoneTextPaint, fontFamilyKey, Typeface.BOLD)
+        elevDoneTextPaint.textSize = 15f * fontSizeScale
+        
+        FontHelper.applyFontToPaint(elevRemainTextPaint, fontFamilyKey, Typeface.BOLD)
+        elevRemainTextPaint.textSize = 15f * fontSizeScale
         
         FontHelper.applyFontToPaint(peakTextPaint, fontFamilyKey, Typeface.BOLD)
         peakTextPaint.textSize = 16f * fontSizeScale
@@ -327,8 +342,7 @@ class RouteProfile2DView(context: Context) : View(context) {
             }
         }
         
-        val lineTopY = 30f // almost touching the top border
-        // (Drawn later after km background)
+
         
 
 
@@ -417,23 +431,28 @@ class RouteProfile2DView(context: Context) : View(context) {
                 (if (firstPending < 0) catClimbs.size - 3 else firstPending).coerceAtMost(catClimbs.size - 3)
             } else 0
 
+            val completedLabel = try {
+                context.getString(R.string.profile_tv_climb_completed)
+            } catch (e: Exception) {
+                "OK"
+            }
+
             for ((i, item) in catClimbs.withIndex()) {
                 if (i < firstShown) continue
                 val climb = item.first
                 val cat = item.second
                 val startKm = climb.startDistance / 1000.0
                 
-                // Dim primary color if passed, normal if not
                 val isPassed = climb.endDistance <= currentDistance
                 if (isPassed) {
-                    climbListPaint.color = dimmedColor // Atenuado
-                    climbListCatPaint.color = dimmedColor
+                    climbListPaint.color = Color.parseColor("#9E9E9E") // Clearly legible light-mid grey
+                    climbListCatPaint.color = Color.parseColor("#81C784") // Soft green for completed
                 } else {
-                    climbListPaint.color = Color.parseColor("#DDDDDD")
-                    climbListCatPaint.color = Color.parseColor("#F59E0B")
+                    climbListPaint.color = Color.WHITE // Crisp white for sunlight readability
+                    climbListCatPaint.color = Color.parseColor("#FFB300") // Vivid amber for upcoming pass
                 }
 
-                // Línea 1: nombre (o Pto N), categoría y km de inicio
+                // Línea 1: nombre (o Pto N), categoría y km de inicio (o estado Completado)
                 val showName = showClimbNames && !climb.name.isNullOrBlank()
                 val ptoStr = if (showName) "${climb.name} " else "$ptoPrefix ${i + 1} "
                 canvas.drawText(ptoStr, listStartX, climbY, climbListPaint)
@@ -442,7 +461,9 @@ class RouteProfile2DView(context: Context) : View(context) {
                 val catStr = "($cat)"
                 canvas.drawText(catStr, listStartX + ptoWidth, climbY, climbListCatPaint)
                 val catWidth = climbListCatPaint.measureText(catStr)
-                canvas.drawText(String.format(" · km %.1f", startKm), listStartX + ptoWidth + catWidth, climbY, climbListPaint)
+
+                val statusOrKm = if (isPassed) " · ✓ $completedLabel" else String.format(" · km %.1f", startKm)
+                canvas.drawText(statusOrKm, listStartX + ptoWidth + catWidth, climbY, if (isPassed) climbListCatPaint else climbListPaint)
 
                 // Línea 2: longitud, pendiente media y máxima, alineada a la izquierda con el nombre
                 val baseSize = climbListPaint.textSize
@@ -628,34 +649,76 @@ class RouteProfile2DView(context: Context) : View(context) {
             drawFlag(canvas, pxEnd, pyEnd, "#FFFFFF", 0.6f) // End Flag (White, smaller)
         }
 
-        // --- DRAW KM TEXTS AND CYCLIST LINE LAST SO THEY ARE ON TOP OF EVERYTHING ---
+        // --- DRAW KM & ELEVATION TEXTS AND CYCLIST LINE LAST SO THEY ARE ON TOP OF EVERYTHING ---
         val kmDoneText = String.format("%.1f km", currentDistance / 1000.0)
-        val doneWidth = kmDoneTextPaint.measureText(kmDoneText)
-        
         val remainDist = (totalDistance - currentDistance).coerceAtLeast(0.0)
         val kmRemainText = String.format("-%.1f km", remainDist / 1000.0)
-        val remainWidth = kmRemainTextPaint.measureText(kmRemainText)
-        
+
+        // Calculate elevation done vs elevation remaining
+        var elevDone = 0.0
+        var elevRemain = 0.0
+        if (profileElevations.size >= 2) {
+            val currIdx = (progress * (profileElevations.size - 1)).toInt().coerceIn(0, profileElevations.size - 1)
+            for (i in 1..currIdx) {
+                val d = profileElevations[i] - profileElevations[i - 1]
+                if (d > 0) elevDone += d
+            }
+            for (i in currIdx + 1 until profileElevations.size) {
+                val d = profileElevations[i] - profileElevations[i - 1]
+                if (d > 0) elevRemain += d
+            }
+        }
+        val elevDoneText = String.format("+%dm", elevDone.toInt())
+        val elevRemainText = String.format("-%dm", elevRemain.toInt())
+
+        val doneWidth = maxOf(kmDoneTextPaint.measureText(kmDoneText), elevDoneTextPaint.measureText(elevDoneText))
+        val remainWidth = maxOf(kmRemainTextPaint.measureText(kmRemainText), elevRemainTextPaint.measureText(elevRemainText))
+
+        // Check if remaining numbers run out of room on the right: push them to the left side
+        val needPushLeft = (currentX + 50f > drawW)
+        val needPushRight = (currentX - 50f < 0f)
+
         canvas.save()
-        val textCenterY = 120f // CENTRADOS EN EL MISMO EJE Y
+        // Cut down vertical cyclist line so it doesn't shoot across the entire screen
+        val lineTopY = (currY - 50f).coerceAtLeast(topY - 15f)
+        val textCenterY = (lineTopY + 45f).coerceAtMost(bottomY - 40f)
+
         canvas.translate(currentX, textCenterY)
-        canvas.rotate(-90f) // from bottom to top for BOTH
-        
+        canvas.rotate(-90f) // from bottom to top
+
         val bgPaint = Paint().apply { color = Color.BLACK; style = Paint.Style.FILL }
-        
-        // Cuadrado/rectángulo negro completo y unificado para bloquear completamente el fondo
-        val maxHalfWidth = maxOf(doneWidth, remainWidth) / 2f + 16f
-        canvas.drawRect(-maxHalfWidth, -48f, maxHalfWidth, 54f, bgPaint)
-        
-        // Done KM: Left side (Negative Y)
-        canvas.drawText(kmDoneText, 0f, -10f, kmDoneTextPaint)
-        
-        // Remaining KM: Right side (Positive Y)
-        canvas.drawText(kmRemainText, 0f, 40f, kmRemainTextPaint)
+        val maxHalfWidth = maxOf(doneWidth, remainWidth) / 2f + 14f
+
+        if (needPushLeft) {
+            // Both Done and Remaining are drawn on the left side of the vertical line
+            canvas.drawRect(-maxHalfWidth, -80f, maxHalfWidth, 0f, bgPaint)
+            canvas.drawText(kmDoneText, 0f, -48f, kmDoneTextPaint)
+            canvas.drawText(elevDoneText, 0f, -32f, elevDoneTextPaint)
+            canvas.drawText(kmRemainText, 0f, -14f, kmRemainTextPaint)
+            canvas.drawText(elevRemainText, 0f, 0f, elevRemainTextPaint)
+        } else if (needPushRight) {
+            // Both drawn on the right side if at the very beginning
+            canvas.drawRect(-maxHalfWidth, 0f, maxHalfWidth, 80f, bgPaint)
+            canvas.drawText(kmDoneText, 0f, 18f, kmDoneTextPaint)
+            canvas.drawText(elevDoneText, 0f, 34f, elevDoneTextPaint)
+            canvas.drawText(kmRemainText, 0f, 52f, kmRemainTextPaint)
+            canvas.drawText(elevRemainText, 0f, 68f, elevRemainTextPaint)
+        } else {
+            // Normal: Done on the left (negative Y rotated), Remaining on the right (positive Y rotated)
+            canvas.drawRect(-maxHalfWidth, -48f, maxHalfWidth, 48f, bgPaint)
+            
+            // Left side (Done)
+            canvas.drawText(kmDoneText, 0f, -28f, kmDoneTextPaint)
+            canvas.drawText(elevDoneText, 0f, -10f, elevDoneTextPaint)
+            
+            // Right side (Remaining)
+            canvas.drawText(kmRemainText, 0f, 24f, kmRemainTextPaint)
+            canvas.drawText(elevRemainText, 0f, 42f, elevRemainTextPaint)
+        }
         
         canvas.restore()
 
-        // Línea blanca indicadora del ciclista dibujada POR ENCIMA de todo (incluido el fondo de km)
+        // Línea blanca indicadora del ciclista acotada: no invade el minimapa superior
         canvas.drawLine(currentX, bottomY, currentX, lineTopY, dashLinePaint)
 
         canvas.restore()

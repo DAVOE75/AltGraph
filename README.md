@@ -38,6 +38,12 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 * **Versión 2.9.5**: el desnivel junto a «Ruta/Quedan» pasa a ser opcional (desactivado por defecto) y los datos suben a la fila de los botones de zoom; la regla muestra más decimales (9,95 km); las carreteras recorridas dos veces se desdoblan en el mapa (ida y vuelta, cada una a un lado).
 * **Versión 2.9.6**: los botones de zoom suben arriba siempre que se desactiva «Mostrar datos en el encabezado», aunque «Mostrar pendiente máxima» siga marcada.
 * **Versión 2.9.7**: aviso de puerto (un banner durante la ruta 400 m antes de cada subida con su nombre, longitud, pendiente y categoría), panel en modo oscuro y claro con interruptor sol/luna, un único FTP compartido por toda la app y ajustes mejor ordenados. Se elimina la opción inacabada del virtual pacer.
+* **Versión 2.9.8**: mejoras de visualización y legibilidad al sol en el **Perfil TV 2D**:
+  * **Línea del perfil restante en blanco de alto contraste** (`#E0E0E0`), haciendo visible el relieve pendiente incluso bajo luz solar directa y con gafas de sol polarizadas.
+  * **Línea vertical del ciclista recortada**: se acota a la altura del perfil de elevación para no atravesar la pantalla ni tapar el minimapa.
+  * **Desnivel completado y restante**: se muestra debajo de los km recorridos (`+Xm`) y restantes (`-Ym`).
+  * **Ajuste inteligente de km/desnivel restantes**: cuando el ciclista se acerca al final de la ruta y los datos restantes se quedan sin espacio en el margen derecho, se desplazan automáticamente a la izquierda de la línea vertical evitando que se corten.
+  * **Lista de puertos (*Climb List*) de alto contraste y estado completado**: nombres y categorías en blanco nítido y ámbar brillante; al coronar un puerto, se marca con check y etiqueta verde (`✓ Superado` / `✓ Done`).
 
 ---
 

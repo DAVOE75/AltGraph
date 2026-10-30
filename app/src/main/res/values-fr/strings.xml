@@ -197,6 +197,7 @@
     <string name="pref_elite_custom_climbs_desc">Les cols définis par POIs prévalent sur la détection automatique avec catégorisation officielle</string>
     <string name="profile_tv_climb_list_title">Liste des cols</string>
     <string name="profile_tv_climb_item_prefix">Col</string>
+    <string name="profile_tv_climb_completed">Franchi</string>
     <string name="setting_show_climb_name_title">Afficher le nom du col dans le viseur</string>
     <string name="setting_show_climb_name_desc">Affiche le nom du col au-dessus du graphique 3D au lieu de la simple icône</string>
     <string name="pref_elite_profile_tv_show_climb_names_title">Afficher les noms des cols sur le Profil TV</string>
