@@ -47,6 +47,8 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 * **Versión 2.9.9**: mejoras de legibilidad al sol en el **Perfil TV 2D** (modo vertical):
   * **Línea vertical del ciclista extendida hasta el borde superior del perfil de elevación**: en orientación vertical, la línea blanca ahora sube hasta la línea de cota que separa el minimapa de la gráfica, quedando perfectamente centrada y visible bajo el sol a lo largo de toda la zona de la gráfica.
   * Posición de los textos de km completados y restantes ancada junto al punto del ciclista para mejor legibilidad en todas las posiciones de la ruta.
+* **Versión 2.9.10**: corrección posición etiquetas km/desnivel en **Perfil TV 2D** vertical:
+  * Las etiquetas de km recorridos y restantes (y desnivel) se muestran ahora en la **parte superior de la línea blanca**, pegadas a la línea de cota que separa el minimapa de la gráfica, no junto al punto del ciclista que podía estar en la zona baja del perfil y quedar oculto.
 
 ---
 

@@ -686,8 +686,13 @@ class RouteProfile2DView(context: Context) : View(context) {
 
         // Cyclist vertical line top: in vertical layout extend all the way to topY (the minimap/chart boundary)
         val lineTopY = if (isVerticalLayout) topY else (currY - 50f).coerceAtLeast(topY - 15f)
-        // Text center: place labels just below the cyclist dot, constrained within the profile area
-        val textCenterY = (currY - (if (isVerticalLayout) 35f else 45f)).coerceIn(topY + 40f, bottomY - 35f)
+        // Text center: in vertical layout, pin the km/elev labels at the TOP of the white line (near topY),
+        // so they are always visible above the profile rather than buried near the cyclist dot.
+        val textCenterY = if (isVerticalLayout) {
+            (topY + 44f).coerceAtMost(bottomY - 50f)
+        } else {
+            (currY - 45f).coerceIn(topY + 40f, bottomY - 35f)
+        }
 
         canvas.save()
         canvas.translate(currentX, textCenterY)
