@@ -416,7 +416,7 @@ class RouteProfile2DView(context: Context) : View(context) {
                 textAlign = Paint.Align.CENTER
             }
             FontHelper.applyFontToPaint(climbHeaderPaint, fontFamilyKey, Typeface.BOLD)
-            val headerTitleY = if (isVerticalLayout) (headerBaseY + 34f) else 62f
+            val headerTitleY = if (isVerticalLayout) (headerBaseY + 46f) else 62f
             canvas.drawText(listTitle, headerCenterX, headerTitleY, climbHeaderPaint)
 
             var climbY = headerTitleY + (if (isVerticalLayout) 24f else 28f)

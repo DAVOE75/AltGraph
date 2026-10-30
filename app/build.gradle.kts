@@ -23,8 +23,8 @@ android {
         applicationId = "com.example.altgraph"
         minSdk = 26
         targetSdk = 34
-        versionCode = 404
-        versionName = "2.9.10"
+        versionCode = 405
+        versionName = "2.9.11"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
