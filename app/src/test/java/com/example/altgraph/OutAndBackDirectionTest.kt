@@ -16,7 +16,7 @@ class OutAndBackDirectionTest {
         for (i in 0..200) pts.add(RoutePoint(38.8 + i * step, lon, 100.0 + i * 0.5, i * 10.0))
         for (i in 1..200) pts.add(RoutePoint(38.8 + (200 - i) * step, lon, 200.0 - i * 0.5, 2000.0 + i * 10.0))
         c.routePoints = pts
-        c.currentSpeed = 5.0
+        c.currentSpeed = 0.0
         return c
     }
 

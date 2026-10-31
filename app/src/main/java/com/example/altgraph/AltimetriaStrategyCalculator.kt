@@ -425,7 +425,14 @@ class AltimetriaStrategyCalculator {
         }
         this.currentLatitude = lat
         this.currentLongitude = lng
-        
+
+        // Rumbo estable: solo se recalcula tras desplazarse 15 m, para que el ruido del GPS no lo invierta
+        if (anchorLat == 0.0 && anchorLng == 0.0) { anchorLat = lat; anchorLng = lng }
+        else if (planarDistM(lat to lng, anchorLat to anchorLng) > 15.0) {
+            travelHeading = bearing(anchorLat, anchorLng, lat, lng)
+            travelHeadingValid = true
+            anchorLat = lat; anchorLng = lng
+        }        
         if (routePoints.isNotEmpty()) {
             var minEffectiveDist = Double.MAX_VALUE
             var realMinDistance = Double.MAX_VALUE
@@ -442,7 +449,15 @@ class AltimetriaStrategyCalculator {
                 // Penalizar saltos largos en el índice para evitar que en rutas circulares 
                 // salte al final de la ruta por un metro de diferencia en el GPS.
                 val indexDiff = Math.abs(i - nearestIndex)
-                val penalty = if (nearestIndex == 0) 0.0 else (if (indexDiff > 500) 500.0 else (indexDiff * 0.1))
+                var penalty = if (nearestIndex == 0) 0.0 else (if (indexDiff > 500) 500.0 else (indexDiff * 0.1))
+                
+                // Misma carretera de ida y vuelta: penaliza el tramo cuyo sentido es contrario al rumbo
+                if (travelHeadingValid && dist < 40.0 && i < routePoints.size - 1) {
+                    val nx = routePoints[i + 1]
+                    var ang = Math.abs(bearing(pt.latitude, pt.longitude, nx.latitude, nx.longitude) - travelHeading) % 360.0
+                    if (ang > 180.0) ang = 360.0 - ang
+                    if (ang > 120.0) penalty += 60.0
+                }
                 
                 val effectiveDist = dist + penalty
                 
@@ -462,6 +477,10 @@ class AltimetriaStrategyCalculator {
     }
 
     private var lastProjectedDist = -1.0
+    private var travelHeading = 0.0
+    private var travelHeadingValid = false
+    private var anchorLat = 0.0
+    private var anchorLng = 0.0
     private var backwardMeters = 0.0
 
     // Cambio de sentido: si el ciclista retrocede sobre el tramo de ida (p. ej. barrera a mitad de subida),
@@ -474,7 +493,7 @@ class AltimetriaStrategyCalculator {
         }
         // Retroceso neto respecto al punto más lejano alcanzado (el ruido del GPS no lo acumula)
         backwardMeters = lastProjectedDist - dist
-        if (backwardMeters < 40.0 || currentSpeed < 1.0) return null
+        if (backwardMeters < 40.0) return null
 
         // El rumbo tiene que ser realmente contrario al sentido de la ruta en este punto
         val segIdx = nearestIndex.coerceAtMost(routePoints.size - 2)
@@ -1750,6 +1769,9 @@ class AltimetriaStrategyCalculator {
         this.routePoints = result
         this.nearestIndex = 0
         this.lastProjectedDist = -1.0
+        this.travelHeadingValid = false
+        this.anchorLat = 0.0
+        this.anchorLng = 0.0
         this.backwardMeters = 0.0
         this.isNavigatingRoute = true
         this.fullRoutePolyline = polyline
