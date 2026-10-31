@@ -456,7 +456,6 @@ class AltimetriaStrategyCalculator {
             
             var computedDist = projectedRouteDistance(lat, lng, nearestIndex)
             computedDist = detectUTurnAndJump(lat, lng, computedDist, realMinDistance) ?: computedDist
-            lastProjectedDist = computedDist
             this.currentRouteDistance = computedDist
             this.lastLocationMs = System.currentTimeMillis()
         }
@@ -468,12 +467,22 @@ class AltimetriaStrategyCalculator {
     // Cambio de sentido: si el ciclista retrocede sobre el tramo de ida (p. ej. barrera a mitad de subida),
     // salta al punto de la vuelta que coincide en posición y rumbo. Devuelve la nueva distancia o null.
     private fun detectUTurnAndJump(lat: Double, lng: Double, dist: Double, offRouteM: Double): Double? {
-        val prev = lastProjectedDist
-        if (prev < 0.0 || offRouteM > 40.0) { backwardMeters = 0.0; return null }
-        val delta = dist - prev
-        if (delta < -1.0) backwardMeters += -delta
-        else if (delta > 1.0) backwardMeters = 0.0
+        if (lastProjectedDist < 0.0 || offRouteM > 40.0 || dist > lastProjectedDist) {
+            lastProjectedDist = dist
+            backwardMeters = 0.0
+            return null
+        }
+        // Retroceso neto respecto al punto más lejano alcanzado (el ruido del GPS no lo acumula)
+        backwardMeters = lastProjectedDist - dist
         if (backwardMeters < 40.0 || currentSpeed < 1.0) return null
+
+        // El rumbo tiene que ser realmente contrario al sentido de la ruta en este punto
+        val segIdx = nearestIndex.coerceAtMost(routePoints.size - 2)
+        val cur = routePoints[segIdx]
+        val nxt = routePoints[segIdx + 1]
+        var against = Math.abs(bearing(cur.latitude, cur.longitude, nxt.latitude, nxt.longitude) - currentHeading) % 360.0
+        if (against > 180.0) against = 360.0 - against
+        if (against < 120.0) return null
 
         var bestIdx = -1
         var bestD = Double.MAX_VALUE
@@ -491,7 +500,9 @@ class AltimetriaStrategyCalculator {
         backwardMeters = 0.0
         if (bestIdx < 0) return null
         nearestIndex = bestIdx
-        return projectedRouteDistance(lat, lng, bestIdx)
+        val newDist = projectedRouteDistance(lat, lng, bestIdx)
+        lastProjectedDist = newDist
+        return newDist
     }
 
     // Distancia continua: proyecta la posición sobre los segmentos adyacentes al punto más cercano.
