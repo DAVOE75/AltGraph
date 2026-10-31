@@ -454,10 +454,44 @@ class AltimetriaStrategyCalculator {
             }
             nearestIndex = newNearestIdx
             
-            val computedDist = projectedRouteDistance(lat, lng, nearestIndex)
+            var computedDist = projectedRouteDistance(lat, lng, nearestIndex)
+            computedDist = detectUTurnAndJump(lat, lng, computedDist, realMinDistance) ?: computedDist
+            lastProjectedDist = computedDist
             this.currentRouteDistance = computedDist
             this.lastLocationMs = System.currentTimeMillis()
         }
+    }
+
+    private var lastProjectedDist = -1.0
+    private var backwardMeters = 0.0
+
+    // Cambio de sentido: si el ciclista retrocede sobre el tramo de ida (p. ej. barrera a mitad de subida),
+    // salta al punto de la vuelta que coincide en posición y rumbo. Devuelve la nueva distancia o null.
+    private fun detectUTurnAndJump(lat: Double, lng: Double, dist: Double, offRouteM: Double): Double? {
+        val prev = lastProjectedDist
+        if (prev < 0.0 || offRouteM > 40.0) { backwardMeters = 0.0; return null }
+        val delta = dist - prev
+        if (delta < -1.0) backwardMeters += -delta
+        else if (delta > 1.0) backwardMeters = 0.0
+        if (backwardMeters < 40.0 || currentSpeed < 1.0) return null
+
+        var bestIdx = -1
+        var bestD = Double.MAX_VALUE
+        for (i in nearestIndex + 1 until routePoints.size - 1) {
+            val p = routePoints[i]
+            val d = planarDistM(lat to lng, p.latitude to p.longitude)
+            if (d > 30.0 || d >= bestD) continue
+            if (p.distance - dist < 100.0) continue
+            val q = routePoints[i + 1]
+            val routeBearing = bearing(p.latitude, p.longitude, q.latitude, q.longitude)
+            var diff = Math.abs(routeBearing - currentHeading) % 360.0
+            if (diff > 180.0) diff = 360.0 - diff
+            if (diff < 60.0) { bestD = d; bestIdx = i }
+        }
+        backwardMeters = 0.0
+        if (bestIdx < 0) return null
+        nearestIndex = bestIdx
+        return projectedRouteDistance(lat, lng, bestIdx)
     }
 
     // Distancia continua: proyecta la posición sobre los segmentos adyacentes al punto más cercano.
@@ -1704,6 +1738,8 @@ class AltimetriaStrategyCalculator {
 
         this.routePoints = result
         this.nearestIndex = 0
+        this.lastProjectedDist = -1.0
+        this.backwardMeters = 0.0
         this.isNavigatingRoute = true
         this.fullRoutePolyline = polyline
         this.fullRouteGeomLength = geomLengthM(points)
