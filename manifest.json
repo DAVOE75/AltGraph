@@ -5,6 +5,6 @@
   "latestVersion": "2.9.13",
   "latestVersionCode": 407,
   "iconUrl": "https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon-256.png",
-  "developer": "hesiox",
-  "description": "Extensión de altimetría 3D en relieve, copiloto de voz, alertas de ataque, ritmo VAM e Índice Grado de Fatiga (GF) para Hammerhead Karoo"
+  "developer": "hesiOX",
+  "description": "3D relief altimetry, voice copilot, attack alerts, VAM pacing and Fatigue Grade Index (GF) extension for Hammerhead Karoo"
 }
