@@ -69,6 +69,8 @@
     <string name="setting_show_max_gradient">Mostrar Pendiente Máxima en Encabezado 3D</string>
     <string name="setting_show_3d_header_stats">Mostrar Datos en Encabezado 3D (Nombre de Ruta, Pendientes)</string>
     <string name="setting_rotate_90_cw">Girar Gráfico 90° (Modo Horizontal / Apaisado)</string>
+    <string name="setting_chart_light_bg">Fondo blanco en las gráficas</string>
+    <string name="setting_chart_light_bg_desc">Pinta el fondo de las gráficas 3D en blanco, con cotas y kilómetros en negro y colores más intensos. Útil a pleno sol.</string>
     <string name="setting_use_topographic">Usar Método de Cálculo de Pendiente Topográfico (Proyección Horizontal)</string>
     <string name="setting_show_hairpins">Mostrar Curvas de Herradura (Líneas Negras)</string>
     <string name="setting_poi_filter">Filtro de Puntos de Interés (Hitos)</string>
@@ -229,7 +231,7 @@
     <string name="setting_show_climb_name_desc">Muestra el nombre del puerto arriba de la gráfica 3D en lugar de solo el icono</string>
     <string name="pref_elite_profile_tv_show_climb_names_title">Mostrar nombre de puertos en Perfil TV</string>
     <string name="pref_elite_profile_tv_show_climb_names_desc">Muestra el nombre completo del puerto sobre el perfil 2D y en la lista de puertos</string>
-    <string name="setting_pan_buttons_position_title">Posición de Flechas de Avance (&lt; / &gt;)</string>
+    <string name="setting_pan_buttons_position_title">Posición de Flechas de Avance (&lt;&#160;/&#160;&gt;)</string>
     <string name="setting_pan_buttons_position_desc">Coloca las flechas de desplazamiento en la parte inferior o superior del gráfico 3D</string>
     <string name="pan_position_bottom">Abajo (Por defecto)</string>
     <string name="pan_position_top">Arriba</string>
@@ -375,6 +377,6 @@
     <string name="setting_gear_title">Transmisión (marcha recomendada 3D)</string>
     <string name="setting_gear_desc">Introduce los dientes de tus platos y los piñones del cassette separados por comas para que la marcha recomendada se adapte a tu bici</string>
     <string name="setting_gear_chainrings">Platos (ej. 50,34)</string>
-    <string name="setting_gear_cassette">Cassette (ej. 11,12,13,14,15,17,19,21,24,27,30,34)</string>
+    <string name="setting_gear_cassette">Cassette (ej. 11, 12, 13, 14, 15, 17, 19, 21, 24, 27, 30, 34)</string>
     <string name="label_training_zone_bar">Barra de zona de entrenamiento</string>
 </resources>

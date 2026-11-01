@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Altimetria Karoo</string>
+    <string name="app_name">ALTGRAPH</string>
     <string name="data_type_altimetria_title">Höhenprofil-Stratege</string>
     <string name="data_type_altimetria_desc">Dynamisches Höhenprofil mit Steigungen und Angriffsalarmen</string>
     <string name="data_type_altimetria_3d_title">3D Höhenprofil</string>
@@ -55,6 +55,8 @@
     <string name="setting_show_max_gradient">Maximale Steigung im 3D-Kopf anzeigen</string>
     <string name="setting_show_3d_header_stats">3D-Kopfdaten anzeigen (Routenname, Steigungen)</string>
     <string name="setting_rotate_90_cw">Diagramm um 90° drehen (Querformat)</string>
+    <string name="setting_chart_light_bg">Weißer Hintergrund in den Diagrammen</string>
+    <string name="setting_chart_light_bg_desc">Zeichnet den Hintergrund der 3D-Diagramme weiß, mit schwarzen Höhen- und Kilometerangaben und kräftigeren Farben. Praktisch bei starker Sonne.</string>
     <string name="setting_use_topographic">Topografische Steigungsberechnung (horizontale Projektion)</string>
     <string name="setting_show_hairpins">Serpentinen / Haarnadelkurven anzeigen</string>
     <string name="setting_poi_filter">Interessenpunkte-Filter (POIs)</string>
@@ -202,7 +204,7 @@
     <string name="setting_show_climb_name_desc">Zeigt den Passnamen über dem 3D-Höhenprofil anstelle nur des Icons</string>
     <string name="pref_elite_profile_tv_show_climb_names_title">Passnamen im TV-Profil anzeigen</string>
     <string name="pref_elite_profile_tv_show_climb_names_desc">Zeigt den vollständigen Passnamen im 2D-Profil und in der Pässeliste an</string>
-    <string name="setting_pan_buttons_position_title">Position der Navigationspfeile (&lt; / &gt;)</string>
+    <string name="setting_pan_buttons_position_title">Position der Navigationspfeile (&lt;&#160;/&#160;&gt;)</string>
     <string name="setting_pan_buttons_position_desc">Platziert die Pfeile zum Vor-/Zurückscrollen oben oder unten im 3D-Profil</string>
     <string name="pan_position_bottom">Unten (Standard)</string>
     <string name="pan_position_top">Oben</string>
@@ -348,6 +350,6 @@
     <string name="setting_gear_title">Schaltung (empfohlener Gang 3D)</string>
     <string name="setting_gear_desc">Gib die Zähne deiner Kettenblätter und Ritzel der Kassette durch Kommas getrennt ein, damit der empfohlene Gang zu deinem Rad passt</string>
     <string name="setting_gear_chainrings">Kettenblätter (z. B. 50,34)</string>
-    <string name="setting_gear_cassette">Kassette (z. B. 11,12,13,14,15,17,19,21,24,27,30,34)</string>
+    <string name="setting_gear_cassette">Kassette (z. B. 11, 12, 13, 14, 15, 17, 19, 21, 24, 27, 30, 34)</string>
     <string name="label_training_zone_bar">Trainingszonen-Leiste</string>
 </resources>

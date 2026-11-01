@@ -728,6 +728,12 @@ class Altimetria3DView @JvmOverloads constructor(
     // Y de la línea de altitud más alta del perfil (-1 si el estilo no la calcula); el texto de distancias se coloca bajo ella
     private var profileTopLineY: Float = -1f
     private var currentFontKey: String = "sans-serif-condensed"
+
+    // Los límites máximos de letra crecen con la escala (a 60%) para que el ajuste se note también en vistas grandes
+    private fun fsHi(hi: Float): Float = hi * (1f + (fontScale - 1f) * 0.6f)
+
+    // Versión más contenida para textos con poco hueco (cifras grandes del encabezado y leyendas inferiores)
+    private fun fsHiSmall(hi: Float): Float = hi * (1f + (fontScale - 1f) * 0.3f)
     private var showSurfaceTextures: Boolean = false
 
     fun update3DData(
@@ -844,6 +850,8 @@ class Altimetria3DView @JvmOverloads constructor(
         FontHelper.applyFontToPaint(axisTextPaint, fontFamilyKey)
         FontHelper.applyFontToPaint(poiLabelPaint, fontFamilyKey)
         FontHelper.applyFontToPaint(baseDistTextPaint, fontFamilyKey)
+        FontHelper.applyFontToPaint(poiBadgeTextPaint, fontFamilyKey)
+        FontHelper.applyFontToPaint(zoomBtnPaint, fontFamilyKey)
         FontHelper.applyFontToPaint(routeInfoValuePaint, fontFamilyKey)
         FontHelper.applyFontToPaint(routeInfoLabelPaint, fontFamilyKey, Typeface.NORMAL)
         currentFontKey = fontFamilyKey
@@ -956,6 +964,12 @@ class Altimetria3DView @JvmOverloads constructor(
         postInvalidate()
     }
 
+    // Fondo blanco: se dibuja todo igual y se filtra la capa. Invierte la luminosidad conservando el matiz
+    // (blanco/gris claro -> negro/gris muy oscuro para cotas y km; naranjas y rojos siguen siendo naranjas y rojos)
+    // y refuerza la saturación para que los colores se vean intensos sobre blanco.
+    private var lightBgActive = false
+    private val lightBgPaint: Paint get() = LightBgFilter.paint
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -963,6 +977,9 @@ class Altimetria3DView @JvmOverloads constructor(
         val h = height.toFloat()
 
         if (w <= 0 || h <= 0) return
+
+        lightBgActive = AppPreferences.getInstance(context).chartLightBackground
+        val layer = if (lightBgActive) canvas.saveLayer(0f, 0f, w, h, lightBgPaint) else -1
 
         if (rotate90) {
             canvas.save()
@@ -973,9 +990,29 @@ class Altimetria3DView @JvmOverloads constructor(
         } else {
             drawRenderContent(canvas, w, h)
         }
+
+        if (layer >= 0) canvas.restoreToCount(layer)
+    }
+
+    private fun fitTextToWidth(p: Paint, text: String, maxW: Float, minSize: Float) {
+        val wNow = p.measureText(text)
+        if (wNow > maxW && wNow > 0f) p.textSize = (p.textSize * maxW / wNow).coerceAtLeast(minSize)
     }
 
     private fun drawRenderContent(canvas: Canvas, w: Float, h: Float) {
+        // Líneas de cota de fondo: en modo blanco el filtro invierte su tono, así que se parte de un gris medio
+        // (sale gris oscuro, bien visible) y se engrosan un poco
+        if (lightBgActive) {
+            gridPaint.color = Color.parseColor("#626262")
+            gridPaint.strokeWidth = 1.5f
+            cotaLinePaint.color = Color.parseColor("#5A5A5A")
+            cotaLinePaint.strokeWidth = 1.8f
+        } else {
+            gridPaint.color = Color.parseColor("#1E293B")
+            gridPaint.strokeWidth = 1.2f
+            cotaLinePaint.color = Color.parseColor("#334155")
+            cotaLinePaint.strokeWidth = 1.6f
+        }
         // 1. Fondo Oscuro
         canvas.drawRect(0f, 0f, w, h, bgPaint)
 
@@ -983,7 +1020,7 @@ class Altimetria3DView @JvmOverloads constructor(
         if (showHeaderStats) {
         val baseTitle = context.getString(R.string.data_type_altimetria_3d_title)
         val titleText = if (!routeName.isNullOrEmpty()) "$baseTitle - $routeName" else baseTitle
-        titlePaint.textSize = ((h * 0.080f) * fontScale).coerceIn(16f, 28f)
+        titlePaint.textSize = ((h * 0.080f) * fontScale).coerceIn(16f, fsHi(28f))
         canvas.drawText(titleText, 18f, h * 0.07f, titlePaint)
 
         val numCols = if (showMaxGrade) 3 else 2
@@ -992,15 +1029,23 @@ class Altimetria3DView @JvmOverloads constructor(
         val col2X = 16f + colW
         val col3X = 16f + colW * 2f
 
-        subTitleLabelPaint.textSize = ((h * 0.050f) * fontScale).coerceIn(10f, 15f)
+        subTitleLabelPaint.textSize = ((h * 0.050f) * fontScale).coerceIn(10f, fsHi(15f))
+        // Las tres etiquetas comparten tamaño y caben cada una en su columna (cualquier fuente o escala)
+        val headerLabels = listOfNotNull(
+            context.getString(R.string.label_current_gradient),
+            context.getString(R.string.label_avg_gradient_tramo),
+            if (showMaxGrade) context.getString(R.string.label_max_gradient_tramo) else null
+        )
+        for (lbl in headerLabels) fitTextToWidth(subTitleLabelPaint, lbl, colW - 8f, 8f)
 
         // COLUMNA 1: PENDIENTE ACTUAL
         val labelCurrentGrade = context.getString(R.string.label_current_gradient)
         canvas.drawText(labelCurrentGrade, col1X, h * 0.14f, subTitleLabelPaint)
 
         val liveGradeText = "%.1f%%".format(currentGrade)
-        liveGradePaint.textSize = ((h * 0.22f) * fontScale).coerceIn(36f, 62f)
-        liveGradePaint.color = GradeColorScale.getTelemetryColor(currentGrade)
+        liveGradePaint.textSize = ((h * 0.22f) * fontScale).coerceIn(36f, fsHiSmall(62f))
+        liveGradePaint.color = lightComp(GradeColorScale.getTelemetryColor(currentGrade))
+        fitTextToWidth(liveGradePaint, liveGradeText, colW - 8f, 24f)
         canvas.drawText(liveGradeText, col1X, h * 0.27f, liveGradePaint)
 
         // COLUMNA 2: PENDIENTE MEDIA DEL TRAMO VISIBLE
@@ -1009,8 +1054,9 @@ class Altimetria3DView @JvmOverloads constructor(
         canvas.drawText(labelAvgGrade, col2X, h * 0.14f, subTitleLabelPaint)
 
         val avgGradeText = "%.1f%%".format(tramoAvgGrade)
-        liveGradePaint.textSize = ((h * 0.18f) * fontScale).coerceIn(28f, 50f)
-        liveGradePaint.color = GradeColorScale.getTelemetryColor(tramoAvgGrade)
+        liveGradePaint.textSize = ((h * 0.18f) * fontScale).coerceIn(28f, fsHiSmall(50f))
+        liveGradePaint.color = lightComp(GradeColorScale.getTelemetryColor(tramoAvgGrade))
+        fitTextToWidth(liveGradePaint, avgGradeText, colW - 8f, 24f)
         canvas.drawText(avgGradeText, col2X, h * 0.26f, liveGradePaint)
 
         // COLUMNA 3: PENDIENTE MÁXIMA DEL TRAMO VISIBLE
@@ -1020,8 +1066,9 @@ class Altimetria3DView @JvmOverloads constructor(
             canvas.drawText(labelMaxGrade, col3X, h * 0.14f, subTitleLabelPaint)
 
             val maxGradeText = "%.1f%%".format(tramoMaxGrade)
-            maxGradePaint.textSize = ((h * 0.18f) * fontScale).coerceIn(28f, 50f)
-            maxGradePaint.color = GradeColorScale.getTelemetryColor(tramoMaxGrade)
+            maxGradePaint.textSize = ((h * 0.18f) * fontScale).coerceIn(28f, fsHiSmall(50f))
+            maxGradePaint.color = lightComp(GradeColorScale.getTelemetryColor(tramoMaxGrade))
+            fitTextToWidth(maxGradePaint, maxGradeText, colW - 8f, 24f)
             canvas.drawText(maxGradeText, col3X, h * 0.26f, maxGradePaint)
         }
         } // Fin de if (showHeaderStats)
@@ -1044,7 +1091,7 @@ class Altimetria3DView @JvmOverloads constructor(
     private fun drawRouteDistances(canvas: Canvas, w: Float, h: Float) {
         if (routeTotalLength <= 0.0) return
         val left = if (remainingDistance > 0.0) remainingDistance.coerceAtMost(routeTotalLength) else 0.0
-        val textSize0 = ((h * 0.034f) * fontScale).coerceIn(15f, 24f)
+        val textSize0 = ((h * 0.034f) * fontScale).coerceIn(15f, fsHi(24f))
         val total = routeTotalAscent
         val remaining = routeRemainingAscent
         val lines = listOf(
@@ -1389,7 +1436,7 @@ class Altimetria3DView @JvmOverloads constructor(
 
         // 1. Isolíneas de altitud de fondo
         val steps = 4
-        axisTextPaint.textSize = (h * 0.038f).coerceIn(9f, 13f)
+        axisTextPaint.textSize = (h * 0.038f).coerceIn(9f, 13f) * (1f + (fontScale - 1f) * 0.6f)
         axisTextPaint.textAlign = Paint.Align.LEFT
         for (k in 0..steps) {
             val ratio = k.toFloat() / steps
@@ -1501,7 +1548,7 @@ class Altimetria3DView @JvmOverloads constructor(
         }
 
         // 5. DIVISORES DE BLOQUE MAYOR VERTICALES CON COTAS DE ALTITUD
-        cotaTextPaint.textSize = ((h * 0.055f) * fontScale).coerceIn(12f, 18f)
+        cotaTextPaint.textSize = ((h * 0.055f) * fontScale).coerceIn(12f, fsHi(18f))
         cotaTextPaint.color = Color.parseColor("#E2E8F0") // Más claro y visible
         
         val maxMajorIdx = if (majorElevations.isNotEmpty()) majorElevations.indices.maxByOrNull { majorElevations[it] } ?: -1 else -1
@@ -1675,7 +1722,7 @@ class Altimetria3DView @JvmOverloads constructor(
                     arrowPath.close()
                     canvas.drawPath(arrowPath, rampArrowHeadPaint)
 
-                    rampTextPaint.textSize = ((h * 0.052f) * fontScale).coerceIn(10f, 17f)
+                    rampTextPaint.textSize = ((h * 0.052f) * fontScale).coerceIn(10f, fsHi(17f))
                     val rampLabel = "%.0f%%".format(maxG)
                     canvas.drawText(rampLabel, mx, arrowTopY - 4f, rampTextPaint)
                 }
@@ -1736,7 +1783,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 }
                 canvas.drawText(badgeText, px, badgeCenterY + 4f, poiBadgeTextPaint)
 
-                poiLabelPaint.textSize = ((h * 0.038f) * fontScale).coerceIn(9f, 13f)
+                poiLabelPaint.textSize = ((h * 0.038f) * fontScale).coerceIn(9f, fsHi(13f))
                 canvas.drawText(poi.name, px, badgeCenterY - badgeRadius - 5f, poiLabelPaint)
             }
         }
@@ -1760,7 +1807,7 @@ class Altimetria3DView @JvmOverloads constructor(
         canvas.drawPath(leftBaseEndcapPath, baseBarBorderPaint)
 
         // Rótulos de distancia en la barra inferior (Ventana rodante de 50 metros)
-        baseDistTextPaint.textSize = (barH * 0.68f).coerceIn(12f, 18f)
+        baseDistTextPaint.textSize = (barH * 0.68f).coerceIn(12f, 18f) * (1f + (fontScale - 1f) * 0.6f)
         val majorDistMeters = if (profileElevations.isNotEmpty()) majorBlockSizeMeters else (totalMetersAhead / majorBlocksCount)
 
         for (k in 0 until majorSamples) {
@@ -1796,18 +1843,18 @@ class Altimetria3DView @JvmOverloads constructor(
         // Leyenda de escala debajo de la gráfica (más legible y adaptada a la escala de fuente)
         val scaleLegendPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.parseColor("#CBD5E1") // Gris muy claro para máximo contraste
-            textSize = ((h * 0.075f) * fontScale).coerceIn(16f, 23f)
+            textSize = ((h * 0.075f) * fontScale).coerceIn(16f, fsHiSmall(23f))
             textAlign = Paint.Align.CENTER
-            typeface = Typeface.DEFAULT_BOLD
+            FontHelper.applyFontToPaint(this, currentFontKey, Typeface.BOLD)
         }
         
         val subBlockMeters = subBlockSizeMeters.toInt()
         val subScaleLegendText = context.getString(R.string.scale_legend_sub_block, subBlockMeters)
         val subScaleLegendPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.parseColor("#94A3B8") // Gris intermedio nítido
-            textSize = ((h * 0.065f) * fontScale).coerceIn(13f, 19f)
+            textSize = ((h * 0.065f) * fontScale).coerceIn(13f, fsHiSmall(19f))
             textAlign = Paint.Align.CENTER
-            typeface = Typeface.DEFAULT
+            FontHelper.applyFontToPaint(this, currentFontKey, Typeface.NORMAL)
         }
 
         canvas.drawText(scaleLegendText, w / 2f, h - 23f, scaleLegendPaint)
@@ -1971,9 +2018,9 @@ class Altimetria3DView @JvmOverloads constructor(
             // Etiqueta W'bal
             val wbalLabelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                 color = fireColor
-                textSize = (h * 0.07f).coerceIn(9f, 14f)
+                textSize = (h * 0.07f).coerceIn(9f, 14f) * (1f + (fontScale - 1f) * 0.6f)
                 textAlign = Paint.Align.LEFT
-                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                FontHelper.applyFontToPaint(this, currentFontKey, Typeface.BOLD)
                 setShadowLayer(3f, 0f, 1f, Color.BLACK)
             }
             val wbalPct = (wbalFrac * 100).toInt()
@@ -1996,9 +2043,9 @@ class Altimetria3DView @JvmOverloads constructor(
 
                 val failTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                     color = Color.parseColor("#EF4444")
-                    textSize = (h * 0.075f).coerceIn(9f, 13f)
+                    textSize = (h * 0.075f).coerceIn(9f, 13f) * (1f + (fontScale - 1f) * 0.6f)
                     textAlign = Paint.Align.CENTER
-                    typeface = android.graphics.Typeface.DEFAULT_BOLD
+                    FontHelper.applyFontToPaint(this, currentFontKey, Typeface.BOLD)
                     setShadowLayer(4f, 0f, 2f, Color.BLACK)
                 }
                 val failKm = String.format("%.1f", failMeters / 1000.0)
@@ -2059,9 +2106,9 @@ class Altimetria3DView @JvmOverloads constructor(
                         val midY = yFront[midIdx]
                         val wallTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                             color = Color.parseColor("#FFFEE2E2")
-                            textSize = (h * 0.075f).coerceIn(8f, 12f)
+                            textSize = (h * 0.075f).coerceIn(8f, 12f) * (1f + (fontScale - 1f) * 0.6f)
                             textAlign = Paint.Align.CENTER
-                            typeface = android.graphics.Typeface.DEFAULT_BOLD
+                            FontHelper.applyFontToPaint(this, currentFontKey, Typeface.BOLD)
                             setShadowLayer(5f, 0f, 1f, Color.parseColor("#99000000"))
                         }
                         val wallBadge = try { context.getString(R.string.gear_wall_badge) } catch (_: Exception) { "GEAR WALL" }
@@ -2785,9 +2832,14 @@ class Altimetria3DView @JvmOverloads constructor(
         }
     }
 
+    // Con fondo blanco los colores de pendiente se precompensan (ver LightBgFilter) y salen intensos tras el filtro
     private fun getGradeColor(grade: Double): String {
-        return GradeColorScale.getColorHex(grade)
+        val hex = GradeColorScale.getColorHex(grade)
+        if (!lightBgActive) return hex
+        return String.format("#%06X", 0xFFFFFF and LightBgFilter.precompensate(Color.parseColor(hex)))
     }
+
+    private fun lightComp(color: Int): Int = if (lightBgActive) LightBgFilter.precompensate(color) else color
 
     private fun getGradeColorDarkShaded(grade: Double): Int {
         if (grade > 20.0) return Color.parseColor("#05070D")
@@ -2841,8 +2893,9 @@ class Altimetria3DView @JvmOverloads constructor(
 
         // Draw Base Grid
         val gridPaint = Paint().apply {
-            color = Color.parseColor("#33FFFFFF")
-            strokeWidth = 1f
+            // En modo blanco el filtro invierte: un gris medio opaco sale gris oscuro visible
+            color = if (lightBgActive) Color.parseColor("#6E6E6E") else Color.parseColor("#33FFFFFF")
+            strokeWidth = if (lightBgActive) 1.3f else 1f
             style = Paint.Style.STROKE
         }
         val gridLines = 10
@@ -3011,6 +3064,7 @@ class Altimetria3DView @JvmOverloads constructor(
             isAntiAlias = true
         }
         reusableKmTextPaint?.textSize = 14f * fontScale
+        reusableKmTextPaint?.let { FontHelper.applyFontToPaint(it, currentFontKey, Typeface.BOLD) }
         val wallPaint = reusableWallPaint!!
         val topPaint = reusableTopPaint!!
         val kmTextPaint = reusableKmTextPaint!!
@@ -3026,7 +3080,7 @@ class Altimetria3DView @JvmOverloads constructor(
             val (b1x, b1y) = projectIso(seg.x1, seg.y1, 0f)
             val (b2x, b2y) = projectIso(seg.x2, seg.y2, 0f)
             
-            val baseColor = android.graphics.Color.parseColor(com.example.altgraph.GradeColorScale.getColorHex(seg.grade.toDouble()))
+            val baseColor = android.graphics.Color.parseColor(getGradeColor(seg.grade.toDouble()))
             val isTraveled = riderIdxGlobal >= 0 && seg.idx < riderIdxGlobal
             wallPaint.color = if (isTraveled) darkenColor(baseColor, 0.32f) else baseColor
             topPaint.color = if (isTraveled) Color.parseColor("#4B5563") else Color.WHITE
@@ -3081,7 +3135,7 @@ class Altimetria3DView @JvmOverloads constructor(
                     arrowPath.close()
                     canvas.drawPath(arrowPath, rampArrowHeadPaint)
                     
-                    rampTextPaint.textSize = ((h * 0.052f) * fontScale).coerceIn(11f, 17f)
+                    rampTextPaint.textSize = ((h * 0.052f) * fontScale).coerceIn(11f, fsHi(17f))
                     val rampLabel = "%.0f%%".format(seg.grade)
                     canvas.drawText(rampLabel, mx, arrowTopY - 4f, rampTextPaint)
                 }
@@ -3113,8 +3167,10 @@ class Altimetria3DView @JvmOverloads constructor(
         val paint = reusableLegendPaint!!
         val textPaint = reusableLegendTextPaint!!
         textPaint.textSize = 11f * fontScale
+        FontHelper.applyFontToPaint(textPaint, currentFontKey, Typeface.NORMAL)
         val titlePaint = reusableLegendTitlePaint!!
         titlePaint.textSize = 13f * fontScale
+        FontHelper.applyFontToPaint(titlePaint, currentFontKey, Typeface.BOLD)
         
         val legendX = w * 0.05f
         val legendY = h * 0.82f
@@ -3125,7 +3181,7 @@ class Altimetria3DView @JvmOverloads constructor(
         
         var currentX = legendX
         grades.forEachIndexed { idx, grade ->
-            paint.color = android.graphics.Color.parseColor(com.example.altgraph.GradeColorScale.getColorHex(grade))
+            paint.color = android.graphics.Color.parseColor(getGradeColor(grade.toDouble()))
             val boxWidth = 24f
             val labelW = textPaint.measureText(labels[idx])
             val spacing = maxOf(labelW, boxWidth) + 10f
@@ -3136,6 +3192,15 @@ class Altimetria3DView @JvmOverloads constructor(
             canvas.drawText(labels[idx], textX, legendY + 24f, textPaint)
             currentX += spacing
         }
+    }
+
+    private fun hsBlend(a: Int, b: Int, t: Float): Int {
+        val k = t.coerceIn(0f, 1f)
+        return Color.rgb(
+            (Color.red(a) + (Color.red(b) - Color.red(a)) * k).toInt().coerceIn(0, 255),
+            (Color.green(a) + (Color.green(b) - Color.green(a)) * k).toInt().coerceIn(0, 255),
+            (Color.blue(a) + (Color.blue(b) - Color.blue(a)) * k).toInt().coerceIn(0, 255)
+        )
     }
 
     /**
@@ -3159,51 +3224,62 @@ class Altimetria3DView @JvmOverloads constructor(
         yBase: FloatArray,
         depth3dY: Float
     ) {
-        // Vector de luz oblicua (normalizado), desde arriba-izquierda
-        val lightX = -0.6f
-        val lightY = -0.8f
-        val lightLen = kotlin.math.sqrt(lightX * lightX + lightY * lightY)
-        val lx = lightX / lightLen
-        val ly = lightY / lightLen
+        // Luz desde arriba-izquierda en el plano del perfil (x a la derecha, y hacia arriba), normalizada
+        val hsLx = 0.55f
+        val hsLy = 0.835f
+
+        // Pendiente visual de cada tramo en pantalla (sube > 0), suavizada con 5 muestras para evitar bandas.
+        // Al depender de la pantalla, el relieve se acentúa o se suaviza con el zoom, como en un mapa.
+        val segCount = (totalMicroSamples - 1).coerceAtLeast(0)
+        val rawSlope = FloatArray(segCount) { i ->
+            val dx = xFront[i + 1] - xFront[i]
+            if (dx > 0.01f) (yFront[i] - yFront[i + 1]) / dx else 0f
+        }
+        val visualSlope = FloatArray(segCount) { i ->
+            var sum = 0f
+            var n = 0
+            for (k in -2..2) {
+                val j = i + k
+                if (j in 0 until segCount) { sum += rawSlope[j]; n++ }
+            }
+            if (n > 0) sum / n else 0f
+        }
 
         val hillshadePath = Path()
 
         for (i in 0 until totalMicroSamples - 1) {
             val grade = if (i < microGrades.size) microGrades[i] else 0f
             val prevGrade = if (i > 0 && i - 1 < microGrades.size) microGrades[i - 1] else grade
-            val nextGrade = if (i + 1 < microGrades.size) microGrades[i + 1] else grade
-
-            // Pendiente normalizada (-1 a 1 para pendientes de 0% a 20%)
-            val slopeNorm = (grade / 15f).coerceIn(0f, 1.5f)
 
             // Cambio relativo de pendiente (escalón de relieve): si la rampa se empina respecto al anterior
             val gradeStep = (grade - prevGrade)
 
-            // Iluminación cenital oblicua de relieve (Hillshading topográfico):
-            // 1. Efecto pendiente intrínseca: las rampas más empinadas reciben más sombra cenital en la pared vertical
-            // 2. Efecto escalón (aristas de relieve): un incremento brusco de pendiente genera contraste de luz y sombra
-            val slopeShade = (1.0f - (slopeNorm * 0.45f)).coerceIn(0.40f, 1.15f)
-            val stepShade = (gradeStep * 0.08f).coerceIn(-0.35f, 0.35f)
-            val lightFactor = (slopeShade + stepShade).coerceIn(0.35f, 1.25f)
+            // Hillshade direccional (Lambert): las caras orientadas a la luz (subidas) se iluminan y
+            // las opuestas (bajadas) quedan en sombra. El color sigue indicando la pendiente.
+            val s = visualSlope[i]
+            val lambert = ((hsLx * s + hsLy) / kotlin.math.sqrt(1f + s * s)).coerceIn(0f, 1f)
+            val tDir = ((lambert - 0.15f) / 0.80f).coerceIn(0f, 1f)
 
-            // Color base del gradiente de pendiente (verde, amarillo, naranja, rojo, negro)
-            val baseColor = Color.parseColor(getGradeColor(grade.toDouble()))
-            val baseR = Color.red(baseColor)
-            val baseG = Color.green(baseColor)
-            val baseB = Color.blue(baseColor)
-
-            val rTop = (baseR * lightFactor).toInt().coerceIn(0, 255)
-            val gTop = (baseG * lightFactor).toInt().coerceIn(0, 255)
-            val bTop = (baseB * lightFactor).toInt().coerceIn(0, 255)
-
-            // La base del muro proyecta sombra de oclusión ambiental profunda hacia el suelo
-            val ambientOcclusion = (0.35f * (1f - (slopeNorm * 0.2f))).coerceIn(0.20f, 0.50f)
-            val rBot = (baseR * ambientOcclusion).toInt().coerceIn(0, 255)
-            val gBot = (baseG * ambientOcclusion).toInt().coerceIn(0, 255)
-            val bBot = (baseB * ambientOcclusion).toInt().coerceIn(0, 255)
-
-            val colorTop = Color.rgb(rTop, gTop, bTop)
-            val colorBot = Color.rgb(rBot, gBot, bBot)
+            val colorTop: Int
+            val colorBot: Int
+            if (lightBgActive) {
+                // Fondo blanco: se define el aspecto final (cara iluminada = color vivo; cara en sombra = más oscura y
+                // rica; la base se aclara hacia el blanco) y se precompensa para que el filtro lo deje como se ve aquí.
+                val base = Color.parseColor(GradeColorScale.getColorHex(grade.toDouble()))
+                val shadeT = hsBlend(base, 0xFF101828.toInt(), 0.38f)
+                val topT = hsBlend(shadeT, base, tDir)
+                val botT = hsBlend(topT, Color.WHITE, 0.22f)
+                colorTop = LightBgFilter.precompensate(topT)
+                colorBot = LightBgFilter.precompensate(botT)
+            } else {
+                val baseColor = Color.parseColor(getGradeColor(grade.toDouble()))
+                // Zona iluminada: luz cálida ligera. Zona en sombra: tinte frío azulado (estilo Imhof), nunca negro puro
+                val litColor = hsBlend(baseColor, Color.WHITE, 0.14f)
+                val shadeColor = hsBlend(hsBlend(baseColor, 0xFF1B2440.toInt(), 0.45f), Color.BLACK, 0.25f)
+                colorTop = hsBlend(shadeColor, litColor, tDir)
+                // Oclusión ambiental suave hacia la base del muro
+                colorBot = hsBlend(colorTop, 0xFF0B1022.toInt(), 0.55f)
+            }
 
             // Pared frontal esculpida con degradado vertical de volumen
             hillshadePath.reset()
@@ -3322,9 +3398,9 @@ class Altimetria3DView @JvmOverloads constructor(
                 // Etiqueta de pendiente local encima del diamante
                 val apexTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
                     color = Color.WHITE
-                    textSize = (h * 0.07f).coerceIn(8f, 12f)
+                    textSize = (h * 0.07f).coerceIn(8f, 12f) * (1f + (fontScale - 1f) * 0.6f)
                     textAlign = Paint.Align.CENTER
-                    typeface = android.graphics.Typeface.DEFAULT_BOLD
+                    FontHelper.applyFontToPaint(this, currentFontKey, Typeface.BOLD)
                     setShadowLayer(3f, 0f, 1f, Color.BLACK)
                 }
                 canvas.drawText("${localGrade.toInt()}%", apexX, apexY - 52f, apexTextPaint)

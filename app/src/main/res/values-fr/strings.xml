@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Altimetria Karoo</string>
+    <string name="app_name">ALTGRAPH</string>
     <string name="data_type_altimetria_title">Stratège d\'Altimétrie</string>
     <string name="data_type_altimetria_desc">Profil altimétrique dynamique avec pentes et alertes d\'attaque</string>
     <string name="data_type_altimetria_3d_title">Altimétrie 3D</string>
@@ -55,6 +55,8 @@
     <string name="setting_show_max_gradient">Afficher pente max dans l\'en-tête 3D</string>
     <string name="setting_show_3d_header_stats">Afficher données d\'en-tête 3D (Nom d\'itinéraire, pentes)</string>
     <string name="setting_rotate_90_cw">Pivoter graphique de 90° (Mode paysage)</string>
+    <string name="setting_chart_light_bg">Fond blanc des graphiques</string>
+    <string name="setting_chart_light_bg_desc">Affiche le fond des graphiques 3D en blanc, avec altitudes et kilomètres en noir et des couleurs plus intenses. Utile en plein soleil.</string>
     <string name="setting_use_topographic">Méthode de calcul topographique (projection horizontale)</string>
     <string name="setting_show_hairpins">Afficher lacets et virages en épingle</string>
     <string name="setting_poi_filter">Filtre des Points d\'Intérêt (POIs)</string>
@@ -202,7 +204,7 @@
     <string name="setting_show_climb_name_desc">Affiche le nom du col au-dessus du graphique 3D au lieu de la simple icône</string>
     <string name="pref_elite_profile_tv_show_climb_names_title">Afficher les noms des cols sur le Profil TV</string>
     <string name="pref_elite_profile_tv_show_climb_names_desc">Affiche le nom complet du col sur le profil 2D et dans la liste des cols</string>
-    <string name="setting_pan_buttons_position_title">Position des Flèches de Défilement (&lt; / &gt;)</string>
+    <string name="setting_pan_buttons_position_title">Position des Flèches de Défilement (&lt;&#160;/&#160;&gt;)</string>
     <string name="setting_pan_buttons_position_desc">Place les flèches de défilement en haut ou en bas du profil 3D</string>
     <string name="pan_position_bottom">En bas (Par défaut)</string>
     <string name="pan_position_top">En haut</string>
@@ -348,6 +350,6 @@
     <string name="setting_gear_title">Transmission (rapport conseillé 3D)</string>
     <string name="setting_gear_desc">Saisissez les dents de vos plateaux et les pignons de la cassette séparés par des virgules pour adapter le rapport conseillé à votre vélo</string>
     <string name="setting_gear_chainrings">Plateaux (ex. 50,34)</string>
-    <string name="setting_gear_cassette">Cassette (ex. 11,12,13,14,15,17,19,21,24,27,30,34)</string>
+    <string name="setting_gear_cassette">Cassette (ex. 11, 12, 13, 14, 15, 17, 19, 21, 24, 27, 30, 34)</string>
     <string name="label_training_zone_bar">Barre des zones d\'entraînement</string>
 </resources>

@@ -316,8 +316,9 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                               val cx = vCompassX
                               val cy = vCompassY
                     
+                              val compassInk = if (prefs.chartLightBackground) android.graphics.Color.BLACK else android.graphics.Color.WHITE
                               val compassPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-                                  color = android.graphics.Color.WHITE
+                                  color = compassInk
                                   style = android.graphics.Paint.Style.STROKE
                                   strokeWidth = 3f
                               }
@@ -357,7 +358,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                       
                               // Draw text N
                               val textPaint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-                                  color = android.graphics.Color.WHITE
+                                  color = compassInk
                                   textSize = 14f
                                   textAlign = android.graphics.Paint.Align.CENTER
                                   typeface = android.graphics.Typeface.DEFAULT_BOLD

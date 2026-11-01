@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Altimetria Karoo</string>
+    <string name="app_name">ALTGRAPH</string>
     <string name="data_type_altimetria_title">Estrategista de Altimetria</string>
     <string name="data_type_altimetria_desc">Gráfico de perfil dinâmico com inclinações por trechos e alertas de ataque</string>
     <string name="data_type_altimetria_3d_title">Altimetria 3D</string>
@@ -55,6 +55,8 @@
     <string name="setting_show_max_gradient">Mostrar Inclinação Máxima no Cabeçalho 3D</string>
     <string name="setting_show_3d_header_stats">Mostrar Dados no Cabeçalho 3D (Nome da Rota, Inclinações)</string>
     <string name="setting_rotate_90_cw">Girar Gráfico 90° (Modo Paisagem)</string>
+    <string name="setting_chart_light_bg">Fundo branco nos gráficos</string>
+    <string name="setting_chart_light_bg_desc">Desenha o fundo dos gráficos 3D em branco, com cotas e quilómetros a preto e cores mais intensas. Útil com sol forte.</string>
     <string name="setting_use_topographic">Usar Método de Cálculo de Inclinação Topográfica (Projeção Horizontal)</string>
     <string name="setting_show_hairpins">Mostrar Curvas em Ferradura e Cotovelos</string>
     <string name="setting_poi_filter">Filtro de Pontos de Interesse (POIs)</string>
@@ -202,7 +204,7 @@
     <string name="setting_show_climb_name_desc">Apresenta o nome do passo de montanha no topo do gráfico 3D em vez de apenas o ícone</string>
     <string name="pref_elite_profile_tv_show_climb_names_title">Mostrar nomes das subidas no Perfil TV</string>
     <string name="pref_elite_profile_tv_show_climb_names_desc">Mostra o nome completo do passo no perfil 2D e na lista de subidas</string>
-    <string name="setting_pan_buttons_position_title">Posição das Setas de Navegação (&lt; / &gt;)</string>
+    <string name="setting_pan_buttons_position_title">Posição das Setas de Navegação (&lt;&#160;/&#160;&gt;)</string>
     <string name="setting_pan_buttons_position_desc">Coloca as setas de deslocamento no topo ou na base do perfil 3D</string>
     <string name="pan_position_bottom">Abaixo (Padrão)</string>
     <string name="pan_position_top">Acima</string>
@@ -348,6 +350,6 @@
     <string name="setting_gear_title">Transmissão (marcha recomendada 3D)</string>
     <string name="setting_gear_desc">Introduza os dentes das coroas e as roldanas da cassete separados por vírgulas para adaptar a marcha recomendada à sua bicicleta</string>
     <string name="setting_gear_chainrings">Coroas (ex. 50,34)</string>
-    <string name="setting_gear_cassette">Cassete (ex. 11,12,13,14,15,17,19,21,24,27,30,34)</string>
+    <string name="setting_gear_cassette">Cassete (ex. 11, 12, 13, 14, 15, 17, 19, 21, 24, 27, 30, 34)</string>
     <string name="label_training_zone_bar">Barra de zona de treino</string>
 </resources>

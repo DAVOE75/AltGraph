@@ -179,6 +179,11 @@ class MapOverlayManager(
                 }
             }
             Log.d("MapOverlayManager", "updateOverlay: Emitted ${activePolylines.size} polylines!")
+            if (polylineCount > highWaterPolylines) highWaterPolylines = polylineCount
+            val hwPrefs = context.getSharedPreferences(HW_PREFS, Context.MODE_PRIVATE)
+            if (polylineCount > hwPrefs.getInt(HW_KEY, 0) || !hwPrefs.contains(HW_KEY)) {
+                hwPrefs.edit().putInt(HW_KEY, polylineCount).apply()
+            }
         } catch (e: Exception) {
             Log.e("MapOverlayManager", "Error processing overlay", e)
         }
@@ -186,7 +191,11 @@ class MapOverlayManager(
 
     private fun clearPolylines(emitter: Emitter<MapEffect>) {
         try {
-            for (id in activePolylines) {
+            // También los ids de instancias o procesos anteriores: el mapa del host conserva sus líneas
+            val ids = LinkedHashSet<String>(activePolylines)
+            val known = maxOf(highWaterPolylines, context.getSharedPreferences(HW_PREFS, Context.MODE_PRIVATE).getInt(HW_KEY, DEFAULT_HIGH_WATER))
+            for (n in 0 until known) ids.add("altgraph-grade-$n")
+            for (id in ids) {
                 if (!emit(emitter, HidePolyline(id))) break
             }
         } catch (e: Exception) {
@@ -194,6 +203,7 @@ class MapOverlayManager(
             Log.w("MapOverlayManager", "clearPolylines failed", e)
         }
         activePolylines.clear()
+        lastRouteId = null
     }
 
     private fun getElevationAt(points: List<ElevationPolylineDecoder.ElevationPoint>, distance: Double): Double {
@@ -271,6 +281,12 @@ class MapOverlayManager(
     }
 
     companion object {
+        @Volatile private var highWaterPolylines = 0
+        private const val HW_PREFS = "altgraph_map_overlay"
+        private const val HW_KEY = "polyline_high_water"
+        // Sin dato guardado (versiones previas) se ocultan hasta 1500 ids una vez
+        private const val DEFAULT_HIGH_WATER = 1500
+
         // Nota: umbral fijo; si hiciera falta más detalle en puertos cortos, bajarlo
         private const val MIN_SEGMENT_M = 300.0
 

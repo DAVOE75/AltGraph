@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import kotlin.math.abs
@@ -98,6 +99,8 @@ object PanelTheme {
             is Spinner -> themeSpinner(root)
             is TextView -> style(root)
         }
+        // Con alineación por línea base, un botón de dos líneas se desplaza y queda recortado
+        if (root is LinearLayout && root.orientation == LinearLayout.HORIZONTAL) root.isBaselineAligned = false
         if (root is ViewGroup) {
             for (i in 0 until root.childCount) apply(root.getChildAt(i))
         }
@@ -118,6 +121,10 @@ object PanelTheme {
         }
         if (abs(sp - target) > 0.01f) tv.textSize = target
 
+        // Subtextos (descripciones) justificados
+        if (target == CAPTION && !bold && tv !is Button && tv !is CompoundButton && tv !is EditText) {
+            tv.justificationMode = android.text.Layout.JUSTIFICATION_MODE_INTER_WORD
+        }
         if (tv is EditText) tv.setHintTextColor(colors.hint)
         // Los botones ya salen con los colores del tema desde sus ayudantes
         if (tv is Button && tv !is CompoundButton) return
@@ -158,7 +165,10 @@ object PanelTheme {
         }
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View =
-            tint(super.getView(position, convertView, parent), false)
+            tint(super.getView(position, convertView, parent), false).also {
+                // El valor elegido puede ser largo: que ocupe 2 líneas en vez de cortarse con puntos
+                (it as? TextView)?.apply { isSingleLine = false; maxLines = 2; ellipsize = null }
+            }
 
         override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View =
             tint(super.getDropDownView(position, convertView, parent), true)

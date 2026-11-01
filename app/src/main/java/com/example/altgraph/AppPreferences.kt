@@ -156,6 +156,10 @@ class AppPreferences(context: Context) {
         }
         set(value) = prefs.edit().putString(KEY_CLIMB_ALTIMETRIA_STYLE, value.key).apply()
 
+    var chartLightBackground: Boolean
+        get() = prefs.getBoolean(KEY_CHART_LIGHT_BG, false)
+        set(value) = prefs.edit().putBoolean(KEY_CHART_LIGHT_BG, value).apply()
+
     // --- PRO FEATURES (NIVEL SDK MÁXIMO) ---
     var smartZoomEnabled: Boolean
         get() = prefs.getBoolean(KEY_SMART_ZOOM_ENABLED, true)
@@ -506,6 +510,7 @@ class AppPreferences(context: Context) {
         private const val KEY_ALTIMETRIA_STYLE = "altimetria_style_key"
         private const val KEY_CLIMB_ALTIMETRIA_STYLE = "climb_altimetria_style_key"
 
+        private const val KEY_CHART_LIGHT_BG = "chart_light_bg"
         private const val KEY_SMART_ZOOM_ENABLED = "smart_zoom_enabled"
         private const val KEY_OASIS_TRACKING_ENABLED = "oasis_tracking_enabled"
         private const val KEY_SWITCHBACK_RENDERING_ENABLED = "switchback_rendering_enabled"

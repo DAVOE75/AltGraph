@@ -66,7 +66,7 @@ class MainActivity : Activity() {
 
         val subtitle = TextView(this).apply {
             val versionName = packageManager.getPackageInfo(packageName, 0).versionName
-            text = "${getString(R.string.title_settings)} • v$versionName ELITE"
+            text = "${getString(R.string.title_settings)} •\u00A0v$versionName\u00A0ELITE"
             textSize = 12f
             setTextColor(Color.parseColor("#A1A1AA"))
             gravity = Gravity.CENTER
@@ -131,7 +131,7 @@ class MainActivity : Activity() {
         }
 
         tabTitles.forEachIndexed { idx, titleStr ->
-            val btn = Button(this).apply {
+            val btn = FitButton(this, maxSp = 11f, minSp = 8f, maxLines = 1, stackWhenTight = false).apply {
                 text = titleStr
                 textSize = 10f
                 typeface = Typeface.DEFAULT_BOLD
@@ -140,7 +140,7 @@ class MainActivity : Activity() {
                 maxLines = 1
                 minWidth = 0
                 minimumWidth = 0
-                setPadding(0, 12, 0, 12)
+                setPadding(4, 12, 4, 12)
                 layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f).apply {
                     leftMargin = 3
                     rightMargin = 3
@@ -201,10 +201,11 @@ class MainActivity : Activity() {
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                     val selected = styleOptions[position]
+                    val changed = selected != prefs.altimetriaStyle
                     prefs.altimetriaStyle = selected
                     styleValueText.text = getString(selected.titleRes)
                     styleDescText.text = getString(selected.descRes)
-                    Toast.makeText(this@MainActivity, getString(R.string.toast_vista, getString(selected.titleRes)), Toast.LENGTH_SHORT).show()
+                    if (changed) Toast.makeText(this@MainActivity, getString(R.string.toast_vista, getString(selected.titleRes)), Toast.LENGTH_SHORT).show()
                 }
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
@@ -239,10 +240,11 @@ class MainActivity : Activity() {
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                     val selected = styleOptions[position]
+                    val changed = selected != prefs.climbAltimetriaStyle
                     prefs.climbAltimetriaStyle = selected
                     climbStyleValueText.text = getString(selected.titleRes)
                     climbStyleDescText.text = getString(selected.descRes)
-                    Toast.makeText(this@MainActivity, getString(R.string.toast_visor_puertos, getString(selected.titleRes)), Toast.LENGTH_SHORT).show()
+                    if (changed) Toast.makeText(this@MainActivity, getString(R.string.toast_visor_puertos, getString(selected.titleRes)), Toast.LENGTH_SHORT).show()
                 }
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
@@ -310,6 +312,21 @@ class MainActivity : Activity() {
         }
         rotate90Card.addView(switchRotate90)
 
+        // Opción: fondo blanco en las gráficas 3D (colores intensificados por filtro en la vista)
+        val lightBgCard = createCardContainer()
+        lightBgCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_chart_light_bg)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.chartLightBackground
+            setOnCheckedChangeListener { _, isChecked -> prefs.chartLightBackground = isChecked }
+        })
+        lightBgCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_chart_light_bg_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 4)
+        })
         val climbRotate90Card = createCardContainer()
         val climbSwitchRotate90 = Switch(this).apply {
             text = getString(R.string.setting_rotate_90_cw) + getString(R.string.suffix_puertos)
@@ -406,6 +423,7 @@ class MainActivity : Activity() {
         tabEstiloContainer.addView(fontCard)
         tabEstiloContainer.addView(font3dCard)
         tabEstiloContainer.addView(rotate90Card)
+        tabEstiloContainer.addView(lightBgCard)
         tabEstiloContainer.addView(createSectionLabel(getString(R.string.label_climb_viewer_section)))
         tabEstiloContainer.addView(climbRotate90Card)
         tabEstiloContainer.addView(climbNameCard)
@@ -774,8 +792,26 @@ class MainActivity : Activity() {
             gearCard.addView(createValueText(label))
             gearCard.addView(EditText(this).apply {
                 inputType = android.text.InputType.TYPE_CLASS_TEXT
-                setTextColor(Color.WHITE)
+                // Lista larga de dientes: la letra baja lo justo para que se vea entera en una línea
+                tag = PanelTheme.KEEP
+                textSize = 14f
+                setTextColor(PanelTheme.colors.text)
+                setHintTextColor(PanelTheme.colors.hint)
                 setText(current)
+                val fitSize = {
+                    val avail = width - compoundPaddingLeft - compoundPaddingRight
+                    if (avail > 0) {
+                        var sp = 14f
+                        val p = android.text.TextPaint(paint)
+                        while (sp > 10f) {
+                            p.textSize = sp * resources.displayMetrics.scaledDensity
+                            if (p.measureText(text.toString()) <= avail) break
+                            sp -= 0.5f
+                        }
+                        if (kotlin.math.abs(textSize / resources.displayMetrics.scaledDensity - sp) > 0.01f) textSize = sp
+                    }
+                }
+                addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> fitSize() }
                 setSingleLine(true)
                 addTextChangedListener(object : android.text.TextWatcher {
                     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -1209,7 +1245,7 @@ class MainActivity : Activity() {
 
         qualities.forEach { q ->
             val isActive = abs(prefs.asphaltFactor - q.factor) < 0.05
-            val btn = createSegmentButton(q.getLocalizedLabel().take(6), isActive) {
+            val btn = createSegmentButton(q.getLocalizedLabel(), isActive) {
                 prefs.asphaltFactor = q.factor
                 asphaltValueText.text = "${q.getLocalizedLabel()} (TA = %.1f)".format(Locale.US, q.factor)
                 updateSegmentActiveStates(asphaltButtons, qualities.indexOf(q))
@@ -1929,8 +1965,7 @@ class MainActivity : Activity() {
 
         // Selector de umbral de pendiente (%)
         val steepThresholdLayout = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
+            orientation = LinearLayout.VERTICAL
             setPadding(0, 0, 0, 8)
         }
         val steepThresholdLabel = TextView(this).apply {
@@ -2016,8 +2051,7 @@ class MainActivity : Activity() {
 
         // Intervalo KGhost
         val kghostIntervalLayout = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
+            orientation = LinearLayout.VERTICAL
             setPadding(0, 0, 0, 8)
         }
         val kghostIntervalLabel = TextView(this).apply {
@@ -2103,8 +2137,7 @@ class MainActivity : Activity() {
 
         // Intervalo del Resumen Periódico
         val periodicIntervalLayout = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
+            orientation = LinearLayout.VERTICAL
             setPadding(0, 0, 0, 8)
         }
         val periodicIntervalLabel = TextView(this).apply {
@@ -2424,11 +2457,11 @@ class MainActivity : Activity() {
     }
 
     private fun createSegmentButton(textStr: String, isActive: Boolean, onClick: () -> Unit): Button {
-        return Button(this).apply {
+        return FitButton(this).apply {
             text = textStr
             textSize = PanelTheme.BUTTON
             typeface = Typeface.DEFAULT_BOLD
-            setPadding(6, 10, 6, 10)
+            setPadding(3, 10, 3, 10)
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f).apply {
                 leftMargin = 3
                 rightMargin = 3
@@ -2439,7 +2472,7 @@ class MainActivity : Activity() {
     }
 
     private fun createActionButton(textStr: String, onClick: () -> Unit): Button {
-        return Button(this).apply {
+        return FitButton(this).apply {
             text = textStr
             textSize = PanelTheme.BUTTON
             typeface = Typeface.DEFAULT_BOLD
