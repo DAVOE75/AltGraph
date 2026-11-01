@@ -1678,6 +1678,9 @@ class AltimetriaStrategyCalculator {
             polylineScaleFactor = 1.0
             lastRouteNameForReset = routeName
             isNewRouteName = true
+            // Los puertos (también los personalizados) pertenecen a la ruta anterior
+            routeClimbs = emptyList()
+            routeKeyForClimbs = null
         }
 
         

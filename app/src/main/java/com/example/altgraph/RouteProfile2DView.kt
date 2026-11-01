@@ -163,17 +163,17 @@ class RouteProfile2DView(context: Context) : View(context) {
         linePaint.color = primaryColor
         kmDoneTextPaint.color = primaryColor
         FontHelper.applyFontToPaint(kmDoneTextPaint, fontFamilyKey, Typeface.BOLD)
-        kmDoneTextPaint.textSize = (if (isVerticalLayout) 18f else 21f) * fontSizeScale
+        kmDoneTextPaint.textSize = (if (isVerticalLayout) 20f else 21f) * fontSizeScale
         
         FontHelper.applyFontToPaint(kmRemainTextPaint, fontFamilyKey, Typeface.BOLD)
-        kmRemainTextPaint.textSize = (if (isVerticalLayout) 18f else 21f) * fontSizeScale
+        kmRemainTextPaint.textSize = (if (isVerticalLayout) 20f else 21f) * fontSizeScale
 
         elevDoneTextPaint.color = primaryColor
         FontHelper.applyFontToPaint(elevDoneTextPaint, fontFamilyKey, Typeface.BOLD)
-        elevDoneTextPaint.textSize = (if (isVerticalLayout) 13f else 15f) * fontSizeScale
+        elevDoneTextPaint.textSize = (if (isVerticalLayout) 14.5f else 15f) * fontSizeScale
         
         FontHelper.applyFontToPaint(elevRemainTextPaint, fontFamilyKey, Typeface.BOLD)
-        elevRemainTextPaint.textSize = (if (isVerticalLayout) 13f else 15f) * fontSizeScale
+        elevRemainTextPaint.textSize = (if (isVerticalLayout) 14.5f else 15f) * fontSizeScale
         
         FontHelper.applyFontToPaint(peakTextPaint, fontFamilyKey, Typeface.BOLD)
         peakTextPaint.textSize = (if (isVerticalLayout) 14f else 16f) * fontSizeScale
@@ -489,7 +489,12 @@ class RouteProfile2DView(context: Context) : View(context) {
             
             val mapBoxLeft = 10f
             val mapBoxTop = if (isVerticalLayout) (headerBaseY + 45f) else 75f
-            val mapBoxRight = if (isVerticalLayout) (drawW * 0.40f) else (drawW * 0.45f)
+            // Sin lista de puertos, el minimapa ocupa todo el ancho
+            val mapBoxRight = when {
+                catClimbs.isEmpty() -> drawW - 10f
+                isVerticalLayout -> drawW * 0.40f
+                else -> drawW * 0.45f
+            }
             val mapBoxBottom = if (isVerticalLayout) (topY - 15f) else (topY + 180f)
             
             val mapW = (mapBoxRight - mapBoxLeft).coerceAtLeast(10f)
@@ -695,6 +700,28 @@ class RouteProfile2DView(context: Context) : View(context) {
         }
 
         canvas.save()
+        if (isVerticalLayout) {
+            // Horizontal labels: done | remaining side by side, box clamped to the screen at both ends
+            val pad = 8f
+            val boxW = doneWidth + remainWidth + pad * 3f
+            val boxLeft = (currentX - boxW / 2f).coerceIn(0f, (drawW - boxW).coerceAtLeast(0f))
+            val boxTop = topY + 6f
+            val boxH = 52f * fontSizeScale.coerceAtLeast(1f)
+            val bg = Paint().apply { color = Color.BLACK; style = Paint.Style.FILL }
+            canvas.drawRect(boxLeft, boxTop, boxLeft + boxW, boxTop + boxH, bg)
+            val doneCx = boxLeft + pad + doneWidth / 2f
+            val remainCx = boxLeft + boxW - pad - remainWidth / 2f
+            val kmY = boxTop + 22f * fontSizeScale.coerceAtLeast(1f)
+            val elevY = boxTop + 43f * fontSizeScale.coerceAtLeast(1f)
+            canvas.drawText(kmDoneText, doneCx, kmY, kmDoneTextPaint)
+            canvas.drawText(elevDoneText, doneCx, elevY, elevDoneTextPaint)
+            canvas.drawText(kmRemainText, remainCx, kmY, kmRemainTextPaint)
+            canvas.drawText(elevRemainText, remainCx, elevY, elevRemainTextPaint)
+            canvas.drawLine(currentX, bottomY, currentX, lineTopY, dashLinePaint)
+            canvas.restore()
+            canvas.restore()
+            return
+        }
         canvas.translate(currentX, textCenterY)
         canvas.rotate(-90f) // from bottom to top
 
