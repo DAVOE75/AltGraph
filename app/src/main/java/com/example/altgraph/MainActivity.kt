@@ -327,6 +327,22 @@ class MainActivity : Activity() {
             setTextColor(Color.LTGRAY)
             setPadding(0, 4, 0, 4)
         })
+
+        // Opción: eje vertical ajustado a la ventana visible (más relieve a zoom corto)
+        val fitAxisCard = createCardContainer()
+        fitAxisCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_chart_fit_axis)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.chartFitAxis
+            setOnCheckedChangeListener { _, isChecked -> prefs.chartFitAxis = isChecked }
+        })
+        fitAxisCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_chart_fit_axis_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 4)
+        })
         val climbRotate90Card = createCardContainer()
         val climbSwitchRotate90 = Switch(this).apply {
             text = getString(R.string.setting_rotate_90_cw) + getString(R.string.suffix_puertos)
@@ -424,6 +440,7 @@ class MainActivity : Activity() {
         tabEstiloContainer.addView(font3dCard)
         tabEstiloContainer.addView(rotate90Card)
         tabEstiloContainer.addView(lightBgCard)
+        tabEstiloContainer.addView(fitAxisCard)
         tabEstiloContainer.addView(createSectionLabel(getString(R.string.label_climb_viewer_section)))
         tabEstiloContainer.addView(climbRotate90Card)
         tabEstiloContainer.addView(climbNameCard)

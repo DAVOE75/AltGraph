@@ -56,6 +56,8 @@
     <string name="setting_show_3d_header_stats">Afficher données d\'en-tête 3D (Nom d\'itinéraire, pentes)</string>
     <string name="setting_rotate_90_cw">Pivoter graphique de 90° (Mode paysage)</string>
     <string name="setting_chart_light_bg">Fond blanc des graphiques</string>
+    <string name="setting_chart_fit_axis">Échelle verticale ajustée au tronçon visible</string>
+    <string name="setting_chart_fit_axis_desc">Ajuste la hauteur du profil 3D aux altitudes visibles, pour mieux voir le relief avec un zoom court. Les routes plates ne sont pas exagérées en dessous de 30 m. Les pentes et les couleurs ne changent pas.</string>
     <string name="setting_chart_light_bg_desc">Affiche le fond des graphiques 3D en blanc, avec altitudes et kilomètres en noir et des couleurs plus intenses. Utile en plein soleil.</string>
     <string name="setting_use_topographic">Méthode de calcul topographique (projection horizontale)</string>
     <string name="setting_show_hairpins">Afficher lacets et virages en épingle</string>

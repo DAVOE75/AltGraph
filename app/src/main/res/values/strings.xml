@@ -71,6 +71,8 @@
     <string name="setting_show_3d_header_stats">Show 3D Header Statistics (Route Name, Gradients)</string>
     <string name="setting_rotate_90_cw">Rotate Graph 90° Clockwise (Landscape Mode)</string>
     <string name="setting_chart_light_bg">White chart background</string>
+    <string name="setting_chart_fit_axis">Vertical scale fitted to the visible stretch</string>
+    <string name="setting_chart_fit_axis_desc">Fits the 3D profile height to the elevations you see, so terrain shows more at short zoom. Flat roads are not exaggerated below 30 m. Gradients and colours do not change.</string>
     <string name="setting_chart_light_bg_desc">Draws the 3D chart background in white, with elevations and kilometres in black and more intense colours. Handy in bright sunlight.</string>
     <string name="setting_use_topographic">Use Topographic Slope Calculation Method</string>
     <string name="setting_show_hairpins">Show Hairpin Bends (Black Lines)</string>

@@ -70,6 +70,8 @@
     <string name="setting_show_3d_header_stats">Mostrar Datos en Encabezado 3D (Nombre de Ruta, Pendientes)</string>
     <string name="setting_rotate_90_cw">Girar Gráfico 90° (Modo Horizontal / Apaisado)</string>
     <string name="setting_chart_light_bg">Fondo blanco en las gráficas</string>
+    <string name="setting_chart_fit_axis">Escala vertical ajustada al tramo visible</string>
+    <string name="setting_chart_fit_axis_desc">Ajusta la altura del perfil 3D a las altitudes que ves, para que el relieve se note más con zoom corto. Los llanos no se exageran por debajo de 30 m. Las pendientes y colores no cambian.</string>
     <string name="setting_chart_light_bg_desc">Pinta el fondo de las gráficas 3D en blanco, con cotas y kilómetros en negro y colores más intensos. Útil a pleno sol.</string>
     <string name="setting_use_topographic">Usar Método de Cálculo de Pendiente Topográfico (Proyección Horizontal)</string>
     <string name="setting_show_hairpins">Mostrar Curvas de Herradura (Líneas Negras)</string>

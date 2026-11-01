@@ -729,6 +729,11 @@ class Altimetria3DView @JvmOverloads constructor(
     private var profileTopLineY: Float = -1f
     private var currentFontKey: String = "sans-serif-condensed"
 
+    // Eje vertical ajustado: se conserva entre fotogramas y solo se recalcula cuando el perfil deja de caber
+    private var fitAxisMin = 0f
+    private var fitAxisSpan = 0f
+    private var fitAxisWindow = 0f
+
     // Los límites máximos de letra crecen con la escala (a 60%) para que el ajuste se note también en vistas grandes
     private fun fsHi(hi: Float): Float = hi * (1f + (fontScale - 1f) * 0.6f)
 
@@ -1385,14 +1390,31 @@ class Altimetria3DView @JvmOverloads constructor(
         }
         val actualRange = (rawMaxElev - rawMinElev).coerceAtLeast(0f)
 
-        // Escala visual proporcional: un 15% de pendiente debe ocupar todo el alto.
-        // Limitamos este rango mínimo a 250m para que rutas largas no queden planas.
-        val minProportionalRange = (totalMetersAhead * 0.15f).toFloat().coerceAtMost(250f)
-        val effectiveRange = actualRange.coerceAtLeast(minProportionalRange).coerceAtLeast(15f)
-
-        val padding = (effectiveRange - actualRange) / 2f
-        val displayMinElev = rawMinElev - padding
-        val finalElevRange = effectiveRange
+        val displayMinElev: Float
+        val finalElevRange: Float
+        if (AppPreferences.getInstance(context).chartFitAxis) {
+            // Eje ajustado a la ventana visible: tramo mínimo que crece con el zoom, redondeado a 5 m
+            val minSpan = (maxPeakHeight * totalMetersAhead.toFloat() / (w * 55f)).coerceIn(30f, 100f)
+            val span = (Math.ceil((maxOf(actualRange * 1.2f, minSpan) / 5f).toDouble()) * 5.0).toFloat()
+            val stillFits = fitAxisSpan > 0f && fitAxisWindow == totalMetersAhead.toFloat() &&
+                rawMinElev >= fitAxisMin && rawMaxElev <= fitAxisMin + fitAxisSpan && actualRange >= fitAxisSpan * 0.55f
+            if (!stillFits) {
+                val mid = (rawMinElev + rawMaxElev) / 2f
+                fitAxisMin = (Math.floor(((mid - span / 2f) / 5f).toDouble()) * 5.0).toFloat()
+                fitAxisSpan = span
+                fitAxisWindow = totalMetersAhead.toFloat()
+            }
+            displayMinElev = fitAxisMin
+            finalElevRange = fitAxisSpan
+        } else {
+            fitAxisSpan = 0f
+            // Escala visual proporcional: un 15% de pendiente debe ocupar todo el alto.
+            // Limitamos este rango mínimo a 250m para que rutas largas no queden planas.
+            val minProportionalRange = (totalMetersAhead * 0.15f).toFloat().coerceAtMost(250f)
+            val effectiveRange = actualRange.coerceAtLeast(minProportionalRange).coerceAtLeast(15f)
+            displayMinElev = rawMinElev - (effectiveRange - actualRange) / 2f
+            finalElevRange = effectiveRange
+        }
 
         // GRÁFICA RECTA: xFront avanza de forma estrictamente lineal, sin zigzagueo de carretera
         for (i in 0 until totalMicroSamples) {

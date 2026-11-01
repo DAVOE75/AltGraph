@@ -56,6 +56,8 @@
     <string name="setting_show_3d_header_stats">Mostrar Dados no Cabeçalho 3D (Nome da Rota, Inclinações)</string>
     <string name="setting_rotate_90_cw">Girar Gráfico 90° (Modo Paisagem)</string>
     <string name="setting_chart_light_bg">Fundo branco nos gráficos</string>
+    <string name="setting_chart_fit_axis">Escala vertical ajustada ao troço visível</string>
+    <string name="setting_chart_fit_axis_desc">Ajusta a altura do perfil 3D às altitudes visíveis, para o relevo se notar mais com zoom curto. As estradas planas não são exageradas abaixo de 30 m. As inclinações e as cores não mudam.</string>
     <string name="setting_chart_light_bg_desc">Desenha o fundo dos gráficos 3D em branco, com cotas e quilómetros a preto e cores mais intensas. Útil com sol forte.</string>
     <string name="setting_use_topographic">Usar Método de Cálculo de Inclinação Topográfica (Projeção Horizontal)</string>
     <string name="setting_show_hairpins">Mostrar Curvas em Ferradura e Cotovelos</string>

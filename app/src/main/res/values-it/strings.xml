@@ -56,6 +56,8 @@
     <string name="setting_show_3d_header_stats">Mostra dati nell\'intestazione 3D (Nome percorso, pendenze)</string>
     <string name="setting_rotate_90_cw">Ruota Grafico di 90° (Modalità Orizzontale)</string>
     <string name="setting_chart_light_bg">Sfondo bianco nei grafici</string>
+    <string name="setting_chart_fit_axis">Scala verticale adattata al tratto visibile</string>
+    <string name="setting_chart_fit_axis_desc">Adatta l\'altezza del profilo 3D alle quote visibili, per far risaltare il rilievo con zoom corto. Le strade piane non vengono esagerate sotto i 30 m. Pendenze e colori non cambiano.</string>
     <string name="setting_chart_light_bg_desc">Disegna lo sfondo dei grafici 3D in bianco, con quote e chilometri in nero e colori più intensi. Utile con il sole forte.</string>
     <string name="setting_use_topographic">Usa il metodo topografico di calcolo della pendenza (Proiezione orizzontale)</string>
     <string name="setting_show_hairpins">Mostra Tornanti e Curve a Gomito</string>

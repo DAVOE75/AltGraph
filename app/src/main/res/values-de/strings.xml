@@ -56,6 +56,8 @@
     <string name="setting_show_3d_header_stats">3D-Kopfdaten anzeigen (Routenname, Steigungen)</string>
     <string name="setting_rotate_90_cw">Diagramm um 90° drehen (Querformat)</string>
     <string name="setting_chart_light_bg">Weißer Hintergrund in den Diagrammen</string>
+    <string name="setting_chart_fit_axis">Vertikale Skala an den sichtbaren Abschnitt anpassen</string>
+    <string name="setting_chart_fit_axis_desc">Passt die Höhe des 3D-Profils an die sichtbaren Höhen an, damit das Gelände bei kurzem Zoom besser zu erkennen ist. Flache Strecken werden unter 30 m nicht übertrieben. Steigungen und Farben bleiben gleich.</string>
     <string name="setting_chart_light_bg_desc">Zeichnet den Hintergrund der 3D-Diagramme weiß, mit schwarzen Höhen- und Kilometerangaben und kräftigeren Farben. Praktisch bei starker Sonne.</string>
     <string name="setting_use_topographic">Topografische Steigungsberechnung (horizontale Projektion)</string>
     <string name="setting_show_hairpins">Serpentinen / Haarnadelkurven anzeigen</string>

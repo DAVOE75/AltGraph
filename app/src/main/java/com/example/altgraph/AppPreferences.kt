@@ -156,6 +156,10 @@ class AppPreferences(context: Context) {
         }
         set(value) = prefs.edit().putString(KEY_CLIMB_ALTIMETRIA_STYLE, value.key).apply()
 
+    var chartFitAxis: Boolean
+        get() = prefs.getBoolean(KEY_CHART_FIT_AXIS, false)
+        set(value) = prefs.edit().putBoolean(KEY_CHART_FIT_AXIS, value).apply()
+
     var chartLightBackground: Boolean
         get() = prefs.getBoolean(KEY_CHART_LIGHT_BG, false)
         set(value) = prefs.edit().putBoolean(KEY_CHART_LIGHT_BG, value).apply()
@@ -510,6 +514,7 @@ class AppPreferences(context: Context) {
         private const val KEY_ALTIMETRIA_STYLE = "altimetria_style_key"
         private const val KEY_CLIMB_ALTIMETRIA_STYLE = "climb_altimetria_style_key"
 
+        private const val KEY_CHART_FIT_AXIS = "chart_fit_axis"
         private const val KEY_CHART_LIGHT_BG = "chart_light_bg"
         private const val KEY_SMART_ZOOM_ENABLED = "smart_zoom_enabled"
         private const val KEY_OASIS_TRACKING_ENABLED = "oasis_tracking_enabled"
