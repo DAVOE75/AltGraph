@@ -388,7 +388,8 @@ class Altimetria3DView @JvmOverloads constructor(
                     0 -> {
                         if (posterActive) continue
                         cleanPctPaint.style = Paint.Style.FILL
-                        cleanPctPaint.color = Color.argb(170, 0, 0, 0)
+                        // Fondo claro clásico: el filtro invierte, así que la sombra se dibuja clara para que salga oscura
+                        cleanPctPaint.color = if (lightBgActive) Color.argb(170, 255, 255, 255) else Color.argb(170, 0, 0, 0)
                         canvas.drawText(text, x + shadowOff, y + shadowOff / stretch, cleanPctPaint)
                     }
                     1 -> {
@@ -397,13 +398,14 @@ class Altimetria3DView @JvmOverloads constructor(
                         cleanPctPaint.style = Paint.Style.STROKE
                         cleanPctPaint.strokeJoin = Paint.Join.ROUND
                         cleanPctPaint.strokeWidth = strokeW * 2f
-                        cleanPctPaint.color = Color.parseColor("#1E293B")
+                        // Fondo claro clásico: borde negro tras el filtro
+                        cleanPctPaint.color = if (lightBgActive) Color.WHITE else Color.parseColor("#1E293B")
                         canvas.drawText(text, x, y, cleanPctPaint)
                     }
                     else -> {
                         cleanPctPaint.style = Paint.Style.FILL
-                        // Cartel: el filtro del fondo blanco invierte, así que el negro sale blanco puro (sin borde ni sombra)
-                        cleanPctPaint.color = if (posterActive) Color.BLACK else Color.WHITE
+                        // Fondo claro (clásico y cartel): se dibuja negro para que el filtro lo deje blanco
+                        cleanPctPaint.color = if (lightBgActive) Color.BLACK else Color.WHITE
                         canvas.drawText(text, x, y, cleanPctPaint)
                     }
                 }
@@ -1228,8 +1230,8 @@ class Altimetria3DView @JvmOverloads constructor(
         canvas.drawText(zoomLabel, centerX, centerY, zoomBtnPaint)
     }
 
-    private fun drawTopographicPeaks(canvas: Canvas, xFront: FloatArray, yFront: FloatArray, yBase: FloatArray, totalMicroSamples: Int, microElevations: FloatArray) {
-        if (totalMicroSamples < 3 || microElevations.isEmpty()) return
+    private fun selectTopographicPeaks(totalMicroSamples: Int, microElevations: FloatArray): List<Pair<Int, Float>> {
+        if (totalMicroSamples < 3 || microElevations.isEmpty()) return emptyList()
 
         val peaks = mutableListOf<Pair<Int, Float>>()
         for (i in 1 until totalMicroSamples - 1) {
@@ -1260,6 +1262,12 @@ class Altimetria3DView @JvmOverloads constructor(
                 selectedPeaks.add(peak)
             }
         }
+        return selectedPeaks
+    }
+
+    private fun drawTopographicPeaks(canvas: Canvas, xFront: FloatArray, yFront: FloatArray, yBase: FloatArray, totalMicroSamples: Int, microElevations: FloatArray) {
+        val selectedPeaks = selectTopographicPeaks(totalMicroSamples, microElevations)
+        if (selectedPeaks.isEmpty()) return
 
         if (reusablePinPaint == null) reusablePinPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.WHITE
@@ -1490,13 +1498,39 @@ class Altimetria3DView @JvmOverloads constructor(
         val steps = 4
         axisTextPaint.textSize = (h * 0.038f).coerceIn(9f, 13f) * (1f + (fontScale - 1f) * 0.6f)
         axisTextPaint.textAlign = Paint.Align.LEFT
+        // Barra de escala lateral: tramos alternos marrones y blancos con un borde fino (negro en fondo claro, blanco en oscuro)
+        run {
+            val dp = resources.displayMetrics.density
+            val barW = 2.5f * dp
+            val brownPaint = Paint().apply {
+                color = if (lightBgActive) lightComp(Color.parseColor("#4A2C17")) else Color.parseColor("#7A4A2A")
+                style = Paint.Style.FILL
+            }
+            // El filtro del fondo blanco invierte: se dibuja negro para que salga blanco y blanco para que el borde salga negro
+            val whiteFillPaint = Paint().apply { color = if (lightBgActive) Color.BLACK else Color.WHITE; style = Paint.Style.FILL }
+            val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.WHITE
+                style = Paint.Style.STROKE
+                strokeWidth = 1f
+            }
+            for (k in 0 until steps) {
+                val yLow = baseGroundY - (k.toFloat() / steps * maxPeakHeight)
+                val yHigh = baseGroundY - ((k + 1).toFloat() / steps * maxPeakHeight)
+                if (k % 2 == 0) {
+                    canvas.drawRect(0f, yHigh, barW, yLow, brownPaint)
+                } else {
+                    canvas.drawRect(0f, yHigh, barW, yLow, whiteFillPaint)
+                    canvas.drawRect(0.5f, yHigh, barW - 0.5f, yLow, borderPaint)
+                }
+            }
+        }
         for (k in 0..steps) {
             val ratio = k.toFloat() / steps
             val elevMark = (displayMinElev + (ratio * finalElevRange)).toInt()
             val yIso = baseGroundY - (ratio * maxPeakHeight)
 
             canvas.drawLine(startX - depth3dX, yIso, baseEndX, yIso, gridPaint)
-            canvas.drawText("${elevMark}m", 6f, yIso + 4f, axisTextPaint)
+            canvas.drawText("${elevMark}m", 5f * resources.displayMetrics.density, yIso + 4f, axisTextPaint)
         }
 
         // Fusión opcional de bloques vecinos del mismo color: una sola columna con la pendiente media del tramo
@@ -1611,6 +1645,8 @@ class Altimetria3DView @JvmOverloads constructor(
         
         val maxMajorIdx = if (majorElevations.isNotEmpty()) majorElevations.indices.maxByOrNull { majorElevations[it] } ?: -1 else -1
         val minMajorIdx = if (majorElevations.isNotEmpty()) majorElevations.indices.minByOrNull { majorElevations[it] } ?: -1 else -1
+        // Si una cota cae en un punto cima, se deja solo el marcador de cima
+        val peakXs = selectTopographicPeaks(totalMicroSamples, microElevations).map { xFront[it.first] }
 
         for (k in 0 until majorSamples) {
             val microIdx = (k * microSubDivisions).coerceAtMost(totalMicroSamples - 1)
@@ -1625,6 +1661,7 @@ class Altimetria3DView @JvmOverloads constructor(
             if (shouldDrawCota) {
                 // Línea vertical que sube un poco por encima del perfil
                 canvas.drawLine(px, pyTop - 12f, px, pyBase, cotaLinePaint)
+                if (peakXs.any { abs(it - px) < 14f }) continue
                 
                 val cotaText = "${majorElevations[k].toInt()}"
                 canvas.save()
@@ -2015,7 +2052,7 @@ class Altimetria3DView @JvmOverloads constructor(
             val stepSize = Math.max(1, totalMicroSamples / 10)
             for (i in 0 until totalMicroSamples step stepSize) {
                 val px = xFront[i]
-                val py = yFront[i] - 30f
+                val py = yFront[i] - 42f
                 val dx = if (wind < 0) -20f else 20f
                 canvas.drawLine(px, py, px + dx, py, windPaint)
                 canvas.drawLine(px + dx, py, px + dx - Math.signum(dx)*5f, py - 5f, windPaint)
