@@ -52,10 +52,13 @@
     <string name="setting_show_route_compass">Afficher boussole sur l\'itinéraire global</string>
     <string name="setting_ramp_min_slope">Pente minimale pour flèche de rampe (%)</string>
     <string name="setting_ramp_max_slope">Pente maximale pour flèche de rampe (%)</string>
-    <string name="setting_show_max_gradient">Afficher pente max dans l\'en-tête 3D</string>
-    <string name="setting_show_3d_header_stats">Afficher données d\'en-tête 3D (Nom d\'itinéraire, pentes)</string>
+    <string name="setting_show_3d_header_stats">Afficher les pentes dans l\'en-tête 3D (Actuelle, moyenne et maximale)</string>
+    <string name="setting_show_3d_route_name">Afficher le nom de l\'itinéraire dans l\'en-tête 3D</string>
     <string name="setting_rotate_90_cw">Pivoter graphique de 90° (Mode paysage)</string>
     <string name="setting_chart_light_bg">Fond blanc des graphiques</string>
+    <string name="setting_chart_light_style">Style du fond blanc</string>
+    <string name="setting_chart_light_style_classic">Classique</string>
+    <string name="setting_chart_light_style_poster">Affiche (corps noir, blocs dorés)</string>
     <string name="setting_chart_fit_axis">Échelle verticale ajustée au tronçon visible</string>
     <string name="setting_chart_fit_axis_desc">Ajuste la hauteur du profil 3D aux altitudes visibles, pour mieux voir le relief avec un zoom court. Les routes plates ne sont pas exagérées en dessous de 30 m. Les pentes et les couleurs ne changent pas.</string>
     <string name="setting_chart_light_bg_desc">Affiche le fond des graphiques 3D en blanc, avec altitudes et kilomètres en noir et des couleurs plus intenses. Utile en plein soleil.</string>

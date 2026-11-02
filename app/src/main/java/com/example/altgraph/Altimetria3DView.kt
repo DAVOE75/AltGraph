@@ -386,11 +386,13 @@ class Altimetria3DView @JvmOverloads constructor(
                 val text = if (isNumber) number else "%"
                 when (pass) {
                     0 -> {
+                        if (posterActive) continue
                         cleanPctPaint.style = Paint.Style.FILL
                         cleanPctPaint.color = Color.argb(170, 0, 0, 0)
                         canvas.drawText(text, x + shadowOff, y + shadowOff / stretch, cleanPctPaint)
                     }
                     1 -> {
+                        if (posterActive) continue
                         // Borde exterior: el trazo va bajo el relleno y solo asoma su mitad externa
                         cleanPctPaint.style = Paint.Style.STROKE
                         cleanPctPaint.strokeJoin = Paint.Join.ROUND
@@ -400,7 +402,8 @@ class Altimetria3DView @JvmOverloads constructor(
                     }
                     else -> {
                         cleanPctPaint.style = Paint.Style.FILL
-                        cleanPctPaint.color = Color.WHITE
+                        // Cartel: el filtro del fondo blanco invierte, así que el negro sale blanco puro (sin borde ni sombra)
+                        cleanPctPaint.color = if (posterActive) Color.BLACK else Color.WHITE
                         canvas.drawText(text, x, y, cleanPctPaint)
                     }
                 }
@@ -470,6 +473,14 @@ class Altimetria3DView @JvmOverloads constructor(
         }
         percentTextPaint.textSize = fontSize
         val textW = percentTextPaint.measureText(pctStr)
+        if (posterActive) {
+            // Cartel: solo el número, blanco tras el filtro, sin píldora ni borde
+            val prev = percentTextPaint.color
+            percentTextPaint.color = Color.BLACK
+            canvas.drawText(pctStr, cx, centerY + (fontSize * 0.35f), percentTextPaint)
+            percentTextPaint.color = prev
+            return
+        }
         val pillRect = RectF(
             cx - (textW / 2f) - padX,
             centerY - (fontSize * 0.50f) - padY,
@@ -725,6 +736,8 @@ class Altimetria3DView @JvmOverloads constructor(
     private val pacingPath = Path()
     private val plasmaCorePath = Path()
     private var showHeaderStats: Boolean = true
+    private var showRouteName: Boolean = true
+    private var showGradeStats: Boolean = true
     // Y de la línea de altitud más alta del perfil (-1 si el estilo no la calcula); el texto de distancias se coloca bajo ella
     private var profileTopLineY: Float = -1f
     private var currentFontKey: String = "sans-serif-condensed"
@@ -779,6 +792,8 @@ class Altimetria3DView @JvmOverloads constructor(
         routeName: String? = null,
         customTitle: String? = null,
         showHeaderStats: Boolean = true,
+        showRouteName: Boolean = true,
+        showGradeStats: Boolean = true,
         routeCoords: List<Pair<Double, Double>> = emptyList(),
         mapRotationAngle: Double = 0.0,
         isHeadingUp: Boolean = false,
@@ -831,6 +846,8 @@ class Altimetria3DView @JvmOverloads constructor(
         this.visibleMaxGrade = visibleMaxGrade
         this.routeName = routeName
         this.showHeaderStats = showHeaderStats
+        this.showRouteName = showRouteName
+        this.showGradeStats = showGradeStats
         this.mapRotationAngle = mapRotationAngle
         this.isHeadingUp = isHeadingUp
         this.showSurfaceTextures = showSurfaceTextures
@@ -973,6 +990,7 @@ class Altimetria3DView @JvmOverloads constructor(
     // (blanco/gris claro -> negro/gris muy oscuro para cotas y km; naranjas y rojos siguen siendo naranjas y rojos)
     // y refuerza la saturación para que los colores se vean intensos sobre blanco.
     private var lightBgActive = false
+    private var posterActive = false
     private val lightBgPaint: Paint get() = LightBgFilter.paint
 
     override fun onDraw(canvas: Canvas) {
@@ -984,6 +1002,7 @@ class Altimetria3DView @JvmOverloads constructor(
         if (w <= 0 || h <= 0) return
 
         lightBgActive = AppPreferences.getInstance(context).chartLightBackground
+        posterActive = lightBgActive && AppPreferences.getInstance(context).chartLightStyle == "poster"
         val layer = if (lightBgActive) canvas.saveLayer(0f, 0f, w, h, lightBgPaint) else -1
 
         if (rotate90) {
@@ -1021,14 +1040,15 @@ class Altimetria3DView @JvmOverloads constructor(
         // 1. Fondo Oscuro
         canvas.drawRect(0f, 0f, w, h, bgPaint)
 
-        // 2. Encabezado Título ("Altimetría 3D")
+        // 2. Encabezado: nombre de la ruta (sin prefijo) y, por separado, pendientes actual / media / máxima
         if (showHeaderStats) {
-        val baseTitle = context.getString(R.string.data_type_altimetria_3d_title)
-        val titleText = if (!routeName.isNullOrEmpty()) "$baseTitle - $routeName" else baseTitle
-        titlePaint.textSize = ((h * 0.080f) * fontScale).coerceIn(16f, fsHi(28f))
-        canvas.drawText(titleText, 18f, h * 0.07f, titlePaint)
+        if (showRouteName && !routeName.isNullOrEmpty()) {
+            titlePaint.textSize = ((h * 0.080f) * fontScale).coerceIn(16f, fsHi(28f))
+            canvas.drawText(routeName!!, 18f, h * 0.07f, titlePaint)
+        }
+        if (showGradeStats) {
 
-        val numCols = if (showMaxGrade) 3 else 2
+        val numCols = 3
         val colW = (w - 32f) / numCols
         val col1X = 16f
         val col2X = 16f + colW
@@ -1076,6 +1096,7 @@ class Altimetria3DView @JvmOverloads constructor(
             fitTextToWidth(maxGradePaint, maxGradeText, colW - 8f, 24f)
             canvas.drawText(maxGradeText, col3X, h * 0.26f, maxGradePaint)
         }
+        } // Fin de if (showGradeStats)
         } // Fin de if (showHeaderStats)
 
         // 3. Botones Minimalistas de Zoom [ - | + ]
@@ -1520,7 +1541,10 @@ class Altimetria3DView @JvmOverloads constructor(
         }
 
         // 2. RENDERIZADO DEL PERFIL SEGÚN EL MODELO SELECCIONADO
-        when (altimetriaStyle) {
+        when (if (posterActive) null else altimetriaStyle) {
+            null -> {
+                drawPosterRibbon(canvas, totalMicroSamples, displayGrades, xFront, yFront, xBack, yBack, yBase)
+            }
             AltimetriaStyle.CLASSIC -> {
                 drawClassicRibbon(canvas, totalMicroSamples, displayGrades, xFront, yFront, xBack, yBack, yBase, depth3dY)
             }
@@ -1565,6 +1589,9 @@ class Altimetria3DView @JvmOverloads constructor(
                 riddenDimPath.lineTo(dx, dBase)
                 for (i in dIdx downTo 0) riddenDimPath.lineTo(xFront[i], yBase[i])
                 riddenDimPath.close()
+                // Fondo blanco: el filtro invierte. Clásico oscurece el tramo recorrido (blanco previo -> negro final);
+                // cartel lo aclara (negro previo -> blanco final sobre el cuerpo negro)
+                riddenDimPaint.color = if (lightBgActive && !posterActive) Color.argb(120, 255, 255, 255) else Color.argb(120, 0, 0, 0)
                 canvas.drawPath(riddenDimPath, riddenDimPaint)
             }
         }
@@ -2836,6 +2863,86 @@ class Altimetria3DView @JvmOverloads constructor(
             canvas.drawLine(xFront[i], yFront[i], xFront[i + 1], yFront[i + 1], neonGlowPaint)
             canvas.drawLine(xFront[i], yFront[i], xFront[i + 1], yFront[i + 1], neonCorePaint)
         }
+    }
+
+    // Estilo "cartel" (fondo blanco): cuerpo negro, cresta con el color de la pendiente y bloques dorados.
+    // Se dibuja antes del filtro del fondo blanco, que invierte la luminosidad: el blanco puro sale negro
+    // y el dorado se precompensa para conservar su tono.
+    private fun drawPosterRibbon(
+        canvas: Canvas,
+        totalMicroSamples: Int,
+        microGrades: FloatArray,
+        xFront: FloatArray,
+        yFront: FloatArray,
+        xBack: FloatArray,
+        yBack: FloatArray,
+        yBase: FloatArray
+    ) {
+        val gold = lightComp(Color.parseColor("#B8893C"))
+        val goldSoft = Color.argb(150, Color.red(gold), Color.green(gold), Color.blue(gold))
+        val bodyInk = Color.WHITE
+
+        wallPaint.shader = null
+        wallPaint.color = bodyInk
+        for (i in 0 until totalMicroSamples - 1) {
+            wallPath.reset()
+            wallPath.moveTo(xFront[i], yFront[i])
+            wallPath.lineTo(xFront[i + 1], yFront[i + 1])
+            wallPath.lineTo(xFront[i + 1], yBase[i + 1])
+            wallPath.lineTo(xFront[i], yBase[i])
+            wallPath.close()
+            canvas.drawPath(wallPath, wallPaint)
+        }
+
+        val sepPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
+        for (i in 0..totalMicroSamples - 1) {
+            if (isMergedJoint(i)) continue
+            val major = i % currentMicroSubDivisions == 0
+            sepPaint.color = if (major) gold else goldSoft
+            sepPaint.strokeWidth = if (major) 1.8f else 1.0f
+            canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], sepPaint)
+        }
+
+        val topPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
+        val hatchPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.WHITE
+            strokeWidth = 1.2f
+            style = Paint.Style.STROKE
+        }
+        for (i in 0 until totalMicroSamples - 1) {
+            val grade = if (i < microGrades.size) microGrades[i] else 4.0f
+            ribbonQuadPath.reset()
+            ribbonQuadPath.moveTo(xFront[i], yFront[i])
+            ribbonQuadPath.lineTo(xBack[i], yBack[i])
+            ribbonQuadPath.lineTo(xBack[i + 1], yBack[i + 1])
+            ribbonQuadPath.lineTo(xFront[i + 1], yFront[i + 1])
+            ribbonQuadPath.close()
+            topPaint.color = if (grade > 20.0f) Color.WHITE else Color.parseColor(getGradeColor(grade.toDouble()))
+            canvas.drawPath(ribbonQuadPath, topPaint)
+            if (i % 2 == 0) canvas.drawLine(xFront[i], yFront[i], xBack[i], yBack[i], hatchPaint)
+        }
+
+        val crestPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = gold
+            strokeWidth = 2.2f
+            style = Paint.Style.STROKE
+            strokeCap = Paint.Cap.ROUND
+        }
+        for (i in 0 until totalMicroSamples - 1) {
+            canvas.drawLine(xFront[i], yFront[i], xFront[i + 1], yFront[i + 1], crestPaint)
+            canvas.drawLine(xBack[i], yBack[i], xBack[i + 1], yBack[i + 1], crestPaint)
+        }
+
+        leftEndcapPath.reset()
+        leftEndcapPath.moveTo(xBack[0], yBack[0])
+        leftEndcapPath.lineTo(xFront[0], yFront[0])
+        leftEndcapPath.lineTo(xFront[0], yBase[0])
+        leftEndcapPath.lineTo(xBack[0], yBack[0] + (yBase[0] - yFront[0]))
+        leftEndcapPath.close()
+        topPaint.color = bodyInk
+        canvas.drawPath(leftEndcapPath, topPaint)
+        crestPaint.strokeWidth = 1.4f
+        canvas.drawPath(leftEndcapPath, crestPaint)
     }
 
     private fun isMergedJoint(i: Int): Boolean = i < mergedJoint.size && mergedJoint[i]

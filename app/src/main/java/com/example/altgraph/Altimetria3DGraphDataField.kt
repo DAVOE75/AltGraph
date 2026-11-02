@@ -244,7 +244,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             lookaheadMeters = strategy.windowLengthMeters.toInt(),
                             showCotas = prefs.show3dCotas,
                             showRamps = prefs.show3dRamps,
-                            showMaxGrade = prefs.showMaxGradient,
+                            showMaxGrade = true,
                             fontFamilyKey = prefs.fontFamilyKey,
                             rotate90 = prefs.rotate90Clockwise,
                             rampMinSlope = prefs.rampMinSlopePct,
@@ -268,7 +268,9 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             visibleAvgGrade = strategy.visibleAvgGrade,
                             visibleMaxGrade = strategy.visibleMaxGrade,
                             routeName = strategy.routeName,
-                            showHeaderStats = prefs.show3dHeaderStats,
+                            showHeaderStats = prefs.show3dHeaderStats || prefs.show3dRouteName,
+                            showRouteName = prefs.show3dRouteName,
+                            showGradeStats = prefs.show3dHeaderStats,
                             routeCoords = strategy.routeCoords,
                             mapRotationAngle = mapRotAngle,
                             isHeadingUp = isHeadingUp,
@@ -389,12 +391,18 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             remoteViews.setOnClickPendingIntent(R.id.btn_zoom_out, pendingZoomOut)
                             remoteViews.setOnClickPendingIntent(R.id.btn_zoom_in_top, pendingZoomIn)
                             remoteViews.setOnClickPendingIntent(R.id.btn_zoom_out_top, pendingZoomOut)
+                            if (prefs.chartLightBackground) {
+                                for (id in intArrayOf(R.id.btn_zoom_in, R.id.btn_zoom_in_top, R.id.btn_zoom_out, R.id.btn_zoom_out_top)) {
+                                    remoteViews.setInt(id, "setBackgroundColor", android.graphics.Color.parseColor("#B3E2E8F0"))
+                                    remoteViews.setTextColor(id, android.graphics.Color.parseColor("#0F172A"))
+                                }
+                            }
 
                             // Si el usuario deselecciona "Mostrar Pendiente Máxima" Y "Mostrar Datos en Encabezado",
                             // el espacio superior queda completamente despejado. En ese caso colocamos los botones centrados arriba
                             // para no estorbar a la gráfica lateralmente. Si cualquiera está activa, los botones van al lateral.
                             // La pendiente máxima solo se dibuja dentro del encabezado: sin encabezado el espacio superior está libre
-                            val isHeaderClean = !prefs.show3dHeaderStats
+                            val isHeaderClean = !prefs.show3dHeaderStats && !prefs.show3dRouteName
                             if (isHeaderClean) {
                                 remoteViews.setViewVisibility(R.id.zoom_controls_top, android.view.View.VISIBLE)
                                 remoteViews.setViewVisibility(R.id.zoom_controls_side, android.view.View.GONE)

@@ -663,7 +663,7 @@ class RouteProfile2DView(context: Context) : View(context) {
         // --- DRAW KM & ELEVATION TEXTS AND CYCLIST LINE LAST SO THEY ARE ON TOP OF EVERYTHING ---
         val kmDoneText = String.format("%.1f km", currentDistance / 1000.0)
         val remainDist = (totalDistance - currentDistance).coerceAtLeast(0.0)
-        val kmRemainText = String.format("-%.1f km", remainDist / 1000.0)
+        val kmRemainText = String.format("%.1f km", remainDist / 1000.0)
 
         // Calculate elevation done vs elevation remaining
         var elevDone = 0.0
@@ -680,7 +680,7 @@ class RouteProfile2DView(context: Context) : View(context) {
             }
         }
         val elevDoneText = String.format("+%dm", elevDone.toInt())
-        val elevRemainText = String.format("-%dm", elevRemain.toInt())
+        val elevRemainText = String.format("+%dm", elevRemain.toInt())
 
         val doneWidth = maxOf(kmDoneTextPaint.measureText(kmDoneText), elevDoneTextPaint.measureText(elevDoneText))
         val remainWidth = maxOf(kmRemainTextPaint.measureText(kmRemainText), elevRemainTextPaint.measureText(elevRemainText))

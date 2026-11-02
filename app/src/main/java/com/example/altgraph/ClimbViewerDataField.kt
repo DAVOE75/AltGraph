@@ -377,6 +377,22 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                         color = Color.parseColor("#EF4444") // Red
                     }
                     FontHelper.applyFontToPaint(maxGradePaint, prefs.fontFamilyKey)
+
+                    // Fondo blanco: textos oscuros y sin sombra negra para que se lean
+                    if (prefs.chartLightBackground) {
+                        val ink = Color.parseColor("#0F172A")
+                        overlayPaint.color = ink
+                        overlayPaint.clearShadowLayer()
+                        subPaint.color = ink
+                        subPaint.clearShadowLayer()
+                        maxGradePaint.color = Color.parseColor("#B91C1C")
+                        maxGradePaint.clearShadowLayer()
+                    } else {
+                        overlayPaint.color = Color.WHITE
+                        overlayPaint.setShadowLayer(4f, 0f, 2f, Color.BLACK)
+                        subPaint.color = Color.parseColor("#E2E8F0")
+                        subPaint.setShadowLayer(3f, 0f, 1f, Color.BLACK)
+                    }
                     
                     val showName = prefs.showClimbNameInViewer && !climb.name.isNullOrBlank()
                     val catPart = if (climb.category.isNotBlank()) " (${climb.category})" else ""
@@ -474,6 +490,12 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 remoteViews.setOnClickPendingIntent(R.id.btn_zoom_out_top, pIntentZOut)
                 remoteViews.setTextViewText(R.id.btn_zoom_out, "-")
                 remoteViews.setTextViewText(R.id.btn_zoom_out_top, "-")
+                if (prefs.chartLightBackground) {
+                    for (id in intArrayOf(R.id.btn_zoom_in, R.id.btn_zoom_in_top, R.id.btn_zoom_out, R.id.btn_zoom_out_top)) {
+                        remoteViews.setInt(id, "setBackgroundColor", Color.parseColor("#B3E2E8F0"))
+                        remoteViews.setTextColor(id, Color.parseColor("#0F172A"))
+                    }
+                }
 
                 // Alternar posicion de zoom: encabezado superior vs inferior/lateral
                 if (prefs.climbViewerZoomAtTop) {

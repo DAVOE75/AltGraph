@@ -52,10 +52,13 @@
     <string name="setting_show_route_compass">Kompass auf Gesamtstrecke anzeigen</string>
     <string name="setting_ramp_min_slope">Mindeststeigung für Rampenpfeil (%)</string>
     <string name="setting_ramp_max_slope">Maximalsteigung für Rampenpfeil (%)</string>
-    <string name="setting_show_max_gradient">Maximale Steigung im 3D-Kopf anzeigen</string>
-    <string name="setting_show_3d_header_stats">3D-Kopfdaten anzeigen (Routenname, Steigungen)</string>
+    <string name="setting_show_3d_header_stats">Steigungen im 3D-Kopf anzeigen (Aktuell, Durchschnitt und Maximal)</string>
+    <string name="setting_show_3d_route_name">Routennamen im 3D-Kopf anzeigen</string>
     <string name="setting_rotate_90_cw">Diagramm um 90° drehen (Querformat)</string>
     <string name="setting_chart_light_bg">Weißer Hintergrund in den Diagrammen</string>
+    <string name="setting_chart_light_style">Stil des weißen Hintergrunds</string>
+    <string name="setting_chart_light_style_classic">Klassisch</string>
+    <string name="setting_chart_light_style_poster">Poster (schwarzer Körper, goldene Blöcke)</string>
     <string name="setting_chart_fit_axis">Vertikale Skala an den sichtbaren Abschnitt anpassen</string>
     <string name="setting_chart_fit_axis_desc">Passt die Höhe des 3D-Profils an die sichtbaren Höhen an, damit das Gelände bei kurzem Zoom besser zu erkennen ist. Flache Strecken werden unter 30 m nicht übertrieben. Steigungen und Farben bleiben gleich.</string>
     <string name="setting_chart_light_bg_desc">Zeichnet den Hintergrund der 3D-Diagramme weiß, mit schwarzen Höhen- und Kilometerangaben und kräftigeren Farben. Praktisch bei starker Sonne.</string>

@@ -327,6 +327,27 @@ class MainActivity : Activity() {
             setTextColor(Color.LTGRAY)
             setPadding(0, 4, 0, 4)
         })
+        val lightStyleKeys = listOf("classic", "poster")
+        lightBgCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_chart_light_style)
+            textSize = 13f
+            setTextColor(Color.WHITE)
+            setPadding(0, 8, 0, 0)
+        })
+        lightBgCard.addView(Spinner(this).apply {
+            adapter = ArrayAdapter(
+                this@MainActivity,
+                android.R.layout.simple_spinner_dropdown_item,
+                listOf(getString(R.string.setting_chart_light_style_classic), getString(R.string.setting_chart_light_style_poster))
+            )
+            setSelection(lightStyleKeys.indexOf(prefs.chartLightStyle).coerceAtLeast(0))
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    prefs.chartLightStyle = lightStyleKeys[position]
+                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+        })
 
         // Opción: eje vertical ajustado a la ventana visible (más relieve a zoom corto)
         val fitAxisCard = createCardContainer()
@@ -670,20 +691,7 @@ class MainActivity : Activity() {
         }
         topographicCard.addView(switchTopographic)
 
-        // Opción: Pendiente Máxima en Encabezado
-        val showMaxGradCard = createCardContainer()
-        val switchShowMaxGrad = Switch(this).apply {
-            text = getString(R.string.setting_show_max_gradient)
-            textSize = 15f
-            setTextColor(Color.WHITE)
-            isChecked = prefs.showMaxGradient
-            setOnCheckedChangeListener { _, isChecked ->
-                prefs.showMaxGradient = isChecked
-            }
-        }
-        showMaxGradCard.addView(switchShowMaxGrad)
-
-        // Opción: Mostrar Encabezado con Datos y Pendientes en 3D
+        // Opción: Mostrar pendientes (actual, media y máxima) en el encabezado 3D
         val showHeaderStatsCard = createCardContainer()
         val switchShowHeaderStats = Switch(this).apply {
             text = getString(R.string.setting_show_3d_header_stats)
@@ -695,6 +703,16 @@ class MainActivity : Activity() {
             }
         }
         showHeaderStatsCard.addView(switchShowHeaderStats)
+
+        // Opción: nombre de la ruta en el encabezado 3D
+        val showRouteNameCard = createCardContainer()
+        showRouteNameCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_show_3d_route_name)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.show3dRouteName
+            setOnCheckedChangeListener { _, isChecked -> prefs.show3dRouteName = isChecked }
+        })
 
         // Opción: Mostrar Brujula en Ruta
         val showCompassCard = createCardContainer()
@@ -1088,7 +1106,7 @@ class MainActivity : Activity() {
         tab3dContainer.addView(showHairpinsCard)
         tab3dContainer.addView(poiFilterCard)
         tab3dContainer.addView(topographicCard)
-        tab3dContainer.addView(showMaxGradCard)
+        tab3dContainer.addView(showRouteNameCard)
         tab3dContainer.addView(showHeaderStatsCard)
 
         // ==========================================

@@ -62,6 +62,10 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_SHOW_MAX_GRADIENT, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_MAX_GRADIENT, value).apply()
 
+    var show3dRouteName: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_3D_ROUTE_NAME, true)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_ROUTE_NAME, value).apply()
+
     var show3dHeaderStats: Boolean
         get() = prefs.getBoolean(KEY_SHOW_3D_HEADER_STATS, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_HEADER_STATS, value).apply()
@@ -163,6 +167,11 @@ class AppPreferences(context: Context) {
     var chartLightBackground: Boolean
         get() = prefs.getBoolean(KEY_CHART_LIGHT_BG, false)
         set(value) = prefs.edit().putBoolean(KEY_CHART_LIGHT_BG, value).apply()
+
+    // Variante del fondo blanco: "classic" (filtro invertido, como siempre) o "poster" (cuerpo negro, cresta de color, bloques dorados)
+    var chartLightStyle: String
+        get() = prefs.getString(KEY_CHART_LIGHT_STYLE, "classic") ?: "classic"
+        set(value) = prefs.edit().putString(KEY_CHART_LIGHT_STYLE, value).apply()
 
     // --- PRO FEATURES (NIVEL SDK MÁXIMO) ---
     var smartZoomEnabled: Boolean
@@ -487,6 +496,7 @@ class AppPreferences(context: Context) {
         private const val KEY_SHOW_3D_RAMPS = "show_3d_ramps"
         private const val KEY_SHOW_MAX_GRADIENT = "show_max_gradient"
         private const val KEY_SHOW_3D_HEADER_STATS = "show_3d_header_stats"
+        private const val KEY_SHOW_3D_ROUTE_NAME = "show_3d_route_name"
         private const val KEY_SHOW_ROUTE_COMPASS = "show_route_compass"
         private const val KEY_ROTATE_90_CW = "rotate_90_clockwise"
         private const val KEY_CLIMB_ROTATE_90_CW = "climb_rotate_90_clockwise"
@@ -516,6 +526,7 @@ class AppPreferences(context: Context) {
 
         private const val KEY_CHART_FIT_AXIS = "chart_fit_axis"
         private const val KEY_CHART_LIGHT_BG = "chart_light_bg"
+        private const val KEY_CHART_LIGHT_STYLE = "chart_light_style"
         private const val KEY_SMART_ZOOM_ENABLED = "smart_zoom_enabled"
         private const val KEY_OASIS_TRACKING_ENABLED = "oasis_tracking_enabled"
         private const val KEY_SWITCHBACK_RENDERING_ENABLED = "switchback_rendering_enabled"

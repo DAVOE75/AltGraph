@@ -67,10 +67,13 @@
     <string name="setting_show_route_compass">Show Compass on Global Route</string>
     <string name="setting_ramp_min_slope">Ramp Minimum Slope Alert (%)</string>
     <string name="setting_ramp_max_slope">Ramp Maximum Slope Alert (%)</string>
-    <string name="setting_show_max_gradient">Show Section Max Gradient in 3D Header</string>
-    <string name="setting_show_3d_header_stats">Show 3D Header Statistics (Route Name, Gradients)</string>
+    <string name="setting_show_3d_header_stats">Show Gradients in 3D Header (Current, Average and Max)</string>
+    <string name="setting_show_3d_route_name">Show Route Name in 3D Header</string>
     <string name="setting_rotate_90_cw">Rotate Graph 90° Clockwise (Landscape Mode)</string>
     <string name="setting_chart_light_bg">White chart background</string>
+    <string name="setting_chart_light_style">White background style</string>
+    <string name="setting_chart_light_style_classic">Classic</string>
+    <string name="setting_chart_light_style_poster">Poster (black body, gold blocks)</string>
     <string name="setting_chart_fit_axis">Vertical scale fitted to the visible stretch</string>
     <string name="setting_chart_fit_axis_desc">Fits the 3D profile height to the elevations you see, so terrain shows more at short zoom. Flat roads are not exaggerated below 30 m. Gradients and colours do not change.</string>
     <string name="setting_chart_light_bg_desc">Draws the 3D chart background in white, with elevations and kilometres in black and more intense colours. Handy in bright sunlight.</string>
