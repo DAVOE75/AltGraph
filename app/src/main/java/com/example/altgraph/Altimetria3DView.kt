@@ -738,6 +738,8 @@ class Altimetria3DView @JvmOverloads constructor(
     private var showHeaderStats: Boolean = true
     private var showRouteName: Boolean = true
     private var showGradeStats: Boolean = true
+    // Cabecera grande (con pendientes): condiciona el hueco superior; solo el nombre ocupa una línea y deja el sitio como sin cabecera
+    private val gradeHeaderShown: Boolean get() = showHeaderStats && showGradeStats
     // Y de la línea de altitud más alta del perfil (-1 si el estilo no la calcula); el texto de distancias se coloca bajo ella
     private var profileTopLineY: Float = -1f
     private var currentFontKey: String = "sans-serif-condensed"
@@ -1037,6 +1039,12 @@ class Altimetria3DView @JvmOverloads constructor(
             cotaLinePaint.color = Color.parseColor("#334155")
             cotaLinePaint.strokeWidth = 1.6f
         }
+        // La separación de bloques (línea vertical con cota) es siempre continua; en cartel además es dorada
+        cotaLinePaint.pathEffect = null
+        if (posterActive) {
+            cotaLinePaint.color = lightComp(Color.parseColor("#B8893C"))
+            cotaLinePaint.strokeWidth = 1.8f
+        }
         // 1. Fondo Oscuro
         canvas.drawRect(0f, 0f, w, h, bgPaint)
 
@@ -1044,6 +1052,7 @@ class Altimetria3DView @JvmOverloads constructor(
         if (showHeaderStats) {
         if (showRouteName && !routeName.isNullOrEmpty()) {
             titlePaint.textSize = ((h * 0.080f) * fontScale).coerceIn(16f, fsHi(28f))
+            fitTextToWidth(titlePaint, routeName!!, (w - 36f).coerceAtLeast(40f), 10f)
             canvas.drawText(routeName!!, 18f, h * 0.07f, titlePaint)
         }
         if (showGradeStats) {
@@ -1127,7 +1136,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 (formatRouteKm(left) + if (routeShowElevation && remaining != null) " / ${remaining.roundToInt()}m" else "")
         )
         // Sin cabecera y con las flechas de paso abajo, los datos suben a la fila de los botones de zoom (entre las esquinas y el zoom)
-        val inZoomRow = !showHeaderStats && !rotate90 && !isClimbMode && panButtonsPosition != "top"
+        val inZoomRow = !gradeHeaderShown && !rotate90 && !isClimbMode && panButtonsPosition != "top"
         val dp = resources.displayMetrics.density
         val zoomHalfW = 54f * dp
         var textSize = textSize0
@@ -1149,7 +1158,7 @@ class Altimetria3DView @JvmOverloads constructor(
             val rowCenter = 16f * dp + 24f * dp
             rowCenter - (lineH + textSize) / 2f + textSize
         } else if (profileTopLineY > 0f) profileTopLineY + textSize * 1.15f + 6f
-            else if (showHeaderStats) h * 0.33f else (h * 0.15f).coerceIn(28f, 44f) + 22f
+            else if (gradeHeaderShown) h * 0.33f else (h * 0.15f).coerceIn(28f, 44f) + 22f
         if (routeInfoOnLeft) {
             // A la izquierda, tras el eje de altitudes: etiquetas alineadas y valores en columna
             val leftX = if (inZoomRow) 8f else w * 0.10f + 8f
@@ -1336,20 +1345,20 @@ class Altimetria3DView @JvmOverloads constructor(
         val profileMode = profileElevations.size >= 2 && subBlocks.isNotEmpty() && subBlockSizeMeters > 0.0
         val gearBadgeShown = gearWallEnabled && showGearBadge
         // Sin cabecera (ni título ni datos de pendiente) el engranaje sube justo debajo de los botones de zoom
-        val gearOnTop = gearBadgeShown && !showHeaderStats && !isClimbMode
-        val zoomBottomY = 64f * resources.displayMetrics.density + 6f
+        val gearOnTop = gearBadgeShown && !gradeHeaderShown && !isClimbMode
+        val zoomBottomY = 64f * resources.displayMetrics.density + 6f + (if (showRouteName && showHeaderStats) 6f * resources.displayMetrics.density else 0f)
         val gearTopTextSize = ((h * 0.085f) * fontScale).coerceIn(22f, 32f)
         val gearTopBadgeH = gearTopTextSize * 0.85f + 20f
 
         val startX = (w * 0.10f)
         val baseEndX = (w * 0.98f)
         val defaultGroundY = when {
-            showHeaderStats -> h * 0.82f
+            gradeHeaderShown -> h * 0.82f
             isClimbMode && !rotate90 -> h * 0.81f
             else -> h * 0.77f
         }
         val defaultPeakHeight = when {
-            showHeaderStats -> h * 0.48f
+            gradeHeaderShown -> h * 0.48f
             isClimbMode && !rotate90 -> h * 0.48f
             else -> h * 0.60f
         }
@@ -1930,7 +1939,9 @@ class Altimetria3DView @JvmOverloads constructor(
             // Mismas medidas que los botones del layout XML (44 dp, pegados a la esquina): lo que se ve es lo que se pulsa
             val dp = resources.displayMetrics.density
             val radius = resources.getDimension(R.dimen.pan_btn_size) / 2f
-            val cy = if (panButtonsPosition == "top") radius else (h - radius)
+            // Arriba: centrados con los botones de zoom (16dp de margen + 22dp de medio botón); abajo: 3dp más bajos
+            val nameShift = if (showRouteName && showHeaderStats) 6f * dp else 0f
+            val cy = if (panButtonsPosition == "top") (if (rotate90) 38f else 42f) * dp + nameShift else (h - radius + 3f * dp)
             val cxLeft = PAN_BTN_EDGE_DP * dp + radius
             val cxRight = w - cxLeft
             
@@ -3016,7 +3027,7 @@ class Altimetria3DView @JvmOverloads constructor(
             isHeadingUp && rotate90 -> h * 0.38f
             isHeadingUp -> h * 0.68f
             rotate90 -> h * 0.3f
-            !showHeaderStats -> h * 0.50f
+            !gradeHeaderShown -> h * 0.50f
             else -> h * 0.55f // Move down significantly in portrait to avoid ClimbViewer header
         }
 

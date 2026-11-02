@@ -346,6 +346,8 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                         routeName = "",
                         customTitle = "",
                         showHeaderStats = false,
+                        showGradeStats = false,
+                        showRouteName = false,
                         routeCoords = strategy.routeCoords,
                         showSurfaceTextures = prefs.showSurfaceTextures,
                         panButtonsPosition = "bottom"
@@ -488,11 +490,11 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 val pIntentZOut = PendingIntent.getBroadcast(context, 2, intentZOut, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                 remoteViews.setOnClickPendingIntent(R.id.btn_zoom_out, pIntentZOut)
                 remoteViews.setOnClickPendingIntent(R.id.btn_zoom_out_top, pIntentZOut)
-                remoteViews.setTextViewText(R.id.btn_zoom_out, "-")
-                remoteViews.setTextViewText(R.id.btn_zoom_out_top, "-")
+                remoteViews.setTextViewText(R.id.btn_zoom_out, "−")
+                remoteViews.setTextViewText(R.id.btn_zoom_out_top, "−")
                 if (prefs.chartLightBackground) {
                     for (id in intArrayOf(R.id.btn_zoom_in, R.id.btn_zoom_in_top, R.id.btn_zoom_out, R.id.btn_zoom_out_top)) {
-                        remoteViews.setInt(id, "setBackgroundColor", Color.parseColor("#B3E2E8F0"))
+                        remoteViews.setInt(id, "setBackgroundResource", R.drawable.zoom_btn_bg_light)
                         remoteViews.setTextColor(id, Color.parseColor("#0F172A"))
                     }
                 }

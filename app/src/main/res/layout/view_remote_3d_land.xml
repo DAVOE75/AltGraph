@@ -36,6 +36,7 @@
         android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="top|start"
         android:layout_marginTop="2dp"
+        android:layout_marginStart="-3dp"
         android:stateListAnimator="@null"
         android:background="#01000000" />
 
@@ -46,6 +47,7 @@
         android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="bottom|start"
         android:layout_marginBottom="2dp"
+        android:layout_marginStart="-3dp"
         android:stateListAnimator="@null"
         android:background="#01000000" />
 
@@ -56,6 +58,7 @@
         android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="top|end"
         android:layout_marginTop="2dp"
+        android:layout_marginEnd="21dp"
         android:visibility="gone"
         android:stateListAnimator="@null"
         android:background="#01000000" />
@@ -67,6 +70,30 @@
         android:layout_height="@dimen/pan_btn_size"
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="2dp"
+        android:layout_marginEnd="21dp"
+        android:visibility="gone"
+        android:stateListAnimator="@null"
+        android:background="#01000000" />
+
+    <!-- Con el nombre de la ruta visible: mismos botones superiores, 6dp más abajo (visualmente) -->
+    <Button
+        android:id="@+id/btn_pan_left_top_low"
+        android:layout_width="@dimen/pan_btn_size"
+        android:layout_height="@dimen/pan_btn_size"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="27dp"
+        android:visibility="gone"
+        android:stateListAnimator="@null"
+        android:background="#01000000" />
+
+    <Button
+        android:id="@+id/btn_pan_right_top_low"
+        android:layout_width="@dimen/pan_btn_size"
+        android:layout_height="@dimen/pan_btn_size"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="2dp"
+        android:layout_marginEnd="27dp"
         android:visibility="gone"
         android:stateListAnimator="@null"
         android:background="#01000000" />
@@ -84,26 +111,32 @@
 
         <Button
             android:id="@+id/btn_zoom_out"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="-"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:text="−"
+            android:padding="0dp"
+            android:includeFontPadding="false"
+            android:gravity="center"
             android:textColor="#FFFFFF"
             android:textSize="24sp"
             android:textStyle="bold"
             android:rotation="90"
-            android:background="#88333333"
+            android:background="@drawable/zoom_btn_bg"
             android:layout_marginEnd="16dp" />
 
         <Button
             android:id="@+id/btn_zoom_in"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:text="+"
+            android:padding="0dp"
+            android:includeFontPadding="false"
+            android:gravity="center"
             android:textColor="#FFFFFF"
             android:textSize="24sp"
             android:textStyle="bold"
             android:rotation="90"
-            android:background="#88333333" />
+            android:background="@drawable/zoom_btn_bg" />
     </LinearLayout>
 
     <!-- Zoom buttons visual top-center -> physical right / end centered vertically -->
@@ -119,26 +152,32 @@
 
         <Button
             android:id="@+id/btn_zoom_in_top"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:text="+"
+            android:padding="0dp"
+            android:includeFontPadding="false"
+            android:gravity="center"
             android:textColor="#FFFFFF"
             android:textSize="24sp"
             android:textStyle="bold"
             android:rotation="90"
-            android:background="#88333333"
+            android:background="@drawable/zoom_btn_bg"
             android:layout_marginBottom="12dp" />
 
         <Button
             android:id="@+id/btn_zoom_out_top"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:text="-"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:text="−"
+            android:padding="0dp"
+            android:includeFontPadding="false"
+            android:gravity="center"
             android:textColor="#FFFFFF"
             android:textSize="24sp"
             android:textStyle="bold"
             android:rotation="90"
-            android:background="#88333333" />
+            android:background="@drawable/zoom_btn_bg" />
     </LinearLayout>
 
 </FrameLayout>
