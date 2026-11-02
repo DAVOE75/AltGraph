@@ -20,6 +20,13 @@ import kotlin.math.sin
 // Separación de los botones de paso < > respecto al borde en dp; su tamaño está en R.dimen.pan_btn_size
 private const val PAN_BTN_EDGE_DP = 2f
 
+// Eje vertical ajustado: tramo mínimo = alto del gráfico * ventana / (ancho * K), limitado entre MIN y MAX metros.
+// Son los valores a afinar con rutas llanas, ondulantes y montañosas (probar MIN = 20).
+private const val FIT_AXIS_K = 55f
+private const val FIT_AXIS_MIN_SPAN_M = 30f
+private const val FIT_AXIS_MAX_SPAN_M = 100f
+private const val FIT_AXIS_HYSTERESIS = 0.20f
+
 // Anchura de sub-bloque (px) por debajo de la cual el modo "auto" fusiona bloques vecinos del mismo color
 private const val MERGE_AUTO_MAX_BLOCK_PX = 56f
 
@@ -397,7 +404,7 @@ class Altimetria3DView @JvmOverloads constructor(
                         // Borde exterior: el trazo va bajo el relleno y solo asoma su mitad externa
                         cleanPctPaint.style = Paint.Style.STROKE
                         cleanPctPaint.strokeJoin = Paint.Join.ROUND
-                        cleanPctPaint.strokeWidth = strokeW * 2f
+                        cleanPctPaint.strokeWidth = if (lightBgActive) (strokeW * 1.2f).coerceAtLeast(1.2f) else strokeW * 2f
                         // Fondo claro clásico: borde negro tras el filtro
                         cleanPctPaint.color = if (lightBgActive) Color.WHITE else Color.parseColor("#1E293B")
                         canvas.drawText(text, x, y, cleanPctPaint)
@@ -749,7 +756,6 @@ class Altimetria3DView @JvmOverloads constructor(
     // Eje vertical ajustado: se conserva entre fotogramas y solo se recalcula cuando el perfil deja de caber
     private var fitAxisMin = 0f
     private var fitAxisSpan = 0f
-    private var fitAxisWindow = 0f
 
     // Los límites máximos de letra crecen con la escala (a 60%) para que el ajuste se note también en vistas grandes
     private fun fsHi(hi: Float): Float = hi * (1f + (fontScale - 1f) * 0.6f)
@@ -1431,16 +1437,22 @@ class Altimetria3DView @JvmOverloads constructor(
         val displayMinElev: Float
         val finalElevRange: Float
         if (AppPreferences.getInstance(context).chartFitAxis) {
-            // Eje ajustado a la ventana visible: tramo mínimo que crece con el zoom, redondeado a 5 m
-            val minSpan = (maxPeakHeight * totalMetersAhead.toFloat() / (w * 55f)).coerceIn(30f, 100f)
+            // Eje ajustado a la ventana visible (rango con mín y máx reales): tramo mínimo que crece con el zoom, redondeado a 5 m
+            val minSpan = (maxPeakHeight * totalMetersAhead.toFloat() / (w * FIT_AXIS_K)).coerceIn(FIT_AXIS_MIN_SPAN_M, FIT_AXIS_MAX_SPAN_M)
             val span = (Math.ceil((maxOf(actualRange * 1.2f, minSpan) / 5f).toDouble()) * 5.0).toFloat()
-            val stillFits = fitAxisSpan > 0f && fitAxisWindow == totalMetersAhead.toFloat() &&
-                rawMinElev >= fitAxisMin && rawMaxElev <= fitAxisMin + fitAxisSpan && actualRange >= fitAxisSpan * 0.55f
+            // Histéresis: se mantiene el eje mientras los datos quepan y el tramo nuevo no difiera más del 20 %
+            val stillFits = fitAxisSpan > 0f &&
+                rawMinElev >= fitAxisMin && rawMaxElev <= fitAxisMin + fitAxisSpan &&
+                abs(span - fitAxisSpan) <= fitAxisSpan * FIT_AXIS_HYSTERESIS
             if (!stillFits) {
                 val mid = (rawMinElev + rawMaxElev) / 2f
-                fitAxisMin = (Math.floor(((mid - span / 2f) / 5f).toDouble()) * 5.0).toFloat()
+                var axisMin = (Math.floor(((mid - span / 2f) / 5f).toDouble()) * 5.0).toFloat()
+                // Nivel del mar: si no hay datos negativos, el eje no baja de 0
+                if (rawMinElev >= 0f) axisMin = maxOf(axisMin, 0f)
+                // Tras redondear, la cima real nunca puede quedar fuera del gráfico
+                while (axisMin + span < rawMaxElev) axisMin += 5f
+                fitAxisMin = axisMin
                 fitAxisSpan = span
-                fitAxisWindow = totalMetersAhead.toFloat()
             }
             displayMinElev = fitAxisMin
             finalElevRange = fitAxisSpan
@@ -1531,6 +1543,15 @@ class Altimetria3DView @JvmOverloads constructor(
 
             canvas.drawLine(startX - depth3dX, yIso, baseEndX, yIso, gridPaint)
             canvas.drawText("${elevMark}m", 5f * resources.displayMetrics.density, yIso + 4f, axisTextPaint)
+        }
+
+        // Exageración vertical (alto del gráfico * ventana / (tramo * ancho)) con el eje ajustado; arriba a la derecha
+        // para no chocar con los botones inferiores del Karoo ni con los bloques de pendiente
+        if (fitAxisSpan > 0f && finalElevRange > 0f) {
+            val exaggeration = maxPeakHeight * totalMetersAhead.toFloat() / (finalElevRange * w)
+            val tagPaint = Paint(axisTextPaint).apply { textAlign = Paint.Align.RIGHT }
+            val label = if (exaggeration >= 10f) "%.0fx".format(exaggeration) else "%.1fx".format(exaggeration)
+            canvas.drawText(label, baseEndX - 6f, baseGroundY - maxPeakHeight - 6f, tagPaint)
         }
 
         // Fusión opcional de bloques vecinos del mismo color: una sola columna con la pendiente media del tramo
@@ -2673,9 +2694,9 @@ class Altimetria3DView @JvmOverloads constructor(
             canvas.drawLine(xFront[k], yFront[k], xFront[k + 1], yFront[k + 1], shelfRidgePaint)
         }
 
-        // Rótulo táctico del descansillo si hay anchura
+        // Rótulo táctico del descansillo si hay anchura (no en el perfil de puertos)
         val shelfW = abs(x2 - x1)
-        if (shelfW >= 36f) {
+        if (shelfW >= 36f && !isClimbMode) {
             val distMeters = ((endIdx - startIdx) * subBlockSize).toInt()
             val label = if (shelfW >= 60f) "OASIS ${distMeters}m" else "OASIS"
             percentTextPaint.textSize = (shelfW * 0.22f * fontScale).coerceIn(11f, 15f)
@@ -3019,6 +3040,8 @@ class Altimetria3DView @JvmOverloads constructor(
     private fun lightComp(color: Int): Int = if (lightBgActive) LightBgFilter.precompensate(color) else color
 
     private fun getGradeColorDarkShaded(grade: Double): Int {
+        // Fondo blanco clásico: el filtro invierte la luminosidad y un tono más oscuro saldría más claro (neblina blanca)
+        if (lightBgActive && !posterActive) return Color.parseColor(getGradeColor(grade))
         if (grade > 20.0) return Color.parseColor("#05070D")
         val baseColor = Color.parseColor(getGradeColor(grade))
         val r = (Color.red(baseColor) * 0.65f).toInt()
