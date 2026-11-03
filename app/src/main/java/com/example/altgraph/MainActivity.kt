@@ -365,6 +365,13 @@ class MainActivity : Activity() {
             setTextColor(Color.LTGRAY)
             setPadding(0, 4, 0, 4)
         })
+        fitAxisCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_show_exaggeration_tag)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.showExaggerationTag
+            setOnCheckedChangeListener { _, isChecked -> prefs.showExaggerationTag = isChecked }
+        })
         val climbRotate90Card = createCardContainer()
         val climbSwitchRotate90 = Switch(this).apply {
             text = getString(R.string.setting_rotate_90_cw) + getString(R.string.suffix_puertos)

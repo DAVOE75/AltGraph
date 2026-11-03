@@ -23,7 +23,9 @@ private const val PAN_BTN_EDGE_DP = 2f
 // Eje vertical ajustado: tramo mínimo = alto del gráfico * ventana / (ancho * K), limitado entre MIN y MAX metros.
 // Son los valores a afinar con rutas llanas, ondulantes y montañosas (probar MIN = 20).
 private const val FIT_AXIS_K = 15f // factor vertical
-private const val FIT_AXIS_HEADROOM = 0.7f // fracción del eje que ocupan los datos (el resto es aire arriba)
+private const val FIT_AXIS_PLACEMENT = 0.4f // altura (fracción del gráfico) a la que cae la cima en rutas normales (probar 0.35 a 0.45)
+private const val FIT_AXIS_CAP = 0.65f // fracción máxima del eje que puede ocupar el rango de datos
+private const val FIT_AXIS_REFIT_PEAK = 0.70f // se reajusta el eje en cuanto la cima supera esta fracción de la altura
 private const val FIT_AXIS_MIN_SPAN_M = 30f
 private const val FIT_AXIS_MAX_SPAN_M = 100f
 private const val FIT_AXIS_HYSTERESIS = 0.20f
@@ -654,6 +656,7 @@ class Altimetria3DView @JvmOverloads constructor(
     private var hairpins: List<Double> = emptyList()
     private var pois: List<Poi> = emptyList()
     private var showZoomControls: Boolean = true
+    private var zoomButtonsBottomY: Float = 0f
     private var showBlockPercentages: Boolean = true
     private var curvatureOffsets: List<Float> = emptyList()
     private var mapRotationAngle: Double = 0.0
@@ -1333,7 +1336,19 @@ class Altimetria3DView @JvmOverloads constructor(
             
             canvas.drawPath(triPath, pinPaint)
             
-            canvas.drawText(Units.elev(context, elev.toDouble()), px, pyTop - 10f - triSize, textPaint)
+            val peakText = Units.elev(context, elev.toDouble())
+            val labelTop = pyTop - 10f - triSize + textPaint.fontMetrics.ascent
+            if (showZoomControls && labelTop < zoomButtonsBottomY) {
+                // La etiqueta llegaría a los botones de zoom: va al lado del marcador (a la izquierda si no cabe a la derecha)
+                val tw = textPaint.measureText(peakText)
+                val onRight = px + triSize / 2f + 4f + tw <= width
+                textPaint.textAlign = if (onRight) Paint.Align.LEFT else Paint.Align.RIGHT
+                val tx = if (onRight) px + triSize / 2f + 4f else px - triSize / 2f - 4f
+                canvas.drawText(peakText, tx, pyTop - 6f - triSize / 2f + textPaint.textSize * 0.35f, textPaint)
+                textPaint.textAlign = Paint.Align.CENTER
+            } else {
+                canvas.drawText(peakText, px, pyTop - 10f - triSize, textPaint)
+            }
         }
     }
 
@@ -1387,6 +1402,7 @@ class Altimetria3DView @JvmOverloads constructor(
         // Sin cabecera (ni título ni datos de pendiente) el engranaje sube justo debajo de los botones de zoom
         val gearOnTop = gearBadgeShown && !gradeHeaderShown && !isClimbMode
         val zoomBottomY = 64f * resources.displayMetrics.density + 6f + (if (showRouteName && showHeaderStats) 6f * resources.displayMetrics.density else 0f)
+        zoomButtonsBottomY = zoomBottomY
         val gearTopTextSize = ((h * 0.085f) * fontScale).coerceIn(22f, 32f)
         val gearTopBadgeH = gearTopTextSize * 0.85f + 20f
         // Leyenda "Cada bloque = X / Cada sub-bloque = Y" bajo la gráfica (opcional: sin ella el perfil gana ese espacio)
@@ -1494,13 +1510,15 @@ class Altimetria3DView @JvmOverloads constructor(
             // Eje ajustado a la ventana visible: tramo mínimo que crece con el zoom, redondeado a 5 m,
             // con el perfil en la parte alta del eje (FIT_AXIS_HEADROOM de la altura) para dejar aire arriba
             val minSpan = (maxPeakHeight * totalMetersAhead.toFloat() / (w * FIT_AXIS_K)).coerceIn(FIT_AXIS_MIN_SPAN_M, FIT_AXIS_MAX_SPAN_M)
-            val span = (Math.ceil((maxOf(fitRange / FIT_AXIS_HEADROOM, minSpan) / 5f).toDouble()) * 5.0).toFloat()
-            // Histéresis: se mantiene el eje mientras los datos quepan y el tramo nuevo no difiera más del 20 %
+            val span = (Math.ceil((maxOf(fitRange / FIT_AXIS_CAP, minSpan) / 5f).toDouble()) * 5.0).toFloat()
+            // Histéresis: se mantiene el eje mientras los datos quepan, la cima no pase del 70 % de la altura
+            // y el tramo nuevo no difiera más del 20 %
             val stillFits = fitAxisSpan > 0f &&
                 medMin >= fitAxisMin && medMax <= fitAxisMin + fitAxisSpan &&
+                (medMax - fitAxisMin) <= fitAxisSpan * FIT_AXIS_REFIT_PEAK &&
                 abs(span - fitAxisSpan) <= fitAxisSpan * FIT_AXIS_HYSTERESIS
             if (!stillFits) {
-                var axisMin = (Math.ceil(((medMax - FIT_AXIS_HEADROOM * span) / 5f).toDouble()) * 5.0).toFloat()
+                var axisMin = (Math.ceil(((medMax - FIT_AXIS_PLACEMENT * span) / 5f).toDouble()) * 5.0).toFloat()
                 // Si el mínimo queda por debajo del eje, se baja de 5 en 5 hasta que quepa
                 while (medMin < axisMin) axisMin -= 5f
                 // Nivel del mar: si no hay datos negativos, el eje no baja de 0
@@ -1594,18 +1612,21 @@ class Altimetria3DView @JvmOverloads constructor(
                 }
             }
         }
+        // Con el eje ajustado solo se rotulan tres alturas (mín, medio, máx) redondeadas al metro
         for (k in 0..steps) {
             val ratio = k.toFloat() / steps
             val elevMark = (displayMinElev + (ratio * finalElevRange)).toInt()
             val yIso = baseGroundY - (ratio * maxPeakHeight)
 
             canvas.drawLine(startX - depth3dX, yIso, baseEndX, yIso, gridPaint)
-            canvas.drawText(Units.elev(context, elevMark.toDouble()), 5f * resources.displayMetrics.density, yIso + 4f, axisTextPaint)
+            if (fitAxisSpan > 0f && k % 2 != 0) continue
+            val labelElev = if (fitAxisSpan > 0f) Math.round(displayMinElev + ratio * finalElevRange).toDouble() else elevMark.toDouble()
+            canvas.drawText(Units.elev(context, labelElev), 5f * resources.displayMetrics.density, yIso + 4f, axisTextPaint)
         }
 
         // Exageración vertical (alto del gráfico * ventana / (tramo * ancho)) con el eje ajustado; arriba a la derecha
         // para no chocar con los botones inferiores del Karoo ni con los bloques de pendiente
-        if (fitAxisSpan > 0f && finalElevRange > 0f) {
+        if (fitAxisSpan > 0f && finalElevRange > 0f && AppPreferences.getInstance(context).showExaggerationTag) {
             val exaggeration = maxPeakHeight * totalMetersAhead.toFloat() / (finalElevRange * w)
             val tagPaint = Paint(axisTextPaint).apply { textAlign = Paint.Align.RIGHT }
             val label = if (exaggeration >= 10f) "%.0fx".format(exaggeration) else "%.1fx".format(exaggeration)

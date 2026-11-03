@@ -196,6 +196,10 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_CHART_FIT_AXIS, false)
         set(value) = prefs.edit().putBoolean(KEY_CHART_FIT_AXIS, value).apply()
 
+    var showExaggerationTag: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_EXAGGERATION_TAG, true)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_EXAGGERATION_TAG, value).apply()
+
     var chartLightBackground: Boolean
         get() = prefs.getBoolean(KEY_CHART_LIGHT_BG, false)
         set(value) = prefs.edit().putBoolean(KEY_CHART_LIGHT_BG, value).apply()
@@ -491,7 +495,7 @@ class AppPreferences(context: Context) {
     // Estado efectivo de todos los ajustes visuales que tocan las plantillas, como texto comparable
     private fun visualState(): String = listOf(
         altimetriaStyle.key, showBlockPercentages, show3dCotas, show3dRamps, show3dScaleBar, showClimbScaleBar,
-        adaptGradeTextColors, show3dBlockLegend, show3dRouteName, show3dHeaderStats, showHairpins, show3dZoomControls, chartFitAxis,
+        adaptGradeTextColors, show3dBlockLegend, show3dRouteName, show3dHeaderStats,         showHairpins, show3dZoomControls, chartFitAxis, showExaggerationTag,
         chartLightBackground, chartLightStyle, showSurfaceTextures, showRouteDistances3d, mergeBlocksMode3d, pctLabelStyle3d,
         mergeMarginPct3d, hideGradeRangeEnabled3d, hideGradeMin3d, hideGradeMax3d, showGearBadge, showRouteCompass, showRouteElevation3d,
         panButtonsPosition
@@ -511,7 +515,7 @@ class AppPreferences(context: Context) {
         prefs.edit()
             .remove(KEY_ALTIMETRIA_STYLE).remove(KEY_SHOW_BLOCK_PERCENTAGES).remove(KEY_SHOW_3D_COTAS).remove(KEY_SHOW_3D_RAMPS)
             .remove(KEY_SHOW_3D_SCALE_BAR).remove(KEY_SHOW_3D_BLOCK_LEGEND).remove(KEY_SHOW_CLIMB_SCALE_BAR).remove(KEY_ADAPT_GRADE_TEXT).remove(KEY_SHOW_3D_ROUTE_NAME)
-            .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM).remove(KEY_CHART_FIT_AXIS)
+            .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM)            .remove(KEY_CHART_FIT_AXIS).remove(KEY_SHOW_EXAGGERATION_TAG)
             .remove(KEY_CHART_LIGHT_BG).remove(KEY_CHART_LIGHT_STYLE).remove(KEY_SHOW_SURFACE_TEXTURES).remove(KEY_SHOW_ROUTE_DISTANCES_3D)
             .remove(KEY_MERGE_MODE_3D).remove(KEY_MERGE_SIMILAR_BLOCKS_3D).remove(KEY_PCT_LABEL_STYLE_3D).remove(KEY_MERGE_MARGIN_3D)
             .remove(KEY_HIDE_GRADE_RANGE_ENABLED_3D).remove(KEY_HIDE_GRADE_MIN_3D).remove(KEY_HIDE_GRADE_MAX_3D)
@@ -651,6 +655,7 @@ class AppPreferences(context: Context) {
         private const val KEY_CLIMB_ALTIMETRIA_STYLE = "climb_altimetria_style_key"
 
         private const val KEY_CHART_FIT_AXIS = "chart_fit_axis"
+        private const val KEY_SHOW_EXAGGERATION_TAG = "show_exaggeration_tag"
         private const val KEY_CHART_LIGHT_BG = "chart_light_bg"
         private const val KEY_CHART_LIGHT_STYLE = "chart_light_style"
         private const val KEY_SMART_ZOOM_ENABLED = "smart_zoom_enabled"

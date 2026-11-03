@@ -464,4 +464,5 @@
     <string name="label_target_vam_format_value">VAM PACING (TARGET: %1$s)</string>
     <string name="setting_show_block_legend">Show block scale legend</string>
     <string name="setting_show_block_legend_desc">Shows the text under the 3D chart ("Each block = 500m / Each sub-block = 100m"). Turn it off and the profile gets that space.</string>
+    <string name="setting_show_exaggeration_tag">Show vertical exaggeration tag (e.g. 15x)</string>
 </resources>
