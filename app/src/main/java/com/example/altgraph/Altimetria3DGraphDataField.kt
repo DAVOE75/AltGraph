@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Build
+import android.os.SystemClock
 import android.view.View
 import android.widget.RemoteViews
 import io.hammerhead.karooext.extension.DataTypeImpl
@@ -38,10 +39,50 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
     // Despierta el bucle de dibujo al pulsar zoom o paso de página
     private val refreshChannel = Channel<Unit>(Channel.CONFLATED)
 
+    // Zoom por toque: el primer toque acerca al instante; un segundo toque rápido lo deshace y aleja
+    private var lastTapAt = 0L
+    private var tapPrevLookahead: Int? = null
+
+    private fun zoomInStep(curr: Int): Int = when {
+        curr <= 50 -> 50
+        curr <= 500 -> curr - 50
+        curr <= 1000 -> curr - 100
+        curr <= 5000 -> curr - 500
+        curr <= 20000 -> curr - 1000
+        curr <= 50000 -> curr - 5000
+        curr <= 100000 -> curr - 10000
+        curr <= 200000 -> curr - 50000
+        else -> 200000
+    }
+
+    private fun zoomOutStep(curr: Int, routeMaxMeters: Int?): Int {
+        val maxAllowed = routeMaxMeters ?: 200000
+        if (curr >= maxAllowed) return curr
+        var nextVal = when {
+            curr >= 200000 -> 200000
+            curr >= 100000 -> curr + 50000
+            curr >= 50000 -> curr + 10000
+            curr >= 20000 -> curr + 5000
+            curr >= 5000 -> curr + 1000
+            curr >= 1000 -> curr + 500
+            curr >= 500 -> curr + 100
+            curr >= 50 -> curr + 50
+            else -> 50
+        }
+        if (routeMaxMeters != null && (nextVal > routeMaxMeters || (curr < routeMaxMeters && nextVal >= routeMaxMeters))) {
+            nextVal = routeMaxMeters
+        }
+        return nextVal.coerceAtMost(maxAllowed)
+    }
+
     companion object {
         const val ACTION_CYCLE_3D_ZOOM = "com.example.altgraph.ACTION_CYCLE_3D_ZOOM"
         const val ACTION_ZOOM_IN = "com.example.altgraph.ACTION_ZOOM_IN"
         const val ACTION_ZOOM_OUT = "com.example.altgraph.ACTION_ZOOM_OUT"
+        const val ACTION_TAP_ZOOM = "com.example.altgraph.ACTION_TAP_ZOOM"
+        private const val DOUBLE_TAP_MS = 400L
+        private const val MIN_LOOKAHEAD_M = 50
+        private const val DEFAULT_LOOKAHEAD_M = 350
         const val ACTION_TOGGLE_COMPASS = "com.example.altgraph.ACTION_TOGGLE_COMPASS"
         const val ACTION_PAN_LEFT = "com.example.altgraph.ACTION_PAN_LEFT"
         const val ACTION_PAN_RIGHT = "com.example.altgraph.ACTION_PAN_RIGHT"
@@ -94,20 +135,28 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                     // Redibujar en cuanto cambia el ajuste (después de guardarlo), sin esperar al siguiente ciclo de 1 s
                     try {
                     val routeMaxMeters = AltgraphRepository.snapshot.value?.routeTotalLength?.takeIf { it > 500.0 }?.toInt()
-                    if (intent?.action == ACTION_ZOOM_IN && ctx != null) {
+                    if (intent?.action == ACTION_TAP_ZOOM && ctx != null) {
+                        val prefs = AppPreferences.getInstance(ctx)
+                        val now = SystemClock.elapsedRealtime()
+                        val curr = prefs.lookaheadMeters3d
+                        if (tapPrevLookahead != null && now - lastTapAt <= DOUBLE_TAP_MS) {
+                            // Segundo toque rápido: deshace el acercamiento del primero y aleja un paso desde ahí
+                            prefs.lookaheadMeters3d = zoomOutStep(tapPrevLookahead!!, routeMaxMeters)
+                            tapPrevLookahead = null
+                        } else if (curr <= MIN_LOOKAHEAD_M) {
+                            // Zoom máximo alcanzado: el toque vuelve al nivel por defecto para no quedar atascado
+                            prefs.lookaheadMeters3d = DEFAULT_LOOKAHEAD_M
+                            tapPrevLookahead = null
+                        } else {
+                            tapPrevLookahead = curr
+                            lastTapAt = now
+                            prefs.lookaheadMeters3d = zoomInStep(curr)
+                        }
+                        prefs.smartZoomEnabled = false
+                    } else if (intent?.action == ACTION_ZOOM_IN && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
                         val curr = prefs.lookaheadMeters3d
-                        val nextVal = when {
-                            curr <= 50 -> 50
-                            curr <= 500 -> curr - 50
-                            curr <= 1000 -> curr - 100
-                            curr <= 5000 -> curr - 500
-                            curr <= 20000 -> curr - 1000
-                            curr <= 50000 -> curr - 5000
-                            curr <= 100000 -> curr - 10000
-                            curr <= 200000 -> curr - 50000
-                            else -> 200000
-                        }
+                        val nextVal = zoomInStep(curr)
                         prefs.lookaheadMeters3d = nextVal
                         prefs.smartZoomEnabled = false
                     } else if (intent?.action == ACTION_ZOOM_OUT && ctx != null) {
@@ -118,21 +167,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             // Ya estamos al zoom máximo permitido (ruta completa o 200km)
                             return
                         }
-                        var nextVal = when {
-                            curr >= 200000 -> 200000
-                            curr >= 100000 -> curr + 50000
-                            curr >= 50000 -> curr + 10000
-                            curr >= 20000 -> curr + 5000
-                            curr >= 5000 -> curr + 1000
-                            curr >= 1000 -> curr + 500
-                            curr >= 500 -> curr + 100
-                            curr >= 50 -> curr + 50
-                            else -> 50
-                        }
-                        if (routeMaxMeters != null && (nextVal > routeMaxMeters || (curr < routeMaxMeters && nextVal >= routeMaxMeters))) {
-                            nextVal = routeMaxMeters
-                        }
-                        prefs.lookaheadMeters3d = nextVal.coerceAtMost(maxAllowed)
+                        prefs.lookaheadMeters3d = zoomOutStep(curr, routeMaxMeters)
                         prefs.smartZoomEnabled = false
                     } else if (intent?.action == ACTION_TOGGLE_COMPASS && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
@@ -154,6 +189,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
             val filter = IntentFilter().apply {
                 addAction(ACTION_ZOOM_IN)
                 addAction(ACTION_ZOOM_OUT)
+                addAction(ACTION_TAP_ZOOM)
                 addAction(ACTION_TOGGLE_COMPASS)
                 addAction(ACTION_PAN_LEFT)
                 addAction(ACTION_PAN_RIGHT)
@@ -425,12 +461,12 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         } else {
                             remoteViews.setViewVisibility(R.id.zoom_controls_top, android.view.View.GONE)
                             remoteViews.setViewVisibility(R.id.zoom_controls_side, android.view.View.GONE)
-                            // Sin botones: tocar la mitad derecha acerca y la izquierda aleja
-                            val tapIn = PendingIntent.getBroadcast(context, 4, Intent(ACTION_ZOOM_IN).apply { setPackage(context.packageName) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                            val tapOut = PendingIntent.getBroadcast(context, 5, Intent(ACTION_ZOOM_OUT).apply { setPackage(context.packageName) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                            // Sin botones: cualquier toque en la gráfica hace zoom (ver ACTION_TAP_ZOOM)
+                            val tapZoom = PendingIntent.getBroadcast(context, 6, Intent(ACTION_TAP_ZOOM).apply { setPackage(context.packageName) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                             remoteViews.setViewVisibility(R.id.tap_zoom_area, android.view.View.VISIBLE)
-                            remoteViews.setOnClickPendingIntent(R.id.tap_zoom_in_area, tapIn)
-                            remoteViews.setOnClickPendingIntent(R.id.tap_zoom_out_area, tapOut)
+                            remoteViews.setOnClickPendingIntent(R.id.tap_zoom_area, tapZoom)
+                            remoteViews.setOnClickPendingIntent(R.id.tap_zoom_in_area, tapZoom)
+                            remoteViews.setOnClickPendingIntent(R.id.tap_zoom_out_area, tapZoom)
                         }
                                         if (prefs.showRouteCompass && strategy.routeCoords.isNotEmpty() && prefs.altimetriaStyle == AltimetriaStyle.GLOBAL_ISOMETRIC) {
                               val intentCompass = Intent(ACTION_TOGGLE_COMPASS).apply {
