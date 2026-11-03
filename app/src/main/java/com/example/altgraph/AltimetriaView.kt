@@ -126,7 +126,7 @@ class AltimetriaView @JvmOverloads constructor(
         canvas.drawText(context.getString(R.string.header_climb_strategist), centerX, h * 0.12f, labelPaint)
 
         val distanceKm = remainingDistance / 1000.0
-        val distanceText = String.format(Locale.getDefault(), "%.1f km", distanceKm)
+        val distanceText = if (Units.imperial(context)) Units.distImperial(remainingDistance) else String.format(Locale.getDefault(), "%.1f km", distanceKm)
         val minutes = timeToSummit / 60
         val seconds = timeToSummit % 60
         val timeText = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
@@ -153,7 +153,11 @@ class AltimetriaView @JvmOverloads constructor(
         val totalMeters = (count * blockSizeMeters).toInt()
 
         labelPaint.textSize = (h * 0.065f).coerceAtLeast(16f)
-        val blocksTitle = context.getString(R.string.label_next_blocks, totalMeters, blockSizeMeters.toInt())
+        val blocksTitle = if (Units.imperial(context)) {
+            context.getString(R.string.label_next_blocks_value, Units.distImperial(totalMeters.toDouble(), 2), Units.distImperial(blockSizeMeters, 2))
+        } else {
+            context.getString(R.string.label_next_blocks, totalMeters, blockSizeMeters.toInt())
+        }
         canvas.drawText(blocksTitle, centerX, barY - 10f, labelPaint)
 
         if (count > 0) {

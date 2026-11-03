@@ -26,6 +26,7 @@ La versione 3.0 rende AltGraph più facile da configurare, più chiaro al sole e
 * **Intestazione 3D più flessibile**: il nome del percorso e le pendenze (attuale, media e massima) sono interruttori separati; barra di scala opzionale, testo di pendenza nero su giallo e arancione (opzionale) e linee dei tornanti leggibili su sfondo bianco.
 * **Dettagli**: pulsanti di zoom e di cambio pagina più piccoli, arrotondati e allineati; niente cartellini «OASIS»; separazione dei blocchi continua.
 * **Dislivello accumulato più affidabile**: il dislivello usato da traguardi e riepilogo vocale filtra il rumore e la lenta deriva del barometro (una salita conta solo oltre 2 m).
+* **Unità metriche o imperiali** (scheda Stile): i testi dei grafici, del radar, del visualizzatore di salite, del profilo TV 2D e del pannello passano a piedi e miglia. Anche gli avvisi vocali seguono le unità scelte.
 
 ---
 

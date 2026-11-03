@@ -417,7 +417,8 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                         val km = (Math.abs(distanceToStart) / 1000).toInt()
                         val m = (Math.abs(distanceToStart) % 1000).toInt()
                         if (distanceToStart > 0) {
-                            if (km > 0) " | Faltan ${km}km ${m}m" else " | Faltan ${m}m"
+                            if (Units.imperial(context)) " | Faltan ${Units.distImperial(Math.abs(distanceToStart))}"
+                            else if (km > 0) " | Faltan ${km}km ${m}m" else " | Faltan ${m}m"
                         } else if (distanceToStart <= 0 && snap.currentRouteDistance < climb.endDistance) {
                             " | En puerto"
                         } else {
@@ -428,7 +429,8 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                     val difficultyStr = if (prefs.showClimbDifficulty && climb.difficultyIndex > 0.0) {
                         " | ${context.getString(R.string.label_climb_difficulty)} ${String.format("%.1f", climb.difficultyIndex)}"
                     } else ""
-                    val line1 = "${String.format("%.1f", climb.length / 1000f)}km | +${climb.totalElevation.toInt()}m$difficultyStr$distStr"
+                    val lenStr = if (Units.imperial(context)) Units.distImperial(climb.length) else "${String.format("%.1f", climb.length / 1000f)}km"
+                    val line1 = "$lenStr | +${Units.elev(context, climb.totalElevation)}$difficultyStr$distStr"
                     
                     // Line 2: Pend. Actual | P.Med | P.Max
                     val liveGrade = snap.instantBarometricGrade

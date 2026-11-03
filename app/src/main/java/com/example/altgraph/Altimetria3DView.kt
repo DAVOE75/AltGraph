@@ -1155,12 +1155,12 @@ class Altimetria3DView @JvmOverloads constructor(
         val etaText = etaFinishMinutes?.let { android.text.format.DateFormat.getTimeFormat(context).format(java.util.Date(it * 60000L)) }
         val lines = listOfNotNull(
             context.getString(R.string.label_route_total) to
-                (formatRouteKm(routeTotalLength) + if (routeShowElevation && total != null) " / ${total.roundToInt()}m" else ""),
+                (formatRouteKm(routeTotalLength) + if (routeShowElevation && total != null) " / ${Units.elev(context, total, true)}" else ""),
             context.getString(R.string.label_route_left) to
-                (formatRouteKm(left) + if (routeShowElevation && remaining != null) " / ${remaining.roundToInt()}m" else ""),
+                (formatRouteKm(left) + if (routeShowElevation && remaining != null) " / ${Units.elev(context, remaining, true)}" else ""),
             if (resupply != null) context.getString(R.string.label_route_next_resupply) to formatRouteKm(resupply) else null,
             if (etaText != null) context.getString(R.string.label_route_eta) to etaText else null,
-            ascentPaceMetersPerHour?.let { context.getString(R.string.label_route_ascent_pace) to "+$it m/h" }
+            ascentPaceMetersPerHour?.let { context.getString(R.string.label_route_ascent_pace) to Units.climbRate(context, it) }
         )
         // Sin cabecera y con las flechas de paso abajo, los datos suben a la fila de los botones de zoom (entre las esquinas y el zoom)
         val inZoomRow = !gradeHeaderShown && !rotate90 && !isClimbMode && panButtonsPosition != "top"
@@ -1211,7 +1211,7 @@ class Altimetria3DView @JvmOverloads constructor(
     }
 
     // Distancia en la regla: añade decimales solo cuando hacen falta (9.9km, 9.95km, 10km)
-    private fun formatRulerDist(m: Long): String = when {
+    private fun formatRulerDist(m: Long): String = if (Units.imperial(context)) Units.distImperial(m.toDouble(), 2) else when {
         m < 1000 -> "${m}m"
         m % 1000L == 0L -> "${m / 1000}km"
         m % 100L == 0L -> "${m / 1000}.${(m % 1000L) / 100}km"
@@ -1219,7 +1219,7 @@ class Altimetria3DView @JvmOverloads constructor(
         else -> "${m / 1000}.${String.format("%03d", m % 1000L)}km"
     }
 
-    private fun formatRouteKm(meters: Double): String = when {
+    private fun formatRouteKm(meters: Double): String = if (Units.imperial(context)) Units.distImperial(meters) else when {
         meters < 1000.0 -> "${meters.toInt()}m"
         meters < 100000.0 -> String.format("%.1fkm", meters / 1000.0)
         else -> String.format("%.0fkm", meters / 1000.0)
@@ -1247,7 +1247,7 @@ class Altimetria3DView @JvmOverloads constructor(
         val centerY = top + (pillH / 2f) + (textSize * 0.35f)
         val centerX = left + (pillW / 2f)
 
-        val zoomLabel = when {
+        val zoomLabel = if (Units.imperial(context)) Units.distImperial(lookaheadMeters.toDouble(), 2) else when {
             lookaheadMeters < 1000 -> "${lookaheadMeters}m"
             lookaheadMeters % 1000 == 0 -> "${lookaheadMeters / 1000}km"
             else -> "${lookaheadMeters / 1000}.${(lookaheadMeters % 1000) / 100}km"
@@ -1326,7 +1326,7 @@ class Altimetria3DView @JvmOverloads constructor(
             
             canvas.drawPath(triPath, pinPaint)
             
-            canvas.drawText("${elev.toInt()}m", px, pyTop - 10f - triSize, textPaint)
+            canvas.drawText(Units.elev(context, elev.toDouble()), px, pyTop - 10f - triSize, textPaint)
         }
     }
 
@@ -1580,7 +1580,7 @@ class Altimetria3DView @JvmOverloads constructor(
             val yIso = baseGroundY - (ratio * maxPeakHeight)
 
             canvas.drawLine(startX - depth3dX, yIso, baseEndX, yIso, gridPaint)
-            canvas.drawText("${elevMark}m", 5f * resources.displayMetrics.density, yIso + 4f, axisTextPaint)
+            canvas.drawText(Units.elev(context, elevMark.toDouble()), 5f * resources.displayMetrics.density, yIso + 4f, axisTextPaint)
         }
 
         // Exageración vertical (alto del gráfico * ventana / (tramo * ancho)) con el eje ajustado; arriba a la derecha
@@ -1996,7 +1996,9 @@ class Altimetria3DView @JvmOverloads constructor(
         }
 
         // Leyenda de escala debajo de la gráfica
-        val scaleLegendText = if (majorDistMeters < 1000.0) {
+        val scaleLegendText = if (Units.imperial(context)) {
+            context.getString(R.string.scale_legend_major_block_value, Units.distImperial(majorDistMeters, 2))
+        } else if (majorDistMeters < 1000.0) {
             context.getString(R.string.scale_legend_major_block_m, majorDistMeters.toInt())
         } else {
             val km = majorDistMeters / 1000.0
@@ -2012,7 +2014,11 @@ class Altimetria3DView @JvmOverloads constructor(
         }
         
         val subBlockMeters = subBlockSizeMeters.toInt()
-        val subScaleLegendText = context.getString(R.string.scale_legend_sub_block, subBlockMeters)
+        val subScaleLegendText = if (Units.imperial(context)) {
+            context.getString(R.string.scale_legend_sub_block_value, Units.distImperial(subBlockMeters.toDouble(), 2))
+        } else {
+            context.getString(R.string.scale_legend_sub_block, subBlockMeters)
+        }
         val subScaleLegendPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = Color.parseColor("#94A3B8") // Gris intermedio nítido
             textSize = ((h * 0.065f) * fontScale).coerceIn(13f, fsHiSmall(19f))
@@ -2214,7 +2220,7 @@ class Altimetria3DView @JvmOverloads constructor(
                     setShadowLayer(4f, 0f, 2f, Color.BLACK)
                 }
                 val failKm = String.format("%.1f", failMeters / 1000.0)
-                canvas.drawText("⚡ ${failKm}km", failX, failY - 34f, failTextPaint)
+                canvas.drawText("⚡ " + (if (Units.imperial(context)) Units.distImperial(failMeters) else "${failKm}km"), failX, failY - 34f, failTextPaint)
             }
         }
 
@@ -2791,7 +2797,7 @@ class Altimetria3DView @JvmOverloads constructor(
             for (k in startIdx until endIdx) {
                 if (k < microGrades.size && microGrades[k] > maxG) maxG = microGrades[k]
             }
-            val label = if (crucibleW >= 60f) "MURO ${distMeters}m" else "${maxG.roundToInt()}%"
+            val label = if (crucibleW >= 60f) "MURO ${Units.elev(context, distMeters.toDouble())}" else "${maxG.roundToInt()}%"
             percentTextPaint.textSize = (crucibleW * 0.22f * fontScale).coerceIn(11f, 15f)
             val textW = percentTextPaint.measureText(label)
             val badgeRect = RectF(
@@ -3329,7 +3335,7 @@ class Altimetria3DView @JvmOverloads constructor(
             
             // Draw km marker every 50 blocks (e.g. 50 * 50m = 2.5km)
             if (seg.idx % 50 == 0 && seg.idx > 0) {
-                canvas.drawText("${"%.1f".format(seg.km)}km", b1x + centerX + 5f, b1y + centerY + 15f, kmTextPaint)
+                canvas.drawText(if (Units.imperial(context)) Units.distImperial(seg.km * 1000.0) else "${"%.1f".format(seg.km)}km", b1x + centerX + 5f, b1y + centerY + 15f, kmTextPaint)
             }
 
             // Iso Ramps: Draw vertical pills for local maxima

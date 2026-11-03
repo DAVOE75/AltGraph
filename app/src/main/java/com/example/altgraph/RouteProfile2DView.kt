@@ -39,7 +39,11 @@ class RouteProfile2DView(context: Context) : View(context) {
     }
 
     private fun climbDetailText(climb: RouteClimb): String =
-        String.format("%.1f km | %.1f%% | max %.1f%%", climb.length / 1000.0, climb.avgGrade, climbMaxGrade(climb))
+        String.format("%s | %.1f%% | max %.1f%%", if (Units.imperial(context)) Units.distImperial(climb.length) else String.format("%.1f km", climb.length / 1000.0), climb.avgGrade, climbMaxGrade(climb))
+
+    // "· km 12.4" / "· mi 7.7": inicio de cada puerto en la lista, en las unidades elegidas
+    private fun climbStartText(startMeters: Double): String =
+        if (Units.imperial(context)) " · " + Units.distImperial(startMeters) else String.format(" · km %.1f", startMeters / 1000.0)
 
     private val pathLine = Path()
     private val pathFill = Path()
@@ -210,7 +214,7 @@ class RouteProfile2DView(context: Context) : View(context) {
                 val gy = bottomY - ((currGridElev - minElev) / elevRange) * (bottomY - topY)
                 if (gy in topY..bottomY) {
                     canvas.drawLine(0f, gy, drawW, gy, gridPaint)
-                    canvas.drawText("${currGridElev.toInt()}m", 5f, gy - 5f, gridTextPaint)
+                    canvas.drawText(Units.elev(context, currGridElev.toDouble()), 5f, gy - 5f, gridTextPaint)
                 }
             }
             currGridElev += gridStep
@@ -403,7 +407,7 @@ class RouteProfile2DView(context: Context) : View(context) {
                 val named = showClimbNames && !climb.name.isNullOrBlank()
                 val ptoStr = if (named) "${climb.name} " else "$ptoPrefix 99 "
                 val line1W = climbListPaint.measureText(ptoStr) + climbListCatPaint.measureText("(H.C.)") +
-                    climbListPaint.measureText(String.format(" · km %.1f", climb.startDistance / 1000.0))
+                    climbListPaint.measureText(climbStartText(climb.startDistance))
                 val line2W = climbListPaint.measureText(climbDetailText(climb)) * 0.85f
                 maxOf(line1W, line2W)
             } ?: (drawW - listStartX - 10f)
@@ -458,7 +462,7 @@ class RouteProfile2DView(context: Context) : View(context) {
                 canvas.drawText(catStr, listStartX + ptoWidth, climbY, climbListCatPaint)
                 val catWidth = climbListCatPaint.measureText(catStr)
 
-                val statusOrKm = if (isPassed) " · ✓ $completedLabel" else String.format(" · km %.1f", startKm)
+                val statusOrKm = if (isPassed) " · ✓ $completedLabel" else climbStartText(startKm * 1000.0)
                 canvas.drawText(statusOrKm, listStartX + ptoWidth + catWidth, climbY, if (isPassed) climbListCatPaint else climbListPaint)
 
                 // Línea 2: longitud, pendiente media y máxima, alineada a la izquierda con el nombre
@@ -656,14 +660,15 @@ class RouteProfile2DView(context: Context) : View(context) {
         val titleY = headerBaseY
         canvas.drawText(titleText, 14f, titleY, textPaint)
         
-        val distText = String.format("Total %.1f km - %s", totalDistance / 1000.0, altitudeGainText)
+        val imperial = Units.imperial(context)
+        val distText = String.format("Total %s - %s", if (imperial) Units.distImperial(totalDistance) else String.format("%.1f km", totalDistance / 1000.0), altitudeGainText)
         val distY = titleY + (if (isVerticalLayout) 20f else 25f)
         canvas.drawText(distText, 14f, distY, subTextPaint)
 
         // --- DRAW KM & ELEVATION TEXTS AND CYCLIST LINE LAST SO THEY ARE ON TOP OF EVERYTHING ---
-        val kmDoneText = String.format("%.1f km", currentDistance / 1000.0)
+        val kmDoneText = if (imperial) Units.distImperial(currentDistance) else String.format("%.1f km", currentDistance / 1000.0)
         val remainDist = (totalDistance - currentDistance).coerceAtLeast(0.0)
-        val kmRemainText = String.format("%.1f km", remainDist / 1000.0)
+        val kmRemainText = if (imperial) Units.distImperial(remainDist) else String.format("%.1f km", remainDist / 1000.0)
 
         // Calculate elevation done vs elevation remaining
         var elevDone = 0.0
@@ -679,8 +684,8 @@ class RouteProfile2DView(context: Context) : View(context) {
                 if (d > 0) elevRemain += d
             }
         }
-        val elevDoneText = String.format("+%dm", elevDone.toInt())
-        val elevRemainText = String.format("+%dm", elevRemain.toInt())
+        val elevDoneText = "+" + Units.elev(context, elevDone)
+        val elevRemainText = "+" + Units.elev(context, elevRemain)
 
         val doneWidth = maxOf(kmDoneTextPaint.measureText(kmDoneText), elevDoneTextPaint.measureText(elevDoneText))
         val remainWidth = maxOf(kmRemainTextPaint.measureText(kmRemainText), elevRemainTextPaint.measureText(elevRemainText))

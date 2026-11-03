@@ -82,12 +82,16 @@ class ClimbPacingView @JvmOverloads constructor(
 
         // 1. Título VAM
         titlePaint.textSize = (h * 0.08f).coerceIn(14f, 20f)
-        val titleText = context.getString(R.string.label_target_vam_format, targetVam)
+        val titleText = if (Units.imperial(context)) {
+            context.getString(R.string.label_target_vam_format_value, Units.vam(context, targetVam))
+        } else {
+            context.getString(R.string.label_target_vam_format, targetVam)
+        }
         canvas.drawText(titleText, padX, h * 0.16f, titlePaint)
 
         // 2. Valor VAM Principal
         vamValuePaint.textSize = (h * 0.28f).coerceIn(28f, 56f)
-        val vamStr = "$currentVam m/h"
+        val vamStr = Units.vam(context, currentVam)
         canvas.drawText(vamStr, padX, h * 0.46f, vamValuePaint)
 
         // 3. Etiqueta y Valor de Velocidad Objetivo en km/h
@@ -95,7 +99,7 @@ class ClimbPacingView @JvmOverloads constructor(
         canvas.drawText(context.getString(R.string.label_target_speed), padX, h * 0.62f, speedLabelPaint)
 
         speedValuePaint.textSize = (h * 0.22f).coerceIn(22f, 42f)
-        val speedStr = if (targetSpeedKmh > 0.0) "%.1f km/h".format(targetSpeedKmh) else "--.- km/h"
+        val speedStr = if (targetSpeedKmh > 0.0) Units.speed(context, targetSpeedKmh) else if (Units.imperial(context)) "--.- mph" else "--.- km/h"
         canvas.drawText(speedStr, padX, h * 0.88f, speedValuePaint)
 
         // 4. Insinia de Estado

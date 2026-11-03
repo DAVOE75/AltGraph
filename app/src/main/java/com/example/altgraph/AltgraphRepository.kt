@@ -243,11 +243,11 @@ object AltgraphRepository {
         val name = c.name?.takeIf { it.isNotBlank() }
             ?: "${ctx.getString(R.string.profile_tv_climb_item_prefix)} ${alert.index + 1}"
         val parts = mutableListOf(
-            String.format(java.util.Locale.getDefault(), "%.1f km", c.length / 1000.0),
+            if (Units.imperial(ctx)) Units.distImperial(c.length) else String.format(java.util.Locale.getDefault(), "%.1f km", c.length / 1000.0),
             String.format(java.util.Locale.getDefault(), "%.1f%%", c.avgGrade)
         )
         if (c.category.isNotBlank()) parts.add(c.category.trim())
-        if (c.totalElevation > 0.0) parts.add("+${Math.round(c.totalElevation)} m")
+        if (c.totalElevation > 0.0) parts.add("+" + Units.elev(ctx, c.totalElevation, true))
         val sent = system.dispatch(
             InRideAlert(
                 id = "altgraph-climb-${Math.round(c.startDistance)}",

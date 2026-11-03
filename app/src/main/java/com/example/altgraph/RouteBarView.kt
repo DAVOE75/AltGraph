@@ -676,7 +676,7 @@ class RouteBarView(context: Context) : View(context) {
                     // Línea de marca hacia abajo
                     canvas.drawLine(px, headerHeight, px, headerHeight + dynamicTickLen, dividerPaint)
                     // Texto (un-skew if 3D)
-                    val kmLabel = if (tickDist >= 1000) {
+                    val kmLabel = if (Units.imperial(context)) Units.distImperial(tickDist, 2) else if (tickDist >= 1000) {
                         val km = tickDist / 1000.0
                         val kmStr = String.format(java.util.Locale.US, "%.2f", km).trimEnd('0').trimEnd('.')
                         "${kmStr}km"
@@ -952,7 +952,7 @@ class RouteBarView(context: Context) : View(context) {
                 val dynamicTickLen = Math.min(15f, rulerSpace * 0.25f)
 
                 canvas.drawLine(headerWidth, py, headerWidth + dynamicTickLen, py, dividerPaint)
-                val kmLabel = if (tickDist >= 1000) "${(tickDist / 1000).toInt()}km" else "${tickDist.toInt()}m"
+                val kmLabel = if (Units.imperial(context)) Units.distImperial(tickDist, 2) else if (tickDist >= 1000) "${(tickDist / 1000).toInt()}km" else "${tickDist.toInt()}m"
 
                 // Scale down if it's too wide
                 tickTextPaint.textSize = RULER_TEXT_SIZE
@@ -1074,6 +1074,7 @@ class RouteBarView(context: Context) : View(context) {
     }
 
     private fun formatDist(m: Double): String {
+        if (Units.imperial(context)) return Units.distImperial(m, 2)
         return when {
             m < 1000 -> "${Math.round(m)}m"
             m < 10000 -> String.format(java.util.Locale.getDefault(), "%.2fkm", m / 1000.0)

@@ -10,7 +10,7 @@
     <string name="data_type_climb_3d_title">Visore Salite 3D</string>
     <string name="data_type_climb_3d_desc">Visore 3D indipendente dei passi di montagna del percorso</string>
     <string name="data_type_climb_pacing_title">Assistente Passo VAM</string>
-    <string name="data_type_climb_pacing_desc">Assistente VAM obiettivo (m/h) in base alla pendenza attuale</string>
+    <string name="data_type_climb_pacing_desc">Assistente VAM obiettivo in base alla pendenza attuale</string>
     <string name="data_type_gradient_trend_title">Tendenza 3D &amp; Pendenza Max</string>
     <string name="data_type_gradient_trend_desc">Tendenza pendenza in tempo reale e picco massimo % del tratto</string>
     <string name="data_type_grade_zones_title">Zone di Pendenza</string>
@@ -89,9 +89,9 @@
     <string name="zone_orange">Dura</string>
     <string name="zone_red">Molto dura</string>
     <string name="zone_purple">Muro</string>
-    <string name="scale_legend_major_block_m">%1$d m</string>
-    <string name="scale_legend_major_block_km">%1$.1f km</string>
-    <string name="scale_legend_sub_block">%1$d m</string>
+    <string name="scale_legend_major_block_m">Ogni blocco = %1$d m</string>
+    <string name="scale_legend_major_block_km">Ogni blocco = %1$s km</string>
+    <string name="scale_legend_sub_block">Ogni sotto-blocco = %1$d m</string>
     <string name="elite_status_unlocked">STATO: SBLOCCATO</string>
     <string name="elite_status_locked">STATO: BLOCCATO (Richiede Licenza)</string>
     <string name="elite_hint_license">Inserisci Licenza (es. ALTGRAPH-ELITE-2026)</string>
@@ -420,4 +420,19 @@
     <string name="label_route_ascent_pace">Dislivello/h</string>
     <string name="setting_show_ascent_pace">Mostra il ritmo di dislivello (m/h)</string>
     <string name="setting_show_ascent_pace_desc">Dislivello salito dall\'inizio del percorso diviso per il tuo tempo in movimento. Servono 5 minuti di marcia. Disattivato di default.</string>
+    <string name="setting_units_title">Unità</string>
+    <string name="units_metric">Metriche</string>
+    <string name="units_imperial">Imperiali</string>
+    <string name="setting_units_desc">Scegli unità metriche (m, km) o imperiali (ft, mi) per i testi dei grafici, il pannello delle impostazioni e gli avvisi vocali.</string>
+    <string name="scale_legend_major_block_value">Ogni blocco = %1$s</string>
+    <string name="scale_legend_sub_block_value">Ogni sotto-blocco = %1$s</string>
+    <string name="profile_tv_2d_gain_text">Dislivello positivo %1$s</string>
+    <string name="label_next_blocks_value">PROSSIMI %1$s (BLOCCHI DA %2$s)</string>
+    <string name="voice_unit_mile">miglio</string>
+    <string name="voice_unit_miles">miglia</string>
+    <string name="voice_unit_foot">piede</string>
+    <string name="voice_unit_feet">piedi</string>
+    <string name="voice_unit_mph">miglia orarie</string>
+    <string name="voice_climb_mile_progress">Miglio %1$s di salita. Pendenza attuale del %2$s per cento.</string>
+    <string name="label_target_vam_format_value">PASSO VAM (OBIETTIVO: %1$s)</string>
 </resources>

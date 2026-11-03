@@ -26,6 +26,7 @@ Version 3.0 macht AltGraph einfacher einzustellen, bei Sonne besser lesbar und u
 * **Flexiblerer 3D-Kopfbereich**: Routenname und Steigungen (aktuell, Durchschnitt und Maximum) sind getrennte Schalter; optionale Skalenleiste, optional schwarzer Steigungstext auf Gelb und Orange und Serpentinenlinien, die auf weißem Hintergrund lesbar sind.
 * **Details**: kleinere, abgerundete, ausgerichtete Zoom- und Seitenwechsel-Tasten; keine „OASIS“-Schilder; durchgehende Blocktrennlinien.
 * **Zuverlässigere gesammelte Höhenmeter**: Die Höhenmeter für Meilensteine und Sprachzusammenfassung filtern Rauschen und langsame Drift des Barometers (ein Anstieg zählt erst ab 2 m).
+* **Metrische oder imperiale Einheiten** (Reiter Stil): Die Texte der Diagramme, des Radars, der Anstiegsansicht, des TV-2D-Profils und des Einstellungspanels wechseln zu Fuß und Meilen. Auch die Sprachansagen folgen den gewählten Einheiten.
 
 ---
 

@@ -360,7 +360,7 @@ class MainActivity : Activity() {
             setOnCheckedChangeListener { _, isChecked -> prefs.chartFitAxis = isChecked }
         })
         fitAxisCard.addView(TextView(this).apply {
-            text = getString(R.string.setting_chart_fit_axis_desc)
+            text = Units.localize(this@MainActivity, getString(R.string.setting_chart_fit_axis_desc))
             textSize = 12f
             setTextColor(Color.LTGRAY)
             setPadding(0, 4, 0, 4)
@@ -497,7 +497,32 @@ class MainActivity : Activity() {
                     .show()
             })
         })
+        // Unidades de las gráficas: métricas o imperiales
+        val unitsCard = createCardContainer()
+        unitsCard.addView(createSectionLabel(getString(R.string.setting_units_title)))
+        val unitBtns = mutableListOf<Button>()
+        val unitsRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        }
+        listOf(false to R.string.units_metric, true to R.string.units_imperial).forEachIndexed { idx, (imperial, labelRes) ->
+            val btn = createSegmentButton(getString(labelRes), prefs.useImperialUnits == imperial) {
+                prefs.useImperialUnits = imperial
+                updateSegmentActiveStates(unitBtns, idx)
+                recreate() // el panel reconstruye todos sus textos de distancia en la unidad elegida
+            }
+            unitBtns.add(btn)
+            unitsRow.addView(btn)
+        }
+        unitsCard.addView(unitsRow)
+        unitsCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_units_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 4)
+        })
         tabEstiloContainer.addView(presetsCard)
+        tabEstiloContainer.addView(unitsCard)
         tabEstiloContainer.addView(styleCard)
         tabEstiloContainer.addView(climbStyleCard)
         tabEstiloContainer.addView(fontCard)
@@ -529,7 +554,9 @@ class MainActivity : Activity() {
         // ==========================================
 
         fun formatLookaheadText(meters: Int): String {
-            return if (meters < 1000) {
+            return if (Units.imperial(this)) {
+                Units.distImperial(meters.toDouble(), 2)
+            } else if (meters < 1000) {
                 "$meters m"
             } else {
                 "${meters / 1000} km"
@@ -1065,7 +1092,7 @@ class MainActivity : Activity() {
             setPadding(0, 0, 0, 4)
         })
         routeDistancesCard.addView(Switch(this).apply {
-            text = getString(R.string.setting_show_ascent_pace)
+            text = Units.localize(this@MainActivity, getString(R.string.setting_show_ascent_pace))
             textSize = 15f
             setTextColor(Color.WHITE)
             isChecked = prefs.showAscentPace
@@ -1210,7 +1237,7 @@ class MainActivity : Activity() {
             setOnCheckedChangeListener { _, isChecked -> prefs.climbAlertEnabled = isChecked }
         })
         climbAlertCard.addView(TextView(this).apply {
-            text = getString(R.string.setting_climb_alert_desc)
+            text = Units.localize(this@MainActivity, getString(R.string.setting_climb_alert_desc))
             textSize = 12f
             setTextColor(Color.LTGRAY)
             setPadding(0, 4, 0, 8)
@@ -1244,7 +1271,7 @@ class MainActivity : Activity() {
         // Opción: Tamaño de Bloque (50m, 100m, 250m, 500m, 1km)
         val blockCard = createCardContainer()
         val blockLabel = createSectionLabel(getString(R.string.setting_block_size))
-        val currentBlockText = if (prefs.blockSizeMeters >= 1000.0) "${(prefs.blockSizeMeters / 1000).toInt()} km" else "${prefs.blockSizeMeters.toInt()} m"
+        val currentBlockText = if (Units.imperial(this)) Units.distImperial(prefs.blockSizeMeters, 2) else if (prefs.blockSizeMeters >= 1000.0) "${(prefs.blockSizeMeters / 1000).toInt()} km" else "${prefs.blockSizeMeters.toInt()} m"
         val blockValueText = createValueText(currentBlockText)
         val blockRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -1255,10 +1282,10 @@ class MainActivity : Activity() {
         val blockSizes = listOf(50.0, 100.0, 250.0, 500.0, 1000.0)
 
         blockSizes.forEach { size ->
-            val labelStr = if (size >= 1000.0) "${(size / 1000).toInt()}km" else "${size.toInt()}m"
+            val labelStr = if (Units.imperial(this)) Units.distImperial(size, 2) else if (size >= 1000.0) "${(size / 1000).toInt()}km" else "${size.toInt()}m"
             val btn = createSegmentButton(labelStr, prefs.blockSizeMeters == size) {
                 prefs.blockSizeMeters = size
-                blockValueText.text = if (size >= 1000.0) "${(size / 1000).toInt()} km" else "${size.toInt()} m"
+                blockValueText.text = if (Units.imperial(this@MainActivity)) Units.distImperial(size, 2) else if (size >= 1000.0) "${(size / 1000).toInt()} km" else "${size.toInt()} m"
                 updateSegmentActiveStates(blockButtons, blockSizes.indexOf(size))
             }
             blockButtons.add(btn)
@@ -1364,25 +1391,25 @@ class MainActivity : Activity() {
 
         // Opción: VAM Objetivo
         val vamCard = createCardContainer()
-        val vamLabel = createSectionLabel(getString(R.string.setting_target_vam))
-        val vamValueText = createValueText("${prefs.targetVam} m/h")
+        val vamLabel = createSectionLabel(Units.localize(this, getString(R.string.setting_target_vam)))
+        val vamValueText = createValueText(Units.vam(this, prefs.targetVam))
         val vamRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         }
 
-        val vamMinusBtn = createActionButton(getString(R.string.btn_reduce_50)) {
+        val vamMinusBtn = createActionButton(Units.localize(this, getString(R.string.btn_reduce_50))) {
             if (prefs.targetVam > 500) {
                 prefs.targetVam -= 50
-                vamValueText.text = "${prefs.targetVam} m/h"
+                vamValueText.text = Units.vam(this@MainActivity, prefs.targetVam)
             }
         }
 
-        val vamPlusBtn = createActionButton(getString(R.string.btn_increase_50)) {
+        val vamPlusBtn = createActionButton(Units.localize(this, getString(R.string.btn_increase_50))) {
             if (prefs.targetVam < 2000) {
                 prefs.targetVam += 50
-                vamValueText.text = "${prefs.targetVam} m/h"
+                vamValueText.text = Units.vam(this@MainActivity, prefs.targetVam)
             }
         }
 
@@ -1589,7 +1616,7 @@ class MainActivity : Activity() {
             setPadding(0, 0, 0, 16)
         }
         val radarResTitle = TextView(this).apply {
-            text = getString(R.string.label_radar_resolution)
+            text = Units.localize(this@MainActivity, getString(R.string.label_radar_resolution))
             textSize = 15f
             setTextColor(Color.WHITE)
             setPadding(0, 0, 0, 8)
@@ -1601,13 +1628,13 @@ class MainActivity : Activity() {
             isEnabled = prefs.isEliteUnlocked
             val options = arrayOf(
                 getString(R.string.radar_resolution_auto),
-                getString(R.string.radar_resolution_20m),
-                getString(R.string.radar_resolution_50m),
-                getString(R.string.radar_resolution_100m),
-                getString(R.string.radar_resolution_150m),
-                getString(R.string.radar_resolution_300m),
-                getString(R.string.radar_resolution_500m),
-                getString(R.string.radar_resolution_1km)
+                unitLabel(20, R.string.radar_resolution_20m),
+                unitLabel(50, R.string.radar_resolution_50m),
+                unitLabel(100, R.string.radar_resolution_100m),
+                unitLabel(150, R.string.radar_resolution_150m),
+                unitLabel(300, R.string.radar_resolution_300m),
+                unitLabel(500, R.string.radar_resolution_500m),
+                unitLabel(1000, R.string.radar_resolution_1km)
             )
             val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, options)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -2240,7 +2267,7 @@ class MainActivity : Activity() {
         }
         val kghostIntervalSpinner = Spinner(this).apply {
             isEnabled = prefs.isEliteUnlocked
-            val options = arrayOf("500 m", "1000 m (1 km)", "2000 m (2 km)", "5000 m (5 km)")
+            val options = arrayOf(withImperial("500 m", 500.0), withImperial("1000 m (1 km)", 1000.0), withImperial("2000 m (2 km)", 2000.0), withImperial("5000 m (5 km)", 5000.0))
             val values = doubleArrayOf(500.0, 1000.0, 2000.0, 5000.0)
             val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, options)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -2288,7 +2315,7 @@ class MainActivity : Activity() {
             setOnCheckedChangeListener { _, v -> prefs.voiceElevationMilestonesEnabled = v }
         }
         val textVoiceElevationDesc = TextView(this).apply {
-            text = getString(R.string.elite_voice_elevation_milestones_desc)
+            text = Units.localize(this@MainActivity, getString(R.string.elite_voice_elevation_milestones_desc))
             textSize = 12f
             setTextColor(Color.LTGRAY)
             setPadding(0, 2, 0, 8)
@@ -2326,7 +2353,7 @@ class MainActivity : Activity() {
         }
         val periodicIntervalSpinner = Spinner(this).apply {
             isEnabled = prefs.isEliteUnlocked
-            val options = arrayOf("3 km", "5 km", "10 km", "15 km", "20 km")
+            val options = arrayOf(withImperial("3 km", 3000.0), withImperial("5 km", 5000.0), withImperial("10 km", 10000.0), withImperial("15 km", 15000.0), withImperial("20 km", 20000.0))
             val values = doubleArrayOf(3.0, 5.0, 10.0, 15.0, 20.0)
             val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, options)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -2634,6 +2661,14 @@ class MainActivity : Activity() {
             setPadding(0, 0, 0, 10)
         }
     }
+
+    // Etiqueta de distancia del panel en las unidades elegidas; en métrico se usa la cadena traducida de siempre
+    private fun unitLabel(meters: Int, metricRes: Int): String =
+        if (Units.imperial(this)) Units.distImperial(meters.toDouble(), 2) else getString(metricRes)
+
+    // Los avisos por voz siguen en métrico: con unidades imperiales se muestra además el equivalente
+    private fun withImperial(metricLabel: String, meters: Double): String =
+        if (Units.imperial(this)) "$metricLabel (${Units.distImperial(meters, 2)})" else metricLabel
 
     private fun createSegmentButton(textStr: String, isActive: Boolean, onClick: () -> Unit): Button {
         return FitButton(this).apply {

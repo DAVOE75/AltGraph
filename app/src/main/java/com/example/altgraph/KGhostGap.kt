@@ -35,6 +35,7 @@ private fun timeText(s: Double): String {
 private fun distText(d: Double): String {
     val r = Math.round(d)
     val a = Math.abs(d)
+    if (Units.imperialFlag) return sign(r.toDouble()) + Units.distImperial(a)
     return if (Math.abs(r) < 1000) {
         sign(r.toDouble()) + Math.abs(r) + " m"
     } else {

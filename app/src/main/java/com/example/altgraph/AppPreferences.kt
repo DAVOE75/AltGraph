@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 class AppPreferences(context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    init { Units.imperialFlag = prefs.getBoolean(KEY_USE_IMPERIAL_UNITS, false) }
 
     /** Copia de todos los ajustes, para detectar si algo cambió entre frames. */
     val snapshot: Map<String, *> get() = prefs.all
@@ -89,6 +90,11 @@ class AppPreferences(context: Context) {
     var showAscentPace: Boolean
         get() = prefs.getBoolean(KEY_SHOW_ASCENT_PACE, false)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_ASCENT_PACE, value).apply()
+
+    // Unidades de los textos de las gráficas: false = métricas (m, km), true = imperiales (ft, mi)
+    var useImperialUnits: Boolean
+        get() = prefs.getBoolean(KEY_USE_IMPERIAL_UNITS, false)
+        set(value) { prefs.edit().putBoolean(KEY_USE_IMPERIAL_UNITS, value).apply(); Units.imperialFlag = value }
 
     var show3dRouteName: Boolean
         get() = prefs.getBoolean(KEY_SHOW_3D_ROUTE_NAME, true)
@@ -603,6 +609,7 @@ class AppPreferences(context: Context) {
         private const val KEY_SHOW_3D_HEADER_STATS = "show_3d_header_stats"
         private const val KEY_SHOW_3D_ROUTE_NAME = "show_3d_route_name"
         private const val KEY_SHOW_3D_SCALE_BAR = "show_3d_scale_bar"
+        private const val KEY_USE_IMPERIAL_UNITS = "use_imperial_units"
         private const val KEY_VISUAL_PRESET = "visual_preset"
         private const val KEY_VISUAL_PRESET_STATE = "visual_preset_state"
         private const val KEY_SHOW_ASCENT_PACE = "show_ascent_pace"

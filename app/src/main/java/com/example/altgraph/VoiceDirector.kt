@@ -193,11 +193,27 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     private fun normalizeForSpeech(phrase: String): String =
         portAbbreviation.replace(phrase) { if (it.value.startsWith("Ptos", ignoreCase = true)) "Puertos" else "Puerto" }
 
+    // Con unidades imperiales, las cifras con unidad de la frase ya montada ("5 kilómetros", "250 metros por hora",
+    // "20 km/h") se convierten a millas, pies y millas por hora, con las palabras del idioma del usuario.
+    private fun localizeVoiceUnits(phrase: String): String {
+        if (!Units.imperial(context)) return phrase
+        return Units.convertSpoken(
+            phrase,
+            kmWords = listOf(R.string.voice_unit_km_plural, R.string.voice_unit_km_singular).map { context.getString(it) },
+            meterWords = listOf(R.string.voice_unit_meters, R.string.voice_unit_meter).map { context.getString(it) },
+            mile = context.getString(R.string.voice_unit_mile),
+            miles = context.getString(R.string.voice_unit_miles),
+            foot = context.getString(R.string.voice_unit_foot),
+            feet = context.getString(R.string.voice_unit_feet),
+            mph = context.getString(R.string.voice_unit_mph)
+        )
+    }
+
     /**
      * Encola una frase para ser leída si las preferencias lo permiten y se supera el filtro de silencio.
      */
     fun speak(rawPhrase: String, priority: Boolean = false) {
-        val phrase = normalizeForSpeech(rawPhrase)
+        val phrase = localizeVoiceUnits(normalizeForSpeech(rawPhrase))
         val prefs = AppPreferences.getInstance(context)
         if (!prefs.isEliteUnlocked || !prefs.voiceDirectorEnabled) return
         if (phrase.isBlank()) return
@@ -431,14 +447,19 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                      break
                  }
 
-                 // Progresión kilómetro a kilómetro dentro del puerto (ej: Km 1, Km 2...)
+                 // Progresión kilómetro a kilómetro (o milla a milla con unidades imperiales) dentro del puerto
                  if (currentDist >= climb.startDistance && currentDist <= climb.endDistance) {
                      val distInsideClimb = currentDist - climb.startDistance
-                     val kmInside = (distInsideClimb / 1000.0).toInt()
-                     if (kmInside >= 1 && kmInside != lastAnnouncedKmInClimb && (distInsideClimb % 1000.0) < 200.0) {
+                     val imperialUnits = Units.imperial(context)
+                     val stepMeters = if (imperialUnits) 1609.344 else 1000.0
+                     val kmInside = (distInsideClimb / stepMeters).toInt()
+                     if (kmInside >= 1 && kmInside != lastAnnouncedKmInClimb && (distInsideClimb % stepMeters) < 200.0) {
                          lastAnnouncedKmInClimb = kmInside
                          val currentGradeStr = String.format(Locale.getDefault(), "%.0f", strategy.visibleAvgGrade.coerceAtLeast(0.0))
-                         val phrase = context.getString(R.string.voice_climb_km_progress, kmInside.toString(), currentGradeStr)
+                         val phrase = context.getString(
+                             if (imperialUnits) R.string.voice_climb_mile_progress else R.string.voice_climb_km_progress,
+                             kmInside.toString(), currentGradeStr
+                         )
                          speak(phrase, priority = false)
                      }
                  }
@@ -593,11 +614,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                          SurfaceType.TRAIL -> context.getString(R.string.surface_trail)
                          SurfaceType.ASPHALT -> context.getString(R.string.surface_asphalt)
                      }
-                     val lenStr = if (seg.length >= 1000.0) {
-                         String.format(Locale.getDefault(), "%.1f km", seg.length / 1000.0)
-                     } else {
-                         "${seg.length.toInt()} metros"
-                     }
+                     val lenStr = formatDistanceVoice(seg.length.toInt())
                      val phrase = context.getString(R.string.voice_surface_entry, surfaceName, lenStr)
                      speak(phrase, priority = true)
                      break

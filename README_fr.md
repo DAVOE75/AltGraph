@@ -26,6 +26,7 @@ La version 3.0 rend AltGraph plus simple à régler, plus lisible au soleil et p
 * **En-tête 3D plus flexible** : le nom du parcours et les pentes (actuelle, moyenne et maximale) sont des interrupteurs distincts ; barre d'échelle optionnelle, texte de pente en noir sur jaune et orange (optionnel) et lignes des épingles lisibles sur fond blanc.
 * **Détails** : boutons de zoom et de changement de page plus petits, arrondis et alignés ; plus d'étiquettes « OASIS » ; séparation des blocs continue.
 * **Dénivelé cumulé plus fiable** : le dénivelé utilisé par les paliers et le résumé vocal filtre le bruit et la dérive lente du baromètre (une montée ne compte qu'au-delà de 2 m).
+* **Unités métriques ou impériales** (onglet Style) : les textes des graphiques, du radar, de la vue des cols, du profil TV 2D et du panneau passent en pieds et en miles. Les annonces vocales suivent aussi les unités choisies.
 
 ---
 

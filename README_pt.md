@@ -26,6 +26,7 @@ A 3.0 torna o AltGraph mais fácil de configurar, mais claro ao sol e mais útil
 * **Cabeçalho 3D mais flexível**: o nome da rota e as inclinações (atual, média e máxima) são interruptores separados; barra de escala opcional, texto de inclinação a preto sobre amarelo e laranja (opcional) e curvas em ferradura legíveis sobre fundo branco.
 * **Detalhes**: botões de zoom e de passagem de página mais pequenos, arredondados e alinhados; sem etiquetas «OASIS»; separação de blocos contínua.
 * **Desnível acumulado mais fiável**: o desnível usado pelos marcos e pelo resumo por voz filtra o ruído e a deriva lenta do barómetro (só conta uma subida quando ultrapassa 2 m).
+* **Unidades métricas ou imperiais** (separador Estilo): os textos dos gráficos, do radar, do visor de subidas, do perfil TV 2D e do painel passam a pés e milhas. Os avisos de voz também seguem as unidades escolhidas.
 
 ---
 
