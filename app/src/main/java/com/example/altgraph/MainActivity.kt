@@ -48,7 +48,7 @@ class MainActivity : Activity() {
 
         // 1. Header Card (Logo, Título y Versión)
         val headerCard = createCardContainer()
-        val logo = ImageView(this).apply {
+        val logo = ShadowImageView(this).apply {
             setImageResource(R.drawable.altgraph_logo)
             scaleType = ImageView.ScaleType.FIT_CENTER
             layoutParams = LinearLayout.LayoutParams(200, 200).apply {
