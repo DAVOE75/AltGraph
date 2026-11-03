@@ -465,4 +465,8 @@
     <string name="setting_show_block_legend">Show block scale legend</string>
     <string name="setting_show_block_legend_desc">Shows the text under the 3D chart ("Each block = 500m / Each sub-block = 100m"). Turn it off and the profile gets that space.</string>
     <string name="setting_show_exaggeration_tag">Show vertical exaggeration tag (e.g. 15x)</string>
+    <string name="setting_radar_corners">Radar corners (match its position on the page)</string>
+    <string name="radar_corners_all">Both rounded</string>
+    <string name="radar_corners_top">Radar on top</string>
+    <string name="radar_corners_bottom">Radar at bottom</string>
 </resources>

@@ -438,4 +438,8 @@
     <string name="setting_show_block_legend">Afficher la légende de l\'échelle des blocs</string>
     <string name="setting_show_block_legend_desc">Affiche le texte sous le graphique 3D (« Chaque bloc = 500 m / Chaque sous-bloc = 100 m »). Désactivée, le profil gagne cet espace.</string>
     <string name="setting_show_exaggeration_tag">Afficher l\'étiquette d\'exagération verticale (ex. 15x)</string>
+    <string name="setting_radar_corners">Coins du radar (selon sa position sur la page)</string>
+    <string name="radar_corners_all">Tous arrondis</string>
+    <string name="radar_corners_top">Radar en haut</string>
+    <string name="radar_corners_bottom">Radar en bas</string>
 </resources>

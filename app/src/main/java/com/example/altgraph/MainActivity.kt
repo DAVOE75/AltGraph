@@ -1615,6 +1615,32 @@ class MainActivity : Activity() {
             setOnCheckedChangeListener { _, isChecked -> prefs.eliteRadarEnabled = isChecked }
         }
         radarCard.addView(switchRadar)
+        // Esquinas del radar según su posición en la página (arriba: solo redondea las de arriba; abajo: solo las de abajo)
+        radarCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_radar_corners)
+            textSize = 13f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 8, 0, 0)
+        })
+        val cornerModes = listOf("", "top", "bottom")
+        val cornerLabels = listOf(getString(R.string.radar_corners_all), getString(R.string.radar_corners_top), getString(R.string.radar_corners_bottom))
+        val cornerRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { setMargins(0, 8, 0, 8) }
+        }
+        val cornerButtons = mutableListOf<android.widget.Button>()
+        cornerModes.forEachIndexed { i, mode ->
+            val btn = createSegmentButton(cornerLabels[i], prefs.eliteRadarCorners == mode) {
+                prefs.eliteRadarCorners = mode
+                updateSegmentActiveStates(cornerButtons, i)
+            }
+            cornerButtons.add(btn)
+            cornerRow.addView(btn)
+        }
+        radarCard.addView(cornerRow)
         tabEliteContainer.addView(radarCard)
         
         // Opción: Texturizado por Superficie (Gravel/MTB) (Elite)

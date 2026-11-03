@@ -275,6 +275,11 @@ class AppPreferences(context: Context) {
         get() = prefs.getString(KEY_ELITE_RADAR_THEME, "Estándar") ?: "Estándar"
         set(value) = prefs.edit().putString(KEY_ELITE_RADAR_THEME, value).apply()
 
+    // Posición del radar en la página: "" = esquinas redondeadas arriba y abajo; "top" = redondea solo las de arriba; "bottom" = solo las de abajo
+    var eliteRadarCorners: String
+        get() = prefs.getString(KEY_ELITE_RADAR_CORNERS, "") ?: ""
+        set(value) = prefs.edit().putString(KEY_ELITE_RADAR_CORNERS, value).apply()
+
     var elitePowerBarEnabled: Boolean
         get() = prefs.getBoolean(KEY_ELITE_POWER_BAR_ENABLED, false) && isEliteUnlocked
         set(value) = prefs.edit().putBoolean(KEY_ELITE_POWER_BAR_ENABLED, value).apply()
@@ -674,6 +679,7 @@ class AppPreferences(context: Context) {
         private const val KEY_ELITE_HISTOGRAM_ENABLED = "elite_histogram_enabled"
         private const val KEY_ELITE_RADAR_3D_ENABLED = "elite_radar_3d_enabled"
         private const val KEY_ELITE_RADAR_THEME = "elite_radar_theme"
+        private const val KEY_ELITE_RADAR_CORNERS = "elite_radar_corners"
         private const val KEY_ELITE_POWER_BAR_ENABLED = "elite_power_bar_enabled"
         private const val KEY_ELITE_RADAR_ALERTS_ENABLED = "elite_radar_alerts_enabled"
         private const val KEY_ELITE_POWER_GUIDE_ENABLED = "elite_power_guide_enabled"

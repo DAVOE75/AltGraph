@@ -85,9 +85,16 @@ class RouteBarDataType(extension: String) : DataTypeImpl(extension, "route_bar")
         // Karoo dibuja la celda con esquinas redondeadas (~9 dp) pero no recorta el contenido: se vacían las esquinas del bitmap
         val cornerClearPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
         val cornerR = 9f * context.resources.displayMetrics.density
-        val cornerPath = Path().apply {
-            addRoundRect(RectF(0f, 0f, w.toFloat(), h.toFloat()), cornerR, cornerR, Path.Direction.CW)
-            fillType = Path.FillType.INVERSE_WINDING
+        var cornerPath = Path()
+        var cornerMode: String? = null
+        // Con el radar arriba solo se redondean las esquinas superiores; abajo, solo las inferiores
+        fun cornerPathFor(mode: String): Path {
+            val top = if (mode == "bottom") 0f else cornerR
+            val bottom = if (mode == "top") 0f else cornerR
+            return Path().apply {
+                addRoundRect(RectF(0f, 0f, w.toFloat(), h.toFloat()), floatArrayOf(top, top, top, top, bottom, bottom, bottom, bottom), Path.Direction.CW)
+                fillType = Path.FillType.INVERSE_WINDING
+            }
         }
         var lastFrame: List<Any?>? = null
 
@@ -141,6 +148,11 @@ class RouteBarDataType(extension: String) : DataTypeImpl(extension, "route_bar")
                         }
 
                         val remoteViews = RemoteViews(context.packageName, R.layout.view_remote_graphic_clear)
+                        val corners = prefs.eliteRadarCorners
+                        if (corners != cornerMode) {
+                            cornerPath = cornerPathFor(corners)
+                            cornerMode = corners
+                        }
                         currentCanvas.drawPath(cornerPath, cornerClearPaint)
                         remoteViews.setImageViewBitmap(R.id.img_graphic, currentBmp)
 

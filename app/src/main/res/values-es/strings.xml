@@ -465,4 +465,8 @@
     <string name="setting_show_block_legend">Mostrar la leyenda de escala de bloques</string>
     <string name="setting_show_block_legend_desc">Muestra el texto bajo la gráfica 3D («Cada bloque = 500m / Cada sub-bloque = 100m»). Si la desactivas, el perfil gana ese espacio.</string>
     <string name="setting_show_exaggeration_tag">Mostrar etiqueta de exageración vertical (p. ej. 15x)</string>
+    <string name="setting_radar_corners">Esquinas del radar (según su posición en la página)</string>
+    <string name="radar_corners_all">Ambas redondeadas</string>
+    <string name="radar_corners_top">Radar arriba</string>
+    <string name="radar_corners_bottom">Radar abajo</string>
 </resources>

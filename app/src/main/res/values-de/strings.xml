@@ -438,4 +438,8 @@
     <string name="setting_show_block_legend">Legende der Blockskala anzeigen</string>
     <string name="setting_show_block_legend_desc">Zeigt den Text unter dem 3D-Diagramm („Jeder Block = 500 m / Jeder Unterblock = 100 m“). Ausgeschaltet gewinnt das Profil diesen Platz.</string>
     <string name="setting_show_exaggeration_tag">Etikett für vertikale Überhöhung anzeigen (z. B. 15x)</string>
+    <string name="setting_radar_corners">Radar-Ecken (je nach Position auf der Seite)</string>
+    <string name="radar_corners_all">Beide gerundet</string>
+    <string name="radar_corners_top">Radar oben</string>
+    <string name="radar_corners_bottom">Radar unten</string>
 </resources>
