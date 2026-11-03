@@ -62,6 +62,18 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_SHOW_MAX_GRADIENT, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_MAX_GRADIENT, value).apply()
 
+    var show3dScaleBar: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_3D_SCALE_BAR, true)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_SCALE_BAR, value).apply()
+
+    var showClimbScaleBar: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_CLIMB_SCALE_BAR, true)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_CLIMB_SCALE_BAR, value).apply()
+
+    var adaptGradeTextColors: Boolean
+        get() = prefs.getBoolean(KEY_ADAPT_GRADE_TEXT, false)
+        set(value) = prefs.edit().putBoolean(KEY_ADAPT_GRADE_TEXT, value).apply()
+
     var show3dRouteName: Boolean
         get() = prefs.getBoolean(KEY_SHOW_3D_ROUTE_NAME, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_ROUTE_NAME, value).apply()
@@ -118,21 +130,14 @@ class AppPreferences(context: Context) {
         get() = prefs.getString(KEY_BEACON_SHAPE, "circle") ?: "circle"
         set(value) = prefs.edit().putString(KEY_BEACON_SHAPE, value).apply()
 
-    var showPoiTowns: Boolean
-        get() = prefs.getBoolean(KEY_SHOW_POI_TOWNS, true)
-        set(value) = prefs.edit().putBoolean(KEY_SHOW_POI_TOWNS, value).apply()
+    // Puntos de interés: interruptor general y tipos de Hammerhead visibles (por defecto todos)
+    var showPois: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_POIS, true)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_POIS, value).apply()
 
-    var showPoiWater: Boolean
-        get() = prefs.getBoolean(KEY_SHOW_POI_WATER, true)
-        set(value) = prefs.edit().putBoolean(KEY_SHOW_POI_WATER, value).apply()
-
-    var showPoiViewpoints: Boolean
-        get() = prefs.getBoolean(KEY_SHOW_POI_VIEWPOINTS, true)
-        set(value) = prefs.edit().putBoolean(KEY_SHOW_POI_VIEWPOINTS, value).apply()
-
-    var showPoiSummits: Boolean
-        get() = prefs.getBoolean(KEY_SHOW_POI_SUMMITS, true)
-        set(value) = prefs.edit().putBoolean(KEY_SHOW_POI_SUMMITS, value).apply()
+    var poiTypesEnabled: Set<String>
+        get() = prefs.getStringSet(KEY_POI_TYPES_ENABLED, null) ?: PoiTypes.keys.toSet()
+        set(value) = prefs.edit().putStringSet(KEY_POI_TYPES_ENABLED, value.toSet()).apply()
 
     var show3dZoomControls: Boolean
         get() = prefs.getBoolean(KEY_SHOW_3D_ZOOM, true)
@@ -497,6 +502,9 @@ class AppPreferences(context: Context) {
         private const val KEY_SHOW_MAX_GRADIENT = "show_max_gradient"
         private const val KEY_SHOW_3D_HEADER_STATS = "show_3d_header_stats"
         private const val KEY_SHOW_3D_ROUTE_NAME = "show_3d_route_name"
+        private const val KEY_SHOW_3D_SCALE_BAR = "show_3d_scale_bar"
+        private const val KEY_ADAPT_GRADE_TEXT = "adapt_grade_text_colors"
+        private const val KEY_SHOW_CLIMB_SCALE_BAR = "show_climb_scale_bar"
         private const val KEY_SHOW_ROUTE_COMPASS = "show_route_compass"
         private const val KEY_ROTATE_90_CW = "rotate_90_clockwise"
         private const val KEY_CLIMB_ROTATE_90_CW = "climb_rotate_90_clockwise"
@@ -508,10 +516,8 @@ class AppPreferences(context: Context) {
         private const val KEY_RAMP_MAX_SLOPE = "ramp_max_slope_pct"
         private const val KEY_USE_TOPOGRAPHIC_CALCULATION = "use_topographic_calculation"
         private const val KEY_SHOW_HAIRPINS = "show_hairpins"
-        private const val KEY_SHOW_POI_TOWNS = "show_poi_towns"
-        private const val KEY_SHOW_POI_WATER = "show_poi_water"
-        private const val KEY_SHOW_POI_VIEWPOINTS = "show_poi_viewpoints"
-        private const val KEY_SHOW_POI_SUMMITS = "show_poi_summits"
+        private const val KEY_SHOW_POIS = "show_pois"
+        private const val KEY_POI_TYPES_ENABLED = "poi_types_enabled"
         private const val KEY_SHOW_3D_ZOOM = "show_3d_zoom_controls"
         private const val KEY_GEAR_CHAINRINGS = "gear_chainrings"
         private const val KEY_GEAR_CASSETTE = "gear_cassette"

@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
+import android.widget.CheckBox
 import android.widget.Spinner
 import android.widget.Switch
 import android.widget.TextView
@@ -635,48 +636,37 @@ class MainActivity : Activity() {
         }
         showHairpinsCard.addView(switchShowHairpins)
         
-        // Opción: Filtro de Puntos de Interés (Hitos) con 4 conmutadores específicos
+        // Opción: Puntos de interés. Un interruptor general y, si está activo, la lista de tipos de Hammerhead
         val poiFilterCard = createCardContainer()
-        val poiFilterLabel = createSectionLabel(getString(R.string.setting_poi_filter))
-        
-        val switchTowns = Switch(this).apply {
-            text = getString(R.string.setting_poi_towns)
-            textSize = 14f
-            setTextColor(Color.WHITE)
-            isChecked = prefs.showPoiTowns
-            setOnCheckedChangeListener { _, isChecked -> prefs.showPoiTowns = isChecked }
-            setPadding(0, 4, 0, 4)
+        val poiTypesList = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            visibility = if (prefs.showPois) View.VISIBLE else View.GONE
         }
-        val switchWater = Switch(this).apply {
-            text = getString(R.string.setting_poi_water)
-            textSize = 14f
+        val switchPois = Switch(this).apply {
+            text = getString(R.string.setting_poi_enabled)
+            textSize = 15f
             setTextColor(Color.WHITE)
-            isChecked = prefs.showPoiWater
-            setOnCheckedChangeListener { _, isChecked -> prefs.showPoiWater = isChecked }
-            setPadding(0, 4, 0, 4)
+            isChecked = prefs.showPois
+            setOnCheckedChangeListener { _, isChecked ->
+                prefs.showPois = isChecked
+                poiTypesList.visibility = if (isChecked) View.VISIBLE else View.GONE
+            }
         }
-        val switchViewpoints = Switch(this).apply {
-            text = getString(R.string.setting_poi_viewpoints)
-            textSize = 14f
-            setTextColor(Color.WHITE)
-            isChecked = prefs.showPoiViewpoints
-            setOnCheckedChangeListener { _, isChecked -> prefs.showPoiViewpoints = isChecked }
-            setPadding(0, 4, 0, 4)
+        poiTypesList.addView(createSectionLabel(getString(R.string.setting_poi_filter)))
+        for ((typeKey, labelRes) in PoiTypes.all) {
+            poiTypesList.addView(CheckBox(this).apply {
+                text = getString(labelRes)
+                textSize = 14f
+                setTextColor(Color.WHITE)
+                isChecked = typeKey in prefs.poiTypesEnabled
+                setOnCheckedChangeListener { _, isChecked ->
+                    prefs.poiTypesEnabled = if (isChecked) prefs.poiTypesEnabled + typeKey else prefs.poiTypesEnabled - typeKey
+                }
+                setPadding(0, 4, 0, 4)
+            })
         }
-        val switchSummits = Switch(this).apply {
-            text = getString(R.string.setting_poi_summits)
-            textSize = 14f
-            setTextColor(Color.WHITE)
-            isChecked = prefs.showPoiSummits
-            setOnCheckedChangeListener { _, isChecked -> prefs.showPoiSummits = isChecked }
-            setPadding(0, 4, 0, 4)
-        }
-
-        poiFilterCard.addView(poiFilterLabel)
-        poiFilterCard.addView(switchTowns)
-        poiFilterCard.addView(switchWater)
-        poiFilterCard.addView(switchViewpoints)
-        poiFilterCard.addView(switchSummits)
+        poiFilterCard.addView(switchPois)
+        poiFilterCard.addView(poiTypesList)
 
         // Opción: Método de Cálculo Topográfico
         val topographicCard = createCardContainer()
@@ -712,6 +702,34 @@ class MainActivity : Activity() {
             setTextColor(Color.WHITE)
             isChecked = prefs.show3dRouteName
             setOnCheckedChangeListener { _, isChecked -> prefs.show3dRouteName = isChecked }
+        })
+
+        // Opción: barra de escala lateral junto a las altitudes
+        val scaleBarCard = createCardContainer()
+        scaleBarCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_show_3d_scale_bar)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.show3dScaleBar
+            setOnCheckedChangeListener { _, isChecked -> prefs.show3dScaleBar = isChecked }
+        })
+
+        scaleBarCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_show_climb_scale_bar)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.showClimbScaleBar
+            setOnCheckedChangeListener { _, isChecked -> prefs.showClimbScaleBar = isChecked }
+        })
+
+        // Opción: texto de pendiente adaptado al color del bloque (negro sobre amarillo y naranja)
+        val adaptTextCard = createCardContainer()
+        adaptTextCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_adapt_grade_text)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.adaptGradeTextColors
+            setOnCheckedChangeListener { _, isChecked -> prefs.adaptGradeTextColors = isChecked }
         })
 
         // Opción: Mostrar Brujula en Ruta
@@ -1107,6 +1125,8 @@ class MainActivity : Activity() {
         tab3dContainer.addView(poiFilterCard)
         tab3dContainer.addView(topographicCard)
         tab3dContainer.addView(showRouteNameCard)
+        tab3dContainer.addView(scaleBarCard)
+        tab3dContainer.addView(adaptTextCard)
         tab3dContainer.addView(showHeaderStatsCard)
 
         // ==========================================

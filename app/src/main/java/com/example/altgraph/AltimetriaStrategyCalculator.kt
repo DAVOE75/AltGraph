@@ -19,7 +19,7 @@ data class RoutePoint(
 
 enum class PoiType { TOWN, WATER, VIEWPOINT, SUMMIT }
 
-data class Poi(val relativeDistance: Double, val icon: String, val name: String, val type: PoiType)
+data class Poi(val relativeDistance: Double, val icon: String, val name: String, val type: PoiType, val sdkType: String = "")
 
 enum class SurfaceType { ASPHALT, GRAVEL, TRAIL }
 
@@ -602,7 +602,14 @@ class AltimetriaStrategyCalculator {
             name = name.replace(Regex("\\b\\d+\\s*m\\b", RegexOption.IGNORE_CASE), "").trim()
             val realElevation = getTrueElevationAtDistance(nearestDist).toInt()
             name = "$name ${realElevation}m"
-            val icon = when {
+            // El tipo real de Hammerhead manda; el nombre solo desempata los puntos genéricos
+            val typeIcon = when (sym.type) {
+                Symbol.POI.Types.WATER -> "💧"
+                Symbol.POI.Types.VIEWPOINT -> "📸"
+                Symbol.POI.Types.SUMMIT -> "📡"
+                else -> null
+            }
+            val icon = typeIcon ?: when {
                 name.contains("agua", ignoreCase = true) || name.contains("font", ignoreCase = true) || name.contains("fuente", ignoreCase = true) -> "💧"
                 name.contains("mirador", ignoreCase = true) || name.contains("vista", ignoreCase = true) -> "📸"
                 name.contains("puerto", ignoreCase = true) || name.contains("cima", ignoreCase = true) || name.contains("alto", ignoreCase = true) || name.contains("col", ignoreCase = true) -> "📡"
@@ -614,7 +621,7 @@ class AltimetriaStrategyCalculator {
                 "📡" -> PoiType.SUMMIT
                 else -> PoiType.TOWN
             }
-            routePois.add(Poi(nearestDist, icon, name, type))
+            routePois.add(Poi(nearestDist, icon, name, type, sym.type))
         }
 
         // ELITE: Detectar puertos de montaña definidos manualmente mediante POIs por el usuario
@@ -2339,25 +2346,19 @@ class AltimetriaStrategyCalculator {
             .map { it.copy(distance = it.distance - windowStartDist) }
             .filter { it.distance in 0.0..actualLookahead }
 
-        val showPoiTowns = prefs?.showPoiTowns ?: true
-        val showPoiWater = prefs?.showPoiWater ?: true
-        val showPoiViewpoints = prefs?.showPoiViewpoints ?: true
-        val showPoiSummits = prefs?.showPoiSummits ?: true
+        val showPois = prefs?.showPois ?: true
+        val enabledPoiTypes = prefs?.poiTypesEnabled ?: PoiTypes.keys.toSet()
 
         // Solo mostrar POIs reales de la ruta SDK. Si la ruta no tiene POIs no fabricamos ninguno.
         val rawPois = if (routePois.isNotEmpty()) {
-            routePois.map { Poi(it.relativeDistance - windowStartDist, it.icon, it.name, it.type) }
+            routePois.map { Poi(it.relativeDistance - windowStartDist, it.icon, it.name, it.type, it.sdkType) }
         } else {
             emptyList()
         }
 
         val visiblePois = rawPois.filter { poi ->
-            val matchesCategory = when (poi.type) {
-                PoiType.TOWN -> showPoiTowns
-                PoiType.WATER -> showPoiWater
-                PoiType.VIEWPOINT -> showPoiViewpoints
-                PoiType.SUMMIT -> showPoiSummits
-            }
+            // Un tipo que el SDK no conozca (o vacío) se muestra siempre
+            val matchesCategory = showPois && (poi.sdkType.isEmpty() || poi.sdkType !in PoiTypes.keys || poi.sdkType in enabledPoiTypes)
             matchesCategory && poi.relativeDistance in 0.0..actualLookahead
         }
 

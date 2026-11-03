@@ -22,7 +22,8 @@ private const val PAN_BTN_EDGE_DP = 2f
 
 // Eje vertical ajustado: tramo mínimo = alto del gráfico * ventana / (ancho * K), limitado entre MIN y MAX metros.
 // Son los valores a afinar con rutas llanas, ondulantes y montañosas (probar MIN = 20).
-private const val FIT_AXIS_K = 55f
+private const val FIT_AXIS_K = 15f // factor vertical
+private const val FIT_AXIS_HEADROOM = 0.7f // fracción del eje que ocupan los datos (el resto es aire arriba)
 private const val FIT_AXIS_MIN_SPAN_M = 30f
 private const val FIT_AXIS_MAX_SPAN_M = 100f
 private const val FIT_AXIS_HYSTERESIS = 0.20f
@@ -361,6 +362,9 @@ class Altimetria3DView @JvmOverloads constructor(
         textAlign = Paint.Align.LEFT
     }
     var pctLabelStyle: String = AppPreferences.PCT_STYLE_PILL
+    // Pendiente de la etiqueta que se está dibujando: en los bloques amarillos y naranjas el número va en negro, como en Karoo
+    private var labelGrade = 0f
+    private fun labelOnLightBlock(): Boolean = adaptTextActive && !posterActive && labelGrade >= 3f && labelGrade < 8f
 
     // Número alargado en altura, blanco, con borde fino interior y sombra paralela; el % pequeño arriba a la derecha como un símbolo de grados
     private fun drawCleanGradeLabel(canvas: Canvas, pctStr: String, cx: Float, centerY: Float, fontSize: Float) {
@@ -393,14 +397,14 @@ class Altimetria3DView @JvmOverloads constructor(
                 val text = if (isNumber) number else "%"
                 when (pass) {
                     0 -> {
-                        if (posterActive) continue
+                        if (posterActive || labelOnLightBlock()) continue
                         cleanPctPaint.style = Paint.Style.FILL
                         // Fondo claro clásico: el filtro invierte, así que la sombra se dibuja clara para que salga oscura
                         cleanPctPaint.color = if (lightBgActive) Color.argb(170, 255, 255, 255) else Color.argb(170, 0, 0, 0)
                         canvas.drawText(text, x + shadowOff, y + shadowOff / stretch, cleanPctPaint)
                     }
                     1 -> {
-                        if (posterActive) continue
+                        if (posterActive || labelOnLightBlock()) continue
                         // Borde exterior: el trazo va bajo el relleno y solo asoma su mitad externa
                         cleanPctPaint.style = Paint.Style.STROKE
                         cleanPctPaint.strokeJoin = Paint.Join.ROUND
@@ -411,8 +415,13 @@ class Altimetria3DView @JvmOverloads constructor(
                     }
                     else -> {
                         cleanPctPaint.style = Paint.Style.FILL
-                        // Fondo claro (clásico y cartel): se dibuja negro para que el filtro lo deje blanco
-                        cleanPctPaint.color = if (lightBgActive) Color.BLACK else Color.WHITE
+                        // Fondo claro (clásico y cartel): se dibuja negro para que el filtro lo deje blanco.
+                        // Sobre amarillo/naranja el número va negro (con el filtro del fondo claro se dibuja blanco)
+                        cleanPctPaint.color = when {
+                            labelOnLightBlock() -> if (lightBgActive) Color.WHITE else Color.BLACK
+                            lightBgActive -> Color.BLACK
+                            else -> Color.WHITE
+                        }
                         canvas.drawText(text, x, y, cleanPctPaint)
                     }
                 }
@@ -1001,6 +1010,7 @@ class Altimetria3DView @JvmOverloads constructor(
     // y refuerza la saturación para que los colores se vean intensos sobre blanco.
     private var lightBgActive = false
     private var posterActive = false
+    private var adaptTextActive = false
     private val lightBgPaint: Paint get() = LightBgFilter.paint
 
     override fun onDraw(canvas: Canvas) {
@@ -1013,6 +1023,7 @@ class Altimetria3DView @JvmOverloads constructor(
 
         lightBgActive = AppPreferences.getInstance(context).chartLightBackground
         posterActive = lightBgActive && AppPreferences.getInstance(context).chartLightStyle == "poster"
+        adaptTextActive = AppPreferences.getInstance(context).adaptGradeTextColors
         val layer = if (lightBgActive) canvas.saveLayer(0f, 0f, w, h, lightBgPaint) else -1
 
         if (rotate90) {
@@ -1437,20 +1448,37 @@ class Altimetria3DView @JvmOverloads constructor(
         val displayMinElev: Float
         val finalElevRange: Float
         if (AppPreferences.getInstance(context).chartFitAxis) {
-            // Eje ajustado a la ventana visible (rango con mín y máx reales): tramo mínimo que crece con el zoom, redondeado a 5 m
+            // Mín y máx tras un filtro de mediana de 3 puntos: un pico aislado no estira el eje (el marcador de cima sigue usando el valor real)
+            var medMin = Float.MAX_VALUE
+            var medMax = -Float.MAX_VALUE
+            if (scaleTo >= scaleFrom) {
+                for (si in scaleFrom..scaleTo) {
+                    val a0 = microElevations[maxOf(si - 1, scaleFrom)]
+                    val b0 = microElevations[si]
+                    val c0 = microElevations[minOf(si + 1, scaleTo)]
+                    val med = maxOf(minOf(a0, b0), minOf(maxOf(a0, b0), c0))
+                    if (med < medMin) medMin = med
+                    if (med > medMax) medMax = med
+                }
+            }
+            if (medMin == Float.MAX_VALUE) { medMin = rawMinElev; medMax = rawMaxElev }
+            val fitRange = (medMax - medMin).coerceAtLeast(0f)
+            // Eje ajustado a la ventana visible: tramo mínimo que crece con el zoom, redondeado a 5 m,
+            // con el perfil en la parte alta del eje (FIT_AXIS_HEADROOM de la altura) para dejar aire arriba
             val minSpan = (maxPeakHeight * totalMetersAhead.toFloat() / (w * FIT_AXIS_K)).coerceIn(FIT_AXIS_MIN_SPAN_M, FIT_AXIS_MAX_SPAN_M)
-            val span = (Math.ceil((maxOf(actualRange * 1.2f, minSpan) / 5f).toDouble()) * 5.0).toFloat()
+            val span = (Math.ceil((maxOf(fitRange / FIT_AXIS_HEADROOM, minSpan) / 5f).toDouble()) * 5.0).toFloat()
             // Histéresis: se mantiene el eje mientras los datos quepan y el tramo nuevo no difiera más del 20 %
             val stillFits = fitAxisSpan > 0f &&
-                rawMinElev >= fitAxisMin && rawMaxElev <= fitAxisMin + fitAxisSpan &&
+                medMin >= fitAxisMin && medMax <= fitAxisMin + fitAxisSpan &&
                 abs(span - fitAxisSpan) <= fitAxisSpan * FIT_AXIS_HYSTERESIS
             if (!stillFits) {
-                val mid = (rawMinElev + rawMaxElev) / 2f
-                var axisMin = (Math.floor(((mid - span / 2f) / 5f).toDouble()) * 5.0).toFloat()
+                var axisMin = (Math.ceil(((medMax - FIT_AXIS_HEADROOM * span) / 5f).toDouble()) * 5.0).toFloat()
+                // Si el mínimo queda por debajo del eje, se baja de 5 en 5 hasta que quepa
+                while (medMin < axisMin) axisMin -= 5f
                 // Nivel del mar: si no hay datos negativos, el eje no baja de 0
                 if (rawMinElev >= 0f) axisMin = maxOf(axisMin, 0f)
-                // Tras redondear, la cima real nunca puede quedar fuera del gráfico
-                while (axisMin + span < rawMaxElev) axisMin += 5f
+                // La parte alta de los datos nunca queda fuera del gráfico
+                while (axisMin + span < medMax) axisMin += 5f
                 fitAxisMin = axisMin
                 fitAxisSpan = span
             }
@@ -1511,7 +1539,9 @@ class Altimetria3DView @JvmOverloads constructor(
         axisTextPaint.textSize = (h * 0.038f).coerceIn(9f, 13f) * (1f + (fontScale - 1f) * 0.6f)
         axisTextPaint.textAlign = Paint.Align.LEFT
         // Barra de escala lateral: tramos alternos marrones y blancos con un borde fino (negro en fondo claro, blanco en oscuro)
-        run {
+        // Barra de escala lateral: una opción para la ruta global 3D y otra para el perfil de puertos
+        val prefsScale = AppPreferences.getInstance(context)
+        if (if (isClimbMode) prefsScale.showClimbScaleBar else prefsScale.show3dScaleBar) {
             val dp = resources.displayMetrics.density
             val barW = 2.5f * dp
             val brownPaint = Paint().apply {
@@ -1753,6 +1783,7 @@ class Altimetria3DView @JvmOverloads constructor(
                     val textW = percentTextPaint.measureText(pctStr)
                     val padX = (labelSize * 0.26f).coerceIn(4f, 14f)
                     val padY = (labelSize * 0.18f).coerceIn(3f, 10f)
+                    labelGrade = g
                     drawGradeLabel(canvas, pctStr, colMidX, centerY, labelSize, padX, padY, badgeBg, badgeBorder, riddenIdx >= 0 && b <= riddenIdx)
                 }
             } else {
@@ -1796,6 +1827,7 @@ class Altimetria3DView @JvmOverloads constructor(
 
                     val padX = (labelSize * 0.28f).coerceIn(5f, 9f)
                     val padY = (labelSize * 0.18f).coerceIn(3f, 6f)
+                    labelGrade = avgGrade
                     drawGradeLabel(canvas, pctStr, midX, centerY, labelSize, padX, padY, badgeBg, badgeBorder, riddenIdx >= 0 && microIdx2 <= riddenIdx)
                 }
             }
@@ -1859,7 +1891,14 @@ class Altimetria3DView @JvmOverloads constructor(
                 val xB = xBack[idx] + rem * (xBack[idx + 1] - xBack[idx])
                 val yB = yBack[idx] + rem * (yBack[idx + 1] - yBack[idx])
 
-                // Dibujar línea transversal sobre la calzada (asfalto 3D)
+                // Dibujar línea transversal sobre la calzada (asfalto 3D).
+                // Con fondo blanco el filtro invierte: se dibuja al revés para que salga negra con borde blanco
+                val hpInk = if (lightBgActive) Color.WHITE else Color.BLACK
+                val hpEdge = if (lightBgActive) Color.BLACK else Color.WHITE
+                hairpinLineBorderPaint.color = hpEdge
+                hairpinLinePaint.color = hpInk
+                hairpinMarkBorderPaint.color = hpEdge
+                hairpinMarkPaint.color = hpInk
                 canvas.drawLine(xF, yF, xB, yB, hairpinLineBorderPaint)
                 canvas.drawLine(xF, yF, xB, yB, hairpinLinePaint)
 

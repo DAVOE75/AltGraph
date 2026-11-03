@@ -250,7 +250,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             rampMinSlope = prefs.rampMinSlopePct,
                             rampMaxSlope = prefs.rampMaxSlopePct,
                             showHairpins = prefs.showHairpins,
-                            showPois = (prefs.showPoiTowns || prefs.showPoiWater || prefs.showPoiViewpoints || prefs.showPoiSummits),
+                            showPois = prefs.showPois && prefs.poiTypesEnabled.isNotEmpty(),
                             hairpins = strategy.hairpins,
                             pois = strategy.pois,
                             showZoomControls = prefs.show3dZoomControls,
