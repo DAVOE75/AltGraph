@@ -1181,11 +1181,18 @@ class Altimetria3DView @JvmOverloads constructor(
         routeInfoValuePaint.textSize = textSize * 1.15f
         val lineH = textSize * 1.4f
         // Debajo de la línea de altitud más alta del perfil, que sirve de referencia
-        val firstBaseline = if (inZoomRow) {
+        val baseBaseline = if (inZoomRow) {
             val rowCenter = 16f * dp + 24f * dp
             rowCenter - (lineH + textSize) / 2f + textSize
         } else if (profileTopLineY > 0f) profileTopLineY + textSize * 1.15f + 6f
             else if (gradeHeaderShown) h * 0.33f else (h * 0.15f).coerceIn(28f, 44f) + 22f
+        // Con los botones de paso arriba, los datos bajan un poco para quedar justo debajo de ellos y no pisarlos
+        val firstBaseline = if (panButtonsPosition == "top" && !isClimbMode) {
+            val panR = resources.getDimension(R.dimen.pan_btn_size) / 2f
+            val nameShift = if (showRouteName && showHeaderStats) 6f * dp else 0f
+            val buttonsBottom = (if (rotate90) 38f else 42f) * dp + nameShift + panR
+            maxOf(baseBaseline, buttonsBottom + 4f * dp + textSize)
+        } else baseBaseline
         if (routeInfoOnLeft) {
             // A la izquierda, tras el eje de altitudes: etiquetas alineadas y valores en columna
             val leftX = if (inZoomRow) 8f else w * 0.10f + 8f
@@ -1602,7 +1609,11 @@ class Altimetria3DView @JvmOverloads constructor(
             val exaggeration = maxPeakHeight * totalMetersAhead.toFloat() / (finalElevRange * w)
             val tagPaint = Paint(axisTextPaint).apply { textAlign = Paint.Align.RIGHT }
             val label = if (exaggeration >= 10f) "%.0fx".format(exaggeration) else "%.1fx".format(exaggeration)
-            canvas.drawText(label, baseEndX - 6f, baseGroundY - maxPeakHeight - 6f, tagPaint)
+            // Con los botones de paso arriba, la etiqueta se coloca a la izquierda del botón derecho para no quedar bajo él
+            val tagRight = if (panButtonsPosition == "top") {
+                w - (PAN_BTN_EDGE_DP * resources.displayMetrics.density + resources.getDimension(R.dimen.pan_btn_size)) - 6f
+            } else baseEndX - 6f
+            canvas.drawText(label, tagRight, baseGroundY - maxPeakHeight - 6f, tagPaint)
         }
 
         // Fusión opcional de bloques vecinos del mismo color: una sola columna con la pendiente media del tramo
@@ -1996,8 +2007,12 @@ class Altimetria3DView @JvmOverloads constructor(
 
         // Con mucho zoom los sub-bloques son anchos: también se rotulan sus distancias en la regla
         if (profileMode && microSubDivisions > 1 && microStepX >= 60f) {
-            subDistTextPaint.textSize = baseDistTextPaint.textSize * 0.85f
+            subDistTextPaint.textSize = baseDistTextPaint.textSize
             subDistTextPaint.typeface = baseDistTextPaint.typeface
+            subDistTextPaint.isFakeBoldText = baseDistTextPaint.isFakeBoldText
+            subDistTextPaint.letterSpacing = baseDistTextPaint.letterSpacing
+            subDistTextPaint.textScaleX = baseDistTextPaint.textScaleX
+            subDistTextPaint.textSkewX = baseDistTextPaint.textSkewX
             for (i in 1 until totalMicroSamples) {
                 if (i % microSubDivisions == 0) continue
                 val px = xFront[i]
