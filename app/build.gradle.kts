@@ -1,4 +1,4 @@
-import java.util.Properties
+﻿import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -6,7 +6,7 @@ plugins {
 }
 
 // Clave de firma fija: variables de entorno (CI) o ~/.altgraph/keystore.properties (local).
-// Sin ella se firma con la clave debug, que cambia en cada máquina/ejecución y rompe las actualizaciones OTA.
+// Sin ella se firma con la clave debug, que cambia en cada mÃ¡quina/ejecuciÃ³n y rompe las actualizaciones OTA.
 val localKeystore = Properties().apply {
     val f = File(System.getProperty("user.home"), ".altgraph/keystore.properties")
     if (f.exists()) f.inputStream().use { load(it) }
@@ -23,8 +23,8 @@ android {
         applicationId = "com.example.altgraph"
         minSdk = 26
         targetSdk = 34
-        versionCode = 419
-        versionName = "3.0.1"
+        versionCode = 420
+        versionName = "3.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

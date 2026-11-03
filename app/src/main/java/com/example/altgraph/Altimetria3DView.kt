@@ -911,8 +911,22 @@ class Altimetria3DView @JvmOverloads constructor(
         return true
     }
 
+    // Sin botones de zoom: un toque acerca y un doble toque aleja
+    private val tapZoomDetector by lazy { android.view.GestureDetector(context, object : android.view.GestureDetector.SimpleOnGestureListener() {
+        override fun onDown(e: MotionEvent): Boolean = true
+        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+            performClick()
+            zoomIn()
+            return true
+        }
+        override fun onDoubleTap(e: MotionEvent): Boolean {
+            zoomOut()
+            return true
+        }
+    }) }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (!showZoomControls) return super.onTouchEvent(event)
+        if (!showZoomControls) return tapZoomDetector.onTouchEvent(event) || super.onTouchEvent(event)
 
         val touchX = event.x
         val touchY = event.y

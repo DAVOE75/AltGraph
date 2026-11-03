@@ -11,6 +11,29 @@
         android:scaleType="fitXY"
         android:contentDescription="@string/app_name" />
 
+    <!-- Zoom táctil (solo con los botones de zoom ocultos): mitad izquierda aleja, mitad derecha acerca -->
+    <LinearLayout
+        android:id="@+id/tap_zoom_area"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:id="@+id/tap_zoom_out_area"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000" />
+
+        <FrameLayout
+            android:id="@+id/tap_zoom_in_area"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#00000000" />
+    </LinearLayout>
+
     <FrameLayout
         android:id="@+id/btn_toggle_compass"
         android:layout_width="80dp"

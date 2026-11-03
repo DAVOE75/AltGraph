@@ -91,8 +91,8 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
         zoomReceiverRef.acquire(emitter) {
             val zoomReceiver = object : BroadcastReceiver() {
                 override fun onReceive(ctx: Context?, intent: Intent?) {
-                    // Redibujar en cuanto llega la pulsación, sin esperar al siguiente ciclo de 1 s
-                    refreshChannel.trySend(Unit)
+                    // Redibujar en cuanto cambia el ajuste (después de guardarlo), sin esperar al siguiente ciclo de 1 s
+                    try {
                     val routeMaxMeters = AltgraphRepository.snapshot.value?.routeTotalLength?.takeIf { it > 500.0 }?.toInt()
                     if (intent?.action == ACTION_ZOOM_IN && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
@@ -145,6 +145,9 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         val prefs = AppPreferences.getInstance(ctx)
                         val step = prefs.lookaheadMeters3d / 3.0
                         AltgraphRepository.pan3d(step)
+                    }
+                    } finally {
+                        refreshChannel.trySend(Unit)
                     }
                 }
             }
@@ -422,6 +425,12 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         } else {
                             remoteViews.setViewVisibility(R.id.zoom_controls_top, android.view.View.GONE)
                             remoteViews.setViewVisibility(R.id.zoom_controls_side, android.view.View.GONE)
+                            // Sin botones: tocar la mitad derecha acerca y la izquierda aleja
+                            val tapIn = PendingIntent.getBroadcast(context, 4, Intent(ACTION_ZOOM_IN).apply { setPackage(context.packageName) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                            val tapOut = PendingIntent.getBroadcast(context, 5, Intent(ACTION_ZOOM_OUT).apply { setPackage(context.packageName) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                            remoteViews.setViewVisibility(R.id.tap_zoom_area, android.view.View.VISIBLE)
+                            remoteViews.setOnClickPendingIntent(R.id.tap_zoom_in_area, tapIn)
+                            remoteViews.setOnClickPendingIntent(R.id.tap_zoom_out_area, tapOut)
                         }
                                         if (prefs.showRouteCompass && strategy.routeCoords.isNotEmpty() && prefs.altimetriaStyle == AltimetriaStyle.GLOBAL_ISOMETRIC) {
                               val intentCompass = Intent(ACTION_TOGGLE_COMPASS).apply {
