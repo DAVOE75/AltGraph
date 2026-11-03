@@ -25,6 +25,7 @@ Version 3.0 macht AltGraph einfacher einzustellen, bei Sonne besser lesbar und u
 * **Höhenradar**: respektiert die abgerundeten Ecken des Karoo, der linke Streifen wird mit der gefahrenen Route gefüllt, der gefahrene Abschnitt wird samt seinen Prozenten abgedunkelt, das % bleibt sichtbar, auch wenn ein Abschnitt länger als der Bildschirm ist, und die maximale Steigung steht dort, wo sie auftritt.
 * **Flexiblerer 3D-Kopfbereich**: Routenname und Steigungen (aktuell, Durchschnitt und Maximum) sind getrennte Schalter; optionale Skalenleiste, optional schwarzer Steigungstext auf Gelb und Orange und Serpentinenlinien, die auf weißem Hintergrund lesbar sind.
 * **Details**: kleinere, abgerundete, ausgerichtete Zoom- und Seitenwechsel-Tasten; keine „OASIS“-Schilder; durchgehende Blocktrennlinien.
+* **Zuverlässigere gesammelte Höhenmeter**: Die Höhenmeter für Meilensteine und Sprachzusammenfassung filtern Rauschen und langsame Drift des Barometers (ein Anstieg zählt erst ab 2 m).
 
 ---
 

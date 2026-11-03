@@ -25,6 +25,7 @@ A 3.0 torna o AltGraph mais fácil de configurar, mais claro ao sol e mais útil
 * **Radar altimétrico**: respeita os cantos arredondados do Karoo, a faixa esquerda é preenchida com a rota já percorrida, o troço percorrido é sombreado com as suas percentagens, o % vê-se mesmo que o troço seja mais longo que o ecrã e a inclinação máxima é colocada onde acontece.
 * **Cabeçalho 3D mais flexível**: o nome da rota e as inclinações (atual, média e máxima) são interruptores separados; barra de escala opcional, texto de inclinação a preto sobre amarelo e laranja (opcional) e curvas em ferradura legíveis sobre fundo branco.
 * **Detalhes**: botões de zoom e de passagem de página mais pequenos, arredondados e alinhados; sem etiquetas «OASIS»; separação de blocos contínua.
+* **Desnível acumulado mais fiável**: o desnível usado pelos marcos e pelo resumo por voz filtra o ruído e a deriva lenta do barómetro (só conta uma subida quando ultrapassa 2 m).
 
 ---
 

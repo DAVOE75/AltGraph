@@ -22,6 +22,9 @@ import java.util.Locale
  * la petición de AUDIOFOCUS para atenuar suavemente la música mientras habla,
  * y una cola con prioridades y control inteligente de anti-spam para no saturar al ciclista.
  */
+// Umbral (m) para contar una subida en el desnivel acumulado: filtra el ruido y la deriva del barómetro
+private const val ELEV_GAIN_THRESHOLD_M = 2.0
+
 class VoiceDirector private constructor(private val context: Context) : TextToSpeech.OnInitListener {
 
     companion object {
@@ -96,6 +99,8 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     // Estimador de desnivel positivo acumulado cuando no hay sensor dedicado
     private var lastRecordedElevation = 0.0
     private var estimatedElevationGain = 0.0
+    // Punto de anclaje del desnivel acumulado (ver la histéresis en evaluate)
+    private var elevGainAnchor = 0.0
 
     // Estadísticas acumuladas de la sesión para cálculo de media real
     private var rideMovingTimeSeconds = 0L
@@ -344,14 +349,21 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
              rideDistanceMetersAccumulated += speed
          }
 
-         // Acumular ganancia de elevación estimada
-         if (lastRecordedElevation > 0.0 && elev > lastRecordedElevation && speed > 0.4) {
-             val delta = elev - lastRecordedElevation
-             if (delta in 0.05..15.0) { // Contar ganancias graduales sin saltos anómalos
-                 estimatedElevationGain += delta
+         // Acumular ganancia de elevación estimada con histéresis: el ruido y la deriva lenta del barómetro (subidas y
+         // bajadas de décimas de metro) no suman; solo cuenta una subida cuando supera ELEV_GAIN_THRESHOLD_M sobre el
+         // último punto de anclaje. Parado, o ante un salto anómalo entre muestras, se reancla sin contar nada.
+         if (elev > 0.0) {
+             val jump = if (lastRecordedElevation > 0.0) Math.abs(elev - lastRecordedElevation) else 0.0
+             if (speed <= 0.4 || elevGainAnchor <= 0.0 || jump > 15.0) {
+                 elevGainAnchor = elev
+             } else if (elev - elevGainAnchor >= ELEV_GAIN_THRESHOLD_M) {
+                 estimatedElevationGain += elev - elevGainAnchor
+                 elevGainAnchor = elev
+             } else if (elevGainAnchor - elev >= ELEV_GAIN_THRESHOLD_M) {
+                 elevGainAnchor = elev
              }
+             lastRecordedElevation = elev
          }
-         if (elev > 0.0) lastRecordedElevation = elev
 
          // 1. AVISO DE PUERTO (Inicio, Kilómetros y Cima)
          if (prefs.voiceClimbsEnabled && climbs.isNotEmpty()) {

@@ -33,6 +33,7 @@ Version 3.0 makes AltGraph easier to set up, clearer in sunlight and more useful
 * **Altimetric radar**: respects the rounded corners of the Karoo, the left strip is filled with the route already ridden, the ridden stretch is shaded together with its percentages, the % shows even when a stretch is longer than the screen and the max gradient is placed where it happens.
 * **More flexible 3D header**: the route name and the gradients (current, average and max) are separate toggles; optional scale bar, optional black gradient text on yellow and orange, and hairpin lines readable on a white background.
 * **Details**: smaller, rounded, aligned zoom and page-step buttons; no "OASIS" badges; continuous block separators.
+* **More reliable accumulated elevation**: the elevation used by the milestones and the voice summary filters barometer noise and slow drift (a climb only counts once it exceeds 2 m).
 
 ---
 

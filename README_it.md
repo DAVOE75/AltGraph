@@ -25,6 +25,7 @@ La versione 3.0 rende AltGraph più facile da configurare, più chiaro al sole e
 * **Radar altimetrico**: rispetta gli angoli arrotondati del Karoo, la fascia a sinistra è riempita con il percorso già fatto, il tratto percorso è ombreggiato insieme alle sue percentuali, il % resta visibile anche se un tratto è più lungo dello schermo e la pendenza massima è posta dove si verifica.
 * **Intestazione 3D più flessibile**: il nome del percorso e le pendenze (attuale, media e massima) sono interruttori separati; barra di scala opzionale, testo di pendenza nero su giallo e arancione (opzionale) e linee dei tornanti leggibili su sfondo bianco.
 * **Dettagli**: pulsanti di zoom e di cambio pagina più piccoli, arrotondati e allineati; niente cartellini «OASIS»; separazione dei blocchi continua.
+* **Dislivello accumulato più affidabile**: il dislivello usato da traguardi e riepilogo vocale filtra il rumore e la lenta deriva del barometro (una salita conta solo oltre 2 m).
 
 ---
 
