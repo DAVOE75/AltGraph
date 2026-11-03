@@ -2569,7 +2569,10 @@ class Altimetria3DView @JvmOverloads constructor(
                 }
             }
             canvas.drawLine(xBack[i], yBack[i], xBack[i + 1], yBack[i + 1], ribbonBackLinePaint)
+            val frontW = ribbonFrontLinePaint.strokeWidth
+            ribbonFrontLinePaint.strokeWidth = frontW * 0.5f
             canvas.drawLine(xFront[i], yFront[i], xFront[i + 1], yFront[i + 1], ribbonFrontLinePaint)
+            ribbonFrontLinePaint.strokeWidth = frontW
         }
     }
 
@@ -3616,7 +3619,10 @@ class Altimetria3DView @JvmOverloads constructor(
             ribbonSurfacePaint.color = topColor
             canvas.drawPath(ribbonQuadPath, ribbonSurfacePaint)
             canvas.drawLine(xBack[i], yBack[i], xBack[i + 1], yBack[i + 1], ribbonBackLinePaint)
+            val frontW = ribbonFrontLinePaint.strokeWidth
+            ribbonFrontLinePaint.strokeWidth = frontW * 0.5f
             canvas.drawLine(xFront[i], yFront[i], xFront[i + 1], yFront[i + 1], ribbonFrontLinePaint)
+            ribbonFrontLinePaint.strokeWidth = frontW
         }
 
         // APEX: marcadores en herraduras (hairpins) como chinchetas flotantes 3D
