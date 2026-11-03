@@ -5,6 +5,10 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
+import android.graphics.RectF
 import android.view.View
 import android.widget.RemoteViews
 import io.hammerhead.karooext.extension.DataTypeImpl
@@ -78,6 +82,13 @@ class RouteBarDataType(extension: String) : DataTypeImpl(extension, "route_bar")
         var cachedBitmap: Bitmap? = null
         var cachedCanvas: Canvas? = null
         val bgPaint = Paint().apply { color = Color.TRANSPARENT }
+        // Karoo dibuja la celda con esquinas redondeadas (~9 dp) pero no recorta el contenido: se vacían las esquinas del bitmap
+        val cornerClearPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
+        val cornerR = 9f * context.resources.displayMetrics.density
+        val cornerPath = Path().apply {
+            addRoundRect(RectF(0f, 0f, w.toFloat(), h.toFloat()), cornerR, cornerR, Path.Direction.CW)
+            fillType = Path.FillType.INVERSE_WINDING
+        }
         var lastFrame: List<Any?>? = null
 
         val viewJob = CoroutineScope(Dispatchers.Default).launch {
@@ -129,7 +140,8 @@ class RouteBarDataType(extension: String) : DataTypeImpl(extension, "route_bar")
                             currentCanvas.drawText("ELITE", w/2f, h/2f, p)
                         }
 
-                        val remoteViews = RemoteViews(context.packageName, R.layout.view_remote_graphic)
+                        val remoteViews = RemoteViews(context.packageName, R.layout.view_remote_graphic_clear)
+                        currentCanvas.drawPath(cornerPath, cornerClearPaint)
                         remoteViews.setImageViewBitmap(R.id.img_graphic, currentBmp)
 
                         emitter.onNext(UpdateGraphicConfig(showHeader = false))

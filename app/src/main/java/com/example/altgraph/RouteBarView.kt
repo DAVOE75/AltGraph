@@ -29,7 +29,7 @@ class RouteBarView(context: Context) : View(context) {
     }
 
     private val pastOverlayPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(155, 0, 0, 0) // Oscurece el tramo ya recorrido a la izquierda de la flecha con mayor contraste
+        color = Color.argb(200, 0, 0, 0) // Oscurece el tramo ya recorrido a la izquierda de la flecha (78 % de opacidad)
         style = Paint.Style.FILL
     }
 
@@ -480,7 +480,10 @@ class RouteBarView(context: Context) : View(context) {
             val expectedBlocks = (strat.windowLengthMeters / strat.subBlockSizeMeters).toFloat()
             val blockWidth = w / expectedBlocks
             val cWidth = 30f
-            val arrowX = (w * 0.25f).coerceAtLeast(cWidth / 2f)
+            // La flecha va donde la ventana de datos ancla al ciclista (sin hueco a la izquierda); solo al principio de la
+            // ruta se deja un margen del 20 % para la bandera de salida
+            val riderX = w * strat.riderProgress
+            val arrowX = (if (strat.windowStartMeters <= 0.0) maxOf(riderX, w * 0.2f) else riderX).coerceAtLeast(cWidth / 2f)
             val progressOffset = (w * strat.riderProgress) - arrowX
 
             for (i in bands.indices) {
@@ -535,12 +538,7 @@ class RouteBarView(context: Context) : View(context) {
                 }
             }
 
-            // 2. Dibujar overlay oscuro (pasado) a la izquierda de la flecha estática
-            if (arrowX > startX) {
-                // Oscurecer lo que queda atrás (solo en la franja superior donde hay colores)
-                // Hacemos que el overlay empiece desde startX para no oscurecer la bandera de cuadros
-                canvas.drawRect(Math.max(0f, startX), 0f, arrowX, headerHeight, pastOverlayPaint)
-            }
+            // 2. (el sombreado del pasado se dibuja tras los números, para oscurecerlos también)
 
             // 3. Textos de porcentaje medio en la franja superior (sin el fondo oscurecido general)
             percentTextPaint.setShadowLayer(4f, 0f, 2f, Color.BLACK) // Sombra fuerte para legibilidad sin fondo oscuro
@@ -554,54 +552,90 @@ class RouteBarView(context: Context) : View(context) {
 
             val cyPercent = (headerHeight / 2f) + (percentTextPaint.textSize / 3f)
             // getSubBlockSize only returns 50.0 or 100.0 for typical route lookaheads
-            val showMaxGrade = strat.subBlockSizeMeters <= 100.0 && strat.subBlocksMax.isNotEmpty()
+            val showMaxGrade = strat.subBlocksMax.isNotEmpty()
             for (band in bands) {
                 val left = band.startIndex * blockWidth - progressOffset
                 val right = (band.endIndex + 1) * blockWidth - progressOffset
-                val bandWidth = right - left
 
                 // Si la banda está fuera de la pantalla no dibujar su %
                 if (right <= 0f || left >= w) continue
 
-                if (bandWidth > percentTextPaint.textSize * 1.6f) {
+                // Se recorta a la parte visible (y sin invadir las banderas de salida/meta): con zoom, un tramo largo puede
+                // ser más ancho que la pantalla y su centro quedaría fuera. Así el % siempre se ve mientras quepa en pantalla.
+                val actualLeft = Math.max(Math.max(left, startX), 0f)
+                val actualRight = Math.min(Math.min(right, endX), w)
+
+                if (actualRight - actualLeft > percentTextPaint.textSize * 1.6f) {
                     val count = band.endIndex - band.startIndex + 1
                     val avgGrade = (Math.round(band.sumGrade / count)).toInt()
-                    // Adjust drawing to not overlap with checkered start/end if it crosses them
-                    val actualLeft = Math.max(left, startX)
-                    val actualRight = Math.min(right, endX)
-                    val drawCenter = actualLeft + (actualRight - actualLeft) / 2f
-                    drawGradeLabel(canvas, avgGrade, drawCenter, cyPercent, percentTextPaint.textSize)
+                    var drawCenter = actualLeft + (actualRight - actualLeft) / 2f
 
-                    // Max grade label (top-left corner) — computed as extreme across all subBlocks in the band
+                    // Pendiente máxima del tramo: se muestra siempre que supere a la media y se coloca donde ocurre de verdad
+                    // (en el sub-bloque que la contiene), también una vez que la flecha la cruza
+                    var arrow = ""
+                    var maxLabel = ""
+                    var labelX = 0f
+                    var drawMax = false
                     if (showMaxGrade) {
-                        val blockGrades = (band.startIndex..band.endIndex)
-                            .mapNotNull { strat.subBlocksMax.getOrNull(it) }
-                        val maxG = blockGrades.maxOrNull()
-                        val minG = blockGrades.minOrNull()
-                        // Pick the most extreme value: if avg is negative, look at the most negative peak
-                        val extremeG = if (avgGrade < 0 && minG != null && minG < avgGrade - 1f) minG
-                                       else if (maxG != null && maxG > avgGrade + 1f) maxG
+                        val entries = (band.startIndex..band.endIndex).mapNotNull { i -> strat.subBlocksMax.getOrNull(i)?.let { i to it } }
+                        val maxE = entries.maxByOrNull { it.second }
+                        val minE = entries.minByOrNull { it.second }
+                        // Si la media es negativa se busca el pico más negativo; si no, el más positivo. Se compara ya redondeado
+                        // para no mostrar un máximo igual a la media
+                        val extremeE = if (avgGrade < 0 && minE != null && Math.round(minE.second) < avgGrade) minE
+                                       else if (maxE != null && Math.round(maxE.second) > avgGrade) maxE
                                        else null
-                        if (extremeG != null) {
-                            val arrow = if (extremeG < 0) "▼" else "▲"
-                            val maxLabel = "${Math.abs(Math.round(extremeG))}%"
+                        if (extremeE != null) {
+                            val extremeG = extremeE.second
+                            arrow = if (extremeG < 0) "▼" else "▲"
+                            maxLabel = "${Math.abs(Math.round(extremeG))}%"
 
-                            val labelX = actualLeft + currentMaxGradeTextSize // Center relative to text
-                            val arrowY = maxGradeArrowPaint.textSize + 4f
-                            val textY = arrowY + maxGradeBlockPaint.textSize + 2f
+                            val maxHalfW = maxOf(maxGradeBlockPaint.measureText(maxLabel), maxGradeArrowPaint.measureText(arrow)) / 2f
+                            val blockCenter = extremeE.first * blockWidth - progressOffset + blockWidth / 2f
+                            // Dentro de la parte visible del tramo
+                            val minX = actualLeft + maxHalfW + 2f
+                            val maxX = actualRight - maxHalfW - 2f
+                            if (maxX >= minX) {
+                                labelX = blockCenter.coerceIn(minX, maxX)
+                                drawMax = true
 
-                            val baseColor = Color.parseColor(band.colorHex)
-                            val hsv = FloatArray(3)
-                            Color.colorToHSV(baseColor, hsv)
-                            hsv[1] = Math.min(1.0f, hsv[1] * 1.2f) // Increase saturation a bit
-                            hsv[2] *= 0.5f // Decrease brightness for a darker tone
-                            maxGradeArrowPaint.color = Color.HSVToColor(hsv)
-
-                            canvas.drawText(arrow, labelX, arrowY, maxGradeArrowPaint)
-                            canvas.drawText(maxLabel, labelX, textY, maxGradeBlockPaint)
+                                // Si el % medio choca con el máximo, se aparta hacia el lado con sitio; si no cabe, se omite el máximo
+                                val avgHalfW = gradeLabelWidth(avgGrade, percentTextPaint.textSize) / 2f
+                                val gap = maxHalfW + avgHalfW + 10f
+                                if (Math.abs(drawCenter - labelX) < gap) {
+                                    val rightC = labelX + gap
+                                    val leftC = labelX - gap
+                                    if (rightC + avgHalfW <= actualRight) drawCenter = rightC
+                                    else if (leftC - avgHalfW >= actualLeft) drawCenter = leftC
+                                    else drawMax = false
+                                }
+                            }
                         }
                     }
+
+                    drawGradeLabel(canvas, avgGrade, drawCenter, cyPercent, percentTextPaint.textSize)
+
+                    if (drawMax) {
+                        val arrowY = maxGradeArrowPaint.textSize + 4f
+                        val textY = arrowY + maxGradeBlockPaint.textSize + 2f
+
+                        val baseColor = Color.parseColor(band.colorHex)
+                        val hsv = FloatArray(3)
+                        Color.colorToHSV(baseColor, hsv)
+                        hsv[1] = Math.min(1.0f, hsv[1] * 1.2f) // Increase saturation a bit
+                        hsv[2] *= 0.5f // Decrease brightness for a darker tone
+                        maxGradeArrowPaint.color = Color.HSVToColor(hsv)
+
+                        canvas.drawText(arrow, labelX, arrowY, maxGradeArrowPaint)
+                        canvas.drawText(maxLabel, labelX, textY, maxGradeBlockPaint)
+                    }
                 }
+            }
+
+            // Overlay oscuro (pasado) a la izquierda de la flecha estática, por encima de los números: lo recorrido queda
+            // sombreado con sus porcentajes. Empieza en startX para no oscurecer la bandera de cuadros.
+            if (arrowX > startX) {
+                canvas.drawRect(Math.max(0f, startX), 0f, arrowX, headerHeight, pastOverlayPaint)
             }
 
             // 4. Franja Intermedia (Regla / Ruler)
@@ -1007,6 +1041,16 @@ class RouteBarView(context: Context) : View(context) {
                 drawAlerts(canvas, strat, isHorizontal = false, w - alertW, 0f, w, h, fontScale)
             }
         }
+    }
+
+    // Ancho que ocupa el número de pendiente con su símbolo %, igual que lo dibuja drawGradeLabel
+    private fun gradeLabelWidth(grade: Int, numberSize: Float): Float {
+        percentTextPaint.textSize = numberSize
+        val numberW = percentTextPaint.measureText(grade.toString())
+        percentTextPaint.textSize = numberSize * 0.6f
+        val signW = percentTextPaint.measureText("%")
+        percentTextPaint.textSize = numberSize
+        return numberW + signW
     }
 
     // Número grande y símbolo % más pequeño, centrados como un único texto

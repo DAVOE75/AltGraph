@@ -63,7 +63,7 @@
     <string name="setting_chart_light_style_classic">Clássico</string>
     <string name="setting_chart_light_style_poster">Cartaz (corpo preto, blocos dourados)</string>
     <string name="setting_chart_fit_axis">Escala vertical ajustada ao troço visível</string>
-    <string name="setting_chart_fit_axis_desc">Ajusta a altura do perfil 3D às altitudes visíveis, para o relevo se notar mais com zoom curto. As estradas planas não são exageradas abaixo de 30 m. As inclinações e as cores não mudam.</string>
+    <string name="setting_chart_fit_axis_desc">Ajusta a altura do perfil 3D às altitudes visíveis, para o relevo se notar mais com zoom curto. As estradas planas não são exageradas abaixo de 30 m. As inclinações e as cores não mudam. Em rotas ao nível do mar (sem altitudes negativas) o eixo nunca desce abaixo de 0 m, pelo que o perfil pode ficar junto à parte inferior.</string>
     <string name="setting_chart_light_bg_desc">Desenha o fundo dos gráficos 3D em branco, com cotas e quilómetros a preto e cores mais intensas. Útil com sol forte.</string>
     <string name="setting_use_topographic">Usar Método de Cálculo de Inclinação Topográfica (Projeção Horizontal)</string>
     <string name="setting_show_hairpins">Mostrar Curvas em Ferradura e Cotovelos (linhas pretas/brancas)</string>
@@ -332,7 +332,7 @@
     <string name="panel_theme_light">Claro</string>
     <string name="setting_climb_alert">Aviso de subida durante o treino</string>
     <string name="setting_climb_alert_desc">Mostra um aviso no ecrã do treino quando uma subida está prestes a começar (400 m antes): nome, comprimento, inclinação média, categoria e desnível. Útil se desativar o Climber da Hammerhead</string>
-    <string name="setting_show_route_elevation">Mostrar também o desnível (total e restante)</string>
+    <string name="setting_show_route_elevation">Mostrar o desnível (total e restante)</string>
     <string name="route_info_right">Direita</string>
     <string name="route_info_left">Esquerda</string>
     <string name="setting_gear_effort">Mudança por esforço (cadência alvo)</string>
@@ -395,4 +395,29 @@
     <string name="poi_type_viewpoint">Miradouro</string>
     <string name="poi_type_water">Água</string>
     <string name="poi_type_winery">Adega</string>
+    <string name="setting_presets_title">Modelos de definições</string>
+    <string name="setting_presets_desc">Aplica de uma só vez um conjunto de definições visuais. Não altera o teu FTP, peso, licença, avisos de voz nem a transmissão. Depois podes ajustar cada opção.</string>
+    <string name="preset_mountain">Montanha</string>
+    <string name="preset_flat_gravel">Plano e gravel</string>
+    <string name="preset_race">Competição</string>
+    <string name="preset_clean">Limpo</string>
+    <string name="preset_reset">Repor definições visuais</string>
+    <string name="preset_applied">Modelo aplicado: %1$s</string>
+    <string name="preset_reset_confirm">Repor as definições visuais para os valores predefinidos? O FTP, o peso, a licença e os avisos de voz não são alterados.</string>
+    <string name="preset_reset_done">Definições visuais repostas</string>
+    <string name="label_route_next_resupply">Próx. apoio</string>
+    <string name="setting_next_resupply">Mostrar a distância ao próximo ponto de água ou reabastecimento</string>
+    <string name="setting_next_resupply_desc">Conta água, posto de apoio, comida, café, loja, posto de combustível e bar da tua rota, segundo os tipos ativos no filtro de pontos de interesse. Desativado por defeito.</string>
+    <string name="label_climb_difficulty">Dif.</string>
+    <string name="setting_climb_difficulty">Mostrar nota de dificuldade da subida</string>
+    <string name="setting_climb_difficulty_desc">Acrescenta uma nota de dificuldade ao cabeçalho do visor de subidas (desnível ao quadrado / (10 x comprimento), semelhante ao índice Fiets). Quanto mais alta, mais dura: por volta de 2 é fácil, 5 é dura e 8 ou mais, muito dura. Desativado por defeito.</string>
+    <string name="label_route_eta">Chegada</string>
+    <string name="setting_show_eta">Mostrar hora estimada de chegada</string>
+    <string name="setting_show_eta_desc">Estima a hora de chegada à meta com a tua velocidade média em movimento (cerca de 10 minutos de memória) e a distância restante. Desativado por defeito.</string>
+    <string name="elite_voice_climb_summary_title">Resumo ao coroar a subida</string>
+    <string name="elite_voice_climb_summary_desc">Ao terminar uma subida, anuncia o teu tempo, a inclinação média e a VAM. Requer o aviso de subidas ativado.</string>
+    <string name="voice_climb_summary">Cume. Tempo na subida: %1$s. Inclinação média %2$s por cento. VAM %3$s metros por hora.</string>
+    <string name="label_route_ascent_pace">Desnível/h</string>
+    <string name="setting_show_ascent_pace">Mostrar ritmo de desnível (m/h)</string>
+    <string name="setting_show_ascent_pace_desc">Desnível subido desde o início da rota dividido pelo teu tempo em movimento. Precisa de 5 minutos de marcha. Desativado por defeito.</string>
 </resources>

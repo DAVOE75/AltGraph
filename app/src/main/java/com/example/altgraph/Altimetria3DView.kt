@@ -728,6 +728,9 @@ class Altimetria3DView @JvmOverloads constructor(
     // Mostrar también el desnivel junto a Ruta/Quedan (opcional)
     var routeShowElevation: Boolean = false
     var routeRemainingAscent: Double? = null
+    var nextResupplyMeters: Double? = null
+    var etaFinishMinutes: Long? = null
+    var ascentPaceMetersPerHour: Int? = null
     var gearChainrings: String = GearAdvisor.DEFAULT_CHAINRINGS
     var gearCassette: String = GearAdvisor.DEFAULT_CASSETTE
 
@@ -1148,11 +1151,16 @@ class Altimetria3DView @JvmOverloads constructor(
         val textSize0 = ((h * 0.034f) * fontScale).coerceIn(15f, fsHi(24f))
         val total = routeTotalAscent
         val remaining = routeRemainingAscent
-        val lines = listOf(
+        val resupply = nextResupplyMeters
+        val etaText = etaFinishMinutes?.let { android.text.format.DateFormat.getTimeFormat(context).format(java.util.Date(it * 60000L)) }
+        val lines = listOfNotNull(
             context.getString(R.string.label_route_total) to
                 (formatRouteKm(routeTotalLength) + if (routeShowElevation && total != null) " / ${total.roundToInt()}m" else ""),
             context.getString(R.string.label_route_left) to
-                (formatRouteKm(left) + if (routeShowElevation && remaining != null) " / ${remaining.roundToInt()}m" else "")
+                (formatRouteKm(left) + if (routeShowElevation && remaining != null) " / ${remaining.roundToInt()}m" else ""),
+            if (resupply != null) context.getString(R.string.label_route_next_resupply) to formatRouteKm(resupply) else null,
+            if (etaText != null) context.getString(R.string.label_route_eta) to etaText else null,
+            ascentPaceMetersPerHour?.let { context.getString(R.string.label_route_ascent_pace) to "+$it m/h" }
         )
         // Sin cabecera y con las flechas de paso abajo, los datos suben a la fila de los botones de zoom (entre las esquinas y el zoom)
         val inZoomRow = !gradeHeaderShown && !rotate90 && !isClimbMode && panButtonsPosition != "top"
@@ -2733,23 +2741,7 @@ class Altimetria3DView @JvmOverloads constructor(
             canvas.drawLine(xFront[k], yFront[k], xFront[k + 1], yFront[k + 1], shelfRidgePaint)
         }
 
-        // Rótulo táctico del descansillo si hay anchura (no en el perfil de puertos)
-        val shelfW = abs(x2 - x1)
-        if (shelfW >= 36f && !isClimbMode) {
-            val distMeters = ((endIdx - startIdx) * subBlockSize).toInt()
-            val label = if (shelfW >= 60f) "OASIS ${distMeters}m" else "OASIS"
-            percentTextPaint.textSize = (shelfW * 0.22f * fontScale).coerceIn(11f, 15f)
-            val textW = percentTextPaint.measureText(label)
-            val badgeRect = RectF(
-                midX - (textW / 2f) - 6f,
-                topY - 20f,
-                midX + (textW / 2f) + 6f,
-                topY - 2f
-            )
-            canvas.drawRoundRect(badgeRect, 6f, 6f, oasisBadgeBgPaint)
-            canvas.drawRoundRect(badgeRect, 6f, 6f, oasisBadgeBorderPaint)
-            canvas.drawText(label, midX, topY - 7f, percentTextPaint)
-        }
+        // El rótulo "OASIS" se ha eliminado: el descansillo solo se distingue por su sombreado y su cresta
     }
 
     private fun drawCrucibleFire(

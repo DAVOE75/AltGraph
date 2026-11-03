@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v2.8 REVOLUTION)
+# ALTGRAPH (v3.0 EVOLUTION)
 <p>Lesen auf: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** ist eine professionelle Höhen- und Leistungserweiterung der nächsten Generation für **Hammerhead Karoo** Fahrradcomputer (Karoo 2 und Karoo 3), entwickelt von **hesiOX** unter Verwendung des offiziellen `karoo-ext` SDKs.
@@ -10,6 +10,23 @@ Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 7 3D-Höhenv
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## VERSION 3.0: EVOLUTION
+
+Version 3.0 macht AltGraph einfacher einzustellen, bei Sonne besser lesbar und unterwegs nützlicher.
+
+* **Einstellungsvorlagen** (Reiter Stil): Berg, Flach und Gravel, Rennen und Aufgeräumt wenden mehrere visuelle Optionen auf einmal an. Die gewählte Vorlage bleibt markiert, bis du etwas änderst. Sie berühren nie FTP, Gewicht, Lizenz, Sprachansagen oder Übersetzung. Enthält „Visuelle Einstellungen zurücksetzen“.
+* **Weißer Hintergrund und Poster-Stil**: Diagramme mit weißem Hintergrund und ein Poster-Stil (schwarzer Körper, goldene Blocklinien, seitliche Skalenleiste); Zoom-Tasten und Texte der Anstiegsansicht an den hellen Modus angepasst.
+* **An den sichtbaren Abschnitt angepasste vertikale Skala** (optional): Das Profil passt sich den sichtbaren Höhen an (3-Punkte-Median, Luft nach oben, Meeresspiegel-Regel, Hysterese) und zeigt die vertikale Überhöhung (z. B. `14x`).
+* **Filter für Sehenswürdigkeiten**: Ein Hauptschalter öffnet die Liste der Hammerhead-Typen (Verpflegungsstation, Geldautomat, Bar, Café, Aussichtspunkt, Wasser, Weingut …). Gefiltert wird nach dem echten Typ des Punkts, nicht nach dem Namen.
+* **Nächste Versorgung** (optional): Entfernung zum nächsten Wasser-, Versorgungs-, Essens-, Café-, Laden-, Tankstellen- oder Bar-Punkt deiner Route.
+* **Voraussichtliche Ankunftszeit und Steigrate** (optional): Ankunft aus deiner durchschnittlichen Fahrgeschwindigkeit berechnet, und Höhenmeter pro Stunde.
+* **Anstiegsansicht**: optionale Schwierigkeitsnote (ähnlich dem Fiets-Index) und eine Sprachzusammenfassung am Gipfel mit deiner Zeit, der durchschnittlichen Steigung und der VAM.
+* **Höhenradar**: respektiert die abgerundeten Ecken des Karoo, der linke Streifen wird mit der gefahrenen Route gefüllt, der gefahrene Abschnitt wird samt seinen Prozenten abgedunkelt, das % bleibt sichtbar, auch wenn ein Abschnitt länger als der Bildschirm ist, und die maximale Steigung steht dort, wo sie auftritt.
+* **Flexiblerer 3D-Kopfbereich**: Routenname und Steigungen (aktuell, Durchschnitt und Maximum) sind getrennte Schalter; optionale Skalenleiste, optional schwarzer Steigungstext auf Gelb und Orange und Serpentinenlinien, die auf weißem Hintergrund lesbar sind.
+* **Details**: kleinere, abgerundete, ausgerichtete Zoom- und Seitenwechsel-Tasten; keine „OASIS“-Schilder; durchgehende Blocktrennlinien.
+
+---
 
 ## VERSION 2.8: ANPASSBARE BAKE, ANTRIEB UND EMPFOHLENER GANG
 

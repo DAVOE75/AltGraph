@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logotipo ALTGRAPH" width="150" />
 </p>
-# ALTGRAPH (v2.8 REVOLUTION)
+# ALTGRAPH (v3.0 EVOLUTION)
 <p>Ler em: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 **ALTGRAPH** é uma extensão profissional de altimetria e desempenho de ciclismo de última geração para os ciclocomputadores **Hammerhead Karoo** (Karoo 2 e Karoo 3), desenvolvida por **hesiOX** utilizando o SDK oficial `karoo-ext`.
@@ -10,6 +10,23 @@ Revoluciona o conceito tradicional de altimetria de ciclismo incorporando um **C
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logotipo ALTGRAPH" width="350" />
 </p>
+
+## VERSÃO 3.0: EVOLUÇÃO
+
+A 3.0 torna o AltGraph mais fácil de configurar, mais claro ao sol e mais útil na estrada.
+
+* **Modelos de definições** (separador Estilo): Montanha, Plano e gravel, Competição e Limpo aplicam de uma só vez um conjunto de definições visuais. O modelo escolhido fica marcado enquanto não mexeres em nada. Nunca tocam no teu FTP, peso, licença, avisos de voz nem transmissão. Inclui «Repor definições visuais».
+* **Fundo branco e estilo Cartaz**: gráficos com fundo branco e um estilo Cartaz (corpo preto, linhas de bloco douradas, barra de escala lateral); botões de zoom e textos do visor de subidas adaptados ao modo claro.
+* **Escala vertical ajustada ao troço visível** (opcional): o perfil adapta-se às altitudes que vês (mediana de 3 pontos, folga superior, regra do nível do mar, histerese) e mostra o exagero vertical (p. ex. `14x`).
+* **Filtro de pontos de interesse**: um interruptor principal abre a lista de tipos da Hammerhead (posto de apoio, caixa automático, bar, café, miradouro, água, adega…). Filtra-se pelo tipo real do ponto, não pelo nome.
+* **Próximo reabastecimento** (opcional): distância ao próximo ponto de água, apoio, comida, café, loja, posto de combustível ou bar da tua rota.
+* **Hora estimada de chegada e ritmo de desnível** (opcionais): chegada calculada com a tua velocidade média em movimento e desnível por hora.
+* **Visor de subidas**: nota de dificuldade opcional (tipo índice Fiets) e resumo por voz ao coroar, com o teu tempo, a inclinação média e a VAM.
+* **Radar altimétrico**: respeita os cantos arredondados do Karoo, a faixa esquerda é preenchida com a rota já percorrida, o troço percorrido é sombreado com as suas percentagens, o % vê-se mesmo que o troço seja mais longo que o ecrã e a inclinação máxima é colocada onde acontece.
+* **Cabeçalho 3D mais flexível**: o nome da rota e as inclinações (atual, média e máxima) são interruptores separados; barra de escala opcional, texto de inclinação a preto sobre amarelo e laranja (opcional) e curvas em ferradura legíveis sobre fundo branco.
+* **Detalhes**: botões de zoom e de passagem de página mais pequenos, arredondados e alinhados; sem etiquetas «OASIS»; separação de blocos contínua.
+
+---
 
 ## VERSÃO 2.8: BALIZA PERSONALIZÁVEL, TRANSMISSÃO E MARCHA RECOMENDADA
 

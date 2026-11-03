@@ -63,7 +63,7 @@
     <string name="setting_chart_light_style_classic">Classico</string>
     <string name="setting_chart_light_style_poster">Poster (corpo nero, blocchi dorati)</string>
     <string name="setting_chart_fit_axis">Scala verticale adattata al tratto visibile</string>
-    <string name="setting_chart_fit_axis_desc">Adatta l\'altezza del profilo 3D alle quote visibili, per far risaltare il rilievo con zoom corto. Le strade piane non vengono esagerate sotto i 30 m. Pendenze e colori non cambiano.</string>
+    <string name="setting_chart_fit_axis_desc">Adatta l\'altezza del profilo 3D alle quote visibili, per far risaltare il rilievo con zoom corto. Le strade piane non vengono esagerate sotto i 30 m. Pendenze e colori non cambiano. Sui percorsi a livello del mare (senza quote negative) l\'asse non scende mai sotto 0 m, quindi il profilo può restare vicino al bordo inferiore.</string>
     <string name="setting_chart_light_bg_desc">Disegna lo sfondo dei grafici 3D in bianco, con quote e chilometri in nero e colori più intensi. Utile con il sole forte.</string>
     <string name="setting_use_topographic">Usa il metodo topografico di calcolo della pendenza (Proiezione orizzontale)</string>
     <string name="setting_show_hairpins">Mostra Tornanti e Curve a Gomito (linee nere/bianche)</string>
@@ -332,7 +332,7 @@
     <string name="panel_theme_light">Chiaro</string>
     <string name="setting_climb_alert">Avviso di salita durante l\'uscita</string>
     <string name="setting_climb_alert_desc">Mostra un avviso sullo schermo dell\'uscita quando una salita sta per iniziare (400 m prima): nome, lunghezza, pendenza media, categoria e dislivello. Utile se disattivi il Climber di Hammerhead</string>
-    <string name="setting_show_route_elevation">Mostra anche il dislivello (totale e rimanente)</string>
+    <string name="setting_show_route_elevation">Mostra il dislivello (totale e rimanente)</string>
     <string name="route_info_right">Destra</string>
     <string name="route_info_left">Sinistra</string>
     <string name="setting_gear_effort">Rapporto in base allo sforzo (cadenza obiettivo)</string>
@@ -395,4 +395,29 @@
     <string name="poi_type_viewpoint">Punto panoramico</string>
     <string name="poi_type_water">Acqua</string>
     <string name="poi_type_winery">Cantina</string>
+    <string name="setting_presets_title">Modelli di impostazioni</string>
+    <string name="setting_presets_desc">Applica in un colpo solo un insieme di opzioni visive. Non cambia FTP, peso, licenza, avvisi vocali né la trasmissione. Poi puoi ritoccare ogni opzione.</string>
+    <string name="preset_mountain">Montagna</string>
+    <string name="preset_flat_gravel">Pianura e gravel</string>
+    <string name="preset_race">Gara</string>
+    <string name="preset_clean">Pulito</string>
+    <string name="preset_reset">Ripristina impostazioni visive</string>
+    <string name="preset_applied">Modello applicato: %1$s</string>
+    <string name="preset_reset_confirm">Ripristinare le impostazioni visive ai valori predefiniti? FTP, peso, licenza e avvisi vocali non vengono toccati.</string>
+    <string name="preset_reset_done">Impostazioni visive ripristinate</string>
+    <string name="label_route_next_resupply">Prossima sosta</string>
+    <string name="setting_next_resupply">Mostra la distanza dal prossimo punto acqua o rifornimento</string>
+    <string name="setting_next_resupply_desc">Conta acqua, punto di ristoro, cibo, caffetteria, negozio, distributore e bar del percorso, secondo i tipi attivi nel filtro dei punti di interesse. Disattivato di default.</string>
+    <string name="label_climb_difficulty">Diff.</string>
+    <string name="setting_climb_difficulty">Mostra il voto di difficoltà della salita</string>
+    <string name="setting_climb_difficulty_desc">Aggiunge un voto di difficoltà all\'intestazione del visualizzatore di salite (dislivello al quadrato / (10 x lunghezza), simile all\'indice Fiets). Più è alto, più è dura: circa 2 è facile, 5 è dura, 8 o più molto dura. Disattivato di default.</string>
+    <string name="label_route_eta">Arrivo</string>
+    <string name="setting_show_eta">Mostra l\'ora stimata di arrivo</string>
+    <string name="setting_show_eta_desc">Stima l\'ora di arrivo con la tua velocità media in movimento (circa gli ultimi 10 minuti) e la distanza rimanente. Disattivato di default.</string>
+    <string name="elite_voice_climb_summary_title">Riepilogo in vetta</string>
+    <string name="elite_voice_climb_summary_desc">Dopo la vetta annuncia il tuo tempo, la pendenza media e la VAM. Richiede gli avvisi delle salite attivi.</string>
+    <string name="voice_climb_summary">Vetta. Tempo in salita: %1$s. Pendenza media %2$s per cento. VAM %3$s metri all\'ora.</string>
+    <string name="label_route_ascent_pace">Dislivello/h</string>
+    <string name="setting_show_ascent_pace">Mostra il ritmo di dislivello (m/h)</string>
+    <string name="setting_show_ascent_pace_desc">Dislivello salito dall\'inizio del percorso diviso per il tuo tempo in movimento. Servono 5 minuti di marcia. Disattivato di default.</string>
 </resources>

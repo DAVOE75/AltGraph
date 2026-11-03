@@ -63,7 +63,7 @@
     <string name="setting_chart_light_style_classic">Klassisch</string>
     <string name="setting_chart_light_style_poster">Poster (schwarzer Körper, goldene Blöcke)</string>
     <string name="setting_chart_fit_axis">Vertikale Skala an den sichtbaren Abschnitt anpassen</string>
-    <string name="setting_chart_fit_axis_desc">Passt die Höhe des 3D-Profils an die sichtbaren Höhen an, damit das Gelände bei kurzem Zoom besser zu erkennen ist. Flache Strecken werden unter 30 m nicht übertrieben. Steigungen und Farben bleiben gleich.</string>
+    <string name="setting_chart_fit_axis_desc">Passt die Höhe des 3D-Profils an die sichtbaren Höhen an, damit das Gelände bei kurzem Zoom besser zu erkennen ist. Flache Strecken werden unter 30 m nicht übertrieben. Steigungen und Farben bleiben gleich. Auf Routen auf Meereshöhe (ohne negative Höhen) geht die Achse nie unter 0 m, daher kann das Profil am unteren Rand liegen.</string>
     <string name="setting_chart_light_bg_desc">Zeichnet den Hintergrund der 3D-Diagramme weiß, mit schwarzen Höhen- und Kilometerangaben und kräftigeren Farben. Praktisch bei starker Sonne.</string>
     <string name="setting_use_topographic">Topografische Steigungsberechnung (horizontale Projektion)</string>
     <string name="setting_show_hairpins">Serpentinen / Haarnadelkurven anzeigen (schwarze/weiße Linien)</string>
@@ -332,7 +332,7 @@
     <string name="panel_theme_light">Hell</string>
     <string name="setting_climb_alert">Anstiegshinweis im Ride</string>
     <string name="setting_climb_alert_desc">Zeigt einen Hinweis auf dem Ride-Bildschirm, kurz bevor ein Anstieg beginnt (400 m vorher): Name, Länge, durchschnittliche Steigung, Kategorie und Höhenmeter. Nützlich, wenn du den Hammerhead-Climber ausschaltest</string>
-    <string name="setting_show_route_elevation">Auch Höhenmeter anzeigen (gesamt und verbleibend)</string>
+    <string name="setting_show_route_elevation">Höhenmeter anzeigen (gesamt und verbleibend)</string>
     <string name="route_info_right">Rechts</string>
     <string name="route_info_left">Links</string>
     <string name="setting_gear_effort">Gang nach Belastung (Zielkadenz)</string>
@@ -395,4 +395,29 @@
     <string name="poi_type_viewpoint">Aussichtspunkt</string>
     <string name="poi_type_water">Wasser</string>
     <string name="poi_type_winery">Weingut</string>
+    <string name="setting_presets_title">Einstellungsvorlagen</string>
+    <string name="setting_presets_desc">Wendet mehrere visuelle Optionen auf einmal an. FTP, Gewicht, Lizenz, Sprachansagen und Übersetzung bleiben unverändert. Danach kannst du jede Option anpassen.</string>
+    <string name="preset_mountain">Berg</string>
+    <string name="preset_flat_gravel">Flach und Gravel</string>
+    <string name="preset_race">Rennen</string>
+    <string name="preset_clean">Aufgeräumt</string>
+    <string name="preset_reset">Visuelle Einstellungen zurücksetzen</string>
+    <string name="preset_applied">Vorlage angewendet: %1$s</string>
+    <string name="preset_reset_confirm">Visuelle Einstellungen auf Standard zurücksetzen? FTP, Gewicht, Lizenz und Sprachansagen bleiben unberührt.</string>
+    <string name="preset_reset_done">Visuelle Einstellungen zurückgesetzt</string>
+    <string name="label_route_next_resupply">Nächster Stopp</string>
+    <string name="setting_next_resupply">Entfernung zum nächsten Wasser- oder Versorgungspunkt anzeigen</string>
+    <string name="setting_next_resupply_desc">Zählt Wasser, Verpflegungsstation, Essen, Café, Laden, Tankstelle und Bar auf deiner Route, entsprechend den im Filter für Sehenswürdigkeiten aktiven Typen. Standardmäßig aus.</string>
+    <string name="label_climb_difficulty">Schw.</string>
+    <string name="setting_climb_difficulty">Schwierigkeitsnote des Anstiegs anzeigen</string>
+    <string name="setting_climb_difficulty_desc">Fügt der Kopfzeile der Anstiegsansicht eine Schwierigkeitsnote hinzu (Höhenmeter zum Quadrat / (10 x Länge), ähnlich dem Fiets-Index). Je höher, desto härter: etwa 2 ist leicht, 5 ist hart, ab 8 sehr hart. Standardmäßig aus.</string>
+    <string name="label_route_eta">Ankunft</string>
+    <string name="setting_show_eta">Voraussichtliche Ankunftszeit anzeigen</string>
+    <string name="setting_show_eta_desc">Schätzt die Zielzeit aus deiner durchschnittlichen Fahrgeschwindigkeit (etwa die letzten 10 Minuten) und der Restdistanz. Standardmäßig aus.</string>
+    <string name="elite_voice_climb_summary_title">Zusammenfassung am Gipfel</string>
+    <string name="elite_voice_climb_summary_desc">Nach dem Gipfel werden deine Zeit, die durchschnittliche Steigung und die VAM angesagt. Erfordert aktivierte Anstiegsansagen.</string>
+    <string name="voice_climb_summary">Gipfel. Zeit im Anstieg: %1$s. Durchschnittliche Steigung %2$s Prozent. VAM %3$s Höhenmeter pro Stunde.</string>
+    <string name="label_route_ascent_pace">Höhenmeter/h</string>
+    <string name="setting_show_ascent_pace">Steigrate (m/h) anzeigen</string>
+    <string name="setting_show_ascent_pace_desc">Seit Routenbeginn gewonnene Höhenmeter geteilt durch deine Fahrzeit. Benötigt 5 Minuten Fahrt. Standardmäßig aus.</string>
 </resources>

@@ -46,7 +46,10 @@ data class RouteClimb(
     var category: String = "",
     val name: String? = null,
     val isCustom: Boolean = false
-)
+) {
+    // Nota de dificultad tipo índice Fiets (sin el término de altitud): desnivel² / (10 × longitud)
+    val difficultyIndex: Double get() = if (length > 0.0) totalElevation * totalElevation / (10.0 * length) else 0.0
+}
 
 fun List<RouteClimb>.deduplicateOverlappingClimbs(): List<RouteClimb> {
     if (this.size <= 1) return this
@@ -147,6 +150,12 @@ data class StrategyData(
     // Desnivel positivo (m) de toda la ruta y el que queda desde la posición del ciclista; null = sin perfil
     val routeTotalAscent: Double? = null,
     val routeRemainingAscent: Double? = null,
+    // Distancia (m) desde el ciclista hasta el próximo punto de agua / avituallamiento de la ruta; null = desactivado o ninguno
+    val nextResupplyMeters: Double? = null,
+    // Hora estimada de llegada a meta en minutos desde época (resolución de 1 min para no forzar redibujados); null = desactivado o sin datos
+    val etaFinishMinutes: Long? = null,
+    // Ritmo de desnivel (m/h, redondeado a 5) desde el inicio de la ruta con el tiempo en movimiento; null = desactivado o sin datos
+    val ascentPaceMetersPerHour: Int? = null,
     val currentHeartRate: Double = 0.0
 )
 
@@ -1569,6 +1578,58 @@ class AltimetriaStrategyCalculator {
     private var ascentCacheSource: List<ElevationPolylineDecoder.ElevationPoint>? = null
     private var ascentCum = DoubleArray(0)
 
+    // Velocidad media en movimiento con memoria de ~10 min (media exponencial): base de la hora estimada de llegada
+    private var avgSpeedEma = 0.0
+    private var avgSpeedEmaMs = 0L
+    private var movingSeconds = 0.0
+
+    private fun updateAvgSpeed() {
+        val now = System.currentTimeMillis()
+        if (avgSpeedEmaMs == 0L) {
+            avgSpeedEmaMs = now
+            if (currentSpeed > 1.0) avgSpeedEma = currentSpeed
+            return
+        }
+        val dt = ((now - avgSpeedEmaMs) / 1000.0).coerceIn(0.0, 5.0)
+        avgSpeedEmaMs = now
+        if (currentSpeed > 0.8) movingSeconds += dt
+        if (currentSpeed > 1.0) {
+            val a = 1.0 - Math.exp(-dt / 600.0)
+            avgSpeedEma = if (avgSpeedEma <= 0.0) currentSpeed else avgSpeedEma + a * (currentSpeed - avgSpeedEma)
+        }
+    }
+
+    // Desnivel subido desde el inicio de la ruta dividido por el tiempo en movimiento; necesita al menos 5 min y 10 m
+    private fun estimateAscentPace(riderDist: Double): Int? {
+        if (movingSeconds < 300.0) return null
+        val gained = routeAscentBetween(0.0, riderDist.coerceAtLeast(0.0)) ?: return null
+        if (gained < 10.0) return null
+        return (Math.round(gained / (movingSeconds / 3600.0) / 5.0) * 5L).toInt()
+    }
+
+    // Llegada estimada (minutos desde época) con la velocidad media en movimiento; null si no hay ruta o se va demasiado lento
+    private fun estimateFinishMinutes(remainingMeters: Double): Long? {
+        if (remainingMeters <= 0.0 || avgSpeedEma < 1.5) return null
+        val etaMs = System.currentTimeMillis() + (remainingMeters / avgSpeedEma * 1000.0).toLong()
+        return etaMs / 60000L
+    }
+
+    // Próximo punto de agua / avituallamiento por delante del ciclista; respeta los tipos activos en el filtro de puntos de interés
+    private fun nextResupplyDistance(riderDist: Double, enabledTypes: Set<String>): Double? {
+        val resupplyTypes = setOf(
+            Symbol.POI.Types.WATER, Symbol.POI.Types.AID_STATION, Symbol.POI.Types.FOOD, Symbol.POI.Types.COFFEE,
+            Symbol.POI.Types.CONVENIENCE_STORE, Symbol.POI.Types.GAS_STATION, Symbol.POI.Types.BAR
+        )
+        val next = routePois
+            .filter { p ->
+                val isResupply = p.type == PoiType.WATER || p.sdkType in resupplyTypes
+                val allowed = p.sdkType.isEmpty() || p.sdkType !in PoiTypes.keys || p.sdkType in enabledTypes
+                isResupply && allowed && p.relativeDistance > riderDist + 20.0
+            }
+            .minByOrNull { it.relativeDistance } ?: return null
+        return next.relativeDistance - riderDist
+    }
+
     // Desnivel positivo acumulado entre dos distancias de la ruta, a partir del perfil de altitud
     fun routeAscentBetween(from: Double, to: Double): Double? {
         val p = routeElevationProfile
@@ -2348,6 +2409,10 @@ class AltimetriaStrategyCalculator {
 
         val showPois = prefs?.showPois ?: true
         val enabledPoiTypes = prefs?.poiTypesEnabled ?: PoiTypes.keys.toSet()
+        val nextResupplyMeters = if (prefs?.showNextResupply == true) nextResupplyDistance(currentRiderDistance, enabledPoiTypes) else null
+        if (advance) updateAvgSpeed()
+        val etaFinishMinutes = if (prefs?.showEta == true) estimateFinishMinutes(totalDistanceRemaining) else null
+        val ascentPace = if (prefs?.showAscentPace == true) estimateAscentPace(currentRiderDistance) else null
 
         // Solo mostrar POIs reales de la ruta SDK. Si la ruta no tiene POIs no fabricamos ninguno.
         val rawPois = if (routePois.isNotEmpty()) {
@@ -2606,6 +2671,9 @@ class AltimetriaStrategyCalculator {
             } else null,
             routeTotalAscent = routeElevationProfile.lastOrNull()?.distance?.let { routeAscentBetween(0.0, it) },
             routeRemainingAscent = routeElevationProfile.lastOrNull()?.distance?.let { routeAscentBetween(currentRiderDistance.coerceAtLeast(0.0), it) },
+            nextResupplyMeters = nextResupplyMeters,
+            etaFinishMinutes = etaFinishMinutes,
+            ascentPaceMetersPerHour = ascentPace,
             currentHeartRate = currentHeartRate
         )
     }

@@ -63,7 +63,7 @@
     <string name="setting_chart_light_style_classic">Classique</string>
     <string name="setting_chart_light_style_poster">Affiche (corps noir, blocs dorés)</string>
     <string name="setting_chart_fit_axis">Échelle verticale ajustée au tronçon visible</string>
-    <string name="setting_chart_fit_axis_desc">Ajuste la hauteur du profil 3D aux altitudes visibles, pour mieux voir le relief avec un zoom court. Les routes plates ne sont pas exagérées en dessous de 30 m. Les pentes et les couleurs ne changent pas.</string>
+    <string name="setting_chart_fit_axis_desc">Ajuste la hauteur du profil 3D aux altitudes visibles, pour mieux voir le relief avec un zoom court. Les routes plates ne sont pas exagérées en dessous de 30 m. Les pentes et les couleurs ne changent pas. Sur les parcours au niveau de la mer (sans altitudes négatives), l\'axe ne descend jamais sous 0 m, donc le profil peut rester près du bas de l\'écran.</string>
     <string name="setting_chart_light_bg_desc">Affiche le fond des graphiques 3D en blanc, avec altitudes et kilomètres en noir et des couleurs plus intenses. Utile en plein soleil.</string>
     <string name="setting_use_topographic">Méthode de calcul topographique (projection horizontale)</string>
     <string name="setting_show_hairpins">Afficher lacets et virages en épingle (lignes noires/blanches)</string>
@@ -332,7 +332,7 @@
     <string name="panel_theme_light">Clair</string>
     <string name="setting_climb_alert">Alerte de col pendant la sortie</string>
     <string name="setting_climb_alert_desc">Affiche une bannière sur l\'écran de la sortie quand un col est sur le point de commencer (400 m avant) : nom, longueur, pente moyenne, catégorie et dénivelé. Utile si vous désactivez le Climber de Hammerhead</string>
-    <string name="setting_show_route_elevation">Afficher aussi le dénivelé (total et restant)</string>
+    <string name="setting_show_route_elevation">Afficher le dénivelé (total et restant)</string>
     <string name="route_info_right">Droite</string>
     <string name="route_info_left">Gauche</string>
     <string name="setting_gear_effort">Rapport selon l\'effort (cadence cible)</string>
@@ -395,4 +395,29 @@
     <string name="poi_type_viewpoint">Point de vue</string>
     <string name="poi_type_water">Eau</string>
     <string name="poi_type_winery">Cave viticole</string>
+    <string name="setting_presets_title">Modèles de réglages</string>
+    <string name="setting_presets_desc">Applique d\'un coup un ensemble d\'options visuelles. Ne modifie ni ton FTP, ni ton poids, ni la licence, ni les alertes vocales, ni la transmission. Tu peux ensuite ajuster chaque option.</string>
+    <string name="preset_mountain">Montagne</string>
+    <string name="preset_flat_gravel">Plat et gravel</string>
+    <string name="preset_race">Course</string>
+    <string name="preset_clean">Épuré</string>
+    <string name="preset_reset">Réinitialiser les réglages visuels</string>
+    <string name="preset_applied">Modèle appliqué : %1$s</string>
+    <string name="preset_reset_confirm">Réinitialiser les réglages visuels aux valeurs par défaut ? FTP, poids, licence et alertes vocales ne sont pas touchés.</string>
+    <string name="preset_reset_done">Réglages visuels réinitialisés</string>
+    <string name="label_route_next_resupply">Prochain arrêt</string>
+    <string name="setting_next_resupply">Afficher la distance jusqu\'au prochain point d\'eau ou de ravitaillement</string>
+    <string name="setting_next_resupply_desc">Compte l\'eau, les postes de ravitaillement, la nourriture, les cafés, les magasins, les stations-service et les bars de ton parcours, selon les types actifs dans le filtre des points d\'intérêt. Désactivé par défaut.</string>
+    <string name="label_climb_difficulty">Diff.</string>
+    <string name="setting_climb_difficulty">Afficher la note de difficulté du col</string>
+    <string name="setting_climb_difficulty_desc">Ajoute une note de difficulté à l\'en-tête de la vue des cols (dénivelé au carré / (10 x longueur), proche de l\'indice Fiets). Plus elle est haute, plus c\'est dur : environ 2 est facile, 5 est dur, 8 ou plus très dur. Désactivé par défaut.</string>
+    <string name="label_route_eta">Arrivée</string>
+    <string name="setting_show_eta">Afficher l\'heure d\'arrivée estimée</string>
+    <string name="setting_show_eta_desc">Estime l\'heure d\'arrivée avec ta vitesse moyenne en mouvement (environ les 10 dernières minutes) et la distance restante. Désactivé par défaut.</string>
+    <string name="elite_voice_climb_summary_title">Résumé au sommet</string>
+    <string name="elite_voice_climb_summary_desc">Après le sommet, annonce ton temps, la pente moyenne et la VAM. Nécessite les annonces de cols activées.</string>
+    <string name="voice_climb_summary">Sommet. Temps dans le col : %1$s. Pente moyenne %2$s pour cent. VAM %3$s mètres par heure.</string>
+    <string name="label_route_ascent_pace">Dénivelé/h</string>
+    <string name="setting_show_ascent_pace">Afficher le rythme de dénivelé (m/h)</string>
+    <string name="setting_show_ascent_pace_desc">Dénivelé gravi depuis le début du parcours divisé par ton temps en mouvement. Nécessite 5 minutes de roulage. Désactivé par défaut.</string>
 </resources>

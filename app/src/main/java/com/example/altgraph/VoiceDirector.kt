@@ -62,6 +62,9 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     private var lastSummit500AnnouncedClimbIndex = -1
     private var lastSummit100AnnouncedClimbIndex = -1
     private var lastAnnouncedKmInClimb = -1
+    // Resumen al coronar: instante de entrada en cada puerto y último puerto resumido
+    private val climbEnterMs = mutableMapOf<Int, Long>()
+    private var lastSummarizedClimbIndex = -1
     private var lastAnnouncedSteepDistance = -10000.0
     private var lastAnnouncedReliefDistance = -10000.0
     private var lastAnnouncedWallDistance = -10000.0
@@ -354,6 +357,30 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
          if (prefs.voiceClimbsEnabled && climbs.isNotEmpty()) {
              for ((idx, climb) in climbs.withIndex()) {
                  val distToClimb = climb.startDistance - currentDist
+
+                 // Resumen al coronar: tiempo en el puerto, pendiente media y VAM
+                 if (prefs.voiceClimbSummaryEnabled) {
+                     if (currentDist >= climb.startDistance && currentDist < climb.endDistance && idx !in climbEnterMs) {
+                         climbEnterMs[idx] = System.currentTimeMillis()
+                     }
+                     if (currentDist >= climb.endDistance && currentDist <= climb.endDistance + 80.0 && lastSummarizedClimbIndex != idx) {
+                         lastSummarizedClimbIndex = idx
+                         val enterMs = climbEnterMs[idx]
+                         val seconds = if (enterMs != null) (System.currentTimeMillis() - enterMs) / 1000L else 0L
+                         // Solo si se vivió el puerto desde dentro (no si se salta a mitad) y duró un mínimo
+                         if (seconds >= 30L && climb.totalElevation > 0.0) {
+                             val vam = (climb.totalElevation / (seconds / 3600.0)).toInt()
+                             val phrase = context.getString(
+                                 R.string.voice_climb_summary,
+                                 formatTimeVoice(seconds),
+                                 String.format(Locale.getDefault(), "%.1f", climb.avgGrade),
+                                 vam.toString()
+                             )
+                             speak(phrase, priority = true)
+                         }
+                     }
+                 }
+
                  if (distToClimb in -30.0..300.0 && lastAnnouncedClimbIndex != idx) {
                      lastAnnouncedClimbIndex = idx
                      lastAnnouncedKmInClimb = 0

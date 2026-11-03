@@ -425,7 +425,10 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                         }
                     } else ""
                     
-                    val line1 = "${String.format("%.1f", climb.length / 1000f)}km | +${climb.totalElevation.toInt()}m$distStr"
+                    val difficultyStr = if (prefs.showClimbDifficulty && climb.difficultyIndex > 0.0) {
+                        " | ${context.getString(R.string.label_climb_difficulty)} ${String.format("%.1f", climb.difficultyIndex)}"
+                    } else ""
+                    val line1 = "${String.format("%.1f", climb.length / 1000f)}km | +${climb.totalElevation.toInt()}m$difficultyStr$distStr"
                     
                     // Line 2: Pend. Actual | P.Med | P.Max
                     val liveGrade = snap.instantBarometricGrade

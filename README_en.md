@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v2.8 REVOLUTION)
+# ALTGRAPH (v3.0 EVOLUTION)
 <p>Read in: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 <p align="center">
@@ -18,6 +18,23 @@ It revolutionizes traditional cycling elevation profiles by featuring a **Suite 
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## VERSION 3.0: EVOLUTION
+
+Version 3.0 makes AltGraph easier to set up, clearer in sunlight and more useful on the road.
+
+* **Settings templates** (Style tab): Mountain, Flat and gravel, Race and Clean apply a set of visual options at once. The chosen template stays marked until you change something. They never touch your FTP, weight, licence, voice alerts or gearing. Includes "Reset visual settings".
+* **White background and Poster style**: charts with a white background and a Poster style (black body, gold block lines, side scale bar); zoom buttons and climb viewer texts adapted to light mode.
+* **Vertical scale fitted to the visible stretch** (optional): the profile adapts to the elevations you see (3-point median, headroom, sea-level rule, hysteresis) and shows the vertical exaggeration (e.g. `14x`).
+* **Points of interest filter**: a master switch opens the list of Hammerhead types (aid station, ATM, bar, coffee, viewpoint, water, winery…). Points are filtered by their real type, not by their name.
+* **Next resupply** (optional): distance to the next water, aid, food, coffee, shop, gas station or bar point on your route.
+* **Estimated arrival time and climbing rate** (optional): arrival computed from your average moving speed, and elevation gained per hour.
+* **Climb viewer**: optional difficulty score (Fiets-like index) and a voice summary at the summit with your time, average gradient and VAM.
+* **Altimetric radar**: respects the rounded corners of the Karoo, the left strip is filled with the route already ridden, the ridden stretch is shaded together with its percentages, the % shows even when a stretch is longer than the screen and the max gradient is placed where it happens.
+* **More flexible 3D header**: the route name and the gradients (current, average and max) are separate toggles; optional scale bar, optional black gradient text on yellow and orange, and hairpin lines readable on a white background.
+* **Details**: smaller, rounded, aligned zoom and page-step buttons; no "OASIS" badges; continuous block separators.
+
+---
 
 ## VERSION 2.8: CUSTOMIZABLE BEACON, DRIVETRAIN & RECOMMENDED GEAR
 

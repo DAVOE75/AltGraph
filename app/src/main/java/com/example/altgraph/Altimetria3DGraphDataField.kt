@@ -214,6 +214,9 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         altimetria3DView.liveGearGrade = strategy.gearGrade
                         altimetria3DView.routeTotalAscent = strategy.routeTotalAscent
                         altimetria3DView.routeRemainingAscent = strategy.routeRemainingAscent
+                        altimetria3DView.nextResupplyMeters = strategy.nextResupplyMeters
+                        altimetria3DView.etaFinishMinutes = strategy.etaFinishMinutes
+                        altimetria3DView.ascentPaceMetersPerHour = strategy.ascentPaceMetersPerHour
                         altimetria3DView.mergeBlocksMode = prefs.mergeBlocksMode3d
                         altimetria3DView.mergeMarginPct = prefs.mergeMarginPct3d
                         altimetria3DView.hideGradeRangeEnabled = prefs.hideGradeRangeEnabled3d

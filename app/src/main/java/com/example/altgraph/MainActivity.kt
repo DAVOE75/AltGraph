@@ -350,8 +350,8 @@ class MainActivity : Activity() {
             }
         })
 
-        // Opción: eje vertical ajustado a la ventana visible (más relieve a zoom corto)
-        val fitAxisCard = createCardContainer()
+        // Opción: eje vertical ajustado a la ventana visible (más relieve a zoom corto); va en la pestaña 3D, dentro de la tarjeta del perfil
+        val fitAxisCard = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         fitAxisCard.addView(Switch(this).apply {
             text = getString(R.string.setting_chart_fit_axis)
             textSize = 15f
@@ -456,16 +456,72 @@ class MainActivity : Activity() {
         }
         showZoomCard.addView(switchShowZoom)
 
+        // Plantillas de ajustes visuales: aplican un conjunto de opciones de una vez (no tocan FTP, peso, licencia ni voz)
+        val presetsCard = createCardContainer()
+        presetsCard.addView(createSectionLabel(getString(R.string.setting_presets_title)))
+        presetsCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_presets_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 0, 0, 8)
+        })
+        fun applyPreset(key: String, label: String) {
+            prefs.applyVisualPreset(key)
+            android.widget.Toast.makeText(this, getString(R.string.preset_applied, label), android.widget.Toast.LENGTH_SHORT).show()
+            recreate()
+        }
+        // La plantilla aplicada queda marcada mientras no se retoque ningún ajuste visual
+        val activePreset = prefs.activeVisualPreset
+        fun presetRow(vararg items: Pair<String, Int>) = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            for ((key, labelRes) in items) {
+                val label = getString(labelRes)
+                addView(createSegmentButton(label, key == activePreset) { applyPreset(key, label) })
+            }
+        }
+        presetsCard.addView(presetRow(AppPreferences.PRESET_MOUNTAIN to R.string.preset_mountain, AppPreferences.PRESET_FLAT_GRAVEL to R.string.preset_flat_gravel))
+        presetsCard.addView(presetRow(AppPreferences.PRESET_RACE to R.string.preset_race, AppPreferences.PRESET_CLEAN to R.string.preset_clean))
+        presetsCard.addView(LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            addView(createActionButton(getString(R.string.preset_reset)) {
+                android.app.AlertDialog.Builder(this@MainActivity)
+                    .setMessage(getString(R.string.preset_reset_confirm))
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        prefs.resetVisualDefaults()
+                        android.widget.Toast.makeText(this@MainActivity, getString(R.string.preset_reset_done), android.widget.Toast.LENGTH_SHORT).show()
+                        recreate()
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+            })
+        })
+        tabEstiloContainer.addView(presetsCard)
         tabEstiloContainer.addView(styleCard)
         tabEstiloContainer.addView(climbStyleCard)
         tabEstiloContainer.addView(fontCard)
         tabEstiloContainer.addView(font3dCard)
         tabEstiloContainer.addView(rotate90Card)
         tabEstiloContainer.addView(lightBgCard)
-        tabEstiloContainer.addView(fitAxisCard)
         tabEstiloContainer.addView(createSectionLabel(getString(R.string.label_climb_viewer_section)))
         tabEstiloContainer.addView(climbRotate90Card)
         tabEstiloContainer.addView(climbNameCard)
+        val climbDifficultyCard = createCardContainer()
+        climbDifficultyCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_climb_difficulty)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.showClimbDifficulty
+            setOnCheckedChangeListener { _, isChecked -> prefs.showClimbDifficulty = isChecked }
+        })
+        climbDifficultyCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_climb_difficulty_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 4)
+        })
+        tabEstiloContainer.addView(climbDifficultyCard)
         tabEstiloContainer.addView(climbZoomTopCard)
 
         // ==========================================
@@ -722,15 +778,14 @@ class MainActivity : Activity() {
             setOnCheckedChangeListener { _, isChecked -> prefs.showClimbScaleBar = isChecked }
         })
 
-        // Opción: texto de pendiente adaptado al color del bloque (negro sobre amarillo y naranja)
-        val adaptTextCard = createCardContainer()
-        adaptTextCard.addView(Switch(this).apply {
+        // Opción: texto de pendiente adaptado al color del bloque (negro sobre amarillo y naranja); va en la tarjeta del estilo de etiqueta
+        val adaptTextSwitch = Switch(this).apply {
             text = getString(R.string.setting_adapt_grade_text)
             textSize = 15f
             setTextColor(Color.WHITE)
             isChecked = prefs.adaptGradeTextColors
             setOnCheckedChangeListener { _, isChecked -> prefs.adaptGradeTextColors = isChecked }
-        })
+        }
 
         // Opción: Mostrar Brujula en Ruta
         val showCompassCard = createCardContainer()
@@ -981,7 +1036,48 @@ class MainActivity : Activity() {
             routeInfoRow.addView(btn)
         }
         routeDistancesCard.addView(routeInfoRow)
-
+        routeDistancesCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_next_resupply)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.showNextResupply
+            setOnCheckedChangeListener { _, isChecked -> prefs.showNextResupply = isChecked }
+            setPadding(0, 12, 0, 4)
+        })
+        routeDistancesCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_next_resupply_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 0, 0, 4)
+        })
+        routeDistancesCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_show_eta)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.showEta
+            setOnCheckedChangeListener { _, isChecked -> prefs.showEta = isChecked }
+            setPadding(0, 12, 0, 4)
+        })
+        routeDistancesCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_show_eta_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 0, 0, 4)
+        })
+        routeDistancesCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_show_ascent_pace)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.showAscentPace
+            setOnCheckedChangeListener { _, isChecked -> prefs.showAscentPace = isChecked }
+            setPadding(0, 12, 0, 4)
+        })
+        routeDistancesCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_show_ascent_pace_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 0, 0, 4)
+        })
         // Limpieza del perfil: fusionar bloques vecinos del mismo color y ocultar porcentajes en un rango
         val blockCleanCard = createCardContainer()
         blockCleanCard.addView(createSectionLabel(getString(R.string.setting_block_clean_title)))
@@ -1009,8 +1105,21 @@ class MainActivity : Activity() {
             text = getString(R.string.setting_pct_label_style_desc)
             textSize = 12f
             setTextColor(Color.LTGRAY)
-            setPadding(0, 4, 0, 12)
+            setPadding(0, 4, 0, 4)
         })
+        // Separadores finos arriba y abajo del interruptor para distinguirlo del resto de opciones
+        fun thinDivider() = View(this).apply {
+            setBackgroundColor(Color.parseColor("#44FFFFFF"))
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (1 * resources.displayMetrics.density).toInt().coerceAtLeast(1)).apply {
+                topMargin = (6 * resources.displayMetrics.density).toInt()
+                bottomMargin = (6 * resources.displayMetrics.density).toInt()
+            }
+        }
+        blockCleanCard.addView(thinDivider())
+        blockCleanCard.addView(adaptTextSwitch)
+        blockCleanCard.addView(thinDivider())
+        blockCleanCard.addView(fitAxisCard)
+        blockCleanCard.addView(thinDivider())
         blockCleanCard.addView(createValueText(getString(R.string.setting_merge_similar_blocks)))
         val mergeModes = listOf(
             AppPreferences.MERGE_OFF to getString(R.string.merge_mode_off),
@@ -1126,7 +1235,6 @@ class MainActivity : Activity() {
         tab3dContainer.addView(topographicCard)
         tab3dContainer.addView(showRouteNameCard)
         tab3dContainer.addView(scaleBarCard)
-        tab3dContainer.addView(adaptTextCard)
         tab3dContainer.addView(showHeaderStatsCard)
 
         // ==========================================
@@ -1999,6 +2107,22 @@ class MainActivity : Activity() {
         }
         voiceOptionsLayout.addView(switchVoiceClimbs)
         voiceOptionsLayout.addView(textVoiceClimbsDesc)
+        val switchVoiceClimbSummary = Switch(this).apply {
+            text = getString(R.string.elite_voice_climb_summary_title)
+            textSize = 14f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.voiceClimbSummaryEnabled
+            isEnabled = prefs.isEliteUnlocked
+            setOnCheckedChangeListener { _, v -> prefs.voiceClimbSummaryEnabled = v }
+        }
+        val textVoiceClimbSummaryDesc = TextView(this).apply {
+            text = getString(R.string.elite_voice_climb_summary_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 2, 0, 8)
+        }
+        voiceOptionsLayout.addView(switchVoiceClimbSummary)
+        voiceOptionsLayout.addView(textVoiceClimbSummaryDesc)
 
         // Endurecimiento de pendiente
         val switchVoiceSteep = Switch(this).apply {

@@ -74,6 +74,22 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_ADAPT_GRADE_TEXT, false)
         set(value) = prefs.edit().putBoolean(KEY_ADAPT_GRADE_TEXT, value).apply()
 
+    var showNextResupply: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_NEXT_RESUPPLY, false)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_NEXT_RESUPPLY, value).apply()
+
+    var showClimbDifficulty: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_CLIMB_DIFFICULTY, false)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_CLIMB_DIFFICULTY, value).apply()
+
+    var showEta: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_ETA, false)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_ETA, value).apply()
+
+    var showAscentPace: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_ASCENT_PACE, false)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_ASCENT_PACE, value).apply()
+
     var show3dRouteName: Boolean
         get() = prefs.getBoolean(KEY_SHOW_3D_ROUTE_NAME, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_ROUTE_NAME, value).apply()
@@ -322,6 +338,10 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_VOICE_DIRECTOR_ENABLED, false) && isEliteUnlocked
         set(value) = prefs.edit().putBoolean(KEY_VOICE_DIRECTOR_ENABLED, value).apply()
 
+    var voiceClimbSummaryEnabled: Boolean
+        get() = prefs.getBoolean(KEY_VOICE_CLIMB_SUMMARY, true)
+        set(value) = prefs.edit().putBoolean(KEY_VOICE_CLIMB_SUMMARY, value).apply()
+
     var voiceClimbsEnabled: Boolean
         get() = prefs.getBoolean(KEY_VOICE_CLIMBS_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_VOICE_CLIMBS_ENABLED, value).apply()
@@ -455,6 +475,82 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_CLIMB_ALERT, true)
         set(value) = prefs.edit().putBoolean(KEY_CLIMB_ALERT, value).apply()
 
+    // ---- Plantillas de ajustes visuales ----
+    // Solo tocan la apariencia del perfil 3D. Nunca FTP, peso, licencia, avisos de voz, transmisión ni puntos de interés.
+    // Estado efectivo de todos los ajustes visuales que tocan las plantillas, como texto comparable
+    private fun visualState(): String = listOf(
+        altimetriaStyle.key, showBlockPercentages, show3dCotas, show3dRamps, show3dScaleBar, showClimbScaleBar,
+        adaptGradeTextColors, show3dRouteName, show3dHeaderStats, showHairpins, show3dZoomControls, chartFitAxis,
+        chartLightBackground, chartLightStyle, showSurfaceTextures, showRouteDistances3d, mergeBlocksMode3d, pctLabelStyle3d,
+        mergeMarginPct3d, hideGradeRangeEnabled3d, hideGradeMin3d, hideGradeMax3d, showGearBadge, showRouteCompass, showRouteElevation3d,
+        panButtonsPosition
+    ).joinToString("|")
+
+    // Plantilla activa: la última aplicada, mientras los ajustes visuales sigan exactamente como los dejó; si se retoca
+    // cualquier opción pasa a ser una configuración personalizada y no hay ninguna marcada
+    val activeVisualPreset: String
+        get() {
+            val stored = prefs.getString(KEY_VISUAL_PRESET, "") ?: ""
+            if (stored.isEmpty()) return ""
+            return if (prefs.getString(KEY_VISUAL_PRESET_STATE, null) == visualState()) stored else ""
+        }
+
+    fun resetVisualDefaults() {
+        prefs.edit().remove(KEY_VISUAL_PRESET).remove(KEY_VISUAL_PRESET_STATE).apply()
+        prefs.edit()
+            .remove(KEY_ALTIMETRIA_STYLE).remove(KEY_SHOW_BLOCK_PERCENTAGES).remove(KEY_SHOW_3D_COTAS).remove(KEY_SHOW_3D_RAMPS)
+            .remove(KEY_SHOW_3D_SCALE_BAR).remove(KEY_SHOW_CLIMB_SCALE_BAR).remove(KEY_ADAPT_GRADE_TEXT).remove(KEY_SHOW_3D_ROUTE_NAME)
+            .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM).remove(KEY_CHART_FIT_AXIS)
+            .remove(KEY_CHART_LIGHT_BG).remove(KEY_CHART_LIGHT_STYLE).remove(KEY_SHOW_SURFACE_TEXTURES).remove(KEY_SHOW_ROUTE_DISTANCES_3D)
+            .remove(KEY_MERGE_MODE_3D).remove(KEY_MERGE_SIMILAR_BLOCKS_3D).remove(KEY_PCT_LABEL_STYLE_3D).remove(KEY_MERGE_MARGIN_3D)
+            .remove(KEY_HIDE_GRADE_RANGE_ENABLED_3D).remove(KEY_HIDE_GRADE_MIN_3D).remove(KEY_HIDE_GRADE_MAX_3D)
+            .remove(KEY_SHOW_GEAR_BADGE).remove(KEY_SHOW_ROUTE_COMPASS).remove(KEY_SHOW_ROUTE_ELEVATION_3D)
+            .apply()
+    }
+
+    fun applyVisualPreset(preset: String) {
+        resetVisualDefaults() // cada plantilla parte siempre de los valores por defecto
+        when (preset) {
+            PRESET_MOUNTAIN -> {
+                panButtonsPosition = "bottom"
+                chartFitAxis = true
+                pctLabelStyle3d = PCT_STYLE_CLEAN
+            }
+            PRESET_FLAT_GRAVEL -> {
+                chartFitAxis = true
+                showSurfaceTextures = true
+                show3dRamps = false
+                showHairpins = false
+                show3dCotas = false
+                pctLabelStyle3d = PCT_STYLE_CLEAN
+                mergeBlocksMode3d = MERGE_ALWAYS
+                hideGradeRangeEnabled3d = true
+                hideGradeMin3d = -2f
+                hideGradeMax3d = 2f
+            }
+            PRESET_RACE -> {
+                show3dRouteName = false
+                show3dCotas = false
+                show3dZoomControls = false
+                showRouteCompass = false
+                pctLabelStyle3d = PCT_STYLE_CLEAN
+            }
+            PRESET_CLEAN -> {
+                show3dHeaderStats = false
+                show3dRouteName = false
+                show3dCotas = false
+                show3dRamps = false
+                showHairpins = false
+                showGearBadge = false
+                show3dScaleBar = false
+                showClimbScaleBar = false
+                showRouteCompass = false
+                pctLabelStyle3d = PCT_STYLE_CLEAN
+                mergeBlocksMode3d = MERGE_ALWAYS
+            }
+        }
+        prefs.edit().putString(KEY_VISUAL_PRESET, preset).putString(KEY_VISUAL_PRESET_STATE, visualState()).apply()
+    }
     // Tema del panel de ajustes: "dark" (por defecto), "light" o "auto" (sigue al sistema)
     var panelTheme: String
         get() = prefs.getString(KEY_PANEL_THEME, PanelTheme.DARK) ?: PanelTheme.DARK
@@ -462,6 +558,10 @@ class AppPreferences(context: Context) {
 
     companion object {
         private const val KEY_PANEL_THEME = "panel_theme"
+        const val PRESET_MOUNTAIN = "mountain"
+        const val PRESET_FLAT_GRAVEL = "flat_gravel"
+        const val PRESET_RACE = "race"
+        const val PRESET_CLEAN = "clean"
         private const val KEY_CLIMB_ALERT = "climb_alert_enabled"
         private const val KEY_SHOW_ROUTE_ELEVATION_3D = "show_route_elevation_3d"
         const val ROUTE_INFO_RIGHT = "right"
@@ -503,6 +603,12 @@ class AppPreferences(context: Context) {
         private const val KEY_SHOW_3D_HEADER_STATS = "show_3d_header_stats"
         private const val KEY_SHOW_3D_ROUTE_NAME = "show_3d_route_name"
         private const val KEY_SHOW_3D_SCALE_BAR = "show_3d_scale_bar"
+        private const val KEY_VISUAL_PRESET = "visual_preset"
+        private const val KEY_VISUAL_PRESET_STATE = "visual_preset_state"
+        private const val KEY_SHOW_ASCENT_PACE = "show_ascent_pace"
+        private const val KEY_SHOW_ETA = "show_eta"
+        private const val KEY_SHOW_CLIMB_DIFFICULTY = "show_climb_difficulty"
+        private const val KEY_SHOW_NEXT_RESUPPLY = "show_next_resupply"
         private const val KEY_ADAPT_GRADE_TEXT = "adapt_grade_text_colors"
         private const val KEY_SHOW_CLIMB_SCALE_BAR = "show_climb_scale_bar"
         private const val KEY_SHOW_ROUTE_COMPASS = "show_route_compass"
@@ -566,6 +672,7 @@ class AppPreferences(context: Context) {
         private const val KEY_GEAR_WALL_ENABLED = "gear_wall_enabled"
         private const val KEY_VOICE_DIRECTOR_ENABLED = "voice_director_enabled"
         private const val KEY_VOICE_CLIMBS_ENABLED = "voice_climbs_enabled"
+        private const val KEY_VOICE_CLIMB_SUMMARY = "voice_climb_summary"
         private const val KEY_VOICE_STEEP_ENABLED = "voice_steep_enabled"
         private const val KEY_VOICE_STEEP_THRESHOLD = "voice_steep_threshold"
         private const val KEY_VOICE_GEAR_WALL_ENABLED = "voice_gear_wall_enabled"

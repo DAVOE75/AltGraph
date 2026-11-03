@@ -78,7 +78,7 @@
     <string name="setting_chart_light_style_classic">Classic</string>
     <string name="setting_chart_light_style_poster">Poster (black body, gold blocks)</string>
     <string name="setting_chart_fit_axis">Vertical scale fitted to the visible stretch</string>
-    <string name="setting_chart_fit_axis_desc">Fits the 3D profile height to the elevations you see, so terrain shows more at short zoom. Flat roads are not exaggerated below 30 m. Gradients and colours do not change.</string>
+    <string name="setting_chart_fit_axis_desc">Fits the 3D profile height to the elevations you see, so terrain shows more at short zoom. Flat roads are not exaggerated below 30 m. Gradients and colours do not change. On sea-level routes (no negative elevations) the axis never goes below 0 m, so the profile may sit close to the bottom of the chart.</string>
     <string name="setting_chart_light_bg_desc">Draws the 3D chart background in white, with elevations and kilometres in black and more intense colours. Handy in bright sunlight.</string>
     <string name="setting_use_topographic">Use Topographic Slope Calculation Method</string>
     <string name="setting_show_hairpins">Show Hairpin Bends (Black/White Lines)</string>
@@ -359,7 +359,7 @@
     <string name="panel_theme_light">Light</string>
     <string name="setting_climb_alert">Climb alert in the ride</string>
     <string name="setting_climb_alert_desc">Shows a banner on the ride screen when a climb is about to start (400 m before): name, length, average gradient, category and elevation gain. Useful if you turn off the Hammerhead climber</string>
-    <string name="setting_show_route_elevation">Also show elevation gain (total and remaining)</string>
+    <string name="setting_show_route_elevation">Show elevation gain (total and remaining)</string>
     <string name="route_info_right">Right</string>
     <string name="route_info_left">Left</string>
     <string name="setting_gear_effort">Gear by effort (cadence target)</string>
@@ -422,4 +422,29 @@
     <string name="poi_type_viewpoint">Viewpoint</string>
     <string name="poi_type_water">Water</string>
     <string name="poi_type_winery">Winery</string>
+    <string name="setting_presets_title">Settings templates</string>
+    <string name="setting_presets_desc">Applies a set of visual options at once. It does not change your FTP, weight, licence, voice alerts or gearing. You can tweak each option afterwards.</string>
+    <string name="preset_mountain">Mountain</string>
+    <string name="preset_flat_gravel">Flat and gravel</string>
+    <string name="preset_race">Race</string>
+    <string name="preset_clean">Clean</string>
+    <string name="preset_reset">Reset visual settings</string>
+    <string name="preset_applied">Template applied: %1$s</string>
+    <string name="preset_reset_confirm">Reset the visual settings to their defaults? FTP, weight, licence and voice alerts are not touched.</string>
+    <string name="preset_reset_done">Visual settings reset</string>
+    <string name="label_route_next_resupply">Next stop</string>
+    <string name="setting_next_resupply">Show distance to the next water or resupply point</string>
+    <string name="setting_next_resupply_desc">Counts water, aid station, food, coffee, shop, gas station and bar points on your route, according to the types enabled in the points of interest filter. Off by default.</string>
+    <string name="label_climb_difficulty">Diff.</string>
+    <string name="setting_climb_difficulty">Show climb difficulty score</string>
+    <string name="setting_climb_difficulty_desc">Adds a difficulty score to the climb viewer header (elevation gain squared / (10 x length), similar to the Fiets index). Higher is harder: about 2 is easy, 5 is hard, 8 or more is very hard. Off by default.</string>
+    <string name="label_route_eta">ETA</string>
+    <string name="setting_show_eta">Show estimated arrival time</string>
+    <string name="setting_show_eta_desc">Estimates the finish time from your average moving speed (about the last 10 minutes) and the remaining distance. Off by default.</string>
+    <string name="elite_voice_climb_summary_title">Climb summary at the summit</string>
+    <string name="elite_voice_climb_summary_desc">After topping a climb, announces your time on it, the average gradient and the VAM. Needs Climb announcements on.</string>
+    <string name="voice_climb_summary">Summit. Climb time: %1$s. Average gradient %2$s percent. VAM %3$s meters per hour.</string>
+    <string name="label_route_ascent_pace">Climb rate</string>
+    <string name="setting_show_ascent_pace">Show climbing rate (m/h)</string>
+    <string name="setting_show_ascent_pace_desc">Elevation gained since the start of the route divided by your moving time. Needs 5 minutes of riding. Off by default.</string>
 </resources>

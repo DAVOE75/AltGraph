@@ -1,7 +1,7 @@
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="150" />
 </p>
-# ALTGRAPH (v2.8 REVOLUTION)
+# ALTGRAPH (v3.0 EVOLUTION)
 <p>Leer en: <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README.md"> Español</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_en.md"> English</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_fr.md"> Français</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_it.md"> Italiano</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_de.md"> Deutsch</a> | <a href="https://github.com/DAVOE75/ALTGRAPH/blob/main/README_pt.md"> Português</a></p>
 
 <p align="center">
@@ -18,6 +18,23 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
 <p align="center">
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo.png" alt="ALTGRAPH Logo" width="350" />
 </p>
+
+## VERSIÓN 3.0: EVOLUCIÓN
+
+La 3.0 busca que AltGraph sea más fácil de configurar, más claro a la luz del sol y más útil en ruta.
+
+* **Plantillas de ajustes** (pestaña Estilo): Montaña, Llano y gravel, Competición y Limpio aplican de una vez un conjunto de ajustes visuales. La plantilla elegida queda marcada mientras no retoques nada. Nunca tocan tu FTP, peso, licencia, avisos de voz ni la transmisión. Incluye «Restablecer ajustes visuales».
+* **Fondo blanco y estilo Cartel**: gráficas con fondo blanco y un estilo Cartel (cuerpo negro, líneas de bloque doradas, barra de escala lateral); botones de zoom y textos del visor de puertos adaptados al modo claro.
+* **Escala vertical ajustada al tramo visible** (opcional): el perfil se adapta a las altitudes que ves (mediana de 3 puntos, margen superior, regla del nivel del mar, histéresis) y muestra la exageración vertical (p. ej. `14x`).
+* **Filtro de puntos de interés**: un interruptor principal despliega la lista de tipos de Hammerhead (estación de ayuda, cajero, bar, cafetería, mirador, agua, bodega…). Se filtra por el tipo real del punto, no por su nombre.
+* **Próximo avituallamiento** (opcional): distancia al próximo punto de agua, ayuda, comida, cafetería, tienda, gasolinera o bar de tu ruta.
+* **Hora estimada de llegada y ritmo de desnivel** (opcionales): llegada calculada con tu velocidad media en movimiento y desnivel por hora.
+* **Visor de puertos**: nota de dificultad opcional (tipo índice Fiets) y resumen por voz al coronar con tu tiempo, la pendiente media y la VAM.
+* **Radar altimétrico**: respeta las esquinas redondeadas del Karoo, la franja izquierda se rellena con la ruta recorrida, el tramo ya recorrido se sombrea junto con sus porcentajes, el % se ve aunque el tramo sea más largo que la pantalla y la pendiente máxima se coloca donde ocurre.
+* **Encabezado 3D más flexible**: el nombre de la ruta y las pendientes (actual, media y máxima) son interruptores separados; barra de escala opcional, texto de pendiente en negro sobre amarillo y naranja (opcional) y curvas de herradura legibles sobre fondo blanco.
+* **Detalles**: botones de zoom y de paso de página más pequeños, redondeados y alineados; sin cartelitos «OASIS»; separación de bloques continua.
+
+---
 
 ## VERSION 2.8: BALIZA PERSONALIZABLE, TRANSMISIÓN Y MARCHA RECOMENDADA
 
