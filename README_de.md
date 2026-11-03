@@ -27,6 +27,7 @@ Version 3.0 macht AltGraph einfacher einzustellen, bei Sonne besser lesbar und u
 * **Details**: kleinere, abgerundete, ausgerichtete Zoom- und Seitenwechsel-Tasten; keine „OASIS“-Schilder; durchgehende Blocktrennlinien.
 * **Zuverlässigere gesammelte Höhenmeter**: Die Höhenmeter für Meilensteine und Sprachzusammenfassung filtern Rauschen und langsame Drift des Barometers (ein Anstieg zählt erst ab 2 m).
 * **Metrische oder imperiale Einheiten** (Reiter Stil): Die Texte der Diagramme, des Radars, der Anstiegsansicht, des TV-2D-Profils und des Einstellungspanels wechseln zu Fuß und Meilen. Auch die Sprachansagen folgen den gewählten Einheiten.
+* **Optionale Legende der Blockskala**: Der Text „Jeder Block = X / Jeder Unterblock = Y“ unter dem 3D-Diagramm lässt sich ausblenden, und das Profil gewinnt diesen Platz (die Vorlage Aufgeräumt blendet ihn aus).
 
 ---
 

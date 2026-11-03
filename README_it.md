@@ -27,6 +27,7 @@ La versione 3.0 rende AltGraph più facile da configurare, più chiaro al sole e
 * **Dettagli**: pulsanti di zoom e di cambio pagina più piccoli, arrotondati e allineati; niente cartellini «OASIS»; separazione dei blocchi continua.
 * **Dislivello accumulato più affidabile**: il dislivello usato da traguardi e riepilogo vocale filtra il rumore e la lenta deriva del barometro (una salita conta solo oltre 2 m).
 * **Unità metriche o imperiali** (scheda Stile): i testi dei grafici, del radar, del visualizzatore di salite, del profilo TV 2D e del pannello passano a piedi e miglia. Anche gli avvisi vocali seguono le unità scelte.
+* **Legenda della scala dei blocchi opzionale**: il testo «Ogni blocco = X / Ogni sotto-blocco = Y» sotto il grafico 3D può essere nascosto e il profilo guadagna quello spazio (il modello Pulito lo nasconde).
 
 ---
 

@@ -462,4 +462,6 @@
     <string name="voice_unit_mph">miles per hour</string>
     <string name="voice_climb_mile_progress">Climb mile %1$s. Current grade %2$s percent.</string>
     <string name="label_target_vam_format_value">VAM PACING (TARGET: %1$s)</string>
+    <string name="setting_show_block_legend">Show block scale legend</string>
+    <string name="setting_show_block_legend_desc">Shows the text under the 3D chart ("Each block = 500m / Each sub-block = 100m"). Turn it off and the profile gets that space.</string>
 </resources>

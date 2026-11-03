@@ -1382,6 +1382,8 @@ class Altimetria3DView @JvmOverloads constructor(
         val zoomBottomY = 64f * resources.displayMetrics.density + 6f + (if (showRouteName && showHeaderStats) 6f * resources.displayMetrics.density else 0f)
         val gearTopTextSize = ((h * 0.085f) * fontScale).coerceIn(22f, 32f)
         val gearTopBadgeH = gearTopTextSize * 0.85f + 20f
+        // Leyenda "Cada bloque = X / Cada sub-bloque = Y" bajo la gráfica (opcional: sin ella el perfil gana ese espacio)
+        val legendShown = AppPreferences.getInstance(context).show3dBlockLegend
 
         val startX = (w * 0.10f)
         val baseEndX = (w * 0.98f)
@@ -1396,7 +1398,18 @@ class Altimetria3DView @JvmOverloads constructor(
             else -> h * 0.60f
         }
         // Si el engranaje no ocupa el hueco inferior (oculto o movido arriba), la gráfica baja hasta la leyenda de bloques
-        val freedBottom = if (gearOnTop || (!gearBadgeShown && !rotate90)) {
+        val freedBottom = if (!legendShown) {
+            // Sin leyenda el perfil baja hasta el borde de la pantalla, respetando el engranaje (que pasa a la fila de abajo) y
+            // los botones de paso de página si van abajo (ocupan las esquinas)
+            val dpPx = resources.displayMetrics.density
+            val panR = resources.getDimension(R.dimen.pan_btn_size) / 2f
+            val gearSizeEst = ((h * 0.075f) * fontScale).coerceIn(18f, 28f).let { if (rotate90) it * 0.62f + 1f else it }
+            val gearReserve = if (gearBadgeShown && !gearOnTop) gearSizeEst * 0.75f + 20f + 8f else 4f
+            val buttonsReserve = if (panButtonsPosition == "bottom") 2f * panR - 3f * dpPx + 1f else 0f
+            val barH0 = (h * 0.09f).coerceIn(20f, 32f)
+            val gap = if (rotate90) 0f else 4f
+            (h - maxOf(gearReserve, buttonsReserve) - gap - barH0 - defaultGroundY).coerceAtLeast(0f)
+        } else if (gearOnTop || (!gearBadgeShown && !rotate90)) {
             val legendSize = ((h * 0.075f) * fontScale).coerceIn(16f, 23f)
             val legendTop = h - 23f - legendSize * 0.8f
             val barH0 = (h * 0.09f).coerceIn(20f, 32f)
@@ -1405,7 +1418,7 @@ class Altimetria3DView @JvmOverloads constructor(
             (legendTop - gap - barH0 - defaultGroundY).coerceAtLeast(0f)
         } else 0f
         // El perfil sube 1 mm respecto al borde inferior (3 mm menos los 2 mm que se bajaron) para no tapar los botones de paso si van abajo
-        val liftPx = if (freedBottom > 0f) android.util.TypedValue.applyDimension(
+        val liftPx = if (freedBottom > 0f && legendShown) android.util.TypedValue.applyDimension(
             android.util.TypedValue.COMPLEX_UNIT_MM, 1f, resources.displayMetrics
         ) else 0f
         val baseGroundY = defaultGroundY + freedBottom - liftPx
@@ -2026,8 +2039,10 @@ class Altimetria3DView @JvmOverloads constructor(
             FontHelper.applyFontToPaint(this, currentFontKey, Typeface.NORMAL)
         }
 
-        canvas.drawText(scaleLegendText, w / 2f, h - 23f, scaleLegendPaint)
-        canvas.drawText(subScaleLegendText, w / 2f, h - 4f, subScaleLegendPaint)
+        if (legendShown) {
+            canvas.drawText(scaleLegendText, w / 2f, h - 23f, scaleLegendPaint)
+            canvas.drawText(subScaleLegendText, w / 2f, h - 4f, subScaleLegendPaint)
+        }
         
         // Dibujar círculos redondeados para pan left/right
         val btnPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -2348,12 +2363,12 @@ class Altimetria3DView @JvmOverloads constructor(
             }
 
             // Hueco entre la leyenda de bloques (centro) y la flecha de avance (derecha)
-            val legendHalf = maxOf(scaleLegendPaint.measureText(scaleLegendText), subScaleLegendPaint.measureText(subScaleLegendText)) / 2f
+            val legendHalf = if (legendShown) maxOf(scaleLegendPaint.measureText(scaleLegendText), subScaleLegendPaint.measureText(subScaleLegendText)) / 2f else 0f
             val gapL = w / 2f + legendHalf + 8f
             val arrowsBottom = panButtonsPosition == "bottom"
             val gapR = if (arrowsBottom) w - 50f - 28f - 8f else w - 8f
             val gearLabel = if (climbGrade != null) "Rec. ⚙ $recSprocket" else "⚙ $recSprocket"
-            val gearMaxW = if (rotate90 && !gearOnTop) (gapR - gapL) else (w - 40f)
+            val gearMaxW = if (rotate90 && !gearOnTop && legendShown) (gapR - gapL) else (w - 40f)
             while (gearTextPaint.measureText(gearLabel) + 28f > gearMaxW && gearTextPaint.textSize > 20f) {
                 gearTextPaint.textSize -= 1f
             }
@@ -2378,8 +2393,9 @@ class Altimetria3DView @JvmOverloads constructor(
             val badgeW = textW + padX * 2f
             val badgeH = tb.height() + padY * 2f
             // Vertical (no apaisado): el engranaje va encima de la leyenda de bloques
-            val badgeCx = if (rotate90 && !gearOnTop) (gapL + gapR) / 2f else w / 2f
+            val badgeCx = if (rotate90 && !gearOnTop && legendShown) (gapL + gapR) / 2f else w / 2f
             val badgeCy = if (gearOnTop) zoomBottomY + badgeH / 2f
+                else if (!legendShown) h - 6f - badgeH / 2f
                 else if (!rotate90) h - 23f - scaleLegendPaint.textSize - badgeH / 2f - 2f
                 else if (arrowsBottom) h - 24f else h - 12f
             val badgeL = badgeCx - badgeW / 2f

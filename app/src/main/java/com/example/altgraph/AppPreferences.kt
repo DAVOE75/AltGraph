@@ -96,6 +96,11 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_USE_IMPERIAL_UNITS, false)
         set(value) { prefs.edit().putBoolean(KEY_USE_IMPERIAL_UNITS, value).apply(); Units.imperialFlag = value }
 
+    // Leyenda "Cada bloque = X / Cada sub-bloque = Y" bajo la gráfica 3D; sin ella el perfil gana ese espacio
+    var show3dBlockLegend: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_3D_BLOCK_LEGEND, true)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_BLOCK_LEGEND, value).apply()
+
     var show3dRouteName: Boolean
         get() = prefs.getBoolean(KEY_SHOW_3D_ROUTE_NAME, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_ROUTE_NAME, value).apply()
@@ -486,7 +491,7 @@ class AppPreferences(context: Context) {
     // Estado efectivo de todos los ajustes visuales que tocan las plantillas, como texto comparable
     private fun visualState(): String = listOf(
         altimetriaStyle.key, showBlockPercentages, show3dCotas, show3dRamps, show3dScaleBar, showClimbScaleBar,
-        adaptGradeTextColors, show3dRouteName, show3dHeaderStats, showHairpins, show3dZoomControls, chartFitAxis,
+        adaptGradeTextColors, show3dBlockLegend, show3dRouteName, show3dHeaderStats, showHairpins, show3dZoomControls, chartFitAxis,
         chartLightBackground, chartLightStyle, showSurfaceTextures, showRouteDistances3d, mergeBlocksMode3d, pctLabelStyle3d,
         mergeMarginPct3d, hideGradeRangeEnabled3d, hideGradeMin3d, hideGradeMax3d, showGearBadge, showRouteCompass, showRouteElevation3d,
         panButtonsPosition
@@ -505,7 +510,7 @@ class AppPreferences(context: Context) {
         prefs.edit().remove(KEY_VISUAL_PRESET).remove(KEY_VISUAL_PRESET_STATE).apply()
         prefs.edit()
             .remove(KEY_ALTIMETRIA_STYLE).remove(KEY_SHOW_BLOCK_PERCENTAGES).remove(KEY_SHOW_3D_COTAS).remove(KEY_SHOW_3D_RAMPS)
-            .remove(KEY_SHOW_3D_SCALE_BAR).remove(KEY_SHOW_CLIMB_SCALE_BAR).remove(KEY_ADAPT_GRADE_TEXT).remove(KEY_SHOW_3D_ROUTE_NAME)
+            .remove(KEY_SHOW_3D_SCALE_BAR).remove(KEY_SHOW_3D_BLOCK_LEGEND).remove(KEY_SHOW_CLIMB_SCALE_BAR).remove(KEY_ADAPT_GRADE_TEXT).remove(KEY_SHOW_3D_ROUTE_NAME)
             .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM).remove(KEY_CHART_FIT_AXIS)
             .remove(KEY_CHART_LIGHT_BG).remove(KEY_CHART_LIGHT_STYLE).remove(KEY_SHOW_SURFACE_TEXTURES).remove(KEY_SHOW_ROUTE_DISTANCES_3D)
             .remove(KEY_MERGE_MODE_3D).remove(KEY_MERGE_SIMILAR_BLOCKS_3D).remove(KEY_PCT_LABEL_STYLE_3D).remove(KEY_MERGE_MARGIN_3D)
@@ -549,6 +554,7 @@ class AppPreferences(context: Context) {
                 showHairpins = false
                 showGearBadge = false
                 show3dScaleBar = false
+                show3dBlockLegend = false
                 showClimbScaleBar = false
                 showRouteCompass = false
                 pctLabelStyle3d = PCT_STYLE_CLEAN
@@ -609,6 +615,7 @@ class AppPreferences(context: Context) {
         private const val KEY_SHOW_3D_HEADER_STATS = "show_3d_header_stats"
         private const val KEY_SHOW_3D_ROUTE_NAME = "show_3d_route_name"
         private const val KEY_SHOW_3D_SCALE_BAR = "show_3d_scale_bar"
+        private const val KEY_SHOW_3D_BLOCK_LEGEND = "show_3d_block_legend"
         private const val KEY_USE_IMPERIAL_UNITS = "use_imperial_units"
         private const val KEY_VISUAL_PRESET = "visual_preset"
         private const val KEY_VISUAL_PRESET_STATE = "visual_preset_state"

@@ -27,6 +27,7 @@ A 3.0 torna o AltGraph mais fácil de configurar, mais claro ao sol e mais útil
 * **Detalhes**: botões de zoom e de passagem de página mais pequenos, arredondados e alinhados; sem etiquetas «OASIS»; separação de blocos contínua.
 * **Desnível acumulado mais fiável**: o desnível usado pelos marcos e pelo resumo por voz filtra o ruído e a deriva lenta do barómetro (só conta uma subida quando ultrapassa 2 m).
 * **Unidades métricas ou imperiais** (separador Estilo): os textos dos gráficos, do radar, do visor de subidas, do perfil TV 2D e do painel passam a pés e milhas. Os avisos de voz também seguem as unidades escolhidas.
+* **Legenda da escala de blocos opcional**: o texto «Cada bloco = X / Cada sub-bloco = Y» sob o gráfico 3D pode ser ocultado e o perfil ganha esse espaço (o modelo Limpo oculta-o).
 
 ---
 

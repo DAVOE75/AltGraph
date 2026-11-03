@@ -435,4 +435,6 @@
     <string name="voice_unit_mph">miglia orarie</string>
     <string name="voice_climb_mile_progress">Miglio %1$s di salita. Pendenza attuale del %2$s per cento.</string>
     <string name="label_target_vam_format_value">PASSO VAM (OBIETTIVO: %1$s)</string>
+    <string name="setting_show_block_legend">Mostra la legenda della scala dei blocchi</string>
+    <string name="setting_show_block_legend_desc">Mostra il testo sotto il grafico 3D («Ogni blocco = 500 m / Ogni sotto-blocco = 100 m»). Se la disattivi, il profilo guadagna quello spazio.</string>
 </resources>

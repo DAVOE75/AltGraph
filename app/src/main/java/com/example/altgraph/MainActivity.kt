@@ -805,6 +805,22 @@ class MainActivity : Activity() {
             setOnCheckedChangeListener { _, isChecked -> prefs.showClimbScaleBar = isChecked }
         })
 
+        // Opción: leyenda de escala de bloques bajo la gráfica 3D
+        scaleBarCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_show_block_legend)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.show3dBlockLegend
+            setOnCheckedChangeListener { _, isChecked -> prefs.show3dBlockLegend = isChecked }
+            setPadding(0, 12, 0, 4)
+        })
+        scaleBarCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_show_block_legend_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 0, 0, 4)
+        })
+
         // Opción: texto de pendiente adaptado al color del bloque (negro sobre amarillo y naranja); va en la tarjeta del estilo de etiqueta
         val adaptTextSwitch = Switch(this).apply {
             text = getString(R.string.setting_adapt_grade_text)

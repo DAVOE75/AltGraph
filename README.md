@@ -35,6 +35,7 @@ La 3.0 busca que AltGraph sea más fácil de configurar, más claro a la luz del
 * **Detalles**: botones de zoom y de paso de página más pequeños, redondeados y alineados; sin cartelitos «OASIS»; separación de bloques continua.
 * **Desnivel acumulado más fiable**: el desnivel que cuentan los hitos y el resumen por voz filtra el ruido y la deriva lenta del barómetro (solo suma una subida cuando supera 2 m).
 * **Unidades métricas o imperiales** (pestaña Estilo): los textos de las gráficas, el radar, el visor de puertos, el perfil TV 2D y el panel pasan a pies y millas. La voz también habla en las unidades elegidas.
+* **Leyenda de escala de bloques opcional**: el texto «Cada bloque = X / Cada sub-bloque = Y» bajo la gráfica 3D se puede ocultar, y entonces el perfil gana ese espacio (la plantilla Limpio la oculta).
 
 ---
 

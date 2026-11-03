@@ -35,6 +35,7 @@ Version 3.0 makes AltGraph easier to set up, clearer in sunlight and more useful
 * **Details**: smaller, rounded, aligned zoom and page-step buttons; no "OASIS" badges; continuous block separators.
 * **More reliable accumulated elevation**: the elevation used by the milestones and the voice summary filters barometer noise and slow drift (a climb only counts once it exceeds 2 m).
 * **Metric or imperial units** (Style tab): the texts of the charts, the radar, the climb viewer, the TV 2D profile and the settings panel switch to feet and miles. Voice announcements follow the chosen units too.
+* **Optional block scale legend**: the "Each block = X / Each sub-block = Y" text under the 3D chart can be hidden, and the profile then gains that space (the Clean template hides it).
 
 ---
 

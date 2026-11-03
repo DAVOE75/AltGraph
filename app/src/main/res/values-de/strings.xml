@@ -435,4 +435,6 @@
     <string name="voice_unit_mph">Meilen pro Stunde</string>
     <string name="voice_climb_mile_progress">Meile %1$s des Anstiegs. Aktuelle Steigung %2$s Prozent.</string>
     <string name="label_target_vam_format_value">VAM-TEMPO (ZIEL: %1$s)</string>
+    <string name="setting_show_block_legend">Legende der Blockskala anzeigen</string>
+    <string name="setting_show_block_legend_desc">Zeigt den Text unter dem 3D-Diagramm („Jeder Block = 500 m / Jeder Unterblock = 100 m“). Ausgeschaltet gewinnt das Profil diesen Platz.</string>
 </resources>

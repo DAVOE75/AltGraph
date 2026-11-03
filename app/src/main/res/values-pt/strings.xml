@@ -435,4 +435,6 @@
     <string name="voice_unit_mph">milhas por hora</string>
     <string name="voice_climb_mile_progress">Milha %1$s de subida. Inclinação atual de %2$s por cento.</string>
     <string name="label_target_vam_format_value">RITMO VAM (ALVO: %1$s)</string>
+    <string name="setting_show_block_legend">Mostrar a legenda da escala de blocos</string>
+    <string name="setting_show_block_legend_desc">Mostra o texto sob o gráfico 3D («Cada bloco = 500 m / Cada sub-bloco = 100 m»). Se a desativares, o perfil ganha esse espaço.</string>
 </resources>

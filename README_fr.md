@@ -27,6 +27,7 @@ La version 3.0 rend AltGraph plus simple à régler, plus lisible au soleil et p
 * **Détails** : boutons de zoom et de changement de page plus petits, arrondis et alignés ; plus d'étiquettes « OASIS » ; séparation des blocs continue.
 * **Dénivelé cumulé plus fiable** : le dénivelé utilisé par les paliers et le résumé vocal filtre le bruit et la dérive lente du baromètre (une montée ne compte qu'au-delà de 2 m).
 * **Unités métriques ou impériales** (onglet Style) : les textes des graphiques, du radar, de la vue des cols, du profil TV 2D et du panneau passent en pieds et en miles. Les annonces vocales suivent aussi les unités choisies.
+* **Légende d'échelle des blocs optionnelle** : le texte « Chaque bloc = X / Chaque sous-bloc = Y » sous le graphique 3D peut être masqué, et le profil gagne alors cet espace (le modèle Épuré la masque).
 
 ---
 

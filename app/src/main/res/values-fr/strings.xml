@@ -435,4 +435,6 @@
     <string name="voice_unit_mph">miles par heure</string>
     <string name="voice_climb_mile_progress">Mile %1$s du col. Pente actuelle %2$s pour cent.</string>
     <string name="label_target_vam_format_value">ALLURE VAM (CIBLE : %1$s)</string>
+    <string name="setting_show_block_legend">Afficher la légende de l\'échelle des blocs</string>
+    <string name="setting_show_block_legend_desc">Affiche le texte sous le graphique 3D (« Chaque bloc = 500 m / Chaque sous-bloc = 100 m »). Désactivée, le profil gagne cet espace.</string>
 </resources>
