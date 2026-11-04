@@ -228,6 +228,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         altimetria3DView.nextResupplyMeters = strategy.nextResupplyMeters
                         altimetria3DView.etaFinishMinutes = strategy.etaFinishMinutes
                         altimetria3DView.ascentPaceMetersPerHour = strategy.ascentPaceMetersPerHour
+                        altimetria3DView.beaconElevation = strategy.beaconElevation
                         altimetria3DView.distToClimbTop = strategy.distToClimbTop
                         altimetria3DView.elevToClimbTop = strategy.elevToClimbTop
                         altimetria3DView.distToNextClimb = strategy.distToNextClimb

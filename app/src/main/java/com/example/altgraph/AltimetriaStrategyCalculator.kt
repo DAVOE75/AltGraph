@@ -118,6 +118,8 @@ data class StrategyData(
     val riderProgress: Float = 0.0f,
     val windowStartMeters: Double = 0.0,
     val windowStartElevation: Double = 0.0,
+    // Altitud (m) del punto donde está la baliza en el perfil; null = sin perfil
+    val beaconElevation: Double? = null,
     val subBlocks: List<Float> = emptyList(),
     val subBlocksMax: List<Float> = emptyList(),
     val windowLengthMeters: Double = 400.0,
@@ -2661,7 +2663,7 @@ class AltimetriaStrategyCalculator {
             riderProgress = riderProgress,
             windowStartMeters = windowStartDist,
             windowStartElevation = windowStartElevation,
-            subBlocks = routeSubBlocks,
+            beaconElevation = if (routeElevationProfile.isNotEmpty() || routePoints.size >= 2) getElevationAtDistance(windowStartDist + riderProgress * actualLookahead) else null,
             subBlocksMax = routeSubBlocksMax,
             rightBufferBlocks = rightBufferBlocks,
             windowLengthMeters = actualLookahead,

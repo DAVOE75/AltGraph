@@ -578,14 +578,15 @@ class Altimetria3DView @JvmOverloads constructor(
         style = Paint.Style.STROKE
     }
 
+    // Círculo negro con texto y borde blancos; en fondo claro el filtro de la capa lo invierte (círculo blanco, texto y borde negros)
     private val poiBadgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#DC2626")
+        color = Color.BLACK
         style = Paint.Style.FILL
     }
 
     private val poiBadgeBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
-        strokeWidth = 1.5f
+        strokeWidth = 2f
         style = Paint.Style.STROKE
     }
 
@@ -735,6 +736,7 @@ class Altimetria3DView @JvmOverloads constructor(
     var etaFinishMinutes: Long? = null
     var ascentPaceMetersPerHour: Int? = null
     var distToClimbTop: Double? = null
+    var beaconElevation: Double? = null
     var elevToClimbTop: Double? = null
     var distToNextClimb: Double? = null
     var nextClimbLength: Double? = null
@@ -1101,7 +1103,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 AppPreferences.HEADER_STAT_DIST -> Triple(context.getString(R.string.label_header_dist), if (routeTotalLength > 0.0) formatRouteKm((routeTotalLength - routeLeft).coerceAtLeast(0.0)) else "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_ASC_TOTAL -> Triple(context.getString(R.string.hdr_asc_total), routeTotalAscent?.let { Units.elev(context, it, true) } ?: "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_ASC_LEFT -> Triple(context.getString(R.string.hdr_asc_left), routeRemainingAscent?.let { Units.elev(context, it, true) } ?: "--", lightComp(Color.WHITE))
-                AppPreferences.HEADER_STAT_ELEV -> Triple(context.getString(R.string.hdr_elev), Units.elev(context, currentElevation, true), lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_ELEV -> Triple(context.getString(R.string.hdr_elev), Units.elev(context, beaconElevation ?: currentElevation, true), lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_TOP_DIST -> Triple(context.getString(R.string.hdr_top_dist), distToClimbTop?.let { formatRouteKm(it) } ?: "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_TOP_ELEV -> Triple(context.getString(R.string.hdr_top_elev), elevToClimbTop?.let { Units.elev(context, it, true) } ?: "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_NEXT_DIST -> Triple(context.getString(R.string.hdr_next_dist), distToNextClimb?.let { formatRouteKm(it) } ?: "--", lightComp(Color.WHITE))
@@ -1334,6 +1336,23 @@ class Altimetria3DView @JvmOverloads constructor(
             }
         }
         return selectedPeaks
+    }
+
+    private fun summitClimb(absDist: Double): RouteClimb? =
+        activeClimbs.filter { abs(it.endDistance - absDist) <= 400.0 }.minByOrNull { abs(it.endDistance - absDist) }
+
+    // Categoría del puerto cuya cima coincide con una cima de la ruta (1ª-4ª o HC); sin categoría, un triángulo
+    private fun summitBadgeText(absDist: Double): String {
+        val cat = summitClimb(absDist)?.category?.uppercase().orEmpty()
+        return when {
+            cat.isBlank() -> "▲"
+            cat.contains("ESP") || cat.contains("HC") || cat.contains("H.C") -> "HC"
+            cat.contains("1") -> "1ª"
+            cat.contains("2") -> "2ª"
+            cat.contains("3") -> "3ª"
+            cat.contains("4") -> "4ª"
+            else -> "▲"
+        }
     }
 
     private fun drawTopographicPeaks(canvas: Canvas, xFront: FloatArray, yFront: FloatArray, yBase: FloatArray, totalMicroSamples: Int, microElevations: FloatArray) {
@@ -2050,23 +2069,29 @@ class Altimetria3DView @JvmOverloads constructor(
                 val px = xFront[idx] + rem * (xFront[idx + 1] - xFront[idx])
                 val pyTop = yBack[idx] + rem * (yBack[idx + 1] - yBack[idx])
 
-                val badgeRadius = 14f
-                val badgeCenterY = pyTop - (h * 0.14f)
+                val badgeTextBase = ((h * 0.038f) * fontScale).coerceIn(16f, 24f)
+                // El círculo es algo más pequeño que antes, pero el tamaño de la letra se mantiene
+                val badgeRadius = badgeTextBase * 0.88f
+                // Flecha corta: la insignia queda cerca de la cima
+                val badgeCenterY = pyTop - (h * 0.085f) - badgeRadius * 0.5f
 
                 canvas.drawLine(px, pyTop, px, badgeCenterY + badgeRadius, poiLinePaint)
                 canvas.drawCircle(px, badgeCenterY, badgeRadius, poiBadgePaint)
                 canvas.drawCircle(px, badgeCenterY, badgeRadius, poiBadgeBorderPaint)
 
-                poiBadgeTextPaint.textSize = 12f
                 val badgeText = when (poi.type) {
-                    PoiType.SUMMIT -> "1"
+                    PoiType.SUMMIT -> summitBadgeText(windowStartMeters + relDist)
                     PoiType.VIEWPOINT -> "2"
                     else -> poi.icon
                 }
-                canvas.drawText(badgeText, px, badgeCenterY + 4f, poiBadgeTextPaint)
+                // El número llena el círculo; "HC" y textos largos se ajustan
+                poiBadgeTextPaint.textSize = badgeTextBase * (if (badgeText.length > 2) 0.85f else 1.05f)
+                canvas.drawText(badgeText, px, badgeCenterY + poiBadgeTextPaint.textSize * 0.35f, poiBadgeTextPaint)
 
-                poiLabelPaint.textSize = ((h * 0.038f) * fontScale).coerceIn(9f, fsHi(13f))
-                canvas.drawText(poi.name, px, badgeCenterY - badgeRadius - 5f, poiLabelPaint)
+                poiLabelPaint.textSize = ((h * 0.048f) * fontScale).coerceIn(11f, fsHi(17f))
+                // En las cimas solo el nombre: se quita la cota que el SDK añade al final (p. ej. "CIMA: Pto. Cruz Chiquita 205m")
+                val labelText = if (poi.type == PoiType.SUMMIT) poi.name.replace(Regex("\\s+\\d+([.,]\\d+)?\\s?(m|ft)\\s*$", RegexOption.IGNORE_CASE), "") else poi.name
+                canvas.drawText(labelText, px, badgeCenterY - badgeRadius - 5f, poiLabelPaint)
             }
         }
 
