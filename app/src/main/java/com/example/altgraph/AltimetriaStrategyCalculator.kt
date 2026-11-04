@@ -156,6 +156,13 @@ data class StrategyData(
     val etaFinishMinutes: Long? = null,
     // Ritmo de desnivel (m/h, redondeado a 5) desde el inicio de la ruta con el tiempo en movimiento; null = desactivado o sin datos
     val ascentPaceMetersPerHour: Int? = null,
+    // Puerto actual: distancia y desnivel hasta la cima; próximo puerto: distancia hasta su inicio, longitud, desnivel y pendiente media; null = ninguno
+    val distToClimbTop: Double? = null,
+    val elevToClimbTop: Double? = null,
+    val distToNextClimb: Double? = null,
+    val nextClimbLength: Double? = null,
+    val nextClimbGain: Double? = null,
+    val nextClimbGrade: Double? = null,
     val currentHeartRate: Double = 0.0
 )
 
@@ -2409,10 +2416,22 @@ class AltimetriaStrategyCalculator {
 
         val showPois = prefs?.showPois ?: true
         val enabledPoiTypes = prefs?.poiTypesEnabled ?: PoiTypes.keys.toSet()
-        val nextResupplyMeters = if (prefs?.showNextResupply == true) nextResupplyDistance(currentRiderDistance, enabledPoiTypes) else null
+        val headerKeys = prefs?.let { setOf(it.headerStat1, it.headerStat2, it.headerStat3, it.headerStat4, it.headerStat5) } ?: emptySet()
+        val nextResupplyMeters = if (prefs?.showNextResupply == true || AppPreferences.HEADER_STAT_RESUPPLY in headerKeys) nextResupplyDistance(currentRiderDistance, enabledPoiTypes) else null
         if (advance) updateAvgSpeed()
-        val etaFinishMinutes = if (prefs?.showEta == true) estimateFinishMinutes(totalDistanceRemaining) else null
-        val ascentPace = if (prefs?.showAscentPace == true) estimateAscentPace(currentRiderDistance) else null
+        val etaFinishMinutes = if (prefs?.showEta == true || AppPreferences.HEADER_STAT_ETA in headerKeys) estimateFinishMinutes(totalDistanceRemaining) else null
+        val ascentPace = if (prefs?.showAscentPace == true || AppPreferences.HEADER_STAT_PACE in headerKeys) estimateAscentPace(currentRiderDistance) else null
+
+        // Puerto actual (hasta la cima) y próximo puerto, para las métricas del encabezado
+        val hasElevProfile = routeElevationProfile.isNotEmpty() || routePoints.size >= 2
+        val riderPos = currentRiderDistance.coerceAtLeast(0.0)
+        val curClimb = routeClimbs.firstOrNull { riderPos >= it.startDistance && riderPos < it.endDistance }
+        val nextClimbInfo = routeClimbs.filter { it.startDistance > riderPos }.minByOrNull { it.startDistance }
+        val distToClimbTop = curClimb?.let { it.endDistance - riderPos }
+        val elevToClimbTop = curClimb?.let {
+            if (hasElevProfile) (getElevationAtDistance(it.endDistance) - getElevationAtDistance(riderPos)).coerceAtLeast(0.0)
+            else it.totalElevation * ((it.endDistance - riderPos) / it.length.coerceAtLeast(1.0))
+        }
 
         // Solo mostrar POIs reales de la ruta SDK. Si la ruta no tiene POIs no fabricamos ninguno.
         val rawPois = if (routePois.isNotEmpty()) {
@@ -2674,6 +2693,12 @@ class AltimetriaStrategyCalculator {
             nextResupplyMeters = nextResupplyMeters,
             etaFinishMinutes = etaFinishMinutes,
             ascentPaceMetersPerHour = ascentPace,
+            distToClimbTop = distToClimbTop,
+            elevToClimbTop = elevToClimbTop,
+            distToNextClimb = nextClimbInfo?.let { it.startDistance - riderPos },
+            nextClimbLength = nextClimbInfo?.length,
+            nextClimbGain = nextClimbInfo?.totalElevation,
+            nextClimbGrade = nextClimbInfo?.avgGrade,
             currentHeartRate = currentHeartRate
         )
     }

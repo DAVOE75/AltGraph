@@ -734,6 +734,12 @@ class Altimetria3DView @JvmOverloads constructor(
     var nextResupplyMeters: Double? = null
     var etaFinishMinutes: Long? = null
     var ascentPaceMetersPerHour: Int? = null
+    var distToClimbTop: Double? = null
+    var elevToClimbTop: Double? = null
+    var distToNextClimb: Double? = null
+    var nextClimbLength: Double? = null
+    var nextClimbGain: Double? = null
+    var nextClimbGrade: Double? = null
     var gearChainrings: String = GearAdvisor.DEFAULT_CHAINRINGS
     var gearCassette: String = GearAdvisor.DEFAULT_CASSETTE
 
@@ -1100,13 +1106,14 @@ class Altimetria3DView @JvmOverloads constructor(
         }
         if (showGradeStats) {
 
-        val numCols = if (showMaxGrade) 3 else 2
-        val colW = (w - 32f) / numCols
-
         subTitleLabelPaint.textSize = ((h * 0.050f) * fontScale).coerceIn(10f, fsHi(15f))
         val headerPrefs = AppPreferences.getInstance(context)
-        val slotKeys = listOf(headerPrefs.headerStat1, headerPrefs.headerStat2, headerPrefs.headerStat3)
-            .take(if (showMaxGrade) 3 else 2)
+        // Vertical: hasta 3 métricas (campos 1-3); apaisado: hasta 5. Los campos en "ninguno" se omiten y el resto se reparte el ancho
+        val slotKeys = listOf(headerPrefs.headerStat1, headerPrefs.headerStat2, headerPrefs.headerStat3, headerPrefs.headerStat4, headerPrefs.headerStat5)
+            .take(if (rotate90) 5 else 3)
+            .filter { it != AppPreferences.HEADER_STAT_NONE }
+        val numCols = slotKeys.size.coerceAtLeast(1)
+        val colW = (w - 32f) / numCols
         val tramoAvgGrade = if (visibleAvgGrade > 0.0) visibleAvgGrade else (if (subBlocks.isNotEmpty()) subBlocks.average() else (if (nextBlocks.isNotEmpty()) nextBlocks.average() else currentGrade))
         val tramoMaxGrade = if (visibleMaxGrade > 0.0) visibleMaxGrade else (if (subBlocks.isNotEmpty()) subBlocks.maxOrNull()?.toDouble() ?: 12.8 else (if (nextBlocks.isNotEmpty()) nextBlocks.maxOrNull()?.toDouble() ?: 12.8 else 12.8))
         val routeLeft = if (remainingDistance > 0.0) remainingDistance.coerceAtMost(routeTotalLength.coerceAtLeast(remainingDistance)) else 0.0
@@ -1118,6 +1125,18 @@ class Altimetria3DView @JvmOverloads constructor(
                 AppPreferences.HEADER_STAT_ROUTE -> Triple(context.getString(R.string.label_route_total).uppercase(), if (routeTotalLength > 0.0) formatRouteKm(routeTotalLength) else "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_LEFT -> Triple(context.getString(R.string.label_route_left).uppercase(), if (routeTotalLength > 0.0) formatRouteKm(routeLeft) else "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_DIST -> Triple(context.getString(R.string.label_header_dist), if (routeTotalLength > 0.0) formatRouteKm((routeTotalLength - routeLeft).coerceAtLeast(0.0)) else "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_ASC_TOTAL -> Triple(context.getString(R.string.hdr_asc_total), routeTotalAscent?.let { Units.elev(context, it, true) } ?: "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_ASC_LEFT -> Triple(context.getString(R.string.hdr_asc_left), routeRemainingAscent?.let { Units.elev(context, it, true) } ?: "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_ELEV -> Triple(context.getString(R.string.hdr_elev), Units.elev(context, currentElevation, true), lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_TOP_DIST -> Triple(context.getString(R.string.hdr_top_dist), distToClimbTop?.let { formatRouteKm(it) } ?: "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_TOP_ELEV -> Triple(context.getString(R.string.hdr_top_elev), elevToClimbTop?.let { Units.elev(context, it, true) } ?: "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_NEXT_DIST -> Triple(context.getString(R.string.hdr_next_dist), distToNextClimb?.let { formatRouteKm(it) } ?: "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_NEXT_LEN -> Triple(context.getString(R.string.hdr_next_len), nextClimbLength?.let { formatRouteKm(it) } ?: "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_NEXT_GAIN -> Triple(context.getString(R.string.hdr_next_gain), nextClimbGain?.let { Units.elev(context, it, true) } ?: "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_NEXT_GRADE -> Triple(context.getString(R.string.hdr_next_grade), nextClimbGrade?.let { "%.1f%%".format(it) } ?: "--", lightComp(nextClimbGrade?.let { GradeColorScale.getTelemetryColor(it) } ?: Color.WHITE))
+                AppPreferences.HEADER_STAT_RESUPPLY -> Triple(context.getString(R.string.hdr_resupply), nextResupplyMeters?.let { formatRouteKm(it) } ?: "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_ETA -> Triple(context.getString(R.string.hdr_eta), etaFinishMinutes?.let { android.text.format.DateFormat.getTimeFormat(context).format(java.util.Date(it * 60000L)) } ?: "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_PACE -> Triple(context.getString(R.string.hdr_pace), ascentPaceMetersPerHour?.let { Units.climbRate(context, it) } ?: "--", lightComp(Color.WHITE))
                 else -> Triple(context.getString(R.string.label_current_gradient), "%.1f%%".format(currentGrade), lightComp(GradeColorScale.getTelemetryColor(currentGrade)))
             }
         }
@@ -1130,13 +1149,13 @@ class Altimetria3DView @JvmOverloads constructor(
         subTitleLabelPaint.textAlign = Paint.Align.CENTER
         liveGradePaint.textAlign = Paint.Align.LEFT
         val unitPaint = Paint(liveGradePaint)
-        val numRegex = Regex("^([-+]?[\\d.,]+)(.*)$")
+        val numRegex = Regex("^([-+]?\\d+(?:[.,]\\d+)?)([^\\d:].*)?$")
         for ((idx, s) in slots.withIndex()) {
             val colCx = 16f + colW * idx + colW / 2f
             canvas.drawText(s.first, colCx, h * 0.14f, subTitleLabelPaint)
-            val big = idx == 0
             val key = slotKeys[idx]
-            val isDist = key == AppPreferences.HEADER_STAT_ROUTE || key == AppPreferences.HEADER_STAT_LEFT || key == AppPreferences.HEADER_STAT_DIST
+            val big = key == AppPreferences.HEADER_STAT_CURRENT
+            val isDist = key != AppPreferences.HEADER_STAT_CURRENT && key != AppPreferences.HEADER_STAT_AVG && key != AppPreferences.HEADER_STAT_MAX
             // Route/Left algo más pequeños que la pendiente actual
             liveGradePaint.textSize = if (isDist) ((h * 0.17f) * fontScale).coerceIn(24f, fsHiSmall(46f))
                 else if (big) ((h * 0.26f) * fontScale).coerceIn(40f, fsHiSmall(70f)) else ((h * 0.21f) * fontScale).coerceIn(32f, fsHiSmall(56f))

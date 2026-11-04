@@ -256,6 +256,12 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         altimetria3DView.nextResupplyMeters = strategy.nextResupplyMeters
                         altimetria3DView.etaFinishMinutes = strategy.etaFinishMinutes
                         altimetria3DView.ascentPaceMetersPerHour = strategy.ascentPaceMetersPerHour
+                        altimetria3DView.distToClimbTop = strategy.distToClimbTop
+                        altimetria3DView.elevToClimbTop = strategy.elevToClimbTop
+                        altimetria3DView.distToNextClimb = strategy.distToNextClimb
+                        altimetria3DView.nextClimbLength = strategy.nextClimbLength
+                        altimetria3DView.nextClimbGain = strategy.nextClimbGain
+                        altimetria3DView.nextClimbGrade = strategy.nextClimbGrade
                         altimetria3DView.mergeBlocksMode = prefs.mergeBlocksMode3d
                         altimetria3DView.mergeMarginPct = prefs.mergeMarginPct3d
                         altimetria3DView.hideGradeRangeEnabled = prefs.hideGradeRangeEnabled3d

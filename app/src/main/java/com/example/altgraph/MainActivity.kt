@@ -790,19 +790,42 @@ class MainActivity : Activity() {
             setPadding(0, 8, 0, 0)
         })
         val headerStatLabels = listOf(
+            getString(R.string.hdr_none),
             getString(R.string.label_current_gradient),
             getString(R.string.label_avg_gradient_tramo),
             getString(R.string.label_max_gradient_tramo),
             getString(R.string.setting_header_stat_route),
             getString(R.string.setting_header_stat_left),
-            getString(R.string.setting_header_stat_dist)
+            getString(R.string.setting_header_stat_dist),
+            getString(R.string.hdr_asc_total),
+            getString(R.string.hdr_asc_left),
+            getString(R.string.hdr_elev),
+            getString(R.string.hdr_top_dist),
+            getString(R.string.hdr_top_elev),
+            getString(R.string.hdr_next_dist),
+            getString(R.string.hdr_next_len),
+            getString(R.string.hdr_next_gain),
+            getString(R.string.hdr_next_grade),
+            getString(R.string.hdr_resupply),
+            getString(R.string.hdr_eta),
+            getString(R.string.hdr_pace)
         )
         val headerStatAccess = listOf(
             Pair({ prefs.headerStat1 }, { v: String -> prefs.headerStat1 = v }),
             Pair({ prefs.headerStat2 }, { v: String -> prefs.headerStat2 = v }),
-            Pair({ prefs.headerStat3 }, { v: String -> prefs.headerStat3 = v })
+            Pair({ prefs.headerStat3 }, { v: String -> prefs.headerStat3 = v }),
+            Pair({ prefs.headerStat4 }, { v: String -> prefs.headerStat4 = v }),
+            Pair({ prefs.headerStat5 }, { v: String -> prefs.headerStat5 = v })
         )
-        for ((get, set) in headerStatAccess) {
+        for ((slotIdx, acc) in headerStatAccess.withIndex()) {
+            val (get, set) = acc
+            // Los campos 4 y 5 solo se ven con la pantalla en apaisado
+            showHeaderStatsCard.addView(TextView(this).apply {
+                text = getString(if (slotIdx < 3) R.string.setting_header_slot else R.string.setting_header_slot_landscape, slotIdx + 1)
+                textSize = 12f
+                setTextColor(Color.LTGRAY)
+                setPadding(0, 6, 0, 0)
+            })
             showHeaderStatsCard.addView(Spinner(this).apply {
                 adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, headerStatLabels)
                 setSelection(AppPreferences.HEADER_STAT_KEYS.indexOf(get()).coerceAtLeast(0))
