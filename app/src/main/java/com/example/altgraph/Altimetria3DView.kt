@@ -1103,7 +1103,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 AppPreferences.HEADER_STAT_DIST -> Triple(context.getString(R.string.label_header_dist), if (routeTotalLength > 0.0) formatRouteKm((routeTotalLength - routeLeft).coerceAtLeast(0.0)) else "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_ASC_TOTAL -> Triple(context.getString(R.string.hdr_asc_total), routeTotalAscent?.let { Units.elev(context, it, true) } ?: "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_ASC_LEFT -> Triple(context.getString(R.string.hdr_asc_left), routeRemainingAscent?.let { Units.elev(context, it, true) } ?: "--", lightComp(Color.WHITE))
-                AppPreferences.HEADER_STAT_ELEV -> Triple(context.getString(R.string.hdr_elev), Units.elev(context, beaconElevation ?: currentElevation, true), lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_ELEV -> Triple(context.getString(R.string.hdr_elev), Units.elev(context, beaconProfileElevation() ?: beaconElevation ?: currentElevation, true), lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_TOP_DIST -> Triple(context.getString(R.string.hdr_top_dist), distToClimbTop?.let { formatRouteKm(it) } ?: "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_TOP_ELEV -> Triple(context.getString(R.string.hdr_top_elev), elevToClimbTop?.let { Units.elev(context, it, true) } ?: "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_NEXT_DIST -> Triple(context.getString(R.string.hdr_next_dist), distToNextClimb?.let { formatRouteKm(it) } ?: "--", lightComp(Color.WHITE))
@@ -1336,6 +1336,15 @@ class Altimetria3DView @JvmOverloads constructor(
             }
         }
         return selectedPeaks
+    }
+
+    // Altitud del perfil dibujado justo donde se coloca la baliza (misma muestra y misma interpolación que el dibujo)
+    private fun beaconProfileElevation(): Double? {
+        if (profileElevations.size < 2 || subBlocks.isEmpty() || subBlockSizeMeters <= 0.0 || riderProgress < 0f || riderProgress > 1f) return null
+        val idxF = (((riderProgress * lookaheadMeters) + gridOffsetMeters) / subBlockSizeMeters).coerceIn(0.0, (profileElevations.size - 1).toDouble())
+        val i = idxF.toInt().coerceAtMost(profileElevations.size - 2)
+        val rem = idxF - i
+        return profileElevations[i] + rem * (profileElevations[i + 1] - profileElevations[i])
     }
 
     private fun summitClimb(absDist: Double): RouteClimb? =
