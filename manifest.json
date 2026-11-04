@@ -1,9 +1,9 @@
 {
   "label": "AltGraph",
   "packageName": "com.example.altgraph",
-  "latestApkUrl": "https://github.com/DAVOE75/ALTGRAPH/releases/download/v3.0.9/app-release.apk",
-    "latestVersion": "3.0.9",
-    "latestVersionCode": 427,
+  "latestApkUrl": "https://github.com/DAVOE75/ALTGRAPH/releases/download/v3.0.10/app-release.apk",
+    "latestVersion": "3.0.10",
+    "latestVersionCode": 428,
   "iconUrl": "https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/icon-256.png",
   "developer": "hesiOX",
   "description": "3D relief altimetry, voice copilot, attack alerts, VAM pacing and Fatigue Grade Index (GF) extension for Hammerhead Karoo"
