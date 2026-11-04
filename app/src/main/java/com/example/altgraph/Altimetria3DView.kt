@@ -924,12 +924,14 @@ class Altimetria3DView @JvmOverloads constructor(
     // Sin botones de zoom: un toque acerca y un doble toque aleja
     private val tapZoomDetector by lazy { android.view.GestureDetector(context, object : android.view.GestureDetector.SimpleOnGestureListener() {
         override fun onDown(e: MotionEvent): Boolean = true
-        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+        // El primer toque acerca al instante (sin esperar al doble toque); el segundo deshace ese paso y aleja
+        override fun onSingleTapUp(e: MotionEvent): Boolean {
             performClick()
             zoomIn()
             return true
         }
         override fun onDoubleTap(e: MotionEvent): Boolean {
+            zoomOut()
             zoomOut()
             return true
         }
@@ -993,43 +995,15 @@ class Altimetria3DView @JvmOverloads constructor(
     }
 
     private fun zoomIn() {
-        val curr = lookaheadMeters
-        val nextVal = when {
-            curr > 50000 -> 50000
-            curr > 20000 -> 20000
-            curr > 10000 -> 10000
-            curr > 5000 -> 5000
-            curr > 2000 -> 2000
-            curr > 1000 -> 1000
-            curr == 1000 -> 500
-            curr > 200 -> curr - 50
-            else -> 200
-        }
+        val nextVal = ZoomLadder.zoomIn(lookaheadMeters)
         lookaheadMeters = nextVal
         AppPreferences.getInstance(context).lookaheadMeters3d = nextVal
         postInvalidate()
     }
 
     private fun zoomOut() {
-        val curr = lookaheadMeters
-        val maxAllowed = if (routeTotalLength > 500.0) routeTotalLength.toInt() else 200000
-        if (curr >= maxAllowed) return
-
-        var nextVal = when {
-            curr >= 200000 -> 200000
-            curr >= 100000 -> curr + 50000
-            curr >= 50000 -> curr + 10000
-            curr >= 20000 -> curr + 5000
-            curr >= 5000 -> curr + 1000
-            curr >= 1000 -> curr + 500
-            curr >= 500 -> curr + 100
-            curr >= 50 -> curr + 50
-            else -> 50
-        }
-        if (routeTotalLength > 500.0 && (nextVal > maxAllowed || (curr < maxAllowed && nextVal >= maxAllowed))) {
-            nextVal = maxAllowed
-        }
-        val finalVal = nextVal.coerceAtMost(maxAllowed)
+        val finalVal = ZoomLadder.zoomOut(lookaheadMeters, if (routeTotalLength > 500.0) routeTotalLength.toInt() else null)
+        if (finalVal == lookaheadMeters) return
         lookaheadMeters = finalVal
         AppPreferences.getInstance(context).lookaheadMeters3d = finalVal
         postInvalidate()
@@ -1872,16 +1846,29 @@ class Altimetria3DView @JvmOverloads constructor(
             val badgeBorder = if (isObsidian) holoBadgeBorderPaint else pctBadgeBorderPaint
 
             val blockW = abs(xFront[1] - xFront[0])
-            val useRuns = mergedRuns.isNotEmpty()
+            // Opción: un solo % por bloque mayor (media de sus sub-bloques), más grande, aunque los sub-bloques sigan pintados por color
+            val avgPerBlock = profileMode && microSubDivisions > 1 && AppPreferences.getInstance(context).showBlockAvgPct3d
+            val useRuns = mergedRuns.isNotEmpty() || avgPerBlock
             val canDrawSubBlocks = blockW >= 28f || useRuns
 
             if (canDrawSubBlocks) {
                 // Dibujar porcentaje grande y horizontal dentro de cada columna (o de cada tramo fusionado)
-                val groups: List<IntRange> = if (useRuns) mergedRuns else (0 until totalMicroSamples - 1).map { it..it }
+                val groups: List<IntRange> = if (avgPerBlock) {
+                    (0 until majorBlocksCount + 1).mapNotNull { k ->
+                        val s = k * microSubDivisions
+                        val e = minOf((k + 1) * microSubDivisions, totalMicroSamples - 1)
+                        if (s < e) s until e else null
+                    }
+                } else if (useRuns) mergedRuns else (0 until totalMicroSamples - 1).map { it..it }
                 for (grp in groups) {
                     val a = grp.first
                     val b = (grp.last + 1).coerceAtMost(totalMicroSamples - 1)
-                    val g = if (a < displayGrades.size) displayGrades[a] else 4.0f
+                    val g = if (avgPerBlock) {
+                        var sumG = 0.0
+                        var cnt = 0
+                        for (si in a until b) if (si < microGrades.size) { sumG += microGrades[si]; cnt++ }
+                        if (cnt > 0) (sumG / cnt).toFloat() else 0f
+                    } else if (a < displayGrades.size) displayGrades[a] else 4.0f
                     if (isGradeLabelHidden(g)) continue
 
                     // Un tramo fusionado centra su etiqueta en la parte visible
@@ -1902,8 +1889,9 @@ class Altimetria3DView @JvmOverloads constructor(
                     }
 
                     // Con zoom el bloque se ensancha: el recuadro crece con él (sin pasar de ~30% del ancho del bloque)
-                    val maxFont = maxOf(24f, minOf(groupW * 0.30f, ((h * 0.09f) * fontScale).coerceIn(24f, 48f)))
-                    val calcFontSize = (groupW * 0.40f * fontScale).coerceIn(14f, maxFont)
+                    val maxFont = if (avgPerBlock) maxOf(28f, minOf(groupW * 0.45f, ((h * 0.14f) * fontScale).coerceIn(28f, 72f)))
+                        else maxOf(24f, minOf(groupW * 0.30f, ((h * 0.09f) * fontScale).coerceIn(24f, 48f)))
+                    val calcFontSize = (groupW * (if (avgPerBlock) 0.50f else 0.40f) * fontScale).coerceIn(14f, maxFont)
                     percentTextPaint.textSize = calcFontSize
 
                     val isInsideBlock = colH >= (calcFontSize * 2.2f)

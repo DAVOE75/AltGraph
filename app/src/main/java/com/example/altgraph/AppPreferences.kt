@@ -504,6 +504,11 @@ class AppPreferences(context: Context) {
         get() = prefs.getFloat(KEY_MERGE_MARGIN_3D, 0f)
         set(value) = prefs.edit().putFloat(KEY_MERGE_MARGIN_3D, value.coerceIn(0f, 10f)).apply()
 
+    // Un % por bloque mayor (media de sus sub-bloques) en lugar de uno por sub-bloque; desactivado por defecto
+    var showBlockAvgPct3d: Boolean
+        get() = prefs.getBoolean(KEY_BLOCK_AVG_PCT_3D, false)
+        set(value) = prefs.edit().putBoolean(KEY_BLOCK_AVG_PCT_3D, value).apply()
+
     var routeInfoSide3d: String
         get() = prefs.getString(KEY_ROUTE_INFO_SIDE_3D, ROUTE_INFO_RIGHT) ?: ROUTE_INFO_RIGHT
         set(value) = prefs.edit().putString(KEY_ROUTE_INFO_SIDE_3D, value).apply()
@@ -524,7 +529,7 @@ class AppPreferences(context: Context) {
         altimetriaStyle.key, showBlockPercentages, show3dCotas, show3dRamps, show3dScaleBar, showClimbScaleBar,
         adaptGradeTextColors, show3dBlockLegend, show3dRouteName, show3dHeaderStats, headerStat1, headerStat2, headerStat3, headerStat4, headerStat5, showHairpins, show3dZoomControls, chartFitAxis, showExaggerationTag,
         chartLightBackground, chartLightStyle, showSurfaceTextures, showRouteDistances3d, mergeBlocksMode3d, pctLabelStyle3d,
-        mergeMarginPct3d, hideGradeRangeEnabled3d, hideGradeMin3d, hideGradeMax3d, showGearBadge, showRouteCompass, showRouteElevation3d,
+        mergeMarginPct3d, showBlockAvgPct3d, hideGradeRangeEnabled3d, hideGradeMin3d, hideGradeMax3d, showGearBadge, showRouteCompass, showRouteElevation3d,
         panButtonsPosition
     ).joinToString("|")
 
@@ -544,7 +549,7 @@ class AppPreferences(context: Context) {
             .remove(KEY_SHOW_3D_SCALE_BAR).remove(KEY_SHOW_3D_BLOCK_LEGEND).remove(KEY_SHOW_CLIMB_SCALE_BAR).remove(KEY_ADAPT_GRADE_TEXT).remove(KEY_SHOW_3D_ROUTE_NAME)
             .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_HEADER_STAT_1).remove(KEY_HEADER_STAT_2).remove(KEY_HEADER_STAT_3).remove(KEY_HEADER_STAT_4).remove(KEY_HEADER_STAT_5).remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM)            .remove(KEY_CHART_FIT_AXIS).remove(KEY_SHOW_EXAGGERATION_TAG)
             .remove(KEY_CHART_LIGHT_BG).remove(KEY_CHART_LIGHT_STYLE).remove(KEY_SHOW_SURFACE_TEXTURES).remove(KEY_SHOW_ROUTE_DISTANCES_3D)
-            .remove(KEY_MERGE_MODE_3D).remove(KEY_MERGE_SIMILAR_BLOCKS_3D).remove(KEY_PCT_LABEL_STYLE_3D).remove(KEY_MERGE_MARGIN_3D)
+            .remove(KEY_MERGE_MODE_3D).remove(KEY_MERGE_SIMILAR_BLOCKS_3D).remove(KEY_PCT_LABEL_STYLE_3D).remove(KEY_MERGE_MARGIN_3D).remove(KEY_BLOCK_AVG_PCT_3D)
             .remove(KEY_HIDE_GRADE_RANGE_ENABLED_3D).remove(KEY_HIDE_GRADE_MIN_3D).remove(KEY_HIDE_GRADE_MAX_3D)
             .remove(KEY_SHOW_GEAR_BADGE).remove(KEY_SHOW_ROUTE_COMPASS).remove(KEY_SHOW_ROUTE_ELEVATION_3D)
             .apply()
@@ -645,6 +650,7 @@ class AppPreferences(context: Context) {
         private const val KEY_SHOW_MAX_GRADIENT = "show_max_gradient"
         private const val KEY_SHOW_3D_HEADER_STATS = "show_3d_header_stats"
         private const val KEY_HEADER_STAT_1 = "header_stat_1"
+        private const val KEY_BLOCK_AVG_PCT_3D = "block_avg_pct_3d"
         private const val KEY_HEADER_STAT_2 = "header_stat_2"
         private const val KEY_HEADER_STAT_3 = "header_stat_3"
         private const val KEY_HEADER_STAT_4 = "header_stat_4"

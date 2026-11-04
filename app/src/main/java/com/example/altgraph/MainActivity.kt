@@ -1271,6 +1271,20 @@ class MainActivity : Activity() {
             setTextColor(Color.LTGRAY)
             setPadding(0, 4, 0, 12)
         })
+        val blockAvgSwitch = Switch(this).apply {
+            text = getString(R.string.setting_block_avg_pct)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.showBlockAvgPct3d
+            setOnCheckedChangeListener { _, isChecked -> prefs.showBlockAvgPct3d = isChecked }
+        }
+        blockCleanCard.addView(blockAvgSwitch)
+        blockCleanCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_block_avg_pct_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 12)
+        })
         blockCleanCard.addView(Switch(this).apply {
             text = getString(R.string.setting_hide_grade_range)
             textSize = 15f
@@ -1712,8 +1726,7 @@ class MainActivity : Activity() {
         showSurfaceTexturesCard.addView(switchShowSurfaceTextures)
         tabEliteContainer.addView(showSurfaceTexturesCard)
         
-        // Radar Resolution Spinner
-        val radarResCard = createCardContainer()
+        // Radar Resolution Spinner (ahora en la pestaña 3D)
         val radarResLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(0, 0, 0, 16)
@@ -1774,8 +1787,17 @@ class MainActivity : Activity() {
             }
         }
         radarResLayout.addView(radarResSpinner)
-        radarResCard.addView(radarResLayout)
-        tabEliteContainer.addView(radarResCard)
+        // La resolución de bloque afecta también al perfil 3D: va en la pestaña 3D justo encima de "% medio por bloque"
+        val radarResIdx = blockCleanCard.indexOfChild(blockAvgSwitch)
+        blockCleanCard.addView(radarResLayout, radarResIdx)
+        blockCleanCard.addView(thinDivider(), radarResIdx + 1)
+        val radarResNoteCard = createCardContainer()
+        radarResNoteCard.addView(TextView(this).apply {
+            text = getString(R.string.elite_block_resolution_moved)
+            textSize = 13f
+            setTextColor(Color.LTGRAY)
+        })
+        tabEliteContainer.addView(radarResNoteCard)
         
         // Map Overlay Mode Spinner
         val mapOverlayCard = createCardContainer()

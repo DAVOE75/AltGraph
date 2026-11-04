@@ -399,6 +399,9 @@
     <string name="hdr_eta">LLEGADA</string>
     <string name="hdr_pace">RITMO ASC.</string>
     <string name="hdr_none">— Ninguno —</string>
+    <string name="setting_block_avg_pct">Mostrar % medio por bloque</string>
+    <string name="setting_block_avg_pct_desc">Un % por bloque principal (la media de sus sub-bloques), lo más grande que permita el zoom. Los sub-bloques mantienen su color.</string>
+    <string name="elite_block_resolution_moved">La resolución de bloque se ha movido a la pestaña 3D, encima de "Mostrar % medio por bloque".</string>
     <string name="setting_header_slot">Campo %1$d</string>
     <string name="setting_header_slot_landscape">Campo %1$d (solo apaisado)</string>
     <string name="label_route_left">Quedan</string>

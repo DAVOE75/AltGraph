@@ -373,6 +373,9 @@
     <string name="hdr_eta">ARRIVÉE</string>
     <string name="hdr_pace">RYTHME ASC.</string>
     <string name="hdr_none">— Aucun —</string>
+    <string name="setting_block_avg_pct">Afficher la pente moyenne par bloc</string>
+    <string name="setting_block_avg_pct_desc">Un % par bloc principal (la moyenne de ses sous-blocs), aussi grand que le zoom le permet. Les sous-blocs gardent leur couleur.</string>
+    <string name="elite_block_resolution_moved">La résolution de bloc se trouve désormais dans l\'onglet 3D, au-dessus de « Afficher la pente moyenne par bloc ».</string>
     <string name="setting_header_slot">Champ %1$d</string>
     <string name="setting_header_slot_landscape">Champ %1$d (paysage uniquement)</string>
     <string name="setting_gear_title">Transmission (rapport conseillé 3D)</string>

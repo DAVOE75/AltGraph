@@ -373,6 +373,9 @@
     <string name="hdr_eta">ARRIVO</string>
     <string name="hdr_pace">RITMO SALITA</string>
     <string name="hdr_none">— Nessuno —</string>
+    <string name="setting_block_avg_pct">Mostra % medio per blocco</string>
+    <string name="setting_block_avg_pct_desc">Un % per blocco principale (la media dei suoi sotto-blocchi), il più grande possibile in base allo zoom. I sotto-blocchi mantengono il colore.</string>
+    <string name="elite_block_resolution_moved">La risoluzione del blocco si trova ora nella scheda 3D, sopra "Mostra % medio per blocco".</string>
     <string name="setting_header_slot">Campo %1$d</string>
     <string name="setting_header_slot_landscape">Campo %1$d (solo orizzontale)</string>
     <string name="setting_gear_title">Trasmissione (rapporto consigliato 3D)</string>

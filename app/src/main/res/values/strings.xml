@@ -399,6 +399,9 @@
     <string name="hdr_eta">ETA</string>
     <string name="hdr_pace">ASCENT PACE</string>
     <string name="hdr_none">— None —</string>
+    <string name="setting_block_avg_pct">Show average % per block</string>
+    <string name="setting_block_avg_pct_desc">One % per main block (the average of its sub-blocks), as large as the zoom allows. The sub-blocks keep their own colours.</string>
+    <string name="elite_block_resolution_moved">Block resolution has moved to the 3D tab, above "Show average % per block".</string>
     <string name="setting_header_slot">Field %1$d</string>
     <string name="setting_header_slot_landscape">Field %1$d (landscape only)</string>
     <string name="label_route_left">Left</string>

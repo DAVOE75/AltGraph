@@ -373,6 +373,9 @@
     <string name="hdr_eta">ANKUNFT</string>
     <string name="hdr_pace">STEIGRATE</string>
     <string name="hdr_none">— Keine —</string>
+    <string name="setting_block_avg_pct">Durchschnitts-% pro Block anzeigen</string>
+    <string name="setting_block_avg_pct_desc">Ein % pro Hauptblock (Durchschnitt seiner Unterblöcke), so groß wie der Zoom es erlaubt. Die Unterblöcke behalten ihre Farben.</string>
+    <string name="elite_block_resolution_moved">Die Blockauflösung befindet sich jetzt im 3D-Tab, über "Durchschnitts-% pro Block anzeigen".</string>
     <string name="setting_header_slot">Feld %1$d</string>
     <string name="setting_header_slot_landscape">Feld %1$d (nur Querformat)</string>
     <string name="setting_gear_title">Schaltung (empfohlener Gang 3D)</string>

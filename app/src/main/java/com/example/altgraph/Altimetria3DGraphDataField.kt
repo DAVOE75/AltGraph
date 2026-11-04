@@ -43,44 +43,16 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
     private var lastTapAt = 0L
     private var tapPrevLookahead: Int? = null
 
-    private fun zoomInStep(curr: Int): Int = when {
-        curr <= 50 -> 50
-        curr <= 500 -> curr - 50
-        curr <= 1000 -> curr - 100
-        curr <= 5000 -> curr - 500
-        curr <= 20000 -> curr - 1000
-        curr <= 50000 -> curr - 5000
-        curr <= 100000 -> curr - 10000
-        curr <= 200000 -> curr - 50000
-        else -> 200000
-    }
+    private fun zoomInStep(curr: Int): Int = ZoomLadder.zoomIn(curr)
 
-    private fun zoomOutStep(curr: Int, routeMaxMeters: Int?): Int {
-        val maxAllowed = routeMaxMeters ?: 200000
-        if (curr >= maxAllowed) return curr
-        var nextVal = when {
-            curr >= 200000 -> 200000
-            curr >= 100000 -> curr + 50000
-            curr >= 50000 -> curr + 10000
-            curr >= 20000 -> curr + 5000
-            curr >= 5000 -> curr + 1000
-            curr >= 1000 -> curr + 500
-            curr >= 500 -> curr + 100
-            curr >= 50 -> curr + 50
-            else -> 50
-        }
-        if (routeMaxMeters != null && (nextVal > routeMaxMeters || (curr < routeMaxMeters && nextVal >= routeMaxMeters))) {
-            nextVal = routeMaxMeters
-        }
-        return nextVal.coerceAtMost(maxAllowed)
-    }
+    private fun zoomOutStep(curr: Int, routeMaxMeters: Int?): Int = ZoomLadder.zoomOut(curr, routeMaxMeters)
 
     companion object {
         const val ACTION_CYCLE_3D_ZOOM = "com.example.altgraph.ACTION_CYCLE_3D_ZOOM"
         const val ACTION_ZOOM_IN = "com.example.altgraph.ACTION_ZOOM_IN"
         const val ACTION_ZOOM_OUT = "com.example.altgraph.ACTION_ZOOM_OUT"
         const val ACTION_TAP_ZOOM = "com.example.altgraph.ACTION_TAP_ZOOM"
-        private const val DOUBLE_TAP_MS = 400L
+        private const val DOUBLE_TAP_MS = 350L
         private const val MIN_LOOKAHEAD_M = 50
         private const val DEFAULT_LOOKAHEAD_M = 350
         const val ACTION_TOGGLE_COMPASS = "com.example.altgraph.ACTION_TOGGLE_COMPASS"
