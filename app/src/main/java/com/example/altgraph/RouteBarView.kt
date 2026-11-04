@@ -1098,7 +1098,8 @@ class RouteBarView(context: Context) : View(context) {
         var alertText = ""
         var alertColorHex = "#212121" // Default dark gray
         
-        val currentBlockIdxSafe = (strat.riderProgress * strat.windowLengthMeters / strat.subBlockSizeMeters).toInt().coerceIn(0, strat.subBlocks.size - 1)
+        val currentBlockIdxSafe = if (strat.subBlocks.isEmpty() || strat.subBlockSizeMeters <= 0.0) 0
+            else (strat.riderProgress * strat.windowLengthMeters / strat.subBlockSizeMeters).toInt().coerceIn(0, strat.subBlocks.size - 1)
         val currentGrade = if (strat.subBlocks.isNotEmpty()) strat.subBlocks[currentBlockIdxSafe].toDouble() else 0.0
 
         val getTargetPowerStr = { grade: Double ->

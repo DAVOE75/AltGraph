@@ -2664,6 +2664,7 @@ class AltimetriaStrategyCalculator {
             windowStartMeters = windowStartDist,
             windowStartElevation = windowStartElevation,
             beaconElevation = if (routeElevationProfile.isNotEmpty() || routePoints.size >= 2) getElevationAtDistance(windowStartDist + riderProgress * actualLookahead) else null,
+            subBlocks = routeSubBlocks,
             subBlocksMax = routeSubBlocksMax,
             rightBufferBlocks = rightBufferBlocks,
             windowLengthMeters = actualLookahead,
