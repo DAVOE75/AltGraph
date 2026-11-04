@@ -1199,7 +1199,7 @@ class Altimetria3DView @JvmOverloads constructor(
             draw3DStraightRibbon(canvas, w, h)
         }
 
-        if (showRouteDistances) drawRouteDistances(canvas, w, h)
+        if (showRouteDistances || routeShowElevation) drawRouteDistances(canvas, w, h)
     }
 
     // Distancia total de la ruta y distancia que queda, arriba a la derecha de la gráfica
@@ -1209,17 +1209,24 @@ class Altimetria3DView @JvmOverloads constructor(
         val textSize0 = ((h * 0.034f) * fontScale).coerceIn(15f, fsHi(24f))
         val total = routeTotalAscent
         val remaining = routeRemainingAscent
-        val resupply = nextResupplyMeters
-        val etaText = etaFinishMinutes?.let { android.text.format.DateFormat.getTimeFormat(context).format(java.util.Date(it * 60000L)) }
-        val lines = listOfNotNull(
+        val infoPrefs = AppPreferences.getInstance(context)
+        val resupply = if (infoPrefs.showNextResupply) nextResupplyMeters else null
+        val etaText = if (infoPrefs.showEta) etaFinishMinutes?.let { android.text.format.DateFormat.getTimeFormat(context).format(java.util.Date(it * 60000L)) } else null
+        val paceValue = if (infoPrefs.showAscentPace) ascentPaceMetersPerHour else null
+        // Con las distancias desactivadas, el desnivel (total y restante) se muestra solo
+        val lines = if (!showRouteDistances) listOfNotNull(
+            total?.let { context.getString(R.string.label_route_total) to Units.elev(context, it, true) },
+            remaining?.let { context.getString(R.string.label_route_left) to Units.elev(context, it, true) }
+        ) else listOfNotNull(
             context.getString(R.string.label_route_total) to
                 (formatRouteKm(routeTotalLength) + if (routeShowElevation && total != null) " / ${Units.elev(context, total, true)}" else ""),
             context.getString(R.string.label_route_left) to
                 (formatRouteKm(left) + if (routeShowElevation && remaining != null) " / ${Units.elev(context, remaining, true)}" else ""),
             if (resupply != null) context.getString(R.string.label_route_next_resupply) to formatRouteKm(resupply) else null,
             if (etaText != null) context.getString(R.string.label_route_eta) to etaText else null,
-            ascentPaceMetersPerHour?.let { context.getString(R.string.label_route_ascent_pace) to Units.climbRate(context, it) }
+            paceValue?.let { context.getString(R.string.label_route_ascent_pace) to Units.climbRate(context, it) }
         )
+        if (lines.isEmpty()) return
         // Sin cabecera y con las flechas de paso abajo, los datos suben a la fila de los botones de zoom (entre las esquinas y el zoom)
         val inZoomRow = !gradeHeaderShown && !rotate90 && !isClimbMode && panButtonsPosition != "top" && !routeShowElevation
         val dp = resources.displayMetrics.density
@@ -1704,7 +1711,7 @@ class Altimetria3DView @JvmOverloads constructor(
             val label = if (exaggeration >= 10f) "%.0fx".format(exaggeration) else "%.1fx".format(exaggeration)
             val tagY = baseGroundY - maxPeakHeight - 6f
             // Con los datos de ruta a la derecha, la etiqueta pasa a la izquierda (sobre la cota más alta) para no solaparse
-            if (showRouteDistances && !routeInfoOnLeft) {
+            if ((showRouteDistances || routeShowElevation) && !routeInfoOnLeft) {
                 tagPaint.textAlign = Paint.Align.LEFT
                 canvas.drawText(label, 5f * resources.displayMetrics.density, tagY - axisTextPaint.textSize, tagPaint)
             } else {
