@@ -783,6 +783,37 @@ class MainActivity : Activity() {
             }
         }
         showHeaderStatsCard.addView(switchShowHeaderStats)
+        showHeaderStatsCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_header_stats_metrics)
+            textSize = 13f
+            setTextColor(Color.WHITE)
+            setPadding(0, 8, 0, 0)
+        })
+        val headerStatLabels = listOf(
+            getString(R.string.label_current_gradient),
+            getString(R.string.label_avg_gradient_tramo),
+            getString(R.string.label_max_gradient_tramo),
+            getString(R.string.setting_header_stat_route),
+            getString(R.string.setting_header_stat_left),
+            getString(R.string.setting_header_stat_dist)
+        )
+        val headerStatAccess = listOf(
+            Pair({ prefs.headerStat1 }, { v: String -> prefs.headerStat1 = v }),
+            Pair({ prefs.headerStat2 }, { v: String -> prefs.headerStat2 = v }),
+            Pair({ prefs.headerStat3 }, { v: String -> prefs.headerStat3 = v })
+        )
+        for ((get, set) in headerStatAccess) {
+            showHeaderStatsCard.addView(Spinner(this).apply {
+                adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, headerStatLabels)
+                setSelection(AppPreferences.HEADER_STAT_KEYS.indexOf(get()).coerceAtLeast(0))
+                onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        set(AppPreferences.HEADER_STAT_KEYS[position])
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
+            })
+        }
 
         // Opción: nombre de la ruta en el encabezado 3D
         val showRouteNameCard = createCardContainer()

@@ -355,6 +355,11 @@
     <string name="setting_hide_grade_max">Intervalo até (%)</string>
     <string name="label_route_total">Rota</string>
     <string name="label_route_left">Faltam</string>
+    <string name="setting_header_stats_metrics">Métricas do cabeçalho (esquerda, centro, direita)</string>
+    <string name="setting_header_stat_route">ROTA (km totais)</string>
+    <string name="setting_header_stat_left">FALTAM (km restantes)</string>
+    <string name="setting_header_stat_dist">DISTÂNCIA (km percorridos)</string>
+    <string name="label_header_dist">DISTÂNCIA</string>
     <string name="setting_gear_title">Transmissão (marcha recomendada 3D)</string>
     <string name="setting_gear_desc">Introduza os dentes das coroas e as roldanas da cassete separados por vírgulas para adaptar a marcha recomendada à sua bicicleta</string>
     <string name="setting_gear_chainrings">Coroas (ex. 50,34)</string>

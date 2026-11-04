@@ -109,6 +109,19 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_SHOW_3D_HEADER_STATS, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_HEADER_STATS, value).apply()
 
+    // Métrica de cada una de las tres columnas del encabezado 3D (HEADER_STAT_*)
+    var headerStat1: String
+        get() = prefs.getString(KEY_HEADER_STAT_1, HEADER_STAT_CURRENT) ?: HEADER_STAT_CURRENT
+        set(value) = prefs.edit().putString(KEY_HEADER_STAT_1, value).apply()
+
+    var headerStat2: String
+        get() = prefs.getString(KEY_HEADER_STAT_2, HEADER_STAT_AVG) ?: HEADER_STAT_AVG
+        set(value) = prefs.edit().putString(KEY_HEADER_STAT_2, value).apply()
+
+    var headerStat3: String
+        get() = prefs.getString(KEY_HEADER_STAT_3, HEADER_STAT_MAX) ?: HEADER_STAT_MAX
+        set(value) = prefs.edit().putString(KEY_HEADER_STAT_3, value).apply()
+
     var showRouteCompass: Boolean
         get() = prefs.getBoolean(KEY_SHOW_ROUTE_COMPASS, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_ROUTE_COMPASS, value).apply()
@@ -500,7 +513,7 @@ class AppPreferences(context: Context) {
     // Estado efectivo de todos los ajustes visuales que tocan las plantillas, como texto comparable
     private fun visualState(): String = listOf(
         altimetriaStyle.key, showBlockPercentages, show3dCotas, show3dRamps, show3dScaleBar, showClimbScaleBar,
-        adaptGradeTextColors, show3dBlockLegend, show3dRouteName, show3dHeaderStats,         showHairpins, show3dZoomControls, chartFitAxis, showExaggerationTag,
+        adaptGradeTextColors, show3dBlockLegend, show3dRouteName, show3dHeaderStats, headerStat1, headerStat2, headerStat3, showHairpins, show3dZoomControls, chartFitAxis, showExaggerationTag,
         chartLightBackground, chartLightStyle, showSurfaceTextures, showRouteDistances3d, mergeBlocksMode3d, pctLabelStyle3d,
         mergeMarginPct3d, hideGradeRangeEnabled3d, hideGradeMin3d, hideGradeMax3d, showGearBadge, showRouteCompass, showRouteElevation3d,
         panButtonsPosition
@@ -520,7 +533,7 @@ class AppPreferences(context: Context) {
         prefs.edit()
             .remove(KEY_ALTIMETRIA_STYLE).remove(KEY_SHOW_BLOCK_PERCENTAGES).remove(KEY_SHOW_3D_COTAS).remove(KEY_SHOW_3D_RAMPS)
             .remove(KEY_SHOW_3D_SCALE_BAR).remove(KEY_SHOW_3D_BLOCK_LEGEND).remove(KEY_SHOW_CLIMB_SCALE_BAR).remove(KEY_ADAPT_GRADE_TEXT).remove(KEY_SHOW_3D_ROUTE_NAME)
-            .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM)            .remove(KEY_CHART_FIT_AXIS).remove(KEY_SHOW_EXAGGERATION_TAG)
+            .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_HEADER_STAT_1).remove(KEY_HEADER_STAT_2).remove(KEY_HEADER_STAT_3).remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM)            .remove(KEY_CHART_FIT_AXIS).remove(KEY_SHOW_EXAGGERATION_TAG)
             .remove(KEY_CHART_LIGHT_BG).remove(KEY_CHART_LIGHT_STYLE).remove(KEY_SHOW_SURFACE_TEXTURES).remove(KEY_SHOW_ROUTE_DISTANCES_3D)
             .remove(KEY_MERGE_MODE_3D).remove(KEY_MERGE_SIMILAR_BLOCKS_3D).remove(KEY_PCT_LABEL_STYLE_3D).remove(KEY_MERGE_MARGIN_3D)
             .remove(KEY_HIDE_GRADE_RANGE_ENABLED_3D).remove(KEY_HIDE_GRADE_MIN_3D).remove(KEY_HIDE_GRADE_MAX_3D)
@@ -622,6 +635,16 @@ class AppPreferences(context: Context) {
         private const val KEY_SHOW_3D_RAMPS = "show_3d_ramps"
         private const val KEY_SHOW_MAX_GRADIENT = "show_max_gradient"
         private const val KEY_SHOW_3D_HEADER_STATS = "show_3d_header_stats"
+        private const val KEY_HEADER_STAT_1 = "header_stat_1"
+        private const val KEY_HEADER_STAT_2 = "header_stat_2"
+        private const val KEY_HEADER_STAT_3 = "header_stat_3"
+        const val HEADER_STAT_CURRENT = "current"
+        const val HEADER_STAT_AVG = "avg"
+        const val HEADER_STAT_MAX = "max"
+        const val HEADER_STAT_ROUTE = "route"
+        const val HEADER_STAT_LEFT = "left"
+        const val HEADER_STAT_DIST = "dist"
+        val HEADER_STAT_KEYS = listOf(HEADER_STAT_CURRENT, HEADER_STAT_AVG, HEADER_STAT_MAX, HEADER_STAT_ROUTE, HEADER_STAT_LEFT, HEADER_STAT_DIST)
         private const val KEY_SHOW_3D_ROUTE_NAME = "show_3d_route_name"
         private const val KEY_SHOW_3D_SCALE_BAR = "show_3d_scale_bar"
         private const val KEY_SHOW_3D_BLOCK_LEGEND = "show_3d_block_legend"

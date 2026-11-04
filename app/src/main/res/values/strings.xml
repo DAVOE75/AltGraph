@@ -381,6 +381,11 @@
     <string name="setting_hide_grade_min">Range from (%)</string>
     <string name="setting_hide_grade_max">Range to (%)</string>
     <string name="label_route_total">Route</string>
+    <string name="setting_header_stats_metrics">Header metrics (left, middle, right)</string>
+    <string name="setting_header_stat_route">ROUTE (total km)</string>
+    <string name="setting_header_stat_left">LEFT (km remaining)</string>
+    <string name="setting_header_stat_dist">DISTANCE (km covered)</string>
+    <string name="label_header_dist">DISTANCE</string>
     <string name="label_route_left">Left</string>
     <string name="setting_gear_title">Gearing (Global 3D gear hint)</string>
     <string name="setting_gear_desc">Enter your chainring teeth and cassette sprockets, separated by commas, so the recommended gear matches your bike</string>

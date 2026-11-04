@@ -29,7 +29,7 @@ class RouteBarView(context: Context) : View(context) {
     }
 
     private val pastOverlayPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(200, 0, 0, 0) // Oscurece el tramo ya recorrido a la izquierda de la flecha (78 % de opacidad)
+        color = Color.argb(160, 0, 0, 0) // Oscurece el tramo ya recorrido a la izquierda de la flecha (63 % de opacidad)
         style = Paint.Style.FILL
     }
 

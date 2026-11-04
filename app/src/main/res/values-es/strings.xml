@@ -381,6 +381,11 @@
     <string name="setting_hide_grade_min">Rango desde (%)</string>
     <string name="setting_hide_grade_max">Rango hasta (%)</string>
     <string name="label_route_total">Ruta</string>
+    <string name="setting_header_stats_metrics">Métricas del encabezado (izquierda, centro, derecha)</string>
+    <string name="setting_header_stat_route">RUTA (km totales)</string>
+    <string name="setting_header_stat_left">QUEDAN (km restantes)</string>
+    <string name="setting_header_stat_dist">DISTANCIA (km recorridos)</string>
+    <string name="label_header_dist">DISTANCIA</string>
     <string name="label_route_left">Quedan</string>
     <string name="setting_gear_title">Transmisión (marcha recomendada 3D)</string>
     <string name="setting_gear_desc">Introduce los dientes de tus platos y los piñones del cassette separados por comas para que la marcha recomendada se adapte a tu bici</string>

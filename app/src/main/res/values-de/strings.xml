@@ -355,6 +355,11 @@
     <string name="setting_hide_grade_max">Bereich bis (%)</string>
     <string name="label_route_total">Route</string>
     <string name="label_route_left">Übrig</string>
+    <string name="setting_header_stats_metrics">Kopfzeilen-Metriken (links, Mitte, rechts)</string>
+    <string name="setting_header_stat_route">ROUTE (Gesamt-km)</string>
+    <string name="setting_header_stat_left">ÜBRIG (Rest-km)</string>
+    <string name="setting_header_stat_dist">STRECKE (gefahrene km)</string>
+    <string name="label_header_dist">STRECKE</string>
     <string name="setting_gear_title">Schaltung (empfohlener Gang 3D)</string>
     <string name="setting_gear_desc">Gib die Zähne deiner Kettenblätter und Ritzel der Kassette durch Kommas getrennt ein, damit der empfohlene Gang zu deinem Rad passt</string>
     <string name="setting_gear_chainrings">Kettenblätter (z. B. 50,34)</string>

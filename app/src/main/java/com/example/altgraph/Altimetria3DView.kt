@@ -25,7 +25,7 @@ private const val PAN_BTN_EDGE_DP = 2f
 private const val FIT_AXIS_K = 15f // factor vertical
 private const val FIT_AXIS_PLACEMENT = 0.4f // altura (fracción del gráfico) a la que cae la cima en rutas normales (probar 0.35 a 0.45)
 private const val FIT_AXIS_CAP = 0.65f // fracción máxima del eje que puede ocupar el rango de datos
-private const val FIT_AXIS_REFIT_PEAK = 0.70f // se reajusta el eje en cuanto la cima supera esta fracción de la altura
+private const val FIT_AXIS_REFIT_PEAK = 0.95f // se reajusta el eje en cuanto la cima supera esta fracción de la altura
 private const val FIT_AXIS_MIN_SPAN_M = 30f
 private const val FIT_AXIS_MAX_SPAN_M = 100f
 private const val FIT_AXIS_HYSTERESIS = 0.20f
@@ -770,6 +770,10 @@ class Altimetria3DView @JvmOverloads constructor(
 
     // Eje vertical ajustado: se conserva entre fotogramas y solo se recalcula cuando el perfil deja de caber
     private var fitAxisMin = 0f
+    // Eje mostrado: sigue suavemente al eje objetivo (fitAxisMin/fitAxisSpan) para que el reajuste no dé un salto
+    private var animAxisMin = 0f
+    private var animAxisSpan = 0f
+    private var animAxisLastNanos = 0L
     private var fitAxisSpan = 0f
 
     // Los límites máximos de letra crecen con la escala (a 60%) para que el ajuste se note también en vistas grandes
@@ -1096,54 +1100,72 @@ class Altimetria3DView @JvmOverloads constructor(
         }
         if (showGradeStats) {
 
-        val numCols = 3
+        val numCols = if (showMaxGrade) 3 else 2
         val colW = (w - 32f) / numCols
-        val col1X = 16f
-        val col2X = 16f + colW
-        val col3X = 16f + colW * 2f
 
         subTitleLabelPaint.textSize = ((h * 0.050f) * fontScale).coerceIn(10f, fsHi(15f))
-        // Las tres etiquetas comparten tamaño y caben cada una en su columna (cualquier fuente o escala)
-        val headerLabels = listOfNotNull(
-            context.getString(R.string.label_current_gradient),
-            context.getString(R.string.label_avg_gradient_tramo),
-            if (showMaxGrade) context.getString(R.string.label_max_gradient_tramo) else null
-        )
-        for (lbl in headerLabels) fitTextToWidth(subTitleLabelPaint, lbl, colW - 8f, 8f)
-
-        // COLUMNA 1: PENDIENTE ACTUAL
-        val labelCurrentGrade = context.getString(R.string.label_current_gradient)
-        canvas.drawText(labelCurrentGrade, col1X, h * 0.14f, subTitleLabelPaint)
-
-        val liveGradeText = "%.1f%%".format(currentGrade)
-        liveGradePaint.textSize = ((h * 0.22f) * fontScale).coerceIn(36f, fsHiSmall(62f))
-        liveGradePaint.color = lightComp(GradeColorScale.getTelemetryColor(currentGrade))
-        fitTextToWidth(liveGradePaint, liveGradeText, colW - 8f, 24f)
-        canvas.drawText(liveGradeText, col1X, h * 0.27f, liveGradePaint)
-
-        // COLUMNA 2: PENDIENTE MEDIA DEL TRAMO VISIBLE
+        val headerPrefs = AppPreferences.getInstance(context)
+        val slotKeys = listOf(headerPrefs.headerStat1, headerPrefs.headerStat2, headerPrefs.headerStat3)
+            .take(if (showMaxGrade) 3 else 2)
         val tramoAvgGrade = if (visibleAvgGrade > 0.0) visibleAvgGrade else (if (subBlocks.isNotEmpty()) subBlocks.average() else (if (nextBlocks.isNotEmpty()) nextBlocks.average() else currentGrade))
-        val labelAvgGrade = context.getString(R.string.label_avg_gradient_tramo)
-        canvas.drawText(labelAvgGrade, col2X, h * 0.14f, subTitleLabelPaint)
-
-        val avgGradeText = "%.1f%%".format(tramoAvgGrade)
-        liveGradePaint.textSize = ((h * 0.18f) * fontScale).coerceIn(28f, fsHiSmall(50f))
-        liveGradePaint.color = lightComp(GradeColorScale.getTelemetryColor(tramoAvgGrade))
-        fitTextToWidth(liveGradePaint, avgGradeText, colW - 8f, 24f)
-        canvas.drawText(avgGradeText, col2X, h * 0.26f, liveGradePaint)
-
-        // COLUMNA 3: PENDIENTE MÁXIMA DEL TRAMO VISIBLE
-        if (showMaxGrade) {
-            val tramoMaxGrade = if (visibleMaxGrade > 0.0) visibleMaxGrade else (if (subBlocks.isNotEmpty()) subBlocks.maxOrNull()?.toDouble() ?: 12.8 else (if (nextBlocks.isNotEmpty()) nextBlocks.maxOrNull()?.toDouble() ?: 12.8 else 12.8))
-            val labelMaxGrade = context.getString(R.string.label_max_gradient_tramo)
-            canvas.drawText(labelMaxGrade, col3X, h * 0.14f, subTitleLabelPaint)
-
-            val maxGradeText = "%.1f%%".format(tramoMaxGrade)
-            maxGradePaint.textSize = ((h * 0.18f) * fontScale).coerceIn(28f, fsHiSmall(50f))
-            maxGradePaint.color = lightComp(GradeColorScale.getTelemetryColor(tramoMaxGrade))
-            fitTextToWidth(maxGradePaint, maxGradeText, colW - 8f, 24f)
-            canvas.drawText(maxGradeText, col3X, h * 0.26f, maxGradePaint)
+        val tramoMaxGrade = if (visibleMaxGrade > 0.0) visibleMaxGrade else (if (subBlocks.isNotEmpty()) subBlocks.maxOrNull()?.toDouble() ?: 12.8 else (if (nextBlocks.isNotEmpty()) nextBlocks.maxOrNull()?.toDouble() ?: 12.8 else 12.8))
+        val routeLeft = if (remainingDistance > 0.0) remainingDistance.coerceAtMost(routeTotalLength.coerceAtLeast(remainingDistance)) else 0.0
+        // Cada columna: etiqueta, texto y color del valor
+        val slots = slotKeys.map { key ->
+            when (key) {
+                AppPreferences.HEADER_STAT_AVG -> Triple(context.getString(R.string.label_avg_gradient_tramo), "%.1f%%".format(tramoAvgGrade), lightComp(GradeColorScale.getTelemetryColor(tramoAvgGrade)))
+                AppPreferences.HEADER_STAT_MAX -> Triple(context.getString(R.string.label_max_gradient_tramo), "%.1f%%".format(tramoMaxGrade), lightComp(GradeColorScale.getTelemetryColor(tramoMaxGrade)))
+                AppPreferences.HEADER_STAT_ROUTE -> Triple(context.getString(R.string.label_route_total).uppercase(), if (routeTotalLength > 0.0) formatRouteKm(routeTotalLength) else "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_LEFT -> Triple(context.getString(R.string.label_route_left).uppercase(), if (routeTotalLength > 0.0) formatRouteKm(routeLeft) else "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_DIST -> Triple(context.getString(R.string.label_header_dist), if (routeTotalLength > 0.0) formatRouteKm((routeTotalLength - routeLeft).coerceAtLeast(0.0)) else "--", lightComp(Color.WHITE))
+                else -> Triple(context.getString(R.string.label_current_gradient), "%.1f%%".format(currentGrade), lightComp(GradeColorScale.getTelemetryColor(currentGrade)))
+            }
         }
+        // Las etiquetas comparten tamaño y caben cada una en su columna (cualquier fuente o escala)
+        for (s in slots) fitTextToWidth(subTitleLabelPaint, s.first, colW - 8f, 8f)
+
+        // Etiqueta y valor centrados en su columna; las columnas reparten el ancho disponible (vertical o apaisado)
+        val prevLabelAlign = subTitleLabelPaint.textAlign
+        val prevValueAlign = liveGradePaint.textAlign
+        subTitleLabelPaint.textAlign = Paint.Align.CENTER
+        liveGradePaint.textAlign = Paint.Align.LEFT
+        val unitPaint = Paint(liveGradePaint)
+        val numRegex = Regex("^([-+]?[\\d.,]+)(.*)$")
+        for ((idx, s) in slots.withIndex()) {
+            val colCx = 16f + colW * idx + colW / 2f
+            canvas.drawText(s.first, colCx, h * 0.14f, subTitleLabelPaint)
+            val big = idx == 0
+            val key = slotKeys[idx]
+            val isDist = key == AppPreferences.HEADER_STAT_ROUTE || key == AppPreferences.HEADER_STAT_LEFT || key == AppPreferences.HEADER_STAT_DIST
+            // Route/Left algo más pequeños que la pendiente actual
+            liveGradePaint.textSize = if (isDist) ((h * 0.17f) * fontScale).coerceIn(24f, fsHiSmall(46f))
+                else if (big) ((h * 0.26f) * fontScale).coerceIn(40f, fsHiSmall(70f)) else ((h * 0.21f) * fontScale).coerceIn(32f, fsHiSmall(56f))
+            liveGradePaint.color = s.third
+            // La unidad (%, km) va pequeña y elevada, como un exponente, para dejar el número más grande
+            val m = numRegex.find(s.second)
+            val num = m?.groupValues?.get(1) ?: s.second
+            val unit = m?.groupValues?.get(2) ?: ""
+            val unitRatio = 0.5f
+            val gap = if (unit.isEmpty()) 0f else 2f
+            val maxW = colW - 8f
+            fun totalW(): Float = liveGradePaint.measureText(num) + (if (unit.isEmpty()) 0f else gap + liveGradePaint.measureText(unit) * unitRatio)
+            val wNow = totalW()
+            if (wNow > maxW && wNow > 0f) liveGradePaint.textSize = (liveGradePaint.textSize * maxW / wNow).coerceAtLeast(12f)
+            val numSize = liveGradePaint.textSize
+            val baseY = if (big) h * 0.27f else h * 0.26f
+            val startXc = colCx - totalW() / 2f
+            canvas.drawText(num, startXc, baseY, liveGradePaint)
+            if (unit.isNotEmpty()) {
+                unitPaint.typeface = liveGradePaint.typeface
+                unitPaint.textScaleX = liveGradePaint.textScaleX
+                unitPaint.color = liveGradePaint.color
+                unitPaint.setShadowLayer(0f, 0f, 0f, 0)
+                unitPaint.textSize = numSize * unitRatio
+                canvas.drawText(unit, startXc + liveGradePaint.measureText(num) + gap, baseY - numSize * 0.5f, unitPaint)
+            }
+        }
+        subTitleLabelPaint.textAlign = prevLabelAlign
+        liveGradePaint.textAlign = prevValueAlign
         } // Fin de if (showGradeStats)
         } // Fin de if (showHeaderStats)
 
@@ -1180,7 +1202,7 @@ class Altimetria3DView @JvmOverloads constructor(
             ascentPaceMetersPerHour?.let { context.getString(R.string.label_route_ascent_pace) to Units.climbRate(context, it) }
         )
         // Sin cabecera y con las flechas de paso abajo, los datos suben a la fila de los botones de zoom (entre las esquinas y el zoom)
-        val inZoomRow = !gradeHeaderShown && !rotate90 && !isClimbMode && panButtonsPosition != "top"
+        val inZoomRow = !gradeHeaderShown && !rotate90 && !isClimbMode && panButtonsPosition != "top" && !routeShowElevation
         val dp = resources.displayMetrics.density
         val zoomHalfW = 54f * dp
         var textSize = textSize0
@@ -1422,7 +1444,9 @@ class Altimetria3DView @JvmOverloads constructor(
         // Leyenda "Cada bloque = X / Cada sub-bloque = Y" bajo la gráfica (opcional: sin ella el perfil gana ese espacio)
         val legendShown = AppPreferences.getInstance(context).show3dBlockLegend
 
-        val startX = (w * 0.10f)
+        // En el perfil de puerto se deja el espacio para los números de cota; en la ruta global el perfil arranca pegado a la barra
+        val startX = if (isClimbMode) w * 0.10f
+            else 2.5f * resources.displayMetrics.density + (w * 0.012f).coerceIn(4f, 8f) + 1f
         val baseEndX = (w * 0.98f)
         val defaultGroundY = when {
             gradeHeaderShown -> h * 0.82f
@@ -1542,10 +1566,25 @@ class Altimetria3DView @JvmOverloads constructor(
                 fitAxisMin = axisMin
                 fitAxisSpan = span
             }
-            displayMinElev = fitAxisMin
-            finalElevRange = fitAxisSpan
+            // Transición suave hacia el eje objetivo (constante de tiempo ~3,5 s) en lugar de saltar de golpe
+            val nowN = System.nanoTime()
+            if (animAxisSpan <= 0f || animAxisLastNanos == 0L) {
+                animAxisMin = fitAxisMin; animAxisSpan = fitAxisSpan
+            } else {
+                val dt = ((nowN - animAxisLastNanos) / 1e9f).coerceIn(0f, 1.5f)
+                val k = 1f - Math.exp((-dt / 3.5f).toDouble()).toFloat()
+                animAxisMin += (fitAxisMin - animAxisMin) * k
+                animAxisSpan += (fitAxisSpan - animAxisSpan) * k
+                if (abs(fitAxisMin - animAxisMin) < 0.05f && abs(fitAxisSpan - animAxisSpan) < 0.05f) {
+                    animAxisMin = fitAxisMin; animAxisSpan = fitAxisSpan
+                } else postInvalidateOnAnimation()
+            }
+            animAxisLastNanos = nowN
+            displayMinElev = animAxisMin
+            finalElevRange = animAxisSpan
         } else {
             fitAxisSpan = 0f
+            animAxisSpan = 0f
             // Escala visual proporcional: un 15% de pendiente debe ocupar todo el alto.
             // Limitamos este rango mínimo a 250m para que rutas largas no queden planas.
             val minProportionalRange = (totalMetersAhead * 0.15f).toFloat().coerceAtMost(250f)
@@ -1644,11 +1683,18 @@ class Altimetria3DView @JvmOverloads constructor(
             val exaggeration = maxPeakHeight * totalMetersAhead.toFloat() / (finalElevRange * w)
             val tagPaint = Paint(axisTextPaint).apply { textAlign = Paint.Align.RIGHT }
             val label = if (exaggeration >= 10f) "%.0fx".format(exaggeration) else "%.1fx".format(exaggeration)
-            // Con los botones de paso arriba, la etiqueta se coloca a la izquierda del botón derecho para no quedar bajo él
-            val tagRight = if (panButtonsPosition == "top") {
-                w - (PAN_BTN_EDGE_DP * resources.displayMetrics.density + resources.getDimension(R.dimen.pan_btn_size)) - 6f
-            } else baseEndX - 6f
-            canvas.drawText(label, tagRight, baseGroundY - maxPeakHeight - 6f, tagPaint)
+            val tagY = baseGroundY - maxPeakHeight - 6f
+            // Con los datos de ruta a la derecha, la etiqueta pasa a la izquierda (sobre la cota más alta) para no solaparse
+            if (showRouteDistances && !routeInfoOnLeft) {
+                tagPaint.textAlign = Paint.Align.LEFT
+                canvas.drawText(label, 5f * resources.displayMetrics.density, tagY - axisTextPaint.textSize, tagPaint)
+            } else {
+                // Con los botones de paso arriba, la etiqueta se coloca a la izquierda del botón derecho para no quedar bajo él
+                val tagRight = if (panButtonsPosition == "top") {
+                    w - (PAN_BTN_EDGE_DP * resources.displayMetrics.density + resources.getDimension(R.dimen.pan_btn_size)) - 6f
+                } else baseEndX - 6f
+                canvas.drawText(label, tagRight, tagY, tagPaint)
+            }
         }
 
         // Fusión opcional de bloques vecinos del mismo color: una sola columna con la pendiente media del tramo
