@@ -779,6 +779,8 @@ class Altimetria3DView @JvmOverloads constructor(
     // Eje vertical ajustado: se conserva entre fotogramas y solo se recalcula cuando el perfil deja de caber
     private var fitAxisMin = 0f
     // Eje mostrado: sigue suavemente al eje objetivo (fitAxisMin/fitAxisSpan) para que el reajuste no dé un salto
+    // Verdadero mientras el eje vertical ajustado todavía se está moviendo hacia su valor final
+    val axisAnimating: Boolean get() = animAxisSpan > 0f && (abs(fitAxisMin - animAxisMin) >= 0.05f || abs(fitAxisSpan - animAxisSpan) >= 0.05f)
     private var animAxisMin = 0f
     private var animAxisSpan = 0f
     private var animAxisLastNanos = 0L
@@ -923,18 +925,30 @@ class Altimetria3DView @JvmOverloads constructor(
         return true
     }
 
-    // Sin botones de zoom: un toque acerca y un doble toque aleja
+    // Sin botones de zoom: los toques sueltos repiten el sentido actual (acercar al principio) y un doble toque lo invierte
+    private var tapZoomOut = false
+    private var tapPrevLookahead: Int? = null
+    private fun tapStep() { if (tapZoomOut) zoomOut() else zoomIn() }
+
     private val tapZoomDetector by lazy { android.view.GestureDetector(context, object : android.view.GestureDetector.SimpleOnGestureListener() {
         override fun onDown(e: MotionEvent): Boolean = true
-        // El primer toque acerca al instante (sin esperar al doble toque); el segundo deshace ese paso y aleja
         override fun onSingleTapUp(e: MotionEvent): Boolean {
             performClick()
-            zoomIn()
+            val before = lookaheadMeters
+            tapStep()
+            if (lookaheadMeters == before) { tapZoomOut = !tapZoomOut; tapStep() }
+            tapPrevLookahead = before
             return true
         }
         override fun onDoubleTap(e: MotionEvent): Boolean {
-            zoomOut()
-            zoomOut()
+            // Deshace el paso del primer toque, invierte el sentido y da un paso en el nuevo
+            tapPrevLookahead?.let {
+                lookaheadMeters = it
+                AppPreferences.getInstance(context).lookaheadMeters3d = it
+            }
+            tapPrevLookahead = null
+            tapZoomOut = !tapZoomOut
+            tapStep()
             return true
         }
     }) }
@@ -1855,7 +1869,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 canvas.drawLine(px, pyTop - 12f, px, pyBase, cotaLinePaint)
                 if (peakXs.any { abs(it - px) < 14f }) continue
                 
-                val cotaText = "${majorElevations[k].toInt()}"
+                val cotaText = Units.group(majorElevations[k].toLong())
                 canvas.save()
                 val textOffsetX = px + 6f
                 val textOffsetY = pyTop - 18f // Encima de la superficie del perfil

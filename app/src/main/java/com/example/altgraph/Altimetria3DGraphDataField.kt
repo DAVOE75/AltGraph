@@ -39,9 +39,13 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
     // Despierta el bucle de dibujo al pulsar zoom o paso de página
     private val refreshChannel = Channel<Unit>(Channel.CONFLATED)
 
-    // Zoom por toque: el primer toque acerca al instante; un segundo toque rápido lo deshace y aleja
+    // Zoom por toque: los toques sueltos repiten el sentido actual (acercar al principio); un doble toque rápido lo invierte
     private var lastTapAt = 0L
     private var tapPrevLookahead: Int? = null
+    private var tapZoomOut = false
+
+    private fun tapStep(curr: Int, routeMaxMeters: Int?): Int =
+        if (tapZoomOut) zoomOutStep(curr, routeMaxMeters) else zoomInStep(curr)
 
     private fun zoomInStep(curr: Int): Int = ZoomLadder.zoomIn(curr)
 
@@ -112,17 +116,20 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         val now = SystemClock.elapsedRealtime()
                         val curr = prefs.lookaheadMeters3d
                         if (tapPrevLookahead != null && now - lastTapAt <= DOUBLE_TAP_MS) {
-                            // Segundo toque rápido: deshace el acercamiento del primero y aleja un paso desde ahí
-                            prefs.lookaheadMeters3d = zoomOutStep(tapPrevLookahead!!, routeMaxMeters)
-                            tapPrevLookahead = null
-                        } else if (curr <= MIN_LOOKAHEAD_M) {
-                            // Zoom máximo alcanzado: el toque vuelve al nivel por defecto para no quedar atascado
-                            prefs.lookaheadMeters3d = DEFAULT_LOOKAHEAD_M
+                            // Doble toque rápido: deshace el paso del primer toque, invierte el sentido (acercar <-> alejar) y da un paso en el nuevo
+                            tapZoomOut = !tapZoomOut
+                            prefs.lookaheadMeters3d = tapStep(tapPrevLookahead!!, routeMaxMeters)
                             tapPrevLookahead = null
                         } else {
+                            // Toque suelto: un paso en el sentido actual; si ya no se puede seguir, el sentido se invierte solo
+                            var next = tapStep(curr, routeMaxMeters)
+                            if (next == curr) {
+                                tapZoomOut = !tapZoomOut
+                                next = tapStep(curr, routeMaxMeters)
+                            }
                             tapPrevLookahead = curr
                             lastTapAt = now
-                            prefs.lookaheadMeters3d = zoomInStep(curr)
+                            prefs.lookaheadMeters3d = next
                         }
                         prefs.smartZoomEnabled = false
                     } else if (intent?.action == ACTION_ZOOM_IN && ctx != null) {
@@ -202,7 +209,8 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         // Nada ha cambiado (parado, sin ruta...): no redibujar ni reenviar el bitmap.
                         // Es el campo más caro: render 3D por software y bitmap grande por Binder.
                         val frame = listOf(strategy, startElev, snap.instantBarometricGrade, snap.currentHeading, prefs.snapshot)
-                        if (frame == lastFrame) return@safeUpdate
+                        // El eje ajustado se anima entre redibujados: mientras se mueve hay que seguir pintando aunque no cambie nada más
+                        if (frame == lastFrame && !altimetria3DView.axisAnimating) return@safeUpdate
                         altimetria3DView.oasisDistanceToNextCrucible = strategy.oasisDistanceToNextCrucible
                         altimetria3DView.energyBatteryLevel = strategy.energyBatteryLevel
                 

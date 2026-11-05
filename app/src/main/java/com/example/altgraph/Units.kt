@@ -20,10 +20,13 @@ object Units {
 
     fun imperial(ctx: Context): Boolean = AppPreferences.getInstance(ctx).useImperialUnits
 
-    // Altitud o desnivel: "123m" / "404ft". rounded = redondear en vez de truncar (solo afecta a métricas)
+    // Miles con coma a partir de 4 cifras ("2,486"), siempre con coma sea cual sea el idioma del dispositivo
+    fun group(n: Long): String = String.format(Locale.US, "%,d", n)
+
+    // Altitud o desnivel: "123m" / "2,486m" / "404ft". rounded = redondear en vez de truncar (solo afecta a métricas)
     fun elev(ctx: Context, meters: Double, rounded: Boolean = false): String =
-        if (imperial(ctx)) "${(meters * M_TO_FT).roundToInt()}ft"
-        else "${if (rounded) meters.roundToInt() else meters.toInt()}m"
+        if (imperial(ctx)) "${group((meters * M_TO_FT).roundToInt().toLong())}ft"
+        else "${group(if (rounded) meters.roundToInt().toLong() else meters.toLong())}m"
 
     // Distancia en unidades imperiales: pies hasta ~1000 ft y millas a partir de ahí ("0.62mi", "12.4mi")
     fun distImperial(meters: Double, decimals: Int = 1): String {
@@ -36,7 +39,7 @@ object Units {
 
     // Ritmo de desnivel: "+420 m/h" / "+1380 ft/h" (en pies, a la decena más cercana)
     fun climbRate(ctx: Context, metersPerHour: Int): String =
-        if (imperial(ctx)) "+${(Math.round(metersPerHour * M_TO_FT / 10.0) * 10L)} ft/h" else "+$metersPerHour m/h"
+        if (imperial(ctx)) "+${group(Math.round(metersPerHour * M_TO_FT / 10.0) * 10L)} ft/h" else "+${group(metersPerHour.toLong())} m/h"
 
     private val NUMBER_PER_HOUR = Regex("(\\d+(?:[.,]\\d+)?)(\\s?)m/h")
     private val NUMBER_UNIT = Regex("(\\d+(?:[.,]\\d+)?)(\\s?)(km|m)\\b(?![/\\w])")
