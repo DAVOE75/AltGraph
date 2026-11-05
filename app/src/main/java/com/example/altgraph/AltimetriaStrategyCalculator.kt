@@ -209,6 +209,7 @@ class AltimetriaStrategyCalculator {
     var currentLatitude = 0.0
     var currentLongitude = 0.0
     var currentSpeed = 0.0
+    var rideAverageSpeed = 0.0
     var currentElevation = 350.0
     var viewWidth = 480
 

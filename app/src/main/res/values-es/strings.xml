@@ -285,6 +285,7 @@
     <string name="voice_climb_km_progress">Kilómetro %1$s de puerto. Pendiente actual del %2$s por ciento.</string>
     <string name="voice_climb_summit_near">Cima a %1$s metros.</string>
     <string name="voice_steep_ahead">El puerto se endurece: próximos %1$s metros al %2$s por ciento de media.</string>
+    <string name="voice_steep_max">Con rampas máximas del %1$s por ciento.</string>
     <string name="voice_wall_ahead">Atención: Muro del %1$s por ciento en %2$s metros.</string>
     <string name="voice_hairpin_ahead">Curva de herradura %1$s en %2$s metros al %3$s por ciento.</string>
     <string name="voice_hairpin_descent">Precaución: curva cerrada %1$s en %2$s metros.</string>
@@ -293,6 +294,8 @@
     <string name="voice_slope_relief">Descanso: la pendiente suaviza durante los próximos %1$s metros.</string>
     <string name="voice_elevation_milestone">Desnivel positivo acumulado: %1$s metros. Altitud actual: %2$s metros.</string>
     <string name="voice_periodic_summary">Resumen de ruta. Distancia %1$s kilómetros. Velocidad media %2$s kilómetros por hora. Desnivel acumulado %3$s metros.</string>
+    <string name="voice_summary_to_finish">Faltan %1$s para meta.</string>
+    <string name="voice_summary_next_climb">Inicio del próximo puerto de montaña a %1$s.</string>
     <string name="voice_cadence_low">Cadencia baja: %1$s pedaladas. Aligera desarrollo.</string>
     <string name="voice_wbal_warning">Reserva anaeróbica baja: queda el %1$s por ciento.</string>
     <string name="voice_kghost_lead">Liderando: llevas al Ghost %1$s por detrás, a %2$s.</string>
@@ -466,7 +469,9 @@
     <string name="setting_show_eta_desc">Estima la hora de llegada a meta con tu velocidad media en movimiento (unos 10 minutos de memoria) y la distancia que queda. Desactivado por defecto.</string>
     <string name="elite_voice_climb_summary_title">Resumen al coronar el puerto</string>
     <string name="elite_voice_climb_summary_desc">Al terminar un puerto, anuncia tu tiempo, la pendiente media y la VAM. Requiere tener activado el aviso de puertos.</string>
-    <string name="voice_climb_summary">Cima. Tiempo en el puerto: %1$s. Pendiente media %2$s por ciento. VAM %3$s metros por hora.</string>
+    <string name="voice_climb_summit_altitude">Cima %1$s, %2$s metros.</string>
+    <string name="voice_climb_summary">Tiempo en el puerto: %1$s. Pendiente media %2$s por ciento. VAM %3$s metros por hora.</string>
+    <string name="voice_climb_summary_cadence">Cadencia media %1$s pedaladas por minuto.</string>
     <string name="label_route_ascent_pace">Desnivel/h</string>
     <string name="setting_show_ascent_pace">Mostrar ritmo de desnivel (m/h)</string>
     <string name="setting_show_ascent_pace_desc">Desnivel subido desde el inicio de la ruta dividido por tu tiempo en movimiento. Necesita 5 minutos de marcha. Desactivado por defecto.</string>

@@ -258,6 +258,7 @@
     <string name="voice_climb_km_progress">Quilómetro %1$s de subida. Inclinação atual de %2$s por cento.</string>
     <string name="voice_climb_summit_near">Cume a %1$s metros.</string>
     <string name="voice_steep_ahead">A subida agrava-se: próximos %1$s metros a %2$s por cento de média.</string>
+    <string name="voice_steep_max">Com rampas máximas de %1$s por cento.</string>
     <string name="voice_wall_ahead">Atenção: Muro de %1$s por cento em %2$s metros.</string>
     <string name="voice_hairpin_ahead">Curva em gancho %1$s em %2$s metros a %3$s por cento.</string>
     <string name="voice_hairpin_descent">Atenção: curva fechada %1$s em %2$s metros.</string>
@@ -266,6 +267,8 @@
     <string name="voice_slope_relief">Descanso: a inclinação suaviza durante os próximos %1$s metros.</string>
     <string name="voice_elevation_milestone">Desnível acumulado: %1$s metros. Altitude atual: %2$s metros.</string>
     <string name="voice_periodic_summary">Resumo de volta. Distância %1$s quilómetros. Velocidade média %2$s quilómetros por hora. Desnível acumulado %3$s metros.</string>
+    <string name="voice_summary_to_finish">Faltam %1$s para a meta.</string>
+    <string name="voice_summary_next_climb">Início da próxima subida de montanha a %1$s.</string>
     <string name="voice_cadence_low">Cadência baixa: %1$s rotações. Engrena uma relação mais leve.</string>
     <string name="voice_wbal_warning">Reserva anaeróbica baixa: resta %1$s por cento.</string>
     <string name="voice_kghost_lead">Na frente: o Ghost está %1$s atrás, diferença %2$s.</string>
@@ -439,7 +442,9 @@
     <string name="setting_show_eta_desc">Estima a hora de chegada à meta com a tua velocidade média em movimento (cerca de 10 minutos de memória) e a distância restante. Desativado por defeito.</string>
     <string name="elite_voice_climb_summary_title">Resumo ao coroar a subida</string>
     <string name="elite_voice_climb_summary_desc">Ao terminar uma subida, anuncia o teu tempo, a inclinação média e a VAM. Requer o aviso de subidas ativado.</string>
-    <string name="voice_climb_summary">Cume. Tempo na subida: %1$s. Inclinação média %2$s por cento. VAM %3$s metros por hora.</string>
+    <string name="voice_climb_summit_altitude">Cume %1$s, %2$s metros.</string>
+    <string name="voice_climb_summary">Tempo na subida: %1$s. Inclinação média %2$s por cento. VAM %3$s metros por hora.</string>
+    <string name="voice_climb_summary_cadence">Cadência média %1$s rotações por minuto.</string>
     <string name="label_route_ascent_pace">Desnível/h</string>
     <string name="setting_show_ascent_pace">Mostrar ritmo de desnível (m/h)</string>
     <string name="setting_show_ascent_pace_desc">Desnível subido desde o início da rota dividido pelo teu tempo em movimento. Precisa de 5 minutos de marcha. Desativado por defeito.</string>

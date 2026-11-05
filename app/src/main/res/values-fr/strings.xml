@@ -258,6 +258,7 @@
     <string name="voice_climb_km_progress">Kilomètre %1$s du col. Pente actuelle %2$s pour cent.</string>
     <string name="voice_climb_summit_near">Sommet à %1$s mètres.</string>
     <string name="voice_steep_ahead">La pente se durcit : prochains %1$s mètres à %2$s pour cent de moyenne.</string>
+    <string name="voice_steep_max">Avec des rampes jusqu\'à %1$s pour cent.</string>
     <string name="voice_wall_ahead">Attention : Mur de %1$s pour cent dans %2$s mètres.</string>
     <string name="voice_hairpin_ahead">Virage en épingle %1$s dans %2$s mètres à %3$s pour cent.</string>
     <string name="voice_hairpin_descent">Attention : virage serré %1$s dans %2$s mètres.</string>
@@ -266,6 +267,8 @@
     <string name="voice_slope_relief">Replat : la pente s\'adoucit sur les prochains %1$s mètres.</string>
     <string name="voice_elevation_milestone">Dénivelé positif : %1$s mètres. Altitude actuelle : %2$s mètres.</string>
     <string name="voice_periodic_summary">Point parcours. Distance %1$s kilomètres. Vitesse moyenne %2$s km/h. Dénivelé cumulé %3$s mètres.</string>
+    <string name="voice_summary_to_finish">Encore %1$s avant l\'arrivée.</string>
+    <string name="voice_summary_next_climb">Début du prochain col dans %1$s.</string>
     <string name="voice_cadence_low">Cadence faible : %1$s tr/min. Rétrogradez.</string>
     <string name="voice_wbal_warning">Réserve anaérobie faible : reste %1$s pour cent.</string>
     <string name="voice_kghost_lead">En tête : vous devancez le Ghost de %1$s, écart %2$s.</string>
@@ -439,7 +442,9 @@
     <string name="setting_show_eta_desc">Estime l\'heure d\'arrivée avec ta vitesse moyenne en mouvement (environ les 10 dernières minutes) et la distance restante. Désactivé par défaut.</string>
     <string name="elite_voice_climb_summary_title">Résumé au sommet</string>
     <string name="elite_voice_climb_summary_desc">Après le sommet, annonce ton temps, la pente moyenne et la VAM. Nécessite les annonces de cols activées.</string>
-    <string name="voice_climb_summary">Sommet. Temps dans le col : %1$s. Pente moyenne %2$s pour cent. VAM %3$s mètres par heure.</string>
+    <string name="voice_climb_summit_altitude">Sommet %1$s, %2$s mètres.</string>
+    <string name="voice_climb_summary">Temps dans le col : %1$s. Pente moyenne %2$s pour cent. VAM %3$s mètres par heure.</string>
+    <string name="voice_climb_summary_cadence">Cadence moyenne %1$s tours par minute.</string>
     <string name="label_route_ascent_pace">Dénivelé/h</string>
     <string name="setting_show_ascent_pace">Afficher le rythme de dénivelé (m/h)</string>
     <string name="setting_show_ascent_pace_desc">Dénivelé gravi depuis le début du parcours divisé par ton temps en mouvement. Nécessite 5 minutes de roulage. Désactivé par défaut.</string>

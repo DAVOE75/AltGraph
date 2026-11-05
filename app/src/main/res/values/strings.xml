@@ -285,6 +285,7 @@
     <string name="voice_climb_km_progress">Climb kilometer %1$s. Current grade %2$s percent.</string>
     <string name="voice_climb_summit_near">Summit in %1$s meters.</string>
     <string name="voice_steep_ahead">Slope steepens: next %1$s meters at %2$s percent average.</string>
+    <string name="voice_steep_max">With ramps up to %1$s percent.</string>
     <string name="voice_wall_ahead">Warning: Wall of %1$s percent in %2$s meters.</string>
     <string name="voice_hairpin_ahead">Hairpin bend %1$s in %2$s meters at %3$s percent.</string>
     <string name="voice_hairpin_descent">Caution: sharp turn %1$s in %2$s meters.</string>
@@ -293,6 +294,8 @@
     <string name="voice_slope_relief">Relief: gentler slope ahead for next %1$s meters.</string>
     <string name="voice_elevation_milestone">Elevation gained: %1$s meters. Current altitude: %2$s meters.</string>
     <string name="voice_periodic_summary">Ride update. Distance %1$s kilometers. Average speed %2$s km/h. Elevation gained %3$s meters.</string>
+    <string name="voice_summary_to_finish">%1$s to the finish.</string>
+    <string name="voice_summary_next_climb">Next mountain climb starts in %1$s.</string>
     <string name="voice_cadence_low">Low cadence: %1$s rpm. Shift to an easier gear.</string>
     <string name="voice_wbal_warning">Anaerobic reserve low: %1$s percent remaining.</string>
     <string name="voice_kghost_lead">Leading: Ghost is %1$s behind, gap %2$s.</string>
@@ -466,7 +469,9 @@
     <string name="setting_show_eta_desc">Estimates the finish time from your average moving speed (about the last 10 minutes) and the remaining distance. Off by default.</string>
     <string name="elite_voice_climb_summary_title">Climb summary at the summit</string>
     <string name="elite_voice_climb_summary_desc">After topping a climb, announces your time on it, the average gradient and the VAM. Needs Climb announcements on.</string>
-    <string name="voice_climb_summary">Summit. Climb time: %1$s. Average gradient %2$s percent. VAM %3$s meters per hour.</string>
+    <string name="voice_climb_summit_altitude">Summit %1$s, %2$s meters.</string>
+    <string name="voice_climb_summary">Climb time: %1$s. Average gradient %2$s percent. VAM %3$s meters per hour.</string>
+    <string name="voice_climb_summary_cadence">Average cadence %1$s rpm.</string>
     <string name="label_route_ascent_pace">Climb rate</string>
     <string name="setting_show_ascent_pace">Show climbing rate (m/h)</string>
     <string name="setting_show_ascent_pace_desc">Elevation gained since the start of the route divided by your moving time. Needs 5 minutes of riding. Off by default.</string>

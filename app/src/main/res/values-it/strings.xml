@@ -258,6 +258,7 @@
     <string name="voice_climb_km_progress">Chilometro %1$s di salita. Pendenza attuale del %2$s per cento.</string>
     <string name="voice_climb_summit_near">Cima a %1$s metri.</string>
     <string name="voice_steep_ahead">La salita si indurisce: prossimi %1$s metri al %2$s per cento di media.</string>
+    <string name="voice_steep_max">Con rampe fino al %1$s per cento.</string>
     <string name="voice_wall_ahead">Attenzione: Muro del %1$s per cento tra %2$s metri.</string>
     <string name="voice_hairpin_ahead">Tornante %1$s tra %2$s metri al %3$s per cento.</string>
     <string name="voice_hairpin_descent">Attenzione: curva a gomito %1$s tra %2$s metri.</string>
@@ -266,6 +267,8 @@
     <string name="voice_slope_relief">Tratto di riposo: la pendenza diminuisce per i prossimi %1$s metri.</string>
     <string name="voice_elevation_milestone">Dislivello positivo accumulato: %1$s metri. Altitudine attuale: %2$s metri.</string>
     <string name="voice_periodic_summary">Riepilogo percorso. Distanza %1$s chilometri. Velocità media %2$s chilometri orari. Dislivello accumulato %3$s metri.</string>
+    <string name="voice_summary_to_finish">Mancano %1$s al traguardo.</string>
+    <string name="voice_summary_next_climb">Inizio della prossima salita tra %1$s.</string>
     <string name="voice_cadence_low">Cadenza bassa: %1$s pedalate. Alleggerisci il rapporto.</string>
     <string name="voice_wbal_warning">Riserva anaerobica bassa: rimane il %1$s per cento.</string>
     <string name="voice_kghost_lead">In testa: il Ghost è %1$s dietro, distacco %2$s.</string>
@@ -439,7 +442,9 @@
     <string name="setting_show_eta_desc">Stima l\'ora di arrivo con la tua velocità media in movimento (circa gli ultimi 10 minuti) e la distanza rimanente. Disattivato di default.</string>
     <string name="elite_voice_climb_summary_title">Riepilogo in vetta</string>
     <string name="elite_voice_climb_summary_desc">Dopo la vetta annuncia il tuo tempo, la pendenza media e la VAM. Richiede gli avvisi delle salite attivi.</string>
-    <string name="voice_climb_summary">Vetta. Tempo in salita: %1$s. Pendenza media %2$s per cento. VAM %3$s metri all\'ora.</string>
+    <string name="voice_climb_summit_altitude">Vetta %1$s, %2$s metri.</string>
+    <string name="voice_climb_summary">Tempo in salita: %1$s. Pendenza media %2$s per cento. VAM %3$s metri all\'ora.</string>
+    <string name="voice_climb_summary_cadence">Cadenza media %1$s pedalate al minuto.</string>
     <string name="label_route_ascent_pace">Dislivello/h</string>
     <string name="setting_show_ascent_pace">Mostra il ritmo di dislivello (m/h)</string>
     <string name="setting_show_ascent_pace_desc">Dislivello salito dall\'inizio del percorso diviso per il tuo tempo in movimento. Servono 5 minuti di marcia. Disattivato di default.</string>

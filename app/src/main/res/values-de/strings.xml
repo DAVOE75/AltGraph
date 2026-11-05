@@ -258,6 +258,7 @@
     <string name="voice_climb_km_progress">Kilometer %1$s des Anstiegs. Aktuelle Steigung %2$s Prozent.</string>
     <string name="voice_climb_summit_near">Gipfel in %1$s Metern.</string>
     <string name="voice_steep_ahead">Anstieg wird steiler: nächste %1$s Meter bei %2$s Prozent im Schnitt.</string>
+    <string name="voice_steep_max">Mit Rampen von bis zu %1$s Prozent.</string>
     <string name="voice_wall_ahead">Achtung: Steilwand mit %1$s Prozent in %2$s Metern.</string>
     <string name="voice_hairpin_ahead">Serpentine %1$s in %2$s Metern bei %3$s Prozent.</string>
     <string name="voice_hairpin_descent">Vorsicht: scharfe Kurve %1$s in %2$s Metern.</string>
@@ -266,6 +267,8 @@
     <string name="voice_slope_relief">Erholung: Steigung flacht für die nächsten %1$s Meter ab.</string>
     <string name="voice_elevation_milestone">Höhenmeter erreicht: %1$s Meter. Aktuelle Höhe: %2$s Meter.</string>
     <string name="voice_periodic_summary">Fahrtzusammenfassung. Distanz %1$s Kilometer. Durchschnittsgeschwindigkeit %2$s km/h. Höhenmeter %3$s Meter.</string>
+    <string name="voice_summary_to_finish">Noch %1$s bis ins Ziel.</string>
+    <string name="voice_summary_next_climb">Beginn des nächsten Bergs in %1$s.</string>
     <string name="voice_cadence_low">Niedrige Trittfrequenz: %1$s Umdrehungen. Kleineren Gang wählen.</string>
     <string name="voice_wbal_warning">Anaerobe Reserve niedrig: noch %1$s Prozent übrig.</string>
     <string name="voice_kghost_lead">In Führung: Ghost liegt %1$s zurück, Abstand %2$s.</string>
@@ -439,7 +442,9 @@
     <string name="setting_show_eta_desc">Schätzt die Zielzeit aus deiner durchschnittlichen Fahrgeschwindigkeit (etwa die letzten 10 Minuten) und der Restdistanz. Standardmäßig aus.</string>
     <string name="elite_voice_climb_summary_title">Zusammenfassung am Gipfel</string>
     <string name="elite_voice_climb_summary_desc">Nach dem Gipfel werden deine Zeit, die durchschnittliche Steigung und die VAM angesagt. Erfordert aktivierte Anstiegsansagen.</string>
-    <string name="voice_climb_summary">Gipfel. Zeit im Anstieg: %1$s. Durchschnittliche Steigung %2$s Prozent. VAM %3$s Höhenmeter pro Stunde.</string>
+    <string name="voice_climb_summit_altitude">Gipfel %1$s, %2$s Meter.</string>
+    <string name="voice_climb_summary">Zeit im Anstieg: %1$s. Durchschnittliche Steigung %2$s Prozent. VAM %3$s Höhenmeter pro Stunde.</string>
+    <string name="voice_climb_summary_cadence">Durchschnittliche Trittfrequenz %1$s Umdrehungen pro Minute.</string>
     <string name="label_route_ascent_pace">Höhenmeter/h</string>
     <string name="setting_show_ascent_pace">Steigrate (m/h) anzeigen</string>
     <string name="setting_show_ascent_pace_desc">Seit Routenbeginn gewonnene Höhenmeter geteilt durch deine Fahrzeit. Benötigt 5 Minuten Fahrt. Standardmäßig aus.</string>

@@ -774,6 +774,7 @@ class Altimetria3DView @JvmOverloads constructor(
     private val gradeHeaderShown: Boolean get() = showHeaderStats && showGradeStats
     // Y de la línea de altitud más alta del perfil (-1 si el estilo no la calcula); el texto de distancias se coloca bajo ella
     private var profileTopLineY: Float = -1f
+    private var profileGridStepY: Float = 0f
     private var currentFontKey: String = "sans-serif-condensed"
 
     // Eje vertical ajustado: se conserva entre fotogramas y solo se recalcula cuando el perfil deja de caber
@@ -1239,7 +1240,14 @@ class Altimetria3DView @JvmOverloads constructor(
         val baseBaseline = if (inZoomRow) {
             val rowCenter = 16f * dp + 24f * dp
             rowCenter - (lineH + textSize) / 2f + textSize
-        } else if (profileTopLineY > 0f) profileTopLineY + textSize * 1.15f + 6f
+        } else if (profileTopLineY > 0f) {
+            // Centrado entre la línea de puntos superior y la siguiente; si el bloque no cabe, pegado a la superior
+            val capH = textSize * 1.15f * 0.72f
+            val centered = profileTopLineY + profileGridStepY / 2f - ((lines.size - 1) * lineH - capH) / 2f
+            if (profileGridStepY > 0f && centered - capH >= profileTopLineY + 3f &&
+                centered + (lines.size - 1) * lineH <= profileTopLineY + profileGridStepY - 3f) centered
+            else profileTopLineY + textSize * 1.15f + 6f
+        }
             else if (gradeHeaderShown) h * 0.33f else (h * 0.15f).coerceIn(28f, 44f) + 22f
         // Con los botones de paso arriba, los datos bajan un poco para quedar justo debajo de ellos y no pisarlos
         val firstBaseline = if (panButtonsPosition == "top" && !isClimbMode) {
@@ -1529,6 +1537,7 @@ class Altimetria3DView @JvmOverloads constructor(
             (baseGroundY - (zoomBottomY + gearTopBadgeH + (if (rotate90) 6f else 12f))).coerceAtLeast(h * 0.3f)
         } else defaultPeakHeight + freedBottom
         profileTopLineY = baseGroundY - maxPeakHeight
+        profileGridStepY = maxPeakHeight / 4f
 
         // Desplazamiento oblicuo 3D sutil y elegante (profundidad reducida a petición del usuario)
         val depth3dX = (w * 0.012f).coerceIn(4f, 8f)

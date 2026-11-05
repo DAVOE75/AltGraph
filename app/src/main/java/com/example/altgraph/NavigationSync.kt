@@ -15,6 +15,7 @@ object NavigationSync {
     /** Streams que el repositorio debe suscribir. */
     val STREAM_TYPES: List<String> = listOf(
         DataType.Type.SPEED,
+        DataType.Type.AVERAGE_SPEED,
         DataType.Type.PRESSURE_ELEVATION_CORRECTION,
         DataType.Type.ELEVATION_GRADE,
         DataType.Type.POWER,
@@ -87,6 +88,9 @@ object NavigationSync {
                 val speed = values[DataType.Field.SPEED] ?: single ?: 0.0
                 // Log.v(TAG, "STREAM SPEED: $speed m/s") // Opcional, puede generar mucho ruido
                 calc.currentSpeed = speed
+            }
+            DataType.Type.AVERAGE_SPEED -> {
+                calc.rideAverageSpeed = values[DataType.Field.SPEED] ?: single ?: 0.0
             }
             DataType.Type.PRESSURE_ELEVATION_CORRECTION -> {
                 val elev = values[DataType.Field.PRESSURE_ELEVATION] ?: single ?: 0.0

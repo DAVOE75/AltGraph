@@ -56,6 +56,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     private val speechQueue = ArrayDeque<Pair<String, Long>>()
     private var isSpeaking = false
     private var speakStartedMs = 0L
+    private var speakTimeoutMs = 20_000L
     private var lastTtsInitAttemptMs = 0L
 
     // Control anti-spam: marcas de tiempo y distancias para no saturar
@@ -67,6 +68,8 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     private var lastAnnouncedKmInClimb = -1
     // Resumen al coronar: instante de entrada en cada puerto y último puerto resumido
     private val climbEnterMs = mutableMapOf<Int, Long>()
+    private val climbCadenceSum = mutableMapOf<Int, Double>()
+    private val climbCadenceCount = mutableMapOf<Int, Int>()
     private var lastSummarizedClimbIndex = -1
     private var lastAnnouncedSteepDistance = -10000.0
     private var lastAnnouncedReliefDistance = -10000.0
@@ -105,6 +108,8 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
     // Estadísticas acumuladas de la sesión para cálculo de media real
     private var rideMovingTimeSeconds = 0L
     private var rideDistanceMetersAccumulated = 0.0
+    private var rideCadenceSum = 0.0
+    private var rideCadenceCount = 0
     private var lastAnnouncedFinishKm = Int.MAX_VALUE
     private var lastAnnouncedSurfaceIndex = -1
 
@@ -238,8 +243,8 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
 
     private fun processNextInQueue() {
         // Vigilante: si el TTS no notificó el fin de la locución (onDone perdido), no se queda mudo para siempre
-        if (isSpeaking && (System.currentTimeMillis() - speakStartedMs) > 20_000L) {
-            Log.w(TAG, "TTS sin onDone tras 20 s: se libera la cola")
+        if (isSpeaking && (System.currentTimeMillis() - speakStartedMs) > speakTimeoutMs) {
+            Log.w(TAG, "TTS sin onDone tras ${speakTimeoutMs / 1000} s: se libera la cola")
             isSpeaking = false
         }
         if (isSpeaking) return
@@ -280,6 +285,8 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
         requestAudioFocus()
         lastSpokenTimeMs = System.currentTimeMillis()
         speakStartedMs = lastSpokenTimeMs
+        // Las frases largas (resumen de ruta) tardan más de 20 s: el vigilante se adapta a la longitud
+        speakTimeoutMs = (15_000L + next.length * 120L / prefs.voiceSpeechRate.coerceAtLeast(0.5f)).toLong().coerceAtLeast(20_000L)
         isSpeaking = true
         Log.i(TAG, "Aviso: $next")
 
@@ -363,6 +370,10 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
          if (speed > 0.8) {
              rideMovingTimeSeconds += 1L
              rideDistanceMetersAccumulated += speed
+             if (strategy.currentCadence > 0.0) {
+                 rideCadenceSum += strategy.currentCadence
+                 rideCadenceCount += 1
+             }
          }
 
          // Acumular ganancia de elevación estimada con histéresis: el ruido y la deriva lenta del barómetro (subidas y
@@ -388,6 +399,13 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
 
                  // Resumen al coronar: tiempo en el puerto, pendiente media y VAM
                  if (prefs.voiceClimbSummaryEnabled) {
+                     if (currentDist >= climb.startDistance && currentDist < climb.endDistance) {
+                         val cadNow = strategy.currentCadence
+                         if (cadNow > 0.0) {
+                             climbCadenceSum[idx] = (climbCadenceSum[idx] ?: 0.0) + cadNow
+                             climbCadenceCount[idx] = (climbCadenceCount[idx] ?: 0) + 1
+                         }
+                     }
                      if (currentDist >= climb.startDistance && currentDist < climb.endDistance && idx !in climbEnterMs) {
                          climbEnterMs[idx] = System.currentTimeMillis()
                      }
@@ -398,12 +416,19 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                          // Solo si se vivió el puerto desde dentro (no si se salta a mitad) y duró un mínimo
                          if (seconds >= 30L && climb.totalElevation > 0.0) {
                              val vam = (climb.totalElevation / (seconds / 3600.0)).toInt()
-                             val phrase = context.getString(
+                             val summitName = climb.name ?: (context.getString(R.string.profile_tv_climb_item_prefix) + " " + (idx + 1))
+                             val summitAltitude = Math.round(elev)
+                             var phrase = context.getString(R.string.voice_climb_summit_altitude, summitName, summitAltitude.toString()) + " " + context.getString(
                                  R.string.voice_climb_summary,
                                  formatTimeVoice(seconds),
                                  String.format(Locale.getDefault(), "%.1f", climb.avgGrade),
                                  vam.toString()
                              )
+                             val cadCount = climbCadenceCount[idx] ?: 0
+                             if (cadCount >= 10) {
+                                 val avgCad = Math.round((climbCadenceSum[idx] ?: 0.0) / cadCount)
+                                 phrase += " " + context.getString(R.string.voice_climb_summary_cadence, avgCad.toString())
+                             }
                              speak(phrase, priority = true)
                          }
                      }
@@ -492,7 +517,17 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                      } else {
                          String.format(Locale.getDefault(), "%.1f", rounded)
                      }
-                     val phrase = context.getString(R.string.voice_steep_ahead, meters.toString(), gradeFormatted)
+                     var phrase = context.getString(R.string.voice_steep_ahead, meters.toString(), gradeFormatted)
+                     val maxUpcoming = strategy.subBlocksMax.drop(riderIdx).take(lookAheadCount).maxOrNull()?.toDouble() ?: 0.0
+                     val maxRounded = Math.round(maxUpcoming * 10.0) / 10.0
+                     if (maxRounded >= rounded + 1.0) {
+                         val maxFormatted = if (maxRounded % 1.0 == 0.0) {
+                             String.format(Locale.getDefault(), "%.0f", maxRounded)
+                         } else {
+                             String.format(Locale.getDefault(), "%.1f", maxRounded)
+                         }
+                         phrase += " " + context.getString(R.string.voice_steep_max, maxFormatted)
+                     }
                      speak(phrase, priority = false)
                  } else if (strategy.visibleAvgGrade >= 8.0 && avgUpcoming < 3.5 && (currentDist - lastAnnouncedReliefDistance) > 2000.0) {
                      // Descansillo / Alivio de pendiente en subida
@@ -568,15 +603,32 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
              if (currentKm >= intervalKm && (currentKm - lastPeriodicDistanceKm) >= intervalKm) {
                  lastPeriodicDistanceKm = currentKm
                  val distStr = String.format(Locale.getDefault(), "%.0f", currentKm)
-                 // Media real = distancia acumulada / tiempo en movimiento
-                 val avgSpeedKmh = if (rideMovingTimeSeconds > 5) {
+                 // Media real del Karoo (m/s); si no llega, distancia acumulada / tiempo en movimiento
+                 val avgSpeedKmh = if (snapshot.rideAverageSpeed > 0.3) {
+                     snapshot.rideAverageSpeed * 3.6
+                 } else if (rideMovingTimeSeconds > 5) {
                      ((rideDistanceMetersAccumulated / rideMovingTimeSeconds) * 3.6).coerceIn(5.0, 70.0)
                  } else {
                      (speed * 3.6).coerceAtLeast(0.0)
                  }
                  val speedStr = String.format(Locale.getDefault(), "%.1f", avgSpeedKmh)
                  val elevGainStr = estimatedElevationGain.toInt().toString()
-                 val phrase = context.getString(R.string.voice_periodic_summary, distStr, speedStr, elevGainStr)
+                 var phrase = context.getString(R.string.voice_periodic_summary, distStr, speedStr, elevGainStr)
+                 if (rideCadenceCount >= 10) {
+                     val avgCad = Math.round(rideCadenceSum / rideCadenceCount)
+                     phrase += " " + context.getString(R.string.voice_climb_summary_cadence, avgCad.toString())
+                 }
+                 val remainingToFinish = snapshot.routeTotalLength - currentDist
+                 if (snapshot.routeTotalLength > 0.0 && remainingToFinish >= 100.0) {
+                     phrase += " " + context.getString(R.string.voice_summary_to_finish, formatDistanceVoice(remainingToFinish.toInt()))
+                 }
+                 val nextClimb = climbs.filter { it.startDistance > currentDist }.minByOrNull { it.startDistance }
+                 if (nextClimb != null) {
+                     val toNext = nextClimb.startDistance - currentDist
+                     if (toNext >= 100.0) {
+                         phrase += " " + context.getString(R.string.voice_summary_next_climb, formatDistanceVoice(toNext.toInt()))
+                     }
+                 }
                  speak(phrase, priority = false)
              }
          }
