@@ -456,21 +456,56 @@ class AltimetriaStrategyCalculator {
             var minEffectiveDist = Double.MAX_VALUE
             var realMinDistance = Double.MAX_VALUE
             
-            val isLost = (nearestIndex != 0 && routePoints.isNotEmpty() && Math.hypot(lat - routePoints[nearestIndex].latitude, lng - routePoints[nearestIndex].longitude) > 0.005) // approx 500m
-            val searchStart = if (nearestIndex == 0 || isLost) 0 else (nearestIndex - 20).coerceAtLeast(0)
-            val searchEnd = if (nearestIndex == 0 || isLost) routePoints.size else (nearestIndex + 500).coerceAtMost(routePoints.size)
-            
+            // 1. Detección de inicio de ruta: si estamos al principio (nearestIndex == 0 o distancia < 500m)
+            // y la posición GPS está a menos de 500m del punto 0 de la ruta, estamos EN LA SALIDA.
+            // Para evitar que en rutas circulares o de ida/vuelta salte a la meta (que coincide en GPS),
+            // se restringe la búsqueda exclusivamente al primer tramo de la ruta (máx 1500m de avance o 30 puntos).
+            val distToStart = planarDistM(lat to lng, routePoints[0].latitude to routePoints[0].longitude)
+            val atStart = (nearestIndex == 0 || currentRouteDistance < 500.0) && distToStart <= 500.0
+
+            val curPt = routePoints[nearestIndex.coerceIn(0, routePoints.size - 1)]
+            val distToCur = planarDistM(lat to lng, curPt.latitude to curPt.longitude)
+            val isLost = !atStart && nearestIndex != 0 && distToCur > 300.0
+
+            val searchStart: Int
+            val searchEnd: Int
+
+            if (atStart) {
+                searchStart = 0
+                var endIdx = 0
+                while (endIdx < routePoints.size && (routePoints[endIdx].distance <= 1500.0 || endIdx < 30)) {
+                    endIdx++
+                }
+                searchEnd = endIdx.coerceAtMost(routePoints.size)
+            } else if (isLost) {
+                searchStart = (nearestIndex - 50).coerceAtLeast(0)
+                searchEnd = routePoints.size
+            } else {
+                // Avance normal: acotado a la distancia física razonable que puede recorrer un ciclista.
+                // Retroceso: hasta 25 puntos atrás para absorber paradas o retrocesos sin rezagarse.
+                searchStart = (nearestIndex - 25).coerceAtLeast(0)
+
+                // Avance: hasta 250m de ruta por delante (o 25 puntos).
+                // Al limitar el avance a 250m de distancia de ruta, es FÍSICAMENTE IMPOSIBLE que salte
+                // a la bajada de un puerto (que está a kilómetros de ruta por delante) aunque sea
+                // exactamente la misma carretera física, ni a ninguna curva lejana.
+                var endIdx = nearestIndex
+                while (endIdx < routePoints.size && (routePoints[endIdx].distance - curPt.distance <= 250.0 || endIdx - nearestIndex < 25)) {
+                    endIdx++
+                }
+                searchEnd = endIdx.coerceAtMost(routePoints.size)
+            }
+
             var newNearestIdx = nearestIndex
             for (i in searchStart until searchEnd) {
                 val pt = routePoints[i]
                 val dist = planarDistM(lat to lng, pt.latitude to pt.longitude)
                 
-                // Penalizar saltos largos en el índice para evitar que en rutas circulares 
-                // salte al final de la ruta por un metro de diferencia en el GPS.
+                // Penalizar saltos largos en el índice para favorecer siempre la continuidad de ruta
                 val indexDiff = Math.abs(i - nearestIndex)
-                var penalty = if (nearestIndex == 0) 0.0 else (if (indexDiff > 500) 500.0 else (indexDiff * 0.1))
+                var penalty = if (indexDiff > 500) 500.0 else (indexDiff * 0.1)
                 
-                // Misma carretera de ida y vuelta: penaliza el tramo cuyo sentido es contrario al rumbo
+                // Misma carretera de ida y vuelta: penaliza el tramo cuyo sentido es contrario al rumbo estable
                 if (travelHeadingValid && dist < 40.0 && i < routePoints.size - 1) {
                     val nx = routePoints[i + 1]
                     var ang = Math.abs(bearing(pt.latitude, pt.longitude, nx.latitude, nx.longitude) - travelHeading) % 360.0
@@ -501,26 +536,37 @@ class AltimetriaStrategyCalculator {
     private var anchorLat = 0.0
     private var anchorLng = 0.0
     private var backwardMeters = 0.0
+    private var uTurnConfirmTicks = 0
 
     // Cambio de sentido: si el ciclista retrocede sobre el tramo de ida (p. ej. barrera a mitad de subida),
-    // salta al punto de la vuelta que coincide en posición y rumbo. Devuelve la nueva distancia o null.
+    // salta al punto de la vuelta que coincide en posición y rumbo tras confirmarlo con rumbo estable. Devuelve la nueva distancia o null.
     private fun detectUTurnAndJump(lat: Double, lng: Double, dist: Double, offRouteM: Double): Double? {
-        if (lastProjectedDist < 0.0 || offRouteM > 40.0 || dist > lastProjectedDist) {
-            lastProjectedDist = dist
+        // En los primeros 500m de ruta no se permite salto de cambio de sentido
+        if (dist < 500.0 || lastProjectedDist < 0.0 || offRouteM > 60.0 || dist >= lastProjectedDist - 5.0) {
+            if (dist > lastProjectedDist) lastProjectedDist = dist
             backwardMeters = 0.0
+            uTurnConfirmTicks = 0
             return null
         }
         // Retroceso neto respecto al punto más lejano alcanzado (el ruido del GPS no lo acumula)
         backwardMeters = lastProjectedDist - dist
-        if (backwardMeters < 40.0) return null
+        // Debe haber un retroceso sostenido real de al menos 100m (en una paella o herradura
+        // típica la curva mide 20-50m, por lo que nunca alcanza 100m)
+        if (backwardMeters < 100.0 || !travelHeadingValid) {
+            uTurnConfirmTicks = 0
+            return null
+        }
 
         // El rumbo tiene que ser realmente contrario al sentido de la ruta en este punto
         val segIdx = nearestIndex.coerceAtMost(routePoints.size - 2)
         val cur = routePoints[segIdx]
         val nxt = routePoints[segIdx + 1]
-        var against = Math.abs(bearing(cur.latitude, cur.longitude, nxt.latitude, nxt.longitude) - currentHeading) % 360.0
+        var against = Math.abs(bearing(cur.latitude, cur.longitude, nxt.latitude, nxt.longitude) - travelHeading) % 360.0
         if (against > 180.0) against = 360.0 - against
-        if (against < 120.0) return null
+        if (against < 120.0) {
+            uTurnConfirmTicks = 0
+            return null
+        }
 
         var bestIdx = -1
         var bestD = Double.MAX_VALUE
@@ -528,15 +574,24 @@ class AltimetriaStrategyCalculator {
             val p = routePoints[i]
             val d = planarDistM(lat to lng, p.latitude to p.longitude)
             if (d > 30.0 || d >= bestD) continue
-            if (p.distance - dist < 100.0) continue
+            if (p.distance - dist < 150.0) continue
             val q = routePoints[i + 1]
             val routeBearing = bearing(p.latitude, p.longitude, q.latitude, q.longitude)
-            var diff = Math.abs(routeBearing - currentHeading) % 360.0
+            var diff = Math.abs(routeBearing - travelHeading) % 360.0
             if (diff > 180.0) diff = 360.0 - diff
             if (diff < 60.0) { bestD = d; bestIdx = i }
         }
+        if (bestIdx < 0) {
+            uTurnConfirmTicks = 0
+            return null
+        }
+
+        // Confirmar durante al menos 2 ciclos consecutivos antes de ejecutar el salto
+        uTurnConfirmTicks++
+        if (uTurnConfirmTicks < 2) return null
+
         backwardMeters = 0.0
-        if (bestIdx < 0) return null
+        uTurnConfirmTicks = 0
         nearestIndex = bestIdx
         val newDist = projectedRouteDistance(lat, lng, bestIdx)
         lastProjectedDist = newDist
@@ -1849,11 +1904,13 @@ class AltimetriaStrategyCalculator {
 
         this.routePoints = result
         this.nearestIndex = 0
+        this.currentRouteDistance = 0.0
         this.lastProjectedDist = -1.0
         this.travelHeadingValid = false
         this.anchorLat = 0.0
         this.anchorLng = 0.0
         this.backwardMeters = 0.0
+        this.uTurnConfirmTicks = 0
         this.isNavigatingRoute = true
         this.fullRoutePolyline = polyline
         this.fullRouteGeomLength = geomLengthM(points)
@@ -1992,6 +2049,14 @@ class AltimetriaStrategyCalculator {
         this.routePois.clear()
         this.isNavigatingRoute = false
         this.activeRouteName = null
+        this.nearestIndex = 0
+        this.currentRouteDistance = 0.0
+        this.lastProjectedDist = -1.0
+        this.backwardMeters = 0.0
+        this.uTurnConfirmTicks = 0
+        this.travelHeadingValid = false
+        this.anchorLat = 0.0
+        this.anchorLng = 0.0
         // Resetear datos del climb al salir de la navegación
         this.distanceToTop = 0.0
         this.elevationToTop = 0.0

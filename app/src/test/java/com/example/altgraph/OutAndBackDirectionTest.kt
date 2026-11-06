@@ -71,4 +71,49 @@ class OutAndBackDirectionTest {
         repeat(60) { c.updateCurrentLocation(38.8 + 80 * step + (if (it % 2 == 0) 0.00001 else -0.00001), lon) }
         assertTrue(c.currentRouteDistance < 2000.0)
     }
+
+    @Test
+    fun startLineCloserToEndPointNeverJumpsToEnd() {
+        val c = outAndBack()
+        // El ciclista está en la salida, pero su posición GPS está físicamente
+        // más cerca del punto final (4000 m) que del punto inicial (0 m).
+        // Debe quedarse en el inicio (< 50 m) y nunca saltar a los 4000 m.
+        c.updateCurrentLocation(38.8 - 0.00002, lon)
+        assertTrue("No debe saltar al final en la salida: dist=${c.currentRouteDistance}", c.currentRouteDistance < 100.0)
+    }
+
+    @Test
+    fun losNietosRealCoordinatesStartProtection() {
+        val c = AltimetriaStrategyCalculator()
+        val pts = ArrayList<RoutePoint>()
+        // P0 a P100: ida (0 a 1000m)
+        for (i in 0..100) {
+            pts.add(RoutePoint(37.6040899 + i * 0.00009, -0.9760449, 10.0, i * 10.0))
+        }
+        // P101 a P200: vuelta (35000 a 36000m), con P200 situado a solo 7 metros de P0
+        for (i in 0..100) {
+            pts.add(RoutePoint(37.6040482 + (100 - i) * 0.00009, -0.9759732, 10.0, 35000.0 + i * 10.0))
+        }
+        c.routePoints = pts
+        c.currentSpeed = 0.0
+
+        // Ciclista situado en P200 (a 7m de P0, pero en el km 36 de la ruta)
+        c.updateCurrentLocation(37.6040482, -0.9759732)
+        assertTrue("No debe saltar al km 35+ en la salida de Los Nietos: dist=${c.currentRouteDistance}", c.currentRouteDistance < 100.0)
+    }
+
+    @Test
+    fun hairpinTurnOnClimbNeverJumpsToDescent() {
+        val c = outAndBack()
+        ride(c, 0, 1000)
+        // En una paella / curva de herradura, el ciclista gira 180º durante varios segundos.
+        // Se simula la curva con ruido e inversión de rumbo sin que retroceda > 120m.
+        for (i in 0..10) {
+            c.updateCurrentLocation(38.8 + 100 * step - i * 0.00001, lon)
+        }
+        assertTrue("Herradura no debe saltar a la bajada: dist=${c.currentRouteDistance}", c.currentRouteDistance < 2000.0)
+        // Y continúa subiendo hacia la cima
+        ride(c, 1000, 1500)
+        assertTrue("Debe seguir subiendo hacia la cima: dist=${c.currentRouteDistance}", c.currentRouteDistance in 1400.0..1600.0)
+    }
 }
