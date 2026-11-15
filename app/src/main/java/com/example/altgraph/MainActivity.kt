@@ -625,6 +625,26 @@ class MainActivity : Activity() {
         lookaheadCard.addView(lookaheadValueText)
         lookaheadCard.addView(lookaheadRow)
 
+        // Opción: Control de Zoom 3D vinculado al Radar / Mapa
+        val hwZoomCard = createCardContainer()
+        val switchMirrorMap = Switch(this).apply {
+            text = getString(R.string.setting_3d_match_radar_zoom)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.match3dToRadarZoom
+            setOnCheckedChangeListener { _, isChecked ->
+                prefs.match3dToRadarZoom = isChecked
+            }
+        }
+        val mirrorMapDesc = TextView(this).apply {
+            text = getString(R.string.setting_3d_match_radar_zoom_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 4)
+        }
+        hwZoomCard.addView(switchMirrorMap)
+        hwZoomCard.addView(mirrorMapDesc)
+
         // Opción: Mostrar Cotas en 3D
         val showCotasCard = createCardContainer()
         val switchShowCotas = Switch(this).apply {
@@ -1335,6 +1355,7 @@ class MainActivity : Activity() {
         })
 
         tab3dContainer.addView(lookaheadCard)
+        tab3dContainer.addView(hwZoomCard)
         tab3dContainer.addView(climbAlertCard)
         tab3dContainer.addView(beaconModeCard)
         tab3dContainer.addView(routeDistancesCard)

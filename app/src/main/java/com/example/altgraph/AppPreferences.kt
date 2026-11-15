@@ -192,6 +192,11 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_SHOW_3D_ZOOM, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_ZOOM, value).apply()
 
+    // Sincronizar el zoom del mapa global 3D con el zoom del radar altimétrico / mapa
+    var match3dToRadarZoom: Boolean
+        get() = prefs.getBoolean(KEY_MATCH_3D_TO_RADAR_ZOOM, false)
+        set(value) = prefs.edit().putBoolean(KEY_MATCH_3D_TO_RADAR_ZOOM, value).apply()
+
     var panButtonsPosition: String
         get() = prefs.getString(KEY_PAN_BUTTONS_POSITION, "bottom") ?: "bottom"
         set(value) = prefs.edit().putString(KEY_PAN_BUTTONS_POSITION, value).apply()
@@ -706,6 +711,7 @@ class AppPreferences(context: Context) {
         private const val KEY_SHOW_POIS = "show_pois"
         private const val KEY_POI_TYPES_ENABLED = "poi_types_enabled"
         private const val KEY_SHOW_3D_ZOOM = "show_3d_zoom_controls"
+        private const val KEY_MATCH_3D_TO_RADAR_ZOOM = "match_3d_to_radar_zoom"
         private const val KEY_GEAR_CHAINRINGS = "gear_chainrings"
         private const val KEY_GEAR_CASSETTE = "gear_cassette"
         private const val KEY_BEACON_COLOR = "beacon_color"

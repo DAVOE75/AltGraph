@@ -2097,8 +2097,15 @@ class AltimetriaStrategyCalculator {
         // SMART ZOOM LOGIC
         var lookaheadDist = baseLookahead
         
-        // MAP ZOOM OVERRIDE
-        if (mapZoomLevel != null) {
+        // MAP ZOOM OVERRIDE (Radar Altimétrico o Vista 3D si tiene espejo activo)
+        // El Radar Altimétrico SIEMPRE va en espejo con el zoom del mapa (independiente de los ajustes del 3D).
+        // La Ruta Global 3D solo lo usa si el usuario activó match3dToRadarZoom.
+        val mirrorMap3D = prefs?.match3dToRadarZoom ?: false
+        val isFor3D = viewWidth <= 0 // strategyFor3D no pasa viewWidth, mientras que strategyForRouteBar pasa el ancho del radar
+
+        val applyMapZoom = if (isFor3D) mirrorMap3D else true
+
+        if (applyMapZoom && mapZoomLevel != null) {
             // El mapa dibuja 480 píxeles a pantalla completa con esta resolución.
             // Para que la escala encaje en nuestro view (que puede ser 480, 240, etc.),
             // calculamos los metros por píxel y los multiplicamos por el ancho real del view.

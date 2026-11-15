@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ExtensionInfo
     id="altgraph"
-    version="1.0.85"
+    version="1.0.86"
     displayName="@string/app_name"
     icon="@drawable/ic_altgraph"
     configurable="true"
@@ -70,5 +70,13 @@
         description="@string/data_type_profile_tv_2d_desc"
         graphical="true"
         icon="@drawable/ic_altgraph" />
+
+    <BonusAction
+        actionId="zoom_in"
+        displayName="@string/action_zoom_in_title" />
+
+    <BonusAction
+        actionId="zoom_out"
+        displayName="@string/action_zoom_out_title" />
 
 </ExtensionInfo>

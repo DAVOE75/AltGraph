@@ -144,12 +144,21 @@ class AltgraphCore(val calculator: AltimetriaStrategyCalculator = AltimetriaStra
     fun strategyFor3D(context: Context?, base: Snapshot): StrategyData {
         val navigating = calculator.isNavigatingRoute &&
             (calculator.routePoints.isNotEmpty() || calculator.routeElevationProfile.isNotEmpty())
-        if (pan3dMeters == 0.0 && !navigating) return base.strategy
+        val prefs = context?.let { AppPreferences.getInstance(it) }
+        val mirrorMap3D = prefs?.match3dToRadarZoom ?: false
+
+        val needsRecalc = pan3dMeters != 0.0 || (mirrorMap3D && mapZoomLevel != null)
+        if (!needsRecalc && !navigating) return base.strategy
         calculator.manualPanOffsetMeters = pan3dMeters
+        if (mirrorMap3D && mapZoomLevel != null) {
+            calculator.mapZoomLevel = mapZoomLevel
+            calculator.viewWidth = 0 // 3D usa el ancho por defecto de pantalla completa (480)
+        }
         try {
             return calculator.calculateStrategy(context, advance = false, alignGrid = true)
         } finally {
             calculator.manualPanOffsetMeters = 0.0
+            calculator.mapZoomLevel = null
         }
     }
 

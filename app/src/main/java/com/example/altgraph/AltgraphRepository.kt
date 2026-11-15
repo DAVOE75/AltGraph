@@ -348,7 +348,9 @@ object AltgraphRepository {
             s.launch { core.calculator.updateCurrentLocation(event.lat, event.lng) }
         }
         KIND_ZOOM -> system.addConsumer<OnMapZoomLevel> { event ->
-            s.launch { core.mapZoomLevel = event.zoomLevel }
+            s.launch {
+                core.mapZoomLevel = event.zoomLevel
+            }
         }
         else -> system.addConsumer<OnStreamState>(
             OnStreamState.StartStreaming(kind),

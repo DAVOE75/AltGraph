@@ -497,4 +497,10 @@
     <string name="radar_corners_all">Ambas redondeadas</string>
     <string name="radar_corners_top">Radar arriba</string>
     <string name="radar_corners_bottom">Radar abajo</string>
+
+    <!-- Zoom por Botones Físicos y Bonus Actions -->
+    <string name="action_zoom_in_title">AltGraph: Acercar Zoom</string>
+    <string name="action_zoom_out_title">AltGraph: Alejar Zoom</string>
+    <string name="setting_3d_match_radar_zoom">Ajustar mapa global a zoom de radar</string>
+    <string name="setting_3d_match_radar_zoom_desc">Sincroniza la escala de la Ruta Global 3D con el Radar Altimétrico. Al cambiar el zoom del mapa con los botones físicos del Karoo en la pantalla del mapa, el 3D adaptará automáticamente su escala a la misma distancia aunque esté en otra página.</string>
 </resources>

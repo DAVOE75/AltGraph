@@ -5,7 +5,7 @@ import io.hammerhead.karooext.extension.DataTypeImpl
 import io.hammerhead.karooext.extension.KarooExtension
 import kotlinx.coroutines.cancel
 
-class AltimetriaExtensionService : KarooExtension("altgraph", "3.0.0") {
+class AltimetriaExtensionService : KarooExtension("altgraph", "3.0.15") {
 
     override val types: List<DataTypeImpl> by lazy {
         listOf(
@@ -45,6 +45,19 @@ class AltimetriaExtensionService : KarooExtension("altgraph", "3.0.0") {
             manager.stop()
             if (mapOverlayManager === manager) mapOverlayManager = null
         }
+    }
+
+    override fun onBonusAction(actionId: String) {
+        val action = when (actionId) {
+            "zoom_in" -> Altimetria3DGraphDataType.ACTION_ZOOM_IN
+            "zoom_out" -> Altimetria3DGraphDataType.ACTION_ZOOM_OUT
+            else -> null
+        } ?: return
+
+        val intent = android.content.Intent(action).apply {
+            setPackage(packageName)
+        }
+        sendBroadcast(intent)
     }
 
     override fun onDestroy() {
