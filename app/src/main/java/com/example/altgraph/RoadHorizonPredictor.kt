@@ -193,6 +193,7 @@ class RoadHorizonPredictor(private val context: Context) {
 
         // Si faltan algunas cotas puntuales, interpolar
         fixMissingElevations(elevations)
+        smoothElevations(elevations, sampleStepMeters)
         android.util.Log.i("RoadHorizon", "road=$mainRoadName pts=${samplePoints.size} step=$sampleStepMeters dist=$accumulatedDist elev=${elevations.minOrNull()}..${elevations.maxOrNull()} first=${samplePoints.first().lat},${samplePoints.first().lng} last=${samplePoints.last().lat},${samplePoints.last().lng}")
 
         // Calcular pendientes (%)
@@ -249,6 +250,21 @@ class RoadHorizonPredictor(private val context: Context) {
                 lastValid = elevs[i]
             }
         }
+    }
+
+    // El MDT es de 1 m de resolución vertical y recoge edificios/arbolado: sin suavizar salen rampas falsas en llano
+    private fun smoothElevations(e: MutableList<Float>, stepM: Double) {
+        if (e.size < 3) return
+        val radius = Math.ceil(60.0 / stepM).toInt().coerceAtLeast(1)
+        val src = e.toList()
+        for (i in src.indices) {
+            val r = minOf(radius, i, src.size - 1 - i)
+            var sum = 0f
+            for (k in i - r..i + r) sum += src[k]
+            e[i] = sum / (2 * r + 1)
+        }
+        e[0] = src[0]
+        e[e.size - 1] = src[src.size - 1]
     }
 
     private fun roadKey(r: RoadSegment) = "${r.name}_${r.lengthMeters.toInt()}_${r.points.first().lat}_${r.points.first().lng}"
