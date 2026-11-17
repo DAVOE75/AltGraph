@@ -434,6 +434,8 @@ class AltimetriaStrategyCalculator {
         return p0.elevation + frac * (p1.elevation - p0.elevation)
     }
 
+    private var heldAnchor: RoadHorizonPredictor.HorizonResult? = null
+    private var heldAnchorLookahead = 0.0
     private var heldHorizon: RoadHorizonPredictor.HorizonResult? = null
     private var heldHorizonLookahead = 0.0
 
@@ -2179,34 +2181,34 @@ class AltimetriaStrategyCalculator {
                 val predictor = RoadHorizonPredictor.getInstance(effectiveCtx)
                 val stepM = (lookaheadDist / 40.0).coerceIn(15.0, 50.0)
                 if (!pagedBeacon) {
-                    // Baliza ancla: fija al 20% de la ventana; 20% detrás (historial recorrido) y 80% delante (predicción)
-                    val ahead = predictor.predictHorizon(currentLatitude, currentLongitude, currentHeading, lookaheadDist * (1.0 - BEACON_ANCHOR_FRACTION), stepM)
-                    if (ahead != null && ahead.elevations.size >= 2) {
-                        val nb = Math.round(lookaheadDist * BEACON_ANCHOR_FRACTION / stepM).toInt()
-                        val behind = (nb downTo 1).map { k ->
-                            val d = liveDistanceAccumulated - k * stepM
-                            val h = freeRideHistory
-                            when {
-                                h.isEmpty() -> ahead.elevations.first()
-                                d <= h.first().first -> h.first().second.toFloat()
-                                else -> {
-                                    val j = h.indexOfLast { it.first <= d }.coerceAtLeast(0)
-                                    h[j].second.toFloat()
-                                }
-                            }
-                        }
-                        val elevs = behind + ahead.elevations
-                        val grades = (0 until elevs.size - 1).map { i ->
-                            (((elevs[i + 1] - elevs[i]) / stepM) * 100.0).coerceIn(-30.0, 30.0).toFloat()
-                        }
-                        val here = Pair(currentLatitude, currentLongitude)
+                    // Baliza ancla: marcador al 20% de la ventana. Las cotas y pendientes salen de un trazado retenido (cuadrícula fija),
+                    // así que los bloques no cambian mientras se recorren; la ventana solo se desplaza de bloque en bloque.
+                    val count = Math.round(lookaheadDist / stepM).toInt() + 1
+                    val nb = Math.round(lookaheadDist * BEACON_ANCHOR_FRACTION / stepM).toInt()
+                    var held = heldAnchor
+                    var s = -1.0
+                    if (held != null && heldAnchorLookahead == lookaheadDist) {
+                        val frac = projectOnHorizon(held, currentLatitude, currentLongitude)
+                        if (frac != null) s = frac * (held.elevations.size - 1)
+                    }
+                    if (held == null || s < 0.0 || s + (count - nb) > held.elevations.size - 1) {
+                        held = predictor.predictHorizon(currentLatitude, currentLongitude, currentHeading, lookaheadDist * 2.0, stepM)
+                        heldAnchor = held
+                        heldAnchorLookahead = lookaheadDist
+                        s = 0.0
+                    }
+                    if (held != null && held.elevations.size >= 3) {
+                        val total = held.elevations.size
+                        val start = (Math.floor(s).toInt() - nb).coerceIn(0, maxOf(0, total - count))
+                        val end = minOf(total, start + count)
                         horizonResult = RoadHorizonPredictor.HorizonResult(
-                            elevations = elevs, grades = grades,
-                            coordinates = List(nb) { here } + ahead.coordinates,
-                            roadName = ahead.roadName,
-                            totalDistanceMeters = (elevs.size - 1) * stepM
+                            elevations = held.elevations.subList(start, end),
+                            grades = held.grades.subList(start, minOf(held.grades.size, end - 1)),
+                            coordinates = held.coordinates.subList(start, end),
+                            roadName = held.roadName,
+                            totalDistanceMeters = (end - start - 1) * stepM
                         )
-                        horizonProgress = nb.toFloat() / (elevs.size - 1)
+                        horizonProgress = ((s - start) / (end - start - 1)).toFloat().coerceIn(0f, 1f)
                     }
                 } else {
                     // Baliza móvil: perfil estático que se conserva hasta que el ciclista llega al final y salta a la siguiente sección
