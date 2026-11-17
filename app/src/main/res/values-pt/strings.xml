@@ -77,6 +77,8 @@
     <string name="setting_custom_maps_desc">Descobre e importa pacotes de mapas vetoriais de alta resolução (.mbtiles / .map) para Karoo</string>
     <string name="setting_road_horizon">Horizonte Tático 3D (Previsão sem rota)</string>
     <string name="setting_road_horizon_desc">Prevê a estrada e o perfil de elevação à frente usando mapas vetoriais e dados MDT (.hgt) sem rota carregada.</string>
+    <string name="setting_horizon_zoom">Zoom do horizonte (sem rota)</string>
+    <string name="setting_horizon_subblock">Tamanho do sub-bloco</string>
     <string name="map_access_needed">Permita o acesso a todos os ficheiros para o AltGraph ler os mapas offline do Karoo.</string>
     <string name="setting_smart_zoom">Ativar Smart Zoom Tático (Auto-Escala)</string>
     <string name="setting_oasis_tracking">Ativar Oasis Tracking (Zonas de Recuperação)</string>

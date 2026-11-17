@@ -77,6 +77,8 @@
     <string name="setting_custom_maps_desc">Rileva e importa mappe vettoriali offline ad alta definizione (.mbtiles / .map) per Karoo</string>
     <string name="setting_road_horizon">Orizzonte Tattico 3D (Anteprima senza percorso)</string>
     <string name="setting_road_horizon_desc">Prevede la strada e il profilo altimetrico a venire utilizzando mappe vettoriali e dati DTM (.hgt) senza percorso caricato.</string>
+    <string name="setting_horizon_zoom">Zoom dell\'orizzonte (senza percorso)</string>
+    <string name="setting_horizon_subblock">Dimensione sotto-blocco</string>
     <string name="map_access_needed">Consenti l\'accesso a tutti i file affinché AltGraph legga le mappe offline del Karoo.</string>
     <string name="setting_smart_zoom">Attiva Smart Zoom Tattico (Auto-Scala)</string>
     <string name="setting_oasis_tracking">Attiva Oasis Tracking (Zone di Recupero)</string>

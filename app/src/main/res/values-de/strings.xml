@@ -77,6 +77,8 @@
     <string name="setting_custom_maps_desc">Hochauflösende Offline-Vektorkarten (.mbtiles / .map) für Karoo erkennen und importieren</string>
     <string name="setting_road_horizon">Taktischer 3D-Horizont (Vorschau ohne Route)</string>
     <string name="setting_road_horizon_desc">Sagt den kommenden Straßenverlauf und das Höhenprofil anhand von Vektorkarten und DEM-Daten (.hgt) ohne geladene Route voraus.</string>
+    <string name="setting_horizon_zoom">Horizont-Zoom (ohne Route)</string>
+    <string name="setting_horizon_subblock">Unterblockgröße</string>
     <string name="map_access_needed">Erlaube den Zugriff auf alle Dateien, damit AltGraph die Offline-Karten des Karoo lesen kann.</string>
     <string name="setting_smart_zoom">Taktischen Smart Zoom aktivieren (Auto-Skalierung)</string>
     <string name="setting_oasis_tracking">Oasis Tracking aktivieren (Erholungszonen)</string>

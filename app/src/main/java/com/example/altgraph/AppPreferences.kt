@@ -241,6 +241,15 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_ROAD_HORIZON_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_ROAD_HORIZON_ENABLED, value).apply()
 
+    // Zoom del horizonte sin ruta (metros, de 500 en 500) y tamaño de subbloque (50/100/250/500)
+    var horizonDistanceM: Int
+        get() = prefs.getInt("road_horizon_distance_m", 2000)
+        set(value) = prefs.edit().putInt("road_horizon_distance_m", value).apply()
+
+    var horizonSubBlockM: Int
+        get() = prefs.getInt("road_horizon_subblock_m", 50)
+        set(value) = prefs.edit().putInt("road_horizon_subblock_m", value).apply()
+
     // --- PRO FEATURES (NIVEL SDK MÁXIMO) ---
     var smartZoomEnabled: Boolean
         get() = prefs.getBoolean(KEY_SMART_ZOOM_ENABLED, true)

@@ -1622,6 +1622,27 @@ class MainActivity : Activity() {
         }
         roadHorizonCard.addView(switchRoadHorizon)
         roadHorizonCard.addView(roadHorizonDesc)
+
+        // Submenú: zoom del horizonte (de 500 en 500 m) y subbloque
+        fun fmtDist(m: Int) = if (m < 1000) "$m m" else if (m % 1000 == 0) "${m / 1000} km" else "${m / 1000.0} km"
+        fun horizonSpinner(title: String, values: List<Int>, current: Int, onPick: (Int) -> Unit): LinearLayout {
+            val row = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(0, 8, 0, 4) }
+            row.addView(TextView(this).apply { text = title; textSize = 13f; setTextColor(Color.WHITE) })
+            row.addView(Spinner(this).apply {
+                adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, values.map { fmtDist(it) })
+                setSelection(values.indexOf(current).coerceAtLeast(0))
+                onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(p: AdapterView<*>?, v: View?, pos: Int, id: Long) {
+                        (v as? TextView)?.setTextColor(Color.parseColor("#4CAF50"))
+                        onPick(values[pos])
+                    }
+                    override fun onNothingSelected(p: AdapterView<*>?) {}
+                }
+            })
+            return row
+        }
+        roadHorizonCard.addView(horizonSpinner(getString(R.string.setting_horizon_zoom), (1..60).map { it * 500 }, prefs.horizonDistanceM) { prefs.horizonDistanceM = it })
+        roadHorizonCard.addView(horizonSpinner(getString(R.string.setting_horizon_subblock), listOf(50, 100, 250, 500), prefs.horizonSubBlockM) { prefs.horizonSubBlockM = it })
         tabProContainer.addView(roadHorizonCard)
 
         // Smart Zoom

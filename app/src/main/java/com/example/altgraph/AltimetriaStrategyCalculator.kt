@@ -2155,6 +2155,12 @@ class AltimetriaStrategyCalculator {
 
         val isNavigating = isNavigatingRoute && (routePoints.isNotEmpty() || routeElevationProfile.isNotEmpty())
 
+        // Sin ruta y con Road Horizon activo, el zoom lo fija el usuario (3D y radar); con ruta todo sigue como antes
+        val horizonSubBlockM = (prefs?.horizonSubBlockM ?: 50).toDouble()
+        if (!isNavigating && (prefs?.roadHorizonEnabled ?: true)) {
+            lookaheadDist = (prefs?.horizonDistanceM ?: 2000).toDouble()
+        }
+
         // MODO LIBRE / ENTRENAMIENTO REAL SIN RUTA PRECARGADA:
         // Si Road Horizon 3D está activo, predice la carretera y el perfil futuro usando el MDT.
         // Si no hay cobertura o está desactivado, genera el perfil 3D con el historial acumulado en tiempo real.
@@ -2179,7 +2185,7 @@ class AltimetriaStrategyCalculator {
             if (horizonEnabled && currentLatitude != 0.0 && currentLongitude != 0.0 && effectiveCtx != null) {
                 val pagedBeacon = prefs?.beaconMode3d == AppPreferences.BEACON_MODE_PAGED
                 val predictor = RoadHorizonPredictor.getInstance(effectiveCtx)
-                val stepM = (lookaheadDist / 40.0).coerceIn(15.0, 50.0)
+                val stepM = horizonSubBlockM.coerceAtMost(lookaheadDist / 2.0)
                 if (!pagedBeacon) {
                     // Baliza ancla: marcador al 20% de la ventana. Las cotas y pendientes salen de un trazado retenido (cuadrícula fija),
                     // así que los bloques no cambian mientras se recorren; la ventana solo se desplaza de bloque en bloque.
@@ -2231,7 +2237,7 @@ class AltimetriaStrategyCalculator {
                 val hElevs = horizonResult.elevations
                 val hGrades = horizonResult.grades
                 val stepMeters = horizonResult.totalDistanceMeters / (hElevs.size - 1)
-                val majorBlockSize = getMajorBlockSize(lookaheadDist)
+                val majorBlockSize = (Math.round(getMajorBlockSize(lookaheadDist) / stepMeters).toInt().coerceAtLeast(1)) * stepMeters
 
                 val hasAttack = attackAlertsEnabled && hGrades.any { it > thresholdAttack }
                 val liveFatigue = (hGrades.average() * 8.5 + asphaltFactor * 10).roundToInt().coerceIn(10, 250)

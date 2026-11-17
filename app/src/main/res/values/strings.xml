@@ -94,6 +94,8 @@
     <!-- Pro Features -->
     <string name="setting_road_horizon">3D Road Horizon (Routeless Preview)</string>
     <string name="setting_road_horizon_desc">Forecasts the upcoming road elevation profile using offline vector maps and DEM terrain data (.hgt) with no route loaded.</string>
+    <string name="setting_horizon_zoom">Horizon zoom (no route)</string>
+    <string name="setting_horizon_subblock">Sub-block size</string>
     <string name="map_access_needed">Allow access to all files so AltGraph can read the Karoo offline maps.</string>
     <string name="setting_smart_zoom">Enable Tactical Smart Zoom (Auto-Scale)</string>
     <string name="setting_oasis_tracking">Enable Tactical Oasis Tracking (Recovery Zones)</string>
