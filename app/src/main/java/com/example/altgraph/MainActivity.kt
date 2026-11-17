@@ -1683,8 +1683,15 @@ class MainActivity : Activity() {
             setBackgroundColor(Color.parseColor("#33FFFFFF"))
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 2).apply { setMargins(0, 14, 0, 6) }
         }
-        fun addOpt(v: View) { roadHorizonCard.addView(horizonDivider()); roadHorizonCard.addView(v) }
+        var pendingDesc: Int? = null
+        fun addDescNow(res: Int) { roadHorizonCard.addView(TextView(this).apply { text = getString(res); textSize = 11f; setTextColor(Color.GRAY); setPadding(0, 2, 0, 2) }) }
+        fun addOpt(v: View) {
+            roadHorizonCard.addView(horizonDivider()); roadHorizonCard.addView(v)
+            pendingDesc?.let { addDescNow(it); pendingDesc = null }
+        }
         roadHorizonCard.addView(horizonSpinner(getString(R.string.setting_horizon_zoom), (1..60).map { it * 500 }, prefs.horizonDistanceM) { prefs.horizonDistanceM = it })
+        addDescNow(R.string.horizon_desc_zoom)
+        pendingDesc = R.string.horizon_desc_subblock
         addOpt(horizonSpinner(getString(R.string.setting_horizon_subblock), listOf(50, 100, 250, 500), prefs.horizonSubBlockM) { prefs.horizonSubBlockM = it })
 
         fun labelSpinner(title: String, labels: List<String>, current: Int, onPick: (Int) -> Unit): LinearLayout {
@@ -1704,28 +1711,37 @@ class MainActivity : Activity() {
             return row
         }
 
+        pendingDesc = R.string.horizon_desc_junction
+
         addOpt(labelSpinner(getString(R.string.horizon_junction_mode),
             listOf(getString(R.string.horizon_junction_lsr), getString(R.string.horizon_junction_name), getString(R.string.horizon_junction_turn)),
             prefs.horizonJunctionMode) { prefs.horizonJunctionMode = it })
+        pendingDesc = R.string.horizon_desc_smoothing
         addOpt(labelSpinner(getString(R.string.horizon_smoothing),
             listOf(getString(R.string.horizon_level_low), getString(R.string.horizon_level_mid), getString(R.string.horizon_level_high)),
             prefs.horizonSmoothing) { prefs.horizonSmoothing = it })
+        pendingDesc = R.string.horizon_desc_heading
         addOpt(labelSpinner(getString(R.string.horizon_heading_mode),
             listOf(getString(R.string.horizon_heading_nearest), getString(R.string.horizon_heading_gps)),
             prefs.horizonHeadingMode) { prefs.horizonHeadingMode = it })
+        pendingDesc = R.string.horizon_desc_target
         addOpt(labelSpinner(getString(R.string.horizon_target),
             listOf(getString(R.string.horizon_target_both), getString(R.string.horizon_target_radar), getString(R.string.horizon_target_3d)),
             prefs.horizonTarget) { prefs.horizonTarget = it })
         val alertValues = listOf(0, 6, 8, 10, 12, 15)
+        pendingDesc = R.string.horizon_desc_alert
         addOpt(labelSpinner(getString(R.string.horizon_alert),
             alertValues.map { if (it == 0) getString(R.string.horizon_off) else "$it %" },
             alertValues.indexOf(prefs.horizonAlertPct).coerceAtLeast(0)) { prefs.horizonAlertPct = alertValues[it] })
+        pendingDesc = R.string.horizon_desc_mark
         addOpt(horizonSwitch(getString(R.string.horizon_mark_guess), prefs.horizonMarkGuess) { prefs.horizonMarkGuess = it })
 
         // Descarga del terreno (MDT)
         val radiusValues = listOf(10, 30, 60, 120, 150, 180, 210)
+        pendingDesc = R.string.horizon_desc_radius
         addOpt(labelSpinner(getString(R.string.horizon_dl_radius),
             radiusValues.map { "$it km" }, radiusValues.indexOf(prefs.horizonDownloadRadiusKm).coerceAtLeast(0)) { prefs.horizonDownloadRadiusKm = radiusValues[it]; refreshHorizonStatus() })
+        pendingDesc = R.string.horizon_desc_mobile
         addOpt(horizonSwitch(getString(R.string.horizon_mobile_data), prefs.horizonMobileData) { prefs.horizonMobileData = it })
 
         // Estado de mapas, permisos y terreno
@@ -1781,13 +1797,16 @@ class MainActivity : Activity() {
             }
         }
         horizonDownloadBtn = downloadBtn
+        pendingDesc = R.string.horizon_desc_download
         addOpt(downloadBtn)
+        pendingDesc = R.string.horizon_desc_diag
         addOpt(horizonButton(getString(R.string.horizon_btn_diag)) {
             val diag = RoadHorizonPredictor.getInstance(this).lastDiagnostic.ifEmpty { getString(R.string.horizon_diag_empty) }
             val cm = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
             cm.setPrimaryClip(android.content.ClipData.newPlainText("AltGraph Horizon", diag))
             android.widget.Toast.makeText(this, getString(R.string.horizon_diag_copied), android.widget.Toast.LENGTH_LONG).show()
         })
+        pendingDesc = R.string.horizon_desc_reset
         addOpt(horizonButton(getString(R.string.horizon_btn_reset)) {
             prefs.resetHorizonOptions()
             recreate()

@@ -125,6 +125,19 @@ Gel?ndedateien: %3$d (%4$d MB)
     <string name="horizon_speed_zoom">Geschwindigkeitsabhängiger Zoom</string>
     <string name="horizon_speed_zoom_desc">Langsamer = näherer Zoom (Anstieg); schneller = weiterer Zoom, um mehr Gelände voraus zu sehen. Von 250 m (8 km/h oder weniger) bis 5 km (40 km/h oder mehr). Nur mit geladener Route.</string>
     <string name="horizon_btn_update_radius">Download für neuen Radius aktualisieren</string>
+    <string name="horizon_desc_zoom">Strecke, die ohne geladene Route voraus angezeigt wird (500-m-Schritte).</string>
+    <string name="horizon_desc_subblock">Länge jedes farbigen Blocks im Profil. Kleiner = mehr Details.</string>
+    <string name="horizon_desc_junction">Welche Straße an einer Kreuzung angenommen wird, wenn der Weg unklar ist.</string>
+    <string name="horizon_desc_smoothing">Glättet kleine Geländesprünge (Gebäude, Bäume), die falsche Rampen erzeugen. Hoch für Flachstücke, niedrig für Anstiege.</string>
+    <string name="horizon_desc_heading">Wie die Straße im Stand gewählt wird: die nächste Straße oder die vom GPS gemeldete Richtung.</string>
+    <string name="horizon_desc_target">Wo das Profil der Straße voraus angezeigt wird: Höhenradar, 3D-Ansicht oder beides.</string>
+    <string name="horizon_desc_alert">Warnt, wenn voraus ein Anstieg steiler als die gewählte Steigung auftaucht. Standardmäßig aus.</string>
+    <string name="horizon_desc_mark">Zeigt ein \"?\" dort, wo das Profil an einer Kreuzung zur Schätzung wird.</string>
+    <string name="horizon_desc_radius">Gebiet um dich, für das Geländedateien geladen werden. Größerer Radius braucht mehr Speicher (ca. 25 MB pro Kachel).</string>
+    <string name="horizon_desc_mobile">Standardmäßig wird Gelände nur per WLAN geladen. Aktivieren, um auch mobile Daten zu nutzen.</string>
+    <string name="horizon_desc_download">Lädt jetzt die Geländedateien deiner Gegend, damit das Profil unterwegs nicht auf WLAN warten muss.</string>
+    <string name="horizon_desc_diag">Kopiert technische Daten der letzten Vorhersage in die Zwischenablage, nützlich für Fehlermeldungen.</string>
+    <string name="horizon_desc_reset">Setzt alle Horizont-Optionen auf die Standardwerte zurück.</string>
     <string name="map_access_needed">Erlaube den Zugriff auf alle Dateien, damit AltGraph die Offline-Karten des Karoo lesen kann.</string>
     <string name="setting_smart_zoom">Taktischen Smart Zoom aktivieren (Auto-Skalierung)</string>
     <string name="setting_oasis_tracking">Oasis Tracking aktivieren (Erholungszonen)</string>

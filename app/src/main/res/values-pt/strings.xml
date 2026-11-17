@@ -125,6 +125,19 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="horizon_speed_zoom">Zoom conforme a velocidade</string>
     <string name="horizon_speed_zoom_desc">Mais lento = zoom mais próximo (a subir); mais rápido = zoom mais afastado para ver mais terreno à frente. De 250 m (8 km/h ou menos) a 5 km (40 km/h ou mais). Só com uma rota carregada.</string>
     <string name="horizon_btn_update_radius">Atualizar download para o novo raio</string>
+    <string name="horizon_desc_zoom">Distância de estrada mostrada à frente sem rota carregada (passos de 500 m).</string>
+    <string name="horizon_desc_subblock">Comprimento de cada bloco colorido do perfil. Menor = mais detalhe.</string>
+    <string name="horizon_desc_junction">Que estrada assumir num cruzamento quando o caminho não é claro.</string>
+    <string name="horizon_desc_smoothing">Suaviza pequenos saltos do terreno (edifícios, árvores) que criam rampas falsas. Alto para plano; baixo para subidas.</string>
+    <string name="horizon_desc_heading">Como a estrada é escolhida parado: a mais próxima ou a direção indicada pelo GPS.</string>
+    <string name="horizon_desc_target">Onde mostrar o perfil da estrada à frente: radar altimétrico, vista 3D ou ambos.</string>
+    <string name="horizon_desc_alert">Avisa quando surge à frente uma subida mais forte do que a inclinação escolhida. Desativado por defeito.</string>
+    <string name="horizon_desc_mark">Mostra um \"?\" onde o perfil passa a ser uma estimativa num cruzamento.</string>
+    <string name="horizon_desc_radius">Área à sua volta para a qual se descarregam os ficheiros de terreno. Raio maior exige mais armazenamento (cerca de 25 MB por bloco).</string>
+    <string name="horizon_desc_mobile">Por defeito o terreno só é descarregado por Wi-Fi. Ative para usar também dados móveis.</string>
+    <string name="horizon_desc_download">Descarrega agora os ficheiros de terreno da sua zona, para o perfil funcionar sem esperar por Wi-Fi durante o treino.</string>
+    <string name="horizon_desc_diag">Copia para a área de transferência os dados técnicos da última previsão, útil para reportar um problema.</string>
+    <string name="horizon_desc_reset">Repõe todas as opções do horizonte nos valores predefinidos.</string>
     <string name="map_access_needed">Permita o acesso a todos os ficheiros para o AltGraph ler os mapas offline do Karoo.</string>
     <string name="setting_smart_zoom">Ativar Smart Zoom Tático (Auto-Escala)</string>
     <string name="setting_oasis_tracking">Ativar Oasis Tracking (Zonas de Recuperação)</string>

@@ -125,6 +125,19 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="horizon_speed_zoom">Zoom selon la vitesse</string>
     <string name="horizon_speed_zoom_desc">Plus lent = zoom plus proche (montée) ; plus rapide = zoom plus lointain pour voir plus de terrain devant. De 250 m (8 km/h ou moins) à 5 km (40 km/h ou plus). Uniquement avec un itinéraire chargé.</string>
     <string name="horizon_btn_update_radius">Mettre à jour le téléchargement pour le nouveau rayon</string>
+    <string name="horizon_desc_zoom">Distance de route affichée devant vous sans itinéraire chargé (par pas de 500 m).</string>
+    <string name="horizon_desc_subblock">Longueur de chaque bloc coloré du profil. Plus petit = plus de détails.</string>
+    <string name="horizon_desc_junction">Quelle route supposer à un carrefour quand la suite est incertaine.</string>
+    <string name="horizon_desc_smoothing">Lisse les petits écarts du terrain (bâtiments, arbres) qui créent de fausses rampes. Fort pour le plat, faible pour les montées.</string>
+    <string name="horizon_desc_heading">Comment la route est choisie à l\'arrêt : la plus proche, ou la direction indiquée par le GPS.</string>
+    <string name="horizon_desc_target">Où le profil de la route devant est affiché : radar altimétrique, vue 3D ou les deux.</string>
+    <string name="horizon_desc_alert">Avertit quand une montée plus raide que la pente choisie apparaît devant. Désactivé par défaut.</string>
+    <string name="horizon_desc_mark">Affiche un \"?\" là où le profil devient une estimation à un carrefour.</string>
+    <string name="horizon_desc_radius">Zone autour de vous pour laquelle les fichiers de terrain sont téléchargés. Un rayon plus grand demande plus de stockage (environ 25 Mo par tuile).</string>
+    <string name="horizon_desc_mobile">Par défaut le terrain ne se télécharge qu\'en Wi-Fi. Activez pour utiliser aussi les données mobiles.</string>
+    <string name="horizon_desc_download">Télécharge maintenant les fichiers de terrain de votre zone, pour que le profil fonctionne sans attendre le Wi-Fi en sortie.</string>
+    <string name="horizon_desc_diag">Copie dans le presse-papiers les données techniques de la dernière prédiction, utile pour signaler un problème.</string>
+    <string name="horizon_desc_reset">Rétablit toutes les options de l\'horizon à leurs valeurs par défaut.</string>
     <string name="map_access_needed">Autorisez l\'accès à tous les fichiers pour qu\'AltGraph lise les cartes hors ligne du Karoo.</string>
     <string name="setting_smart_zoom">Activer Smart Zoom tactique (auto-échelle)</string>
     <string name="setting_oasis_tracking">Activer Oasis Tracking (zones de récupération)</string>
