@@ -53,7 +53,22 @@ class MainActivity : Activity() {
             else if (em.hasCoverageFor(lat, lng)) getString(R.string.horizon_cover_yes) else getString(R.string.horizon_cover_no)
         val dl = if (em.isDownloading()) "\n" + getString(R.string.horizon_downloading) else ""
         tv.text = getString(R.string.horizon_status_fmt, perm, maps, files, bytes / 1_048_576, cover) + dl
+
+        // Botón de descarga: verde y "ya descargado" cuando no falta ninguna cuadrícula
+        val btn = horizonDownloadBtn ?: return
+        val known = lat != 0.0 || lng != 0.0
+        if (known && !em.isDownloading() && em.isUpToDate(lat, lng)) {
+            btn.text = getString(R.string.horizon_btn_downloaded)
+            btn.setBackgroundColor(Color.parseColor("#2E7D32"))
+            btn.setTextColor(Color.WHITE)
+        } else {
+            btn.text = getString(R.string.horizon_btn_download)
+            btn.setBackgroundResource(android.R.drawable.btn_default)
+            btn.setTextColor(Color.BLACK)
+        }
     }
+
+    private var horizonDownloadBtn: Button? = null
 
     private var storagePrompted = false
 
@@ -1730,9 +1745,11 @@ class MainActivity : Activity() {
             }
             android.widget.Toast.makeText(this, getString(msg), android.widget.Toast.LENGTH_LONG).show()
         }
-        addOpt(horizonButton(getString(R.string.horizon_btn_download)) {
+        val downloadBtn = horizonButton(getString(R.string.horizon_btn_download)) {
             val lat = prefs.horizonLastLat.toDouble(); val lng = prefs.horizonLastLng.toDouble()
-            if (lat != 0.0 || lng != 0.0) {
+            if ((lat != 0.0 || lng != 0.0) && ElevationManager.getInstance(this).isUpToDate(lat, lng)) {
+                android.widget.Toast.makeText(this, getString(R.string.horizon_dl_not_needed), android.widget.Toast.LENGTH_LONG).show()
+            } else if (lat != 0.0 || lng != 0.0) {
                 startHorizonDownload(lat, lng)
             } else {
                 // Sin posición guardada: se pide una al sistema Karoo (solo una vez)
@@ -1759,7 +1776,9 @@ class MainActivity : Activity() {
                     }
                 }, 8000)
             }
-        })
+        }
+        horizonDownloadBtn = downloadBtn
+        addOpt(downloadBtn)
         addOpt(horizonButton(getString(R.string.horizon_btn_diag)) {
             val diag = RoadHorizonPredictor.getInstance(this).lastDiagnostic.ifEmpty { getString(R.string.horizon_diag_empty) }
             val cm = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager

@@ -120,6 +120,8 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="horizon_diag_empty">Ainda sem previsão</string>
     <string name="horizon_btn_reset">Repor opções do horizonte</string>
     <string name="horizon_dl_locating">A obter a sua posição...</string>
+    <string name="horizon_btn_downloaded">Terreno descarregado ✓</string>
+    <string name="horizon_dl_not_needed">Terreno já descarregado: não é preciso descarregar de novo</string>
     <string name="map_access_needed">Permita o acesso a todos os ficheiros para o AltGraph ler os mapas offline do Karoo.</string>
     <string name="setting_smart_zoom">Ativar Smart Zoom Tático (Auto-Escala)</string>
     <string name="setting_oasis_tracking">Ativar Oasis Tracking (Zonas de Recuperação)</string>

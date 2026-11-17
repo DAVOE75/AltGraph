@@ -93,6 +93,12 @@ class ElevationManager(private val context: Context) {
 
     fun isDownloading(): Boolean = isFetching.get()
 
+    /** true si ya están todas las cuadrículas necesarias alrededor de la posición (o no existen datos para ellas). */
+    fun isUpToDate(lat: Double, lng: Double): Boolean {
+        val radius = AppPreferences.getInstance(context).horizonDownloadRadiusKm
+        return findNeededTileNames(lat, lng, radius).all { File(baseDir, it).isFile || isKnownMissing(it) }
+    }
+
     fun heldSummary(): Pair<Int, Long> {
         val files = getHeldFiles()
         return files.size to files.sumOf { it.length() }
