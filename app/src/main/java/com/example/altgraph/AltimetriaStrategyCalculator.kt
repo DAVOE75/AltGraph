@@ -460,6 +460,9 @@ class AltimetriaStrategyCalculator {
     }
 
     private var lastPosSaveMs = 0L
+    private var speedZoomEma = 0.0
+    private var speedZoomCurrent = 0.0
+    private var speedZoomChangeMs = 0L
 
     fun updateCurrentLocation(lat: Double, lng: Double, orientation: Double? = null) {
         if (lat == 0.0 && lng == 0.0) return
@@ -2172,6 +2175,21 @@ class AltimetriaStrategyCalculator {
         val horizonActive = (prefs?.roadHorizonEnabled ?: true) && horizonTargetOk
         if (!isNavigating && horizonActive) {
             lookaheadDist = (prefs?.horizonDistanceM ?: 2000).toDouble()
+            if (prefs?.horizonSpeedZoom == true) {
+                // Zoom por velocidad: despacio (subiendo) = zoom cercano; rápido = zoom lejano. Pasos de 500 m con histéresis
+                if (advance) {
+                    speedZoomEma += (currentSpeed * 3.6 - speedZoomEma) * 0.1
+                    val t = ((speedZoomEma - 8.0) / (40.0 - 8.0)).coerceIn(0.0, 1.0)
+                    val target = (Math.round((500.0 + t * 4500.0) / 500.0) * 500.0)
+                    val now = System.currentTimeMillis()
+                    if (speedZoomCurrent == 0.0) speedZoomCurrent = target
+                    else if (target != speedZoomCurrent && now - speedZoomChangeMs > 10_000L) {
+                        speedZoomCurrent += if (target > speedZoomCurrent) 500.0 else -500.0
+                        speedZoomChangeMs = now
+                    }
+                }
+                if (speedZoomCurrent > 0.0) lookaheadDist = speedZoomCurrent
+            }
         }
 
         // MODO LIBRE / ENTRENAMIENTO REAL SIN RUTA PRECARGADA:

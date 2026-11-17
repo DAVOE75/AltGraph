@@ -1672,12 +1672,20 @@ class MainActivity : Activity() {
             })
             return row
         }
+        fun horizonSwitch(text: String, checked: Boolean, onChange: (Boolean) -> Unit) = Switch(this).apply {
+            this.text = text; textSize = 14f; setTextColor(Color.WHITE); isChecked = checked
+            setOnCheckedChangeListener { _, c -> onChange(c) }
+        }
         fun horizonDivider() = View(this).apply {
             setBackgroundColor(Color.parseColor("#33FFFFFF"))
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 2).apply { setMargins(0, 14, 0, 6) }
         }
         fun addOpt(v: View) { roadHorizonCard.addView(horizonDivider()); roadHorizonCard.addView(v) }
         roadHorizonCard.addView(horizonSpinner(getString(R.string.setting_horizon_zoom), (1..60).map { it * 500 }, prefs.horizonDistanceM) { prefs.horizonDistanceM = it })
+        addOpt(horizonSwitch(getString(R.string.horizon_speed_zoom), prefs.horizonSpeedZoom) { prefs.horizonSpeedZoom = it })
+        roadHorizonCard.addView(TextView(this).apply {
+            text = getString(R.string.horizon_speed_zoom_desc); textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 2, 0, 2)
+        })
         addOpt(horizonSpinner(getString(R.string.setting_horizon_subblock), listOf(50, 100, 250, 500), prefs.horizonSubBlockM) { prefs.horizonSubBlockM = it })
 
         fun labelSpinner(title: String, labels: List<String>, current: Int, onPick: (Int) -> Unit): LinearLayout {
@@ -1695,10 +1703,6 @@ class MainActivity : Activity() {
                 }
             })
             return row
-        }
-        fun horizonSwitch(text: String, checked: Boolean, onChange: (Boolean) -> Unit) = Switch(this).apply {
-            this.text = text; textSize = 14f; setTextColor(Color.WHITE); isChecked = checked
-            setOnCheckedChangeListener { _, c -> onChange(c) }
         }
 
         addOpt(labelSpinner(getString(R.string.horizon_junction_mode),

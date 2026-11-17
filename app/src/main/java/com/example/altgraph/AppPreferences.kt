@@ -246,6 +246,10 @@ class AppPreferences(context: Context) {
         get() = prefs.getInt("road_horizon_distance_m", 2000)
         set(value) = prefs.edit().putInt("road_horizon_distance_m", value).apply()
 
+    var horizonSpeedZoom: Boolean
+        get() = prefs.getBoolean("road_horizon_speed_zoom", false)
+        set(value) = prefs.edit().putBoolean("road_horizon_speed_zoom", value).apply()
+
     var horizonSubBlockM: Int
         get() = prefs.getInt("road_horizon_subblock_m", 50)
         set(value) = prefs.edit().putInt("road_horizon_subblock_m", value).apply()
@@ -296,7 +300,7 @@ class AppPreferences(context: Context) {
             .remove("road_horizon_distance_m").remove("road_horizon_subblock_m").remove("road_horizon_junction_mode")
             .remove("road_horizon_smoothing").remove("road_horizon_dl_radius_km").remove("road_horizon_mobile_data")
             .remove("road_horizon_mark_guess").remove("road_horizon_alert_pct").remove("road_horizon_heading_mode")
-            .remove("road_horizon_target").apply()
+            .remove("road_horizon_target").remove("road_horizon_speed_zoom").apply()
     }
 
     // --- PRO FEATURES (NIVEL SDK MÁXIMO) ---

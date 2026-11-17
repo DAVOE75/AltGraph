@@ -122,6 +122,8 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="horizon_dl_locating">Obtention de votre position...</string>
     <string name="horizon_btn_downloaded">Terrain téléchargé ✓</string>
     <string name="horizon_dl_not_needed">Terrain déjà téléchargé : inutile de le télécharger à nouveau</string>
+    <string name="horizon_speed_zoom">Zoom selon la vitesse</string>
+    <string name="horizon_speed_zoom_desc">Plus lent = zoom plus proche (montée) ; plus rapide = zoom plus lointain pour voir plus de terrain devant. De 500 m (8 km/h ou moins) à 5 km (40 km/h ou plus). Remplace le zoom fixe de l\'horizon.</string>
     <string name="map_access_needed">Autorisez l\'accès à tous les fichiers pour qu\'AltGraph lise les cartes hors ligne du Karoo.</string>
     <string name="setting_smart_zoom">Activer Smart Zoom tactique (auto-échelle)</string>
     <string name="setting_oasis_tracking">Activer Oasis Tracking (zones de récupération)</string>

@@ -139,6 +139,8 @@ Terrain files: %3$d (%4$d MB)
     <string name="horizon_dl_locating">Getting your position...</string>
     <string name="horizon_btn_downloaded">Terrain downloaded ✓</string>
     <string name="horizon_dl_not_needed">Terrain already downloaded: no need to download again</string>
+    <string name="horizon_speed_zoom">Speed-based zoom</string>
+    <string name="horizon_speed_zoom_desc">Slower = closer zoom (climbing); faster = farther zoom to see more terrain ahead. From 500 m (8 km/h or less) to 5 km (40 km/h or more). Overrides the fixed horizon zoom.</string>
     <string name="map_access_needed">Allow access to all files so AltGraph can read the Karoo offline maps.</string>
     <string name="setting_smart_zoom">Enable Tactical Smart Zoom (Auto-Scale)</string>
     <string name="setting_oasis_tracking">Enable Tactical Oasis Tracking (Recovery Zones)</string>
