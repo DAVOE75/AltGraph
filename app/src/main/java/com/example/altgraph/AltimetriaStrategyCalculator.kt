@@ -2143,6 +2143,20 @@ class AltimetriaStrategyCalculator {
 
         val applyMapZoom = if (isFor3D) mirrorMap3D else true
 
+        val speedZoomOn = (prefs?.speedZoomEnabled ?: false) && isNavigatingRoute && (routePoints.isNotEmpty() || routeElevationProfile.isNotEmpty())
+        if (speedZoomOn && advance) {
+            // Zoom por velocidad: despacio (subiendo) = zoom cercano; rápido = zoom lejano. Pasos de 500 m con histéresis
+            speedZoomEma += (currentSpeed * 3.6 - speedZoomEma) * 0.1
+            val t = ((speedZoomEma - 8.0) / (40.0 - 8.0)).coerceIn(0.0, 1.0)
+            val target = Math.round((500.0 + t * 4500.0) / 500.0) * 500.0
+            val nowZ = System.currentTimeMillis()
+            if (speedZoomCurrent == 0.0) speedZoomCurrent = target
+            else if (target != speedZoomCurrent && nowZ - speedZoomChangeMs > 10_000L) {
+                speedZoomCurrent += if (target > speedZoomCurrent) 500.0 else -500.0
+                speedZoomChangeMs = nowZ
+            }
+        }
+
         if (applyMapZoom && mapZoomLevel != null) {
             // El mapa dibuja 480 píxeles a pantalla completa con esta resolución.
             // Para que la escala encaje en nuestro view (que puede ser 480, 240, etc.),
@@ -2153,6 +2167,9 @@ class AltimetriaStrategyCalculator {
             // equivale a medio píxel lógico de Mapbox. Por tanto, dividimos entre 2 el factor.
             val calibrationFactor = 0.416
             lookaheadDist = (actualViewWidth * mapMetersPerPixel * calibrationFactor).coerceIn(50.0, 100000.0)
+        } else if (speedZoomOn && speedZoomCurrent > 0.0) {
+            lookaheadDist = speedZoomCurrent
+            if (advance) smartLookahead = speedZoomCurrent
         } else if (smartZoomEnabled && baseLookahead < 100000.0) {
             val targetLookahead = when {
                 instantBarometricGrade >= 8.0 -> baseLookahead.coerceAtMost(350.0) // Crucible
@@ -2175,21 +2192,6 @@ class AltimetriaStrategyCalculator {
         val horizonActive = (prefs?.roadHorizonEnabled ?: true) && horizonTargetOk
         if (!isNavigating && horizonActive) {
             lookaheadDist = (prefs?.horizonDistanceM ?: 2000).toDouble()
-            if (prefs?.horizonSpeedZoom == true) {
-                // Zoom por velocidad: despacio (subiendo) = zoom cercano; rápido = zoom lejano. Pasos de 500 m con histéresis
-                if (advance) {
-                    speedZoomEma += (currentSpeed * 3.6 - speedZoomEma) * 0.1
-                    val t = ((speedZoomEma - 8.0) / (40.0 - 8.0)).coerceIn(0.0, 1.0)
-                    val target = (Math.round((500.0 + t * 4500.0) / 500.0) * 500.0)
-                    val now = System.currentTimeMillis()
-                    if (speedZoomCurrent == 0.0) speedZoomCurrent = target
-                    else if (target != speedZoomCurrent && now - speedZoomChangeMs > 10_000L) {
-                        speedZoomCurrent += if (target > speedZoomCurrent) 500.0 else -500.0
-                        speedZoomChangeMs = now
-                    }
-                }
-                if (speedZoomCurrent > 0.0) lookaheadDist = speedZoomCurrent
-            }
         }
 
         // MODO LIBRE / ENTRENAMIENTO REAL SIN RUTA PRECARGADA:
@@ -2401,7 +2403,7 @@ class AltimetriaStrategyCalculator {
             if (mapZoomLevel == null && lookaheadDist > 0.0) {
                 var pStart = pageStartDist
                 var pLen = pageLengthDist
-                if (pageBaseLookahead != baseLookahead || (!smartZoomEnabled && pLen != lookaheadDist)) {
+                if (pageBaseLookahead != baseLookahead || (!smartZoomEnabled && !speedZoomOn && pLen != lookaheadDist)) {
                     pLen = 0.0
                     pageLengthDist = 0.0
                     if (advance) pageBaseLookahead = baseLookahead

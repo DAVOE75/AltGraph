@@ -139,7 +139,8 @@ Archivos de terreno: %3$d (%4$d MB)
     <string name="horizon_btn_downloaded">Terreno descargado ✓</string>
     <string name="horizon_dl_not_needed">El terreno ya está descargado: no hace falta descargarlo de nuevo</string>
     <string name="horizon_speed_zoom">Zoom según la velocidad</string>
-    <string name="horizon_speed_zoom_desc">Más despacio = zoom más cercano (subiendo); más rápido = zoom más lejano para ver más terreno por delante. De 500 m (8 km/h o menos) a 5 km (40 km/h o más). Sustituye al zoom fijo del horizonte.</string>
+    <string name="horizon_speed_zoom_desc">Más despacio = zoom más cercano (subiendo); más rápido = zoom más lejano para ver más terreno por delante. De 500 m (8 km/h o menos) a 5 km (40 km/h o más). Solo con ruta cargada.</string>
+    <string name="horizon_btn_update_radius">Actualizar descarga al nuevo radio</string>
     <string name="map_access_needed">Permite el acceso a todos los archivos para que AltGraph lea los mapas offline de la Karoo.</string>
     <string name="setting_smart_zoom">Habilitar Smart Zoom Táctico (Auto-Escala)</string>
     <string name="setting_oasis_tracking">Habilitar Oasis Tracking (Zonas de Recuperación)</string>

@@ -61,8 +61,11 @@ class MainActivity : Activity() {
             btn.text = getString(R.string.horizon_btn_downloaded)
             btn.setBackgroundColor(Color.parseColor("#2E7D32"))
             btn.setTextColor(Color.WHITE)
+        } else if (known && !em.isDownloading() && files > 0) {
+            btn.text = getString(R.string.horizon_btn_update_radius)
+            btn.setBackgroundColor(Color.parseColor("#616161"))
+            btn.setTextColor(Color.WHITE)
         } else {
-            btn.text = getString(R.string.horizon_btn_download)
             btn.setBackgroundResource(android.R.drawable.btn_default)
             btn.setTextColor(Color.BLACK)
         }
@@ -1682,10 +1685,6 @@ class MainActivity : Activity() {
         }
         fun addOpt(v: View) { roadHorizonCard.addView(horizonDivider()); roadHorizonCard.addView(v) }
         roadHorizonCard.addView(horizonSpinner(getString(R.string.setting_horizon_zoom), (1..60).map { it * 500 }, prefs.horizonDistanceM) { prefs.horizonDistanceM = it })
-        addOpt(horizonSwitch(getString(R.string.horizon_speed_zoom), prefs.horizonSpeedZoom) { prefs.horizonSpeedZoom = it })
-        roadHorizonCard.addView(TextView(this).apply {
-            text = getString(R.string.horizon_speed_zoom_desc); textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 2, 0, 2)
-        })
         addOpt(horizonSpinner(getString(R.string.setting_horizon_subblock), listOf(50, 100, 250, 500), prefs.horizonSubBlockM) { prefs.horizonSubBlockM = it })
 
         fun labelSpinner(title: String, labels: List<String>, current: Int, onPick: (Int) -> Unit): LinearLayout {
@@ -1726,7 +1725,7 @@ class MainActivity : Activity() {
         // Descarga del terreno (MDT)
         val radiusValues = listOf(10, 30, 60, 120, 150, 180, 210)
         addOpt(labelSpinner(getString(R.string.horizon_dl_radius),
-            radiusValues.map { "$it km" }, radiusValues.indexOf(prefs.horizonDownloadRadiusKm).coerceAtLeast(0)) { prefs.horizonDownloadRadiusKm = radiusValues[it] })
+            radiusValues.map { "$it km" }, radiusValues.indexOf(prefs.horizonDownloadRadiusKm).coerceAtLeast(0)) { prefs.horizonDownloadRadiusKm = radiusValues[it]; refreshHorizonStatus() })
         addOpt(horizonSwitch(getString(R.string.horizon_mobile_data), prefs.horizonMobileData) { prefs.horizonMobileData = it })
 
         // Estado de mapas, permisos y terreno
@@ -1807,6 +1806,21 @@ class MainActivity : Activity() {
         }
         smartZoomCard.addView(switchSmartZoom)
         tabProContainer.addView(smartZoomCard)
+
+        // Zoom según la velocidad (ruta precargada y horizonte táctico)
+        val speedZoomCard = createCardContainer()
+        val switchSpeedZoom = Switch(this).apply {
+            text = getString(R.string.horizon_speed_zoom)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.speedZoomEnabled
+            setOnCheckedChangeListener { _, isChecked -> prefs.speedZoomEnabled = isChecked }
+        }
+        speedZoomCard.addView(switchSpeedZoom)
+        speedZoomCard.addView(TextView(this).apply {
+            text = getString(R.string.horizon_speed_zoom_desc); textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 4, 0, 4)
+        })
+        tabProContainer.addView(speedZoomCard)
 
         // Oasis Tracking
         val oasisCard = createCardContainer()
