@@ -1572,6 +1572,25 @@ class MainActivity : Activity() {
         val proLabel = createSectionLabel(getString(R.string.label_pro_features))
         tabProContainer.addView(proLabel)
 
+        // Road Horizon 3D (Previsión sin ruta)
+        val roadHorizonCard = createCardContainer()
+        val switchRoadHorizon = Switch(this).apply {
+            text = getString(R.string.setting_road_horizon)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.roadHorizonEnabled
+            setOnCheckedChangeListener { _, isChecked -> prefs.roadHorizonEnabled = isChecked }
+        }
+        val roadHorizonDesc = TextView(this).apply {
+            text = getString(R.string.setting_road_horizon_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 4)
+        }
+        roadHorizonCard.addView(switchRoadHorizon)
+        roadHorizonCard.addView(roadHorizonDesc)
+        tabProContainer.addView(roadHorizonCard)
+
         // Smart Zoom
         val smartZoomCard = createCardContainer()
         val switchSmartZoom = Switch(this).apply {

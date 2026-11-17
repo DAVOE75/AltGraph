@@ -75,6 +75,8 @@
     <string name="setting_show_3d_zoom">Mostrar Controles de Zoom de Toque no Gráfico 3D</string>
     <string name="setting_custom_maps_title">Gestão de Cartografia Personalizada</string>
     <string name="setting_custom_maps_desc">Descobre e importa pacotes de mapas vetoriais de alta resolução (.mbtiles / .map) para Karoo</string>
+    <string name="setting_road_horizon">Horizonte Tático 3D (Previsão sem rota)</string>
+    <string name="setting_road_horizon_desc">Prevê a estrada e o perfil de elevação à frente usando mapas vetoriais e dados MDT (.hgt) sem rota carregada.</string>
     <string name="setting_smart_zoom">Ativar Smart Zoom Tático (Auto-Escala)</string>
     <string name="setting_oasis_tracking">Ativar Oasis Tracking (Zonas de Recuperação)</string>
     <string name="setting_switchback_rendering">Ativar Dinâmica de Curvas 3D</string>

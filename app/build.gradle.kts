@@ -23,8 +23,8 @@ android {
         applicationId = "com.example.altgraph"
         minSdk = 26
         targetSdk = 34
-        versionCode = 433
-        versionName = "3.0.15"
+        versionCode = 434
+        versionName = "3.0.16"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -95,4 +95,7 @@ dependencies {
 
     // SDK oficial de Karoo Extension
     implementation("io.hammerhead:karoo-ext:1.1.9")
+
+    // Lector de mapas vectoriales Mapsforge (.map de Karoo)
+    implementation("org.mapsforge:mapsforge-map-reader:0.25.0")
 }

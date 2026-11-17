@@ -75,6 +75,8 @@
     <string name="setting_show_3d_zoom">Activer le Zoom Tactile sur Graphique 3D</string>
     <string name="setting_custom_maps_title">Gestionnaire de Cartographie Personnalisée</string>
     <string name="setting_custom_maps_desc">Permet de détecter et d\'importer des cartes vectorielles hors ligne haute définition (.mbtiles / .map) pour Karoo</string>
+    <string name="setting_road_horizon">Horizon Tactique 3D (Aperçu sans itinéraire)</string>
+    <string name="setting_road_horizon_desc">Prédit la route et le profil d\'élévation à venir à l\'aide des cartes vectorielles et des données MNT (.hgt) sans parcours chargé.</string>
     <string name="setting_smart_zoom">Activer Smart Zoom tactique (auto-échelle)</string>
     <string name="setting_oasis_tracking">Activer Oasis Tracking (zones de récupération)</string>
     <string name="setting_switchback_rendering">Activer dynamique des virages 3D</string>

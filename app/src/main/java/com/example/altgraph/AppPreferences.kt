@@ -236,6 +236,11 @@ class AppPreferences(context: Context) {
         get() = prefs.getString(KEY_CHART_LIGHT_STYLE, "classic") ?: "classic"
         set(value) = prefs.edit().putString(KEY_CHART_LIGHT_STYLE, value).apply()
 
+    // Horizonte Táctico 3D (Previsión de perfil sin ruta cargada mediante MDT y carreteras offline)
+    var roadHorizonEnabled: Boolean
+        get() = prefs.getBoolean(KEY_ROAD_HORIZON_ENABLED, true)
+        set(value) = prefs.edit().putBoolean(KEY_ROAD_HORIZON_ENABLED, value).apply()
+
     // --- PRO FEATURES (NIVEL SDK MÁXIMO) ---
     var smartZoomEnabled: Boolean
         get() = prefs.getBoolean(KEY_SMART_ZOOM_ENABLED, true)
@@ -727,6 +732,7 @@ class AppPreferences(context: Context) {
         private const val KEY_SHOW_EXAGGERATION_TAG = "show_exaggeration_tag"
         private const val KEY_CHART_LIGHT_BG = "chart_light_bg"
         private const val KEY_CHART_LIGHT_STYLE = "chart_light_style"
+        private const val KEY_ROAD_HORIZON_ENABLED = "road_horizon_enabled"
         private const val KEY_SMART_ZOOM_ENABLED = "smart_zoom_enabled"
         private const val KEY_OASIS_TRACKING_ENABLED = "oasis_tracking_enabled"
         private const val KEY_SWITCHBACK_RENDERING_ENABLED = "switchback_rendering_enabled"

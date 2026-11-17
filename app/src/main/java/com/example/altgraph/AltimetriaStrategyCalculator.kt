@@ -2130,12 +2130,10 @@ class AltimetriaStrategyCalculator {
         val isNavigating = isNavigatingRoute && (routePoints.isNotEmpty() || routeElevationProfile.isNotEmpty())
 
         // MODO LIBRE / ENTRENAMIENTO REAL SIN RUTA PRECARGADA:
-        // Genera el perfil 3D con el historial acumulado en tiempo real en lugar de proyectar al futuro
+        // Si Road Horizon 3D está activo, predice la carretera y el perfil futuro usando el MDT.
+        // Si no hay cobertura o está desactivado, genera el perfil 3D con el historial acumulado en tiempo real.
         if (!isNavigating) {
             val baseGrade = instantBarometricGrade
-            // Integrar por tiempo transcurrido, no "1 s por llamada": con varias vistas o
-            // streams del mismo campo, calculateStrategy() se llama más de una vez por segundo.
-            // Nota: tope de 2 s tras un hueco (vista fuera de pantalla), como el 1 s fijo anterior
             if (advance) {
                 val nowMs = System.currentTimeMillis()
                 val dt = if (lastIntegrationMs == 0L) 1.0 else ((nowMs - lastIntegrationMs) / 1000.0).coerceIn(0.0, 2.0)
@@ -2144,12 +2142,64 @@ class AltimetriaStrategyCalculator {
                     liveDistanceAccumulated += currentSpeed * dt
                 }
 
-                // Acumular el punto actual en el historial si avanzamos más de 5 metros
                 if (freeRideHistory.isEmpty() || liveDistanceAccumulated - freeRideHistory.last().first >= 5.0) {
                     freeRideHistory.add(Pair(liveDistanceAccumulated, currentElevation))
                 }
             }
 
+            val horizonEnabled = prefs?.roadHorizonEnabled ?: true
+            var horizonResult: RoadHorizonPredictor.HorizonResult? = null
+            if (horizonEnabled && currentLatitude != 0.0 && currentLongitude != 0.0 && effectiveCtx != null) {
+                val predictor = RoadHorizonPredictor.getInstance(effectiveCtx)
+                horizonResult = predictor.predictHorizon(
+                    lat = currentLatitude,
+                    lng = currentLongitude,
+                    headingDeg = currentHeading,
+                    distanceMeters = lookaheadDist,
+                    sampleStepMeters = (lookaheadDist / 40.0).coerceIn(15.0, 50.0)
+                )
+            }
+
+            if (horizonResult != null && horizonResult.elevations.size >= 3) {
+                // --- PREDICCIÓN HORIZONTE DE CARRETERA (ROAD HORIZON 3D) ---
+                val hElevs = horizonResult.elevations
+                val hGrades = horizonResult.grades
+                val stepMeters = horizonResult.totalDistanceMeters / (hElevs.size - 1)
+                val majorBlockSize = getMajorBlockSize(lookaheadDist)
+
+                val hasAttack = attackAlertsEnabled && hGrades.any { it > thresholdAttack }
+                val liveFatigue = (hGrades.average() * 8.5 + asphaltFactor * 10).roundToInt().coerceIn(10, 250)
+                if (advance) ClimbStateManager.updateApm(liveFatigue)
+
+                return StrategyData(
+                    remainingDistance = horizonResult.totalDistanceMeters,
+                    timeToSummit = 0L,
+                    avgGrade = baseGrade,
+                    nextBlocks = hGrades.take(10),
+                    attackAlert = hasAttack,
+                    blockSizeMeters = stepMeters,
+                    totalFatigueGrade = liveFatigue,
+                    hairpins = emptyList(),
+                    pois = emptyList(),
+                    curvatureOffsets = List(hElevs.size) { 0f },
+                    riderProgress = 0.0f, // El ciclista se sitúa al inicio mirando al horizonte
+                    windowStartMeters = 0.0,
+                    windowStartElevation = hElevs.first().toDouble(),
+                    beaconElevation = currentElevation,
+                    subBlocks = hGrades,
+                    subBlocksMax = hGrades,
+                    windowLengthMeters = horizonResult.totalDistanceMeters,
+                    subBlockSizeMeters = stepMeters,
+                    majorBlockSizeMeters = majorBlockSize,
+                    profileElevations = hElevs,
+                    activeClimbs = emptyList(),
+                    routeName = horizonResult.roadName ?: "Horizonte Libre",
+                    routeTotalLength = horizonResult.totalDistanceMeters,
+                    routeCoords = horizonResult.coordinates
+                )
+            }
+
+            // Fallback histórico cuando no hay carretera detectada o está desactivado:
             // La ventana ahora mira hacia atrás desde la posición actual
             val windowStartDist = (liveDistanceAccumulated - lookaheadDist).coerceAtLeast(0.0)
             
