@@ -18,6 +18,8 @@ class RoadHorizonPredictor(private val context: Context) {
     private var anchorLat = 0.0
     private var anchorLng = 0.0
     private var hasMoved = false
+    private var lastRoadKey: String? = null
+    private val STICKY_BONUS_M = 15.0
 
     data class HorizonResult(
         val elevations: List<Float>,
@@ -79,12 +81,14 @@ class RoadHorizonPredictor(private val context: Context) {
                 val segmentBearing = p1.bearingTo(p2)
                 val bearingDiff = if (stationary) 0.0 else abs(angleDifference(headingDeg, segmentBearing))
 
-                // Solo consideramos tramos que van más o menos en nuestra dirección (< 75 grados)
-                if (bearingDiff < 75.0) {
+                // Solo consideramos tramos que van más o menos en nuestra dirección (< 60 grados)
+                if (bearingDiff < 60.0) {
                     val distToSeg = distanceToSegment(currentPoint, p1, p2)
+                    val sticky = if (roadKey(road) == lastRoadKey) STICKY_BONUS_M else 0.0
                     // Parado: el rumbo no es fiable, se elige la vía con nombre más larga
-                    val score = if (stationary) (if (road.name != null) 0.0 else 1e9) - road.lengthMeters else distToSeg
-                    if (distToSeg < 35.0 && score < bestScore) {
+                    val score = if (stationary) (if (road.name != null) 0.0 else 1e9) - road.lengthMeters - sticky * 1000.0
+                                else distToSeg + bearingDiff * 0.3 - sticky
+                    if (distToSeg < 30.0 && score < bestScore) {
                         bestScore = score
                         bestRoad = road
                         bestIndex = i
@@ -94,10 +98,15 @@ class RoadHorizonPredictor(private val context: Context) {
         }
 
         if (bestRoad == null) { android.util.Log.w("RoadHorizon", "no road aligned with heading"); return null }
+        lastRoadKey = roadKey(bestRoad)
+
+        // El trazado parte del punto proyectado sobre la vía (no del GPS crudo) para no quedar en el carril contiguo
+        val snapped = projectOnSegment(currentPoint, bestRoad.points[bestIndex], bestRoad.points[bestIndex + 1])
+        val snapDist = currentPoint.distanceTo(snapped)
 
         // 2. Extender camino hacia adelante (Road Following)
         val projectedPoints = mutableListOf<GeoPoint>()
-        projectedPoints.add(currentPoint)
+        projectedPoints.add(if (snapDist < 30.0) snapped else currentPoint)
 
         var currentRoad = bestRoad
         var currentIndex = bestIndex + 1
@@ -240,6 +249,18 @@ class RoadHorizonPredictor(private val context: Context) {
                 lastValid = elevs[i]
             }
         }
+    }
+
+    private fun roadKey(r: RoadSegment) = "${r.name}_${r.lengthMeters.toInt()}_${r.points.first().lat}_${r.points.first().lng}"
+
+    private fun projectOnSegment(p: GeoPoint, a: GeoPoint, b: GeoPoint): GeoPoint {
+        val kLng = Math.cos(Math.toRadians(p.lat))
+        val dx = (b.lng - a.lng) * kLng
+        val dy = b.lat - a.lat
+        val l2 = dx * dx + dy * dy
+        if (l2 == 0.0) return a
+        val t = ((((p.lng - a.lng) * kLng) * dx + (p.lat - a.lat) * dy) / l2).coerceIn(0.0, 1.0)
+        return GeoPoint(a.lat + (b.lat - a.lat) * t, a.lng + (b.lng - a.lng) * t)
     }
 
     private fun angleDifference(a: Double, b: Double): Double {
