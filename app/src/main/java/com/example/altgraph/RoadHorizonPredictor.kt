@@ -85,8 +85,8 @@ class RoadHorizonPredictor(private val context: Context) {
                 if (bearingDiff < 60.0) {
                     val distToSeg = distanceToSegment(currentPoint, p1, p2)
                     val sticky = if (roadKey(road) == lastRoadKey) STICKY_BONUS_M else 0.0
-                    // Parado: el rumbo no es fiable, se elige la vía con nombre más larga
-                    val score = if (stationary) (if (road.name != null) 0.0 else 1e9) - road.lengthMeters - sticky * 1000.0
+                    // Parado el rumbo no es fiable: gana la vía más cercana (la longitud solo desempata)
+                    val score = if (stationary) distToSeg - sticky - road.lengthMeters * 1e-4
                                 else distToSeg + bearingDiff * 0.3 - sticky
                     if (distToSeg < 30.0 && score < bestScore) {
                         bestScore = score
