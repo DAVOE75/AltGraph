@@ -434,6 +434,29 @@ class AltimetriaStrategyCalculator {
         return p0.elevation + frac * (p1.elevation - p0.elevation)
     }
 
+    private var heldHorizon: RoadHorizonPredictor.HorizonResult? = null
+    private var heldHorizonLookahead = 0.0
+
+    // Progreso (0..1) del ciclista sobre el horizonte retenido; null si está a más de 40 m del trazado
+    private fun projectOnHorizon(h: RoadHorizonPredictor.HorizonResult, lat: Double, lng: Double): Float? {
+        val c = h.coordinates
+        if (c.size < 2) return null
+        val kLat = 111320.0
+        val kLng = 111320.0 * Math.cos(Math.toRadians(lat))
+        var bestD = Double.MAX_VALUE
+        var bestPos = 0.0
+        for (i in 0 until c.size - 1) {
+            val ax = (c[i].second - lng) * kLng; val ay = (c[i].first - lat) * kLat
+            val bx = (c[i + 1].second - lng) * kLng; val by = (c[i + 1].first - lat) * kLat
+            val dx = bx - ax; val dy = by - ay
+            val l2 = dx * dx + dy * dy
+            val t = if (l2 == 0.0) 0.0 else ((-ax * dx - ay * dy) / l2).coerceIn(0.0, 1.0)
+            val d = Math.hypot(ax + t * dx, ay + t * dy)
+            if (d < bestD) { bestD = d; bestPos = i + t }
+        }
+        return if (bestD <= 40.0) (bestPos / (c.size - 1)).toFloat() else null
+    }
+
     fun updateCurrentLocation(lat: Double, lng: Double, orientation: Double? = null) {
         if (lat == 0.0 && lng == 0.0) return
         if (orientation != null && this.currentHeading == 0.0) this.currentHeading = (orientation + 360.0) % 360.0
@@ -2150,15 +2173,26 @@ class AltimetriaStrategyCalculator {
 
             val horizonEnabled = prefs?.roadHorizonEnabled ?: true
             var horizonResult: RoadHorizonPredictor.HorizonResult? = null
+            var horizonProgress = 0f
             if (horizonEnabled && currentLatitude != 0.0 && currentLongitude != 0.0 && effectiveCtx != null) {
-                val predictor = RoadHorizonPredictor.getInstance(effectiveCtx)
-                horizonResult = predictor.predictHorizon(
-                    lat = currentLatitude,
-                    lng = currentLongitude,
-                    headingDeg = currentHeading,
-                    distanceMeters = lookaheadDist,
-                    sampleStepMeters = (lookaheadDist / 40.0).coerceIn(15.0, 50.0)
-                )
+                // Perfil estático: se conserva mientras el ciclista avanza por él y solo salta a la sección siguiente al llegar al final
+                val held = heldHorizon
+                val onHeld = if (held != null && heldHorizonLookahead == lookaheadDist) projectOnHorizon(held, currentLatitude, currentLongitude) else null
+                if (held != null && onHeld != null && onHeld < 0.985f) {
+                    horizonResult = held
+                    horizonProgress = onHeld
+                } else {
+                    val predictor = RoadHorizonPredictor.getInstance(effectiveCtx)
+                    horizonResult = predictor.predictHorizon(
+                        lat = currentLatitude,
+                        lng = currentLongitude,
+                        headingDeg = currentHeading,
+                        distanceMeters = lookaheadDist,
+                        sampleStepMeters = (lookaheadDist / 40.0).coerceIn(15.0, 50.0)
+                    )
+                    heldHorizon = horizonResult
+                    heldHorizonLookahead = lookaheadDist
+                }
             }
 
             if (horizonResult != null && horizonResult.elevations.size >= 3) {
@@ -2183,7 +2217,7 @@ class AltimetriaStrategyCalculator {
                     hairpins = emptyList(),
                     pois = emptyList(),
                     curvatureOffsets = List(hElevs.size) { 0f },
-                    riderProgress = 0.0f, // El ciclista se sitúa al inicio mirando al horizonte
+                    riderProgress = horizonProgress,
                     windowStartMeters = 0.0,
                     windowStartElevation = hElevs.first().toDouble(),
                     beaconElevation = currentElevation,
@@ -2301,10 +2335,9 @@ class AltimetriaStrategyCalculator {
                 }
                 val inPage = pLen > 0.0 && riderNow >= pStart && riderNow < pStart + pLen
                 if (!inPage) {
-                    val prevEnd = pStart + pLen
                     pLen = lookaheadDist
-                    pStart = if (pageLengthDist > 0.0 && riderNow >= prevEnd && riderNow < prevEnd + pLen) prevEnd
-                             else Math.floor(riderNow / pLen) * pLen
+                    // Al saltar de sección, la baliza queda al 20% (20% detrás, 80% delante)
+                    pStart = (riderNow - pLen * BEACON_ANCHOR_FRACTION).coerceAtLeast(0.0)
                 }
                 if (advance) { pageStartDist = pStart; pageLengthDist = pLen }
                 windowStartDist = pStart

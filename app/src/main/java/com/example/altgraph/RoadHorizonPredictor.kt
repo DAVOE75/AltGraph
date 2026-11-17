@@ -140,14 +140,19 @@ class RoadHorizonPredictor(private val context: Context) {
                 if (fromStart || fromEnd) {
                     val nextPt = if (fromStart) cand.points[1] else cand.points[cand.points.size - 2]
                     val nextBearing = junctionPoint.bearingTo(nextPt)
-                    val turnAngle = abs(angleDifference(currentBearing, nextBearing))
-
-                    // Prioridad absoluta: Si conserva el mismo nombre de vía
+                    val signedTurn = angleDifference(currentBearing, nextBearing)
+                    val turnAngle = abs(signedTurn)
                     val sameName = (currentRoad.name != null && currentRoad.name == cand.name)
 
-                    val score = if (sameName) turnAngle * 0.5 else turnAngle
+                    // Prioridad ante la duda: izquierda, recto, derecha (a igualdad de clase, mismo nombre y menor giro)
+                    val klass = when {
+                        signedTurn < -25.0 -> 0
+                        turnAngle <= 25.0 -> 1
+                        else -> 2
+                    }
+                    val score = klass * 1000.0 + (if (sameName) 0.0 else 300.0) + turnAngle
                     val revisits = projectedPoints.any { it.distanceTo(nextPt) < 8.0 }
-                    if (!revisits && turnAngle < 70.0 && score < bestNextAngle) {
+                    if (!revisits && turnAngle < 135.0 && score < bestNextAngle) {
                         bestNextAngle = score
                         bestNextRoad = if (fromStart) cand else RoadSegment(
                             cand.points.reversed(), cand.name, cand.ref, cand.kind, cand.oneway,
