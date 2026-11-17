@@ -2149,7 +2149,15 @@ class Altimetria3DView @JvmOverloads constructor(
         baseDistTextPaint.textSize = (barH * 0.68f).coerceIn(12f, 18f) * (1f + (fontScale - 1f) * 0.6f)
         val majorDistMeters = if (profileElevations.isNotEmpty()) majorBlockSizeMeters else (totalMetersAhead / majorBlocksCount)
 
+        // Si las etiquetas no caben (puertos largos), se rotula solo una de cada n para que no se superpongan
+        val labelStride = if (majorSamples >= 2) {
+            val spacing = Math.abs(majorX[1] - majorX[0]).coerceAtLeast(1f)
+            val sampleW = baseDistTextPaint.measureText(formatRulerDist(Math.round(windowStartMeters - gridOffsetMeters + majorDistMeters * (majorSamples - 1))))
+            Math.ceil((sampleW * 1.25f / spacing).toDouble()).toInt().coerceAtLeast(1)
+        } else 1
+
         for (k in 0 until majorSamples) {
+            if (k % labelStride != 0) continue
             val m = Math.round(windowStartMeters - gridOffsetMeters + (k * majorDistMeters))
             val distLabel = formatRulerDist(m)
             val px = majorX[k]
