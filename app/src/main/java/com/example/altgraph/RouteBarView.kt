@@ -553,6 +553,7 @@ class RouteBarView(context: Context) : View(context) {
             val cyPercent = (headerHeight / 2f) + (percentTextPaint.textSize / 3f)
             // getSubBlockSize only returns 50.0 or 100.0 for typical route lookaheads
             val showMaxGrade = strat.subBlocksMax.isNotEmpty()
+            val fullPercentSize = percentTextPaint.textSize
             for (band in bands) {
                 val left = band.startIndex * blockWidth - progressOffset
                 val right = (band.endIndex + 1) * blockWidth - progressOffset
@@ -565,7 +566,10 @@ class RouteBarView(context: Context) : View(context) {
                 val actualLeft = Math.max(Math.max(left, startX), 0f)
                 val actualRight = Math.min(Math.min(right, endX), w)
 
-                if (actualRight - actualLeft > percentTextPaint.textSize * 1.6f) {
+                // En franjas estrechas (zoom amplio) el número se reduce en vez de omitirse
+                val labelSize = Math.min(fullPercentSize, (actualRight - actualLeft) / 1.6f)
+                percentTextPaint.textSize = labelSize
+                if (labelSize >= 11f) {
                     val count = band.endIndex - band.startIndex + 1
                     val avgGrade = (Math.round(band.sumGrade / count)).toInt()
                     var drawCenter = actualLeft + (actualRight - actualLeft) / 2f
@@ -631,6 +635,7 @@ class RouteBarView(context: Context) : View(context) {
                     }
                 }
             }
+            percentTextPaint.textSize = fullPercentSize
 
             // Overlay oscuro (pasado) a la izquierda de la flecha estática, por encima de los números: lo recorrido queda
             // sombreado con sus porcentajes. Empieza en startX para no oscurecer la bandera de cuadros.
