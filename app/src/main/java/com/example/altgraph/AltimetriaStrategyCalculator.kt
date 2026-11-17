@@ -2335,9 +2335,10 @@ class AltimetriaStrategyCalculator {
                 }
                 val inPage = pLen > 0.0 && riderNow >= pStart && riderNow < pStart + pLen
                 if (!inPage) {
+                    val prevEnd = pStart + pLen
                     pLen = lookaheadDist
-                    // Al saltar de sección, la baliza queda al 20% (20% detrás, 80% delante)
-                    pStart = (riderNow - pLen * BEACON_ANCHOR_FRACTION).coerceAtLeast(0.0)
+                    pStart = if (pageLengthDist > 0.0 && riderNow >= prevEnd && riderNow < prevEnd + pLen) prevEnd
+                             else Math.floor(riderNow / pLen) * pLen
                 }
                 if (advance) { pageStartDist = pStart; pageLengthDist = pLen }
                 windowStartDist = pStart
