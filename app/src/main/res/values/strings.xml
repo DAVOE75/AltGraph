@@ -96,6 +96,46 @@
     <string name="setting_road_horizon_desc">Forecasts the upcoming road elevation profile using offline vector maps and DEM terrain data (.hgt) with no route loaded.</string>
     <string name="setting_horizon_zoom">Horizon zoom (no route)</string>
     <string name="setting_horizon_subblock">Sub-block size</string>
+    <string name="horizon_junction_mode">Junction guess priority</string>
+    <string name="horizon_junction_lsr">Left, straight, right</string>
+    <string name="horizon_junction_name">Same street name</string>
+    <string name="horizon_junction_turn">Smallest turn</string>
+    <string name="horizon_smoothing">Terrain smoothing</string>
+    <string name="horizon_level_low">Low (30 m)</string>
+    <string name="horizon_level_mid">Medium (60 m)</string>
+    <string name="horizon_level_high">High (120 m)</string>
+    <string name="horizon_heading_mode">Heading when stopped</string>
+    <string name="horizon_heading_nearest">Nearest road</string>
+    <string name="horizon_heading_gps">GPS orientation</string>
+    <string name="horizon_target">Show horizon on</string>
+    <string name="horizon_target_both">Radar and 3D</string>
+    <string name="horizon_target_radar">Radar only</string>
+    <string name="horizon_target_3d">3D only</string>
+    <string name="horizon_alert">Steep climb alert</string>
+    <string name="horizon_off">Off</string>
+    <string name="horizon_mark_guess">Mark where the profile is a guess</string>
+    <string name="horizon_dl_radius">Terrain download radius</string>
+    <string name="horizon_mobile_data">Allow mobile data for terrain download</string>
+    <string name="horizon_perm_ok">File access: OK</string>
+    <string name="horizon_perm_missing">File access: MISSING (open this panel and allow it)</string>
+    <string name="horizon_cover_yes">Terrain covers your position</string>
+    <string name="horizon_cover_no">No terrain for your position yet</string>
+    <string name="horizon_cover_unknown">Position not known yet</string>
+    <string name="horizon_downloading">Downloading terrain...</string>
+    <string name="horizon_status_fmt">%1$s
+Offline maps: %2$d files
+Terrain files: %3$d (%4$d MB)
+%5$s</string>
+    <string name="horizon_btn_download">Download terrain now</string>
+    <string name="horizon_dl_started">Download started</string>
+    <string name="horizon_dl_no_network">No allowed network (use Wi-Fi or enable mobile data)</string>
+    <string name="horizon_dl_nothing">Nothing to download or already downloading</string>
+    <string name="horizon_dl_no_pos">No position yet: ride or open a GPS fix first</string>
+    <string name="horizon_dl_done">Download finished: %1$d new files</string>
+    <string name="horizon_btn_diag">Copy diagnostics</string>
+    <string name="horizon_diag_copied">Diagnostics copied</string>
+    <string name="horizon_diag_empty">No prediction yet</string>
+    <string name="horizon_btn_reset">Reset horizon options</string>
     <string name="map_access_needed">Allow access to all files so AltGraph can read the Karoo offline maps.</string>
     <string name="setting_smart_zoom">Enable Tactical Smart Zoom (Auto-Scale)</string>
     <string name="setting_oasis_tracking">Enable Tactical Oasis Tracking (Recovery Zones)</string>

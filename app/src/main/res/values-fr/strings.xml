@@ -79,6 +79,46 @@
     <string name="setting_road_horizon_desc">Prédit la route et le profil d\'élévation à venir à l\'aide des cartes vectorielles et des données MNT (.hgt) sans parcours chargé.</string>
     <string name="setting_horizon_zoom">Zoom de l\'horizon (sans itinéraire)</string>
     <string name="setting_horizon_subblock">Taille du sous-bloc</string>
+    <string name="horizon_junction_mode">Priorité aux carrefours</string>
+    <string name="horizon_junction_lsr">Gauche, tout droit, droite</string>
+    <string name="horizon_junction_name">Même nom de rue</string>
+    <string name="horizon_junction_turn">Plus petit virage</string>
+    <string name="horizon_smoothing">Lissage du terrain</string>
+    <string name="horizon_level_low">Faible (30 m)</string>
+    <string name="horizon_level_mid">Moyen (60 m)</string>
+    <string name="horizon_level_high">Fort (120 m)</string>
+    <string name="horizon_heading_mode">Cap à l\'arrêt</string>
+    <string name="horizon_heading_nearest">Route la plus proche</string>
+    <string name="horizon_heading_gps">Orientation GPS</string>
+    <string name="horizon_target">Afficher l\'horizon sur</string>
+    <string name="horizon_target_both">Radar et 3D</string>
+    <string name="horizon_target_radar">Radar seulement</string>
+    <string name="horizon_target_3d">3D seulement</string>
+    <string name="horizon_alert">Alerte de forte montée</string>
+    <string name="horizon_off">Désactivée</string>
+    <string name="horizon_mark_guess">Marquer où le profil est une estimation</string>
+    <string name="horizon_dl_radius">Rayon de téléchargement du terrain</string>
+    <string name="horizon_mobile_data">Autoriser les données mobiles pour le terrain</string>
+    <string name="horizon_perm_ok">Accès aux fichiers : OK</string>
+    <string name="horizon_perm_missing">Accès aux fichiers : MANQUANT (ouvrez ce panneau et autorisez)</string>
+    <string name="horizon_cover_yes">Le terrain couvre votre position</string>
+    <string name="horizon_cover_no">Pas encore de terrain pour votre position</string>
+    <string name="horizon_cover_unknown">Position encore inconnue</string>
+    <string name="horizon_downloading">Téléchargement du terrain...</string>
+    <string name="horizon_status_fmt">%1$s
+Cartes hors ligne : %2$d fichiers
+Fichiers de terrain : %3$d (%4$d Mo)
+%5$s</string>
+    <string name="horizon_btn_download">Télécharger le terrain</string>
+    <string name="horizon_dl_started">Téléchargement lancé</string>
+    <string name="horizon_dl_no_network">Aucun réseau autorisé (Wi-Fi ou données mobiles)</string>
+    <string name="horizon_dl_nothing">Rien à télécharger ou déjà en cours</string>
+    <string name="horizon_dl_no_pos">Pas encore de position : attendez un fix GPS</string>
+    <string name="horizon_dl_done">Téléchargement terminé : %1$d nouveaux fichiers</string>
+    <string name="horizon_btn_diag">Copier le diagnostic</string>
+    <string name="horizon_diag_copied">Diagnostic copié</string>
+    <string name="horizon_diag_empty">Pas encore de prédiction</string>
+    <string name="horizon_btn_reset">Réinitialiser les options de l\'horizon</string>
     <string name="map_access_needed">Autorisez l\'accès à tous les fichiers pour qu\'AltGraph lise les cartes hors ligne du Karoo.</string>
     <string name="setting_smart_zoom">Activer Smart Zoom tactique (auto-échelle)</string>
     <string name="setting_oasis_tracking">Activer Oasis Tracking (zones de récupération)</string>

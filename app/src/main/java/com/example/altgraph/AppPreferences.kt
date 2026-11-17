@@ -250,6 +250,55 @@ class AppPreferences(context: Context) {
         get() = prefs.getInt("road_horizon_subblock_m", 50)
         set(value) = prefs.edit().putInt("road_horizon_subblock_m", value).apply()
 
+    // Opciones avanzadas del Horizonte Táctico 3D (solo sin ruta cargada)
+    var horizonJunctionMode: Int // 0 = izquierda>recto>derecha, 1 = misma calle por nombre, 2 = menor giro
+        get() = prefs.getInt("road_horizon_junction_mode", 0)
+        set(value) = prefs.edit().putInt("road_horizon_junction_mode", value).apply()
+
+    var horizonSmoothing: Int // 0 = bajo (30 m), 1 = medio (60 m), 2 = alto (120 m)
+        get() = prefs.getInt("road_horizon_smoothing", 1)
+        set(value) = prefs.edit().putInt("road_horizon_smoothing", value).apply()
+
+    var horizonDownloadRadiusKm: Int
+        get() = prefs.getInt("road_horizon_dl_radius_km", 30)
+        set(value) = prefs.edit().putInt("road_horizon_dl_radius_km", value).apply()
+
+    var horizonMobileData: Boolean
+        get() = prefs.getBoolean("road_horizon_mobile_data", false)
+        set(value) = prefs.edit().putBoolean("road_horizon_mobile_data", value).apply()
+
+    var horizonMarkGuess: Boolean
+        get() = prefs.getBoolean("road_horizon_mark_guess", true)
+        set(value) = prefs.edit().putBoolean("road_horizon_mark_guess", value).apply()
+
+    var horizonAlertPct: Int // 0 = sin aviso
+        get() = prefs.getInt("road_horizon_alert_pct", 0)
+        set(value) = prefs.edit().putInt("road_horizon_alert_pct", value).apply()
+
+    var horizonHeadingMode: Int // 0 = calle más cercana parado, 1 = orientación del GPS
+        get() = prefs.getInt("road_horizon_heading_mode", 0)
+        set(value) = prefs.edit().putInt("road_horizon_heading_mode", value).apply()
+
+    var horizonTarget: Int // 0 = radar y 3D, 1 = solo radar, 2 = solo 3D
+        get() = prefs.getInt("road_horizon_target", 0)
+        set(value) = prefs.edit().putInt("road_horizon_target", value).apply()
+
+    var horizonLastLat: Float
+        get() = prefs.getFloat("road_horizon_last_lat", 0f)
+        set(value) = prefs.edit().putFloat("road_horizon_last_lat", value).apply()
+
+    var horizonLastLng: Float
+        get() = prefs.getFloat("road_horizon_last_lng", 0f)
+        set(value) = prefs.edit().putFloat("road_horizon_last_lng", value).apply()
+
+    fun resetHorizonOptions() {
+        prefs.edit()
+            .remove("road_horizon_distance_m").remove("road_horizon_subblock_m").remove("road_horizon_junction_mode")
+            .remove("road_horizon_smoothing").remove("road_horizon_dl_radius_km").remove("road_horizon_mobile_data")
+            .remove("road_horizon_mark_guess").remove("road_horizon_alert_pct").remove("road_horizon_heading_mode")
+            .remove("road_horizon_target").apply()
+    }
+
     // --- PRO FEATURES (NIVEL SDK MÁXIMO) ---
     var smartZoomEnabled: Boolean
         get() = prefs.getBoolean(KEY_SMART_ZOOM_ENABLED, true)

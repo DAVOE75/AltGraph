@@ -79,6 +79,46 @@
     <string name="setting_road_horizon_desc">Sagt den kommenden Straßenverlauf und das Höhenprofil anhand von Vektorkarten und DEM-Daten (.hgt) ohne geladene Route voraus.</string>
     <string name="setting_horizon_zoom">Horizont-Zoom (ohne Route)</string>
     <string name="setting_horizon_subblock">Unterblockgröße</string>
+    <string name="horizon_junction_mode">Priorität bei Kreuzungen</string>
+    <string name="horizon_junction_lsr">Links, geradeaus, rechts</string>
+    <string name="horizon_junction_name">Gleicher Straßenname</string>
+    <string name="horizon_junction_turn">Kleinste Abbiegung</string>
+    <string name="horizon_smoothing">Geländeglättung</string>
+    <string name="horizon_level_low">Niedrig (30 m)</string>
+    <string name="horizon_level_mid">Mittel (60 m)</string>
+    <string name="horizon_level_high">Hoch (120 m)</string>
+    <string name="horizon_heading_mode">Richtung im Stand</string>
+    <string name="horizon_heading_nearest">Nächste Straße</string>
+    <string name="horizon_heading_gps">GPS-Ausrichtung</string>
+    <string name="horizon_target">Horizont anzeigen auf</string>
+    <string name="horizon_target_both">Radar und 3D</string>
+    <string name="horizon_target_radar">Nur Radar</string>
+    <string name="horizon_target_3d">Nur 3D</string>
+    <string name="horizon_alert">Warnung bei starkem Anstieg</string>
+    <string name="horizon_off">Aus</string>
+    <string name="horizon_mark_guess">Markieren, wo das Profil geschätzt ist</string>
+    <string name="horizon_dl_radius">Download-Radius für Gelände</string>
+    <string name="horizon_mobile_data">Mobile Daten für Gelände-Download erlauben</string>
+    <string name="horizon_perm_ok">Dateizugriff: OK</string>
+    <string name="horizon_perm_missing">Dateizugriff: FEHLT (Panel öffnen und erlauben)</string>
+    <string name="horizon_cover_yes">Gelände deckt deine Position ab</string>
+    <string name="horizon_cover_no">Noch kein Gelände für deine Position</string>
+    <string name="horizon_cover_unknown">Position noch unbekannt</string>
+    <string name="horizon_downloading">Gelände wird geladen...</string>
+    <string name="horizon_status_fmt">%1$s
+Offline-Karten: %2$d Dateien
+Gel?ndedateien: %3$d (%4$d MB)
+%5$s</string>
+    <string name="horizon_btn_download">Gelände jetzt laden</string>
+    <string name="horizon_dl_started">Download gestartet</string>
+    <string name="horizon_dl_no_network">Kein erlaubtes Netz (WLAN nutzen oder mobile Daten erlauben)</string>
+    <string name="horizon_dl_nothing">Nichts zu laden oder Download läuft bereits</string>
+    <string name="horizon_dl_no_pos">Noch keine Position: erst GPS-Fix abwarten</string>
+    <string name="horizon_dl_done">Download beendet: %1$d neue Dateien</string>
+    <string name="horizon_btn_diag">Diagnose kopieren</string>
+    <string name="horizon_diag_copied">Diagnose kopiert</string>
+    <string name="horizon_diag_empty">Noch keine Vorhersage</string>
+    <string name="horizon_btn_reset">Horizont-Optionen zurücksetzen</string>
     <string name="map_access_needed">Erlaube den Zugriff auf alle Dateien, damit AltGraph die Offline-Karten des Karoo lesen kann.</string>
     <string name="setting_smart_zoom">Taktischen Smart Zoom aktivieren (Auto-Skalierung)</string>
     <string name="setting_oasis_tracking">Oasis Tracking aktivieren (Erholungszonen)</string>

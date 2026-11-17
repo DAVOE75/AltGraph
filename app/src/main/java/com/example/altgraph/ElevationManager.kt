@@ -56,26 +56,46 @@ class ElevationManager(private val context: Context) {
     fun getHeldFiles(): List<File> =
         baseDir.listFiles { f -> f.name.endsWith(".hgt") }?.sortedBy { it.name }.orEmpty()
 
-    fun considerDownload(lat: Double, lng: Double, radiusKm: Int = 30) {
+    fun considerDownload(lat: Double, lng: Double, radiusKm: Int = AppPreferences.getInstance(context).horizonDownloadRadiusKm) {
         val now = SystemClock.elapsedRealtime()
         if (now - lastCheckMs < 60_000L) return
         lastCheckMs = now
+        startDownload(lat, lng, radiusKm, null)
+    }
 
+    /** Descarga inmediata desde el panel. Devuelve false si no hay red permitida o ya hay una descarga en curso. */
+    fun downloadNow(lat: Double, lng: Double, onDone: (Int) -> Unit): Int {
+        val radius = AppPreferences.getInstance(context).horizonDownloadRadiusKm
+        if (!isNetworkAllowed()) return DL_NO_NETWORK
+        return if (startDownload(lat, lng, radius, onDone)) DL_STARTED else DL_NOTHING
+    }
+
+    private fun startDownload(lat: Double, lng: Double, radiusKm: Int, onDone: ((Int) -> Unit)?): Boolean {
         val neededFiles = findNeededTileNames(lat, lng, radiusKm)
-        val missing = neededFiles.filter { !File(baseDir, it).isFile && !isKnownMissing(it) }
-        if (missing.isEmpty() || !isWifiConnected()) return
+        val missing = neededFiles.filter { !File(baseDir, it).isFile && (onDone != null || !isKnownMissing(it)) }
+        if (missing.isEmpty() || !isNetworkAllowed()) return false
 
-        if (!isFetching.compareAndSet(false, true)) return
+        if (!isFetching.compareAndSet(false, true)) return false
         scope.launch {
+            var ok = 0
             try {
                 for (name in missing) {
-                    fetchHgt(name)
+                    if (fetchHgt(name)) ok++
                 }
             } finally {
                 isFetching.set(false)
                 openFiles.clear()
+                onDone?.invoke(ok)
             }
         }
+        return true
+    }
+
+    fun isDownloading(): Boolean = isFetching.get()
+
+    fun heldSummary(): Pair<Int, Long> {
+        val files = getHeldFiles()
+        return files.size to files.sumOf { it.length() }
     }
 
     private fun findNeededTileNames(lat: Double, lng: Double, radiusKm: Int): List<String> {
@@ -101,6 +121,14 @@ class ElevationManager(private val context: Context) {
         return mark.isFile && (System.currentTimeMillis() - mark.lastModified() < 30L * 86_400_000L)
     }
 
+    private fun isNetworkAllowed(): Boolean {
+        if (isWifiConnected()) return true
+        if (!AppPreferences.getInstance(context).horizonMobileData) return false
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return false
+        val caps = cm.getNetworkCapabilities(cm.activeNetwork ?: return false) ?: return false
+        return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+
     private fun isWifiConnected(): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return false
         val network = cm.activeNetwork ?: return false
@@ -108,7 +136,8 @@ class ElevationManager(private val context: Context) {
         return caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
     }
 
-    private fun fetchHgt(name: String) {
+    private fun fetchHgt(name: String): Boolean {
+        var saved = false
         val prefix = name.substring(0, 3) // p. ej. N38
         val urlStr = "https://elevation-tiles-prod.s3.amazonaws.com/skadi/$prefix/$name.gz"
         val partFile = File(baseDir, "$name.part")
@@ -131,6 +160,7 @@ class ElevationManager(private val context: Context) {
                     val n = sqrt(partFile.length() / 2.0).roundToInt()
                     if (n >= 2 && n.toLong() * n * 2 == partFile.length()) {
                         partFile.renameTo(targetFile)
+                        saved = true
                         Log.i("ElevationManager", "MDT guardado: $name (${targetFile.length() / 1024} KB)")
                     } else {
                         partFile.delete()
@@ -149,6 +179,7 @@ class ElevationManager(private val context: Context) {
             Log.e("ElevationManager", "Fallo descargando $name", e)
             partFile.delete()
         }
+        return saved
     }
 
     private fun distanceMeters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
@@ -165,6 +196,10 @@ class ElevationManager(private val context: Context) {
     }
 
     companion object {
+        const val DL_STARTED = 0
+        const val DL_NO_NETWORK = 1
+        const val DL_NOTHING = 2
+
         @Volatile
         private var INSTANCE: ElevationManager? = null
 

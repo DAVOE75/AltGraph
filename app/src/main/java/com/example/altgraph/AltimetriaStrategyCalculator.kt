@@ -2157,7 +2157,11 @@ class AltimetriaStrategyCalculator {
 
         // Sin ruta y con Road Horizon activo, el zoom lo fija el usuario (3D y radar); con ruta todo sigue como antes
         val horizonSubBlockM = (prefs?.horizonSubBlockM ?: 50).toDouble()
-        if (!isNavigating && (prefs?.roadHorizonEnabled ?: true)) {
+        // Target: 0 = radar y 3D, 1 = solo radar, 2 = solo 3D (strategyFor3D no pasa viewWidth)
+        val horizonTarget = prefs?.horizonTarget ?: 0
+        val horizonTargetOk = horizonTarget == 0 || (horizonTarget == 1 && !isFor3D) || (horizonTarget == 2 && isFor3D)
+        val horizonActive = (prefs?.roadHorizonEnabled ?: true) && horizonTargetOk
+        if (!isNavigating && horizonActive) {
             lookaheadDist = (prefs?.horizonDistanceM ?: 2000).toDouble()
         }
 
@@ -2179,7 +2183,7 @@ class AltimetriaStrategyCalculator {
                 }
             }
 
-            val horizonEnabled = prefs?.roadHorizonEnabled ?: true
+            val horizonEnabled = horizonActive
             var horizonResult: RoadHorizonPredictor.HorizonResult? = null
             var horizonProgress = 0f
             if (horizonEnabled && currentLatitude != 0.0 && currentLongitude != 0.0 && effectiveCtx != null) {
@@ -2213,7 +2217,8 @@ class AltimetriaStrategyCalculator {
                             grades = held.grades.subList(start, minOf(held.grades.size, end - 1)),
                             coordinates = held.coordinates.subList(start, end),
                             roadName = held.roadName,
-                            totalDistanceMeters = (end - start - 1) * stepM
+                            totalDistanceMeters = (end - start - 1) * stepM,
+                            guessFromMeters = if (held.guessFromMeters >= 0.0) held.guessFromMeters - start * stepM else -1.0
                         )
                         horizonProgress = ((s - start) / (end - start - 1)).toFloat().coerceIn(0f, 1f)
                     }
@@ -2239,9 +2244,13 @@ class AltimetriaStrategyCalculator {
                 val stepMeters = horizonResult.totalDistanceMeters / (hElevs.size - 1)
                 val majorBlockSize = (Math.round(getMajorBlockSize(lookaheadDist) / stepMeters).toInt().coerceAtLeast(1)) * stepMeters
 
-                val hasAttack = attackAlertsEnabled && hGrades.any { it > thresholdAttack }
+                val alertPct = prefs?.horizonAlertPct ?: 0
+                val hasAttack = alertPct > 0 && hGrades.any { it > alertPct }
                 val liveFatigue = (hGrades.average() * 8.5 + asphaltFactor * 10).roundToInt().coerceIn(10, 250)
                 if (advance) ClimbStateManager.updateApm(liveFatigue)
+                val guessM = horizonResult.guessFromMeters
+                val guessPois = if ((prefs?.horizonMarkGuess ?: true) && guessM >= 0.0 && guessM < horizonResult.totalDistanceMeters)
+                    listOf(Poi(guessM, "?", "", PoiType.TOWN)) else emptyList()
 
                 return StrategyData(
                     remainingDistance = horizonResult.totalDistanceMeters,
@@ -2252,7 +2261,7 @@ class AltimetriaStrategyCalculator {
                     blockSizeMeters = stepMeters,
                     totalFatigueGrade = liveFatigue,
                     hairpins = emptyList(),
-                    pois = emptyList(),
+                    pois = guessPois,
                     curvatureOffsets = List(hElevs.size) { 0f },
                     riderProgress = horizonProgress,
                     windowStartMeters = 0.0,

@@ -13,6 +13,12 @@ import kotlin.math.*
 class RoadHorizonPredictor(private val context: Context) {
 
     private val elevationManager = ElevationManager.getInstance(context)
+    private val appPrefs = AppPreferences.getInstance(context)
+    private var lastPosSaveMs = 0L
+    @Volatile var lastDiagnostic: String = ""
+        private set
+    @Volatile var mapFileCount: Int = 0
+        private set
     private var mapReader: KarooMapReader? = null
     private var lastMapCheckMs = 0L
     private var anchorLat = 0.0
@@ -26,7 +32,8 @@ class RoadHorizonPredictor(private val context: Context) {
         val grades: List<Float>,
         val coordinates: List<Pair<Double, Double>>,
         val roadName: String?,
-        val totalDistanceMeters: Double
+        val totalDistanceMeters: Double,
+        val guessFromMeters: Double = -1.0 // distancia desde la que el trazado es una suposición en un cruce (-1 = ninguna)
     )
 
     private fun ensureMapReader(): KarooMapReader? {
@@ -35,6 +42,7 @@ class RoadHorizonPredictor(private val context: Context) {
             lastMapCheckMs = now
             val mapDir = File("/sdcard/offline/maps")
             val maps = mapDir.listFiles { f -> f.name.endsWith(".map") }?.toList().orEmpty()
+            mapFileCount = maps.size
             android.util.Log.i("RoadHorizon", "maps dir exists=${mapDir.exists()} canRead=${mapDir.canRead()} maps=${maps.size}")
             if (maps.isNotEmpty()) {
                 if (mapReader == null) {
@@ -62,9 +70,14 @@ class RoadHorizonPredictor(private val context: Context) {
         val reader = ensureMapReader()
         if (reader == null) { android.util.Log.w("RoadHorizon", "no map reader (permission/maps?)"); return null }
         val currentPoint = GeoPoint(lat, lng)
+        val nowMs = System.currentTimeMillis()
+        if (nowMs - lastPosSaveMs > 30_000L) {
+            lastPosSaveMs = nowMs
+            appPrefs.horizonLastLat = lat.toFloat(); appPrefs.horizonLastLng = lng.toFloat()
+        }
         if (anchorLat == 0.0) { anchorLat = lat; anchorLng = lng }
         if (!hasMoved && GeoPoint(anchorLat, anchorLng).distanceTo(currentPoint) > 15.0) hasMoved = true
-        val stationary = !hasMoved
+        val stationary = !hasMoved && !(appPrefs.horizonHeadingMode == 1 && headingDeg != 0.0)
         val nearbyRoads = reader.getRoadsNear(currentPoint, radiusMeters = 80.0)
         android.util.Log.i("RoadHorizon", "roads near=${nearbyRoads.size} heading=$headingDeg")
         if (nearbyRoads.isEmpty()) return null
@@ -112,6 +125,7 @@ class RoadHorizonPredictor(private val context: Context) {
         var currentIndex = bestIndex + 1
         var accumulatedDist = 0.0
         val visitedRoads = mutableSetOf<String>()
+        var guessFrom = -1.0
         var mainRoadName = bestRoad.name ?: bestRoad.ref
 
         while (accumulatedDist < distanceMeters && currentRoad != null) {
@@ -141,6 +155,7 @@ class RoadHorizonPredictor(private val context: Context) {
                 projectedPoints[projectedPoints.size - 2].bearingTo(junctionPoint)
             } else headingDeg
 
+            var eligibleCount = 0
             for (tol in doubleArrayOf(25.0, 90.0)) {
             for (cand in candidateRoads) {
                 // Verificar si empieza cerca del junction (con huecos en los datos del mapa se amplía la tolerancia)
@@ -154,14 +169,20 @@ class RoadHorizonPredictor(private val context: Context) {
                     val turnAngle = abs(signedTurn)
                     val sameName = (currentRoad.name != null && currentRoad.name == cand.name)
 
-                    // Prioridad ante la duda: izquierda, recto, derecha (a igualdad de clase, mismo nombre y menor giro)
-                    val klass = when {
-                        signedTurn < -25.0 -> 0
-                        turnAngle <= 25.0 -> 1
-                        else -> 2
+                    val score = when (appPrefs.horizonJunctionMode) {
+                        1 -> (if (sameName) 0.0 else 300.0) + turnAngle // misma calle por nombre, luego menor giro
+                        2 -> turnAngle // menor giro
+                        else -> { // izquierda, recto, derecha (a igualdad de clase, mismo nombre y menor giro)
+                            val klass = when {
+                                signedTurn < -25.0 -> 0
+                                turnAngle <= 25.0 -> 1
+                                else -> 2
+                            }
+                            klass * 1000.0 + (if (sameName) 0.0 else 300.0) + turnAngle
+                        }
                     }
-                    val score = klass * 1000.0 + (if (sameName) 0.0 else 300.0) + turnAngle
                     val revisits = projectedPoints.any { it.distanceTo(nextPt) < 8.0 }
+                    if (!revisits && turnAngle < 135.0) eligibleCount++
                     if (!revisits && turnAngle < 135.0 && score < bestNextAngle) {
                         bestNextAngle = score
                         bestNextRoad = if (fromStart) cand else RoadSegment(
@@ -174,6 +195,7 @@ class RoadHorizonPredictor(private val context: Context) {
             if (bestNextRoad != null) break
             }
 
+            if (bestNextRoad != null && eligibleCount >= 2 && guessFrom < 0.0) guessFrom = accumulatedDist
             if (bestNextRoad != null) {
                 currentRoad = bestNextRoad
                 currentIndex = 1
@@ -214,8 +236,13 @@ class RoadHorizonPredictor(private val context: Context) {
             grades = grades,
             coordinates = samplePoints.map { Pair(it.lat, it.lng) },
             roadName = mainRoadName,
-            totalDistanceMeters = (elevations.size - 1) * sampleStepMeters
-        )
+            totalDistanceMeters = (elevations.size - 1) * sampleStepMeters,
+            guessFromMeters = guessFrom
+        ).also {
+            lastDiagnostic = "road=$mainRoadName dist=${accumulatedDist.toInt()}m step=${sampleStepMeters.toInt()}m " +
+                "elev=${"%.0f".format(elevations.minOrNull() ?: 0f)}..${"%.0f".format(elevations.maxOrNull() ?: 0f)} " +
+                "pos=${"%.5f".format(lat)},${"%.5f".format(lng)} heading=${headingDeg.toInt()} maps=$mapFileCount guess=${guessFrom.toInt()}"
+        }
     }
 
     private fun resamplePath(points: List<GeoPoint>, stepMeters: Double, maxDistMeters: Double): List<GeoPoint> {
@@ -260,7 +287,7 @@ class RoadHorizonPredictor(private val context: Context) {
     // El MDT es de 1 m de resolución vertical y recoge edificios/arbolado: sin suavizar salen rampas falsas en llano
     private fun smoothElevations(e: MutableList<Float>, stepM: Double) {
         if (e.size < 3) return
-        val radius = Math.ceil(60.0 / stepM).toInt().coerceAtLeast(1)
+        val radius = Math.ceil(when (appPrefs.horizonSmoothing) { 0 -> 30.0; 2 -> 120.0; else -> 60.0 } / stepM).toInt().coerceAtLeast(1)
         val src = e.toList()
         for (i in src.indices) {
             val r = minOf(radius, i, src.size - 1 - i)
