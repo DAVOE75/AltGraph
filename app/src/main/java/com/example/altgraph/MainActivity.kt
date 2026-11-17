@@ -27,11 +27,26 @@ class MainActivity : Activity() {
 
     private lateinit var prefs: AppPreferences
 
+    private fun requestMapStorageAccess() {
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= 30) {
+                if (!android.os.Environment.isExternalStorageManager()) {
+                    startActivity(android.content.Intent(
+                        android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                        android.net.Uri.parse("package:$packageName")))
+                }
+            } else if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 77)
+            }
+        } catch (_: Exception) {}
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         prefs = AppPreferences.getInstance(this)
         PanelTheme.init(this, prefs.panelTheme)
         setTheme(if (PanelTheme.isLight) R.style.Theme_ALTGRAPH_Panel_Light else R.style.Theme_ALTGRAPH_Panel_Dark)
         super.onCreate(savedInstanceState)
+        requestMapStorageAccess()
 
         FontHelper.init(this)
 

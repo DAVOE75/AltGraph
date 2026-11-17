@@ -53,9 +53,11 @@ class RoadHorizonPredictor(private val context: Context) {
         // Disparar en segundo plano la descarga si estamos en Wi-Fi
         elevationManager.considerDownload(lat, lng)
 
-        val reader = ensureMapReader() ?: return null
+        val reader = ensureMapReader()
+        if (reader == null) { android.util.Log.w("RoadHorizon", "no map reader (permission/maps?)"); return null }
         val currentPoint = GeoPoint(lat, lng)
         val nearbyRoads = reader.getRoadsNear(currentPoint, radiusMeters = 80.0)
+        android.util.Log.i("RoadHorizon", "roads near=${nearbyRoads.size} heading=$headingDeg")
         if (nearbyRoads.isEmpty()) return null
 
         // 1. Snapping: Encontrar el tramo de carretera más alineado con nuestro rumbo
@@ -68,7 +70,7 @@ class RoadHorizonPredictor(private val context: Context) {
                 val p1 = road.points[i]
                 val p2 = road.points[i + 1]
                 val segmentBearing = p1.bearingTo(p2)
-                val bearingDiff = abs(angleDifference(headingDeg, segmentBearing))
+                val bearingDiff = if (headingDeg == 0.0) 0.0 else abs(angleDifference(headingDeg, segmentBearing))
 
                 // Solo consideramos tramos que van más o menos en nuestra dirección (< 75 grados)
                 if (bearingDiff < 75.0) {
@@ -82,7 +84,7 @@ class RoadHorizonPredictor(private val context: Context) {
             }
         }
 
-        if (bestRoad == null) return null
+        if (bestRoad == null) { android.util.Log.w("RoadHorizon", "no road aligned with heading"); return null }
 
         // 2. Extender camino hacia adelante (Road Following)
         val projectedPoints = mutableListOf<GeoPoint>()
