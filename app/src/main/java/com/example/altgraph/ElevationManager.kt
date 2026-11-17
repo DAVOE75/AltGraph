@@ -108,8 +108,9 @@ class ElevationManager(private val context: Context) {
         val out = mutableListOf<String>()
         val lat0 = floor(lat).toInt()
         val lng0 = floor(lng).toInt()
-        for (dLat in -1..1) {
-            for (dLng in -1..1) {
+        val span = Math.ceil(radiusKm / 70.0).toInt().coerceIn(1, 4)
+        for (dLat in -span..span) {
+            for (dLng in -span..span) {
                 val s = (lat0 + dLat).toDouble()
                 val w = (lng0 + dLng).toDouble()
                 val nearestLat = lat.coerceIn(s, s + 1.0)

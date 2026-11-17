@@ -1724,7 +1724,7 @@ class MainActivity : Activity() {
         addOpt(horizonSwitch(getString(R.string.horizon_mark_guess), prefs.horizonMarkGuess) { prefs.horizonMarkGuess = it })
 
         // Descarga del terreno (MDT)
-        val radiusValues = listOf(10, 30, 60)
+        val radiusValues = listOf(10, 30, 60, 120, 150, 180, 210)
         addOpt(labelSpinner(getString(R.string.horizon_dl_radius),
             radiusValues.map { "$it km" }, radiusValues.indexOf(prefs.horizonDownloadRadiusKm).coerceAtLeast(0)) { prefs.horizonDownloadRadiusKm = radiusValues[it] })
         addOpt(horizonSwitch(getString(R.string.horizon_mobile_data), prefs.horizonMobileData) { prefs.horizonMobileData = it })
