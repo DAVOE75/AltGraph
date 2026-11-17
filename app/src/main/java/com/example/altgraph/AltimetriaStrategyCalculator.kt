@@ -434,8 +434,9 @@ class AltimetriaStrategyCalculator {
         return p0.elevation + frac * (p1.elevation - p0.elevation)
     }
 
-    fun updateCurrentLocation(lat: Double, lng: Double) {
+    fun updateCurrentLocation(lat: Double, lng: Double, orientation: Double? = null) {
         if (lat == 0.0 && lng == 0.0) return
+        if (orientation != null && this.currentHeading == 0.0) this.currentHeading = (orientation + 360.0) % 360.0
         if (this.currentLatitude != 0.0 && this.currentLongitude != 0.0) {
             val dist = Math.hypot(lat - this.currentLatitude, lng - this.currentLongitude)
             if (dist > 0.00002) { // aprox 2 metros

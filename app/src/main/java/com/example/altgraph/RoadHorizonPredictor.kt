@@ -137,7 +137,8 @@ class RoadHorizonPredictor(private val context: Context) {
                     val sameName = (currentRoad.name != null && currentRoad.name == cand.name)
 
                     val score = if (sameName) turnAngle * 0.5 else turnAngle
-                    if (turnAngle < 110.0 && score < bestNextAngle) {
+                    val revisits = projectedPoints.any { it.distanceTo(nextPt) < 8.0 }
+                    if (!revisits && turnAngle < 70.0 && score < bestNextAngle) {
                         bestNextAngle = score
                         bestNextRoad = if (fromStart) cand else RoadSegment(
                             cand.points.reversed(), cand.name, cand.ref, cand.kind, cand.oneway,
@@ -156,6 +157,7 @@ class RoadHorizonPredictor(private val context: Context) {
         }
 
         if (projectedPoints.size < 2 || accumulatedDist < 100.0) return null
+        android.util.Log.i("RoadHorizon", "path=" + projectedPoints.filterIndexed { i, _ -> i % 3 == 0 }.joinToString(";") { "%.5f,%.5f".format(it.lat, it.lng) })
 
         // 3. Muestrear elevación del MDT a lo largo de la polilínea proyectada
         val samplePoints = resamplePath(projectedPoints, sampleStepMeters, distanceMeters)
@@ -168,6 +170,7 @@ class RoadHorizonPredictor(private val context: Context) {
 
         // Si faltan algunas cotas puntuales, interpolar
         fixMissingElevations(elevations)
+        android.util.Log.i("RoadHorizon", "road=$mainRoadName pts=${samplePoints.size} step=$sampleStepMeters dist=$accumulatedDist elev=${elevations.minOrNull()}..${elevations.maxOrNull()} first=${samplePoints.first().lat},${samplePoints.first().lng} last=${samplePoints.last().lat},${samplePoints.last().lng}")
 
         // Calcular pendientes (%)
         val grades = mutableListOf<Float>()

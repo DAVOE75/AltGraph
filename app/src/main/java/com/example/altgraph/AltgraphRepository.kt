@@ -345,7 +345,7 @@ object AltgraphRepository {
             }
         }
         KIND_LOC -> system.addConsumer<OnLocationChanged> { event ->
-            s.launch { core.calculator.updateCurrentLocation(event.lat, event.lng) }
+            s.launch { core.calculator.updateCurrentLocation(event.lat, event.lng, event.orientation) }
         }
         KIND_ZOOM -> system.addConsumer<OnMapZoomLevel> { event ->
             s.launch {
