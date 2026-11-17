@@ -141,10 +141,11 @@ class RoadHorizonPredictor(private val context: Context) {
                 projectedPoints[projectedPoints.size - 2].bearingTo(junctionPoint)
             } else headingDeg
 
+            for (tol in doubleArrayOf(25.0, 90.0)) {
             for (cand in candidateRoads) {
-                // Verificar si empieza cerca del junction
-                val fromStart = cand.points.first().distanceTo(junctionPoint) < 25.0
-                val fromEnd = !cand.oneway && cand.points.last().distanceTo(junctionPoint) < 25.0
+                // Verificar si empieza cerca del junction (con huecos en los datos del mapa se amplía la tolerancia)
+                val fromStart = cand.points.first().distanceTo(junctionPoint) < tol
+                val fromEnd = !cand.oneway && cand.points.last().distanceTo(junctionPoint) < tol
 
                 if (fromStart || fromEnd) {
                     val nextPt = if (fromStart) cand.points[1] else cand.points[cand.points.size - 2]
@@ -170,11 +171,15 @@ class RoadHorizonPredictor(private val context: Context) {
                     }
                 }
             }
+            if (bestNextRoad != null) break
+            }
 
             if (bestNextRoad != null) {
                 currentRoad = bestNextRoad
                 currentIndex = 1
             } else {
+                val near = candidateRoads.map { minOf(it.points.first().distanceTo(junctionPoint), it.points.last().distanceTo(junctionPoint)) to it }.sortedBy { it.first }.take(3)
+                android.util.Log.i("RoadHorizon", "path ends at ${junctionPoint.lat},${junctionPoint.lng} after ${accumulatedDist.toInt()} m, candidates=${candidateRoads.size} road=${currentRoad.name} pts=${currentRoad.points.size} nearest=" + near.joinToString { "%.0fm/%s/oneway=%s/pts=%d".format(it.first, it.second.name, it.second.oneway, it.second.points.size) })
                 break // Fin de la vía o no hay continuación transitable
             }
         }

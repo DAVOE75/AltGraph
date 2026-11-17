@@ -2279,7 +2279,7 @@ class AltimetriaStrategyCalculator {
             val riderDistInWindow = (liveDistanceAccumulated - windowStartDist).coerceAtLeast(0.0)
             val riderProgress = (riderDistInWindow / lookaheadDist).toFloat().coerceIn(0f, 1f)
 
-            val customResolution = prefs?.eliteRadarResolution ?: 0
+            val customResolution = if (horizonEnabled) horizonSubBlockM.toInt() else (prefs?.eliteRadarResolution ?: 0)
             val subBlockSize = getSubBlockSize(lookaheadDist, customResolution)
             val majorBlockSize = getMajorBlockSize(lookaheadDist)
             val numSubBlocks = (lookaheadDist / subBlockSize).toInt().coerceIn(2, 60)
