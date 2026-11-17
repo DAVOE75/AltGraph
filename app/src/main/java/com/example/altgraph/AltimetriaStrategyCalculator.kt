@@ -2191,7 +2191,8 @@ class AltimetriaStrategyCalculator {
                         val frac = projectOnHorizon(held, currentLatitude, currentLongitude)
                         if (frac != null) s = frac.toDouble() * (held.elevations.size - 1)
                     }
-                    if (held == null || s < 0.0 || s + (count - nb) > held.elevations.size - 1) {
+                    val canGrow = held != null && held.totalDistanceMeters >= lookaheadDist * 1.9
+                    if (held == null || s < 0.0 || s >= held.elevations.size - 2 || (canGrow && s + (count - nb) > held.elevations.size - 1)) {
                         held = predictor.predictHorizon(currentLatitude, currentLongitude, currentHeading, lookaheadDist * 2.0, stepM)
                         heldAnchor = held
                         heldAnchorLookahead = lookaheadDist
