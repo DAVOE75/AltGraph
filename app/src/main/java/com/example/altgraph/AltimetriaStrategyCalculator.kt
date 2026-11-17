@@ -2189,7 +2189,7 @@ class AltimetriaStrategyCalculator {
                     var s = -1.0
                     if (held != null && heldAnchorLookahead == lookaheadDist) {
                         val frac = projectOnHorizon(held, currentLatitude, currentLongitude)
-                        if (frac != null) s = frac * (held.elevations.size - 1)
+                        if (frac != null) s = frac.toDouble() * (held.elevations.size - 1)
                     }
                     if (held == null || s < 0.0 || s + (count - nb) > held.elevations.size - 1) {
                         held = predictor.predictHorizon(currentLatitude, currentLongitude, currentHeading, lookaheadDist * 2.0, stepM)
