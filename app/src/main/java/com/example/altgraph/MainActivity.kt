@@ -29,16 +29,35 @@ class MainActivity : Activity() {
 
     private fun requestMapStorageAccess() {
         try {
-            if (android.os.Build.VERSION.SDK_INT >= 30) {
-                if (!android.os.Environment.isExternalStorageManager()) {
-                    startActivity(android.content.Intent(
-                        android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                        android.net.Uri.parse("package:$packageName")))
-                }
-            } else if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 77)
+            val perms = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            val missing = perms.filter { checkSelfPermission(it) != android.content.pm.PackageManager.PERMISSION_GRANTED }
+            if (missing.isNotEmpty()) requestPermissions(missing.toTypedArray(), 77)
+            else if (android.os.Build.VERSION.SDK_INT >= 30 && !android.os.Environment.isExternalStorageManager()) {
+                startActivity(android.content.Intent(
+                    android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                    android.net.Uri.parse("package:$packageName")))
             }
         } catch (_: Exception) {}
+    }
+
+    private var storagePrompted = false
+
+    override fun onResume() {
+        super.onResume()
+        if (!storagePrompted && !hasMapAccess()) {
+            storagePrompted = true
+            android.widget.Toast.makeText(this, getString(R.string.map_access_needed), android.widget.Toast.LENGTH_LONG).show()
+            requestMapStorageAccess()
+        }
+    }
+
+    private fun hasMapAccess(): Boolean =
+        checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == android.content.pm.PackageManager.PERMISSION_GRANTED &&
+        checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 77) recreate()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +65,6 @@ class MainActivity : Activity() {
         PanelTheme.init(this, prefs.panelTheme)
         setTheme(if (PanelTheme.isLight) R.style.Theme_ALTGRAPH_Panel_Light else R.style.Theme_ALTGRAPH_Panel_Dark)
         super.onCreate(savedInstanceState)
-        requestMapStorageAccess()
 
         FontHelper.init(this)
 

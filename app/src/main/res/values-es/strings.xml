@@ -93,6 +93,7 @@
     <!-- Pro Features -->
     <string name="setting_road_horizon">Horizonte Táctico 3D (Previsión sin ruta)</string>
     <string name="setting_road_horizon_desc">Predice la carretera y el perfil de elevación próximo usando los mapas vectoriales y el modelo de terreno MDT (.hgt), incluso sin track cargado.</string>
+    <string name="map_access_needed">Permite el acceso a todos los archivos para que AltGraph lea los mapas offline de la Karoo.</string>
     <string name="setting_smart_zoom">Habilitar Smart Zoom Táctico (Auto-Escala)</string>
     <string name="setting_oasis_tracking">Habilitar Oasis Tracking (Zonas de Recuperación)</string>
     <string name="setting_switchback_rendering">Habilitar Dinámica de Herraduras 3D</string>

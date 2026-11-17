@@ -33,6 +33,7 @@ class RoadHorizonPredictor(private val context: Context) {
             lastMapCheckMs = now
             val mapDir = File("/sdcard/offline/maps")
             val maps = mapDir.listFiles { f -> f.name.endsWith(".map") }?.toList().orEmpty()
+            android.util.Log.i("RoadHorizon", "maps dir exists=${mapDir.exists()} canRead=${mapDir.canRead()} maps=${maps.size}")
             if (maps.isNotEmpty()) {
                 if (mapReader == null) {
                     mapReader = KarooMapReader(maps)
