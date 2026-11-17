@@ -2148,11 +2148,11 @@ class AltimetriaStrategyCalculator {
             // Zoom por velocidad: despacio (subiendo) = zoom cercano; rápido = zoom lejano. Pasos de 500 m con histéresis
             speedZoomEma += (currentSpeed * 3.6 - speedZoomEma) * 0.1
             val t = ((speedZoomEma - 8.0) / (40.0 - 8.0)).coerceIn(0.0, 1.0)
-            val target = Math.round((500.0 + t * 4500.0) / 500.0) * 500.0
+            val target = Math.round((250.0 + t * 4750.0) / 250.0) * 250.0
             val nowZ = System.currentTimeMillis()
             if (speedZoomCurrent == 0.0) speedZoomCurrent = target
             else if (target != speedZoomCurrent && nowZ - speedZoomChangeMs > 10_000L) {
-                speedZoomCurrent += if (target > speedZoomCurrent) 500.0 else -500.0
+                speedZoomCurrent += if (target > speedZoomCurrent) 250.0 else -250.0
                 speedZoomChangeMs = nowZ
             }
         }
