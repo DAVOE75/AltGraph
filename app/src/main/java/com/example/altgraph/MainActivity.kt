@@ -1657,8 +1657,13 @@ class MainActivity : Activity() {
             })
             return row
         }
+        fun horizonDivider() = View(this).apply {
+            setBackgroundColor(Color.parseColor("#33FFFFFF"))
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 2).apply { setMargins(0, 14, 0, 6) }
+        }
+        fun addOpt(v: View) { roadHorizonCard.addView(horizonDivider()); roadHorizonCard.addView(v) }
         roadHorizonCard.addView(horizonSpinner(getString(R.string.setting_horizon_zoom), (1..60).map { it * 500 }, prefs.horizonDistanceM) { prefs.horizonDistanceM = it })
-        roadHorizonCard.addView(horizonSpinner(getString(R.string.setting_horizon_subblock), listOf(50, 100, 250, 500), prefs.horizonSubBlockM) { prefs.horizonSubBlockM = it })
+        addOpt(horizonSpinner(getString(R.string.setting_horizon_subblock), listOf(50, 100, 250, 500), prefs.horizonSubBlockM) { prefs.horizonSubBlockM = it })
 
         fun labelSpinner(title: String, labels: List<String>, current: Int, onPick: (Int) -> Unit): LinearLayout {
             val row = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(0, 8, 0, 4) }
@@ -1681,29 +1686,29 @@ class MainActivity : Activity() {
             setOnCheckedChangeListener { _, c -> onChange(c) }
         }
 
-        roadHorizonCard.addView(labelSpinner(getString(R.string.horizon_junction_mode),
+        addOpt(labelSpinner(getString(R.string.horizon_junction_mode),
             listOf(getString(R.string.horizon_junction_lsr), getString(R.string.horizon_junction_name), getString(R.string.horizon_junction_turn)),
             prefs.horizonJunctionMode) { prefs.horizonJunctionMode = it })
-        roadHorizonCard.addView(labelSpinner(getString(R.string.horizon_smoothing),
+        addOpt(labelSpinner(getString(R.string.horizon_smoothing),
             listOf(getString(R.string.horizon_level_low), getString(R.string.horizon_level_mid), getString(R.string.horizon_level_high)),
             prefs.horizonSmoothing) { prefs.horizonSmoothing = it })
-        roadHorizonCard.addView(labelSpinner(getString(R.string.horizon_heading_mode),
+        addOpt(labelSpinner(getString(R.string.horizon_heading_mode),
             listOf(getString(R.string.horizon_heading_nearest), getString(R.string.horizon_heading_gps)),
             prefs.horizonHeadingMode) { prefs.horizonHeadingMode = it })
-        roadHorizonCard.addView(labelSpinner(getString(R.string.horizon_target),
+        addOpt(labelSpinner(getString(R.string.horizon_target),
             listOf(getString(R.string.horizon_target_both), getString(R.string.horizon_target_radar), getString(R.string.horizon_target_3d)),
             prefs.horizonTarget) { prefs.horizonTarget = it })
         val alertValues = listOf(0, 6, 8, 10, 12, 15)
-        roadHorizonCard.addView(labelSpinner(getString(R.string.horizon_alert),
+        addOpt(labelSpinner(getString(R.string.horizon_alert),
             alertValues.map { if (it == 0) getString(R.string.horizon_off) else "$it %" },
             alertValues.indexOf(prefs.horizonAlertPct).coerceAtLeast(0)) { prefs.horizonAlertPct = alertValues[it] })
-        roadHorizonCard.addView(horizonSwitch(getString(R.string.horizon_mark_guess), prefs.horizonMarkGuess) { prefs.horizonMarkGuess = it })
+        addOpt(horizonSwitch(getString(R.string.horizon_mark_guess), prefs.horizonMarkGuess) { prefs.horizonMarkGuess = it })
 
         // Descarga del terreno (MDT)
         val radiusValues = listOf(10, 30, 60)
-        roadHorizonCard.addView(labelSpinner(getString(R.string.horizon_dl_radius),
+        addOpt(labelSpinner(getString(R.string.horizon_dl_radius),
             radiusValues.map { "$it km" }, radiusValues.indexOf(prefs.horizonDownloadRadiusKm).coerceAtLeast(0)) { prefs.horizonDownloadRadiusKm = radiusValues[it] })
-        roadHorizonCard.addView(horizonSwitch(getString(R.string.horizon_mobile_data), prefs.horizonMobileData) { prefs.horizonMobileData = it })
+        addOpt(horizonSwitch(getString(R.string.horizon_mobile_data), prefs.horizonMobileData) { prefs.horizonMobileData = it })
 
         // Estado de mapas, permisos y terreno
         horizonStatusView = TextView(this).apply { textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 10, 0, 6) }
@@ -1711,7 +1716,7 @@ class MainActivity : Activity() {
         fun horizonButton(label: String, action: () -> Unit) = Button(this).apply {
             text = label; isAllCaps = false; setOnClickListener { action() }
         }
-        roadHorizonCard.addView(horizonButton(getString(R.string.horizon_btn_download)) {
+        addOpt(horizonButton(getString(R.string.horizon_btn_download)) {
             val lat = prefs.horizonLastLat.toDouble(); val lng = prefs.horizonLastLng.toDouble()
             if (lat == 0.0 && lng == 0.0) {
                 android.widget.Toast.makeText(this, getString(R.string.horizon_dl_no_pos), android.widget.Toast.LENGTH_LONG).show()
@@ -1730,13 +1735,13 @@ class MainActivity : Activity() {
                 android.widget.Toast.makeText(this, getString(msg), android.widget.Toast.LENGTH_LONG).show()
             }
         })
-        roadHorizonCard.addView(horizonButton(getString(R.string.horizon_btn_diag)) {
+        addOpt(horizonButton(getString(R.string.horizon_btn_diag)) {
             val diag = RoadHorizonPredictor.getInstance(this).lastDiagnostic.ifEmpty { getString(R.string.horizon_diag_empty) }
             val cm = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
             cm.setPrimaryClip(android.content.ClipData.newPlainText("AltGraph Horizon", diag))
             android.widget.Toast.makeText(this, getString(R.string.horizon_diag_copied), android.widget.Toast.LENGTH_LONG).show()
         })
-        roadHorizonCard.addView(horizonButton(getString(R.string.horizon_btn_reset)) {
+        addOpt(horizonButton(getString(R.string.horizon_btn_reset)) {
             prefs.resetHorizonOptions()
             recreate()
         })
