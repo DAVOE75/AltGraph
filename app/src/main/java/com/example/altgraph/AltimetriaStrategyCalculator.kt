@@ -2175,23 +2175,51 @@ class AltimetriaStrategyCalculator {
             var horizonResult: RoadHorizonPredictor.HorizonResult? = null
             var horizonProgress = 0f
             if (horizonEnabled && currentLatitude != 0.0 && currentLongitude != 0.0 && effectiveCtx != null) {
-                // Perfil estático: se conserva mientras el ciclista avanza por él y solo salta a la sección siguiente al llegar al final
-                val held = heldHorizon
-                val onHeld = if (held != null && heldHorizonLookahead == lookaheadDist) projectOnHorizon(held, currentLatitude, currentLongitude) else null
-                if (held != null && onHeld != null && onHeld < 0.985f) {
-                    horizonResult = held
-                    horizonProgress = onHeld
+                val pagedBeacon = prefs?.beaconMode3d == AppPreferences.BEACON_MODE_PAGED
+                val predictor = RoadHorizonPredictor.getInstance(effectiveCtx)
+                val stepM = (lookaheadDist / 40.0).coerceIn(15.0, 50.0)
+                if (!pagedBeacon) {
+                    // Baliza ancla: fija al 20% de la ventana; 20% detrás (historial recorrido) y 80% delante (predicción)
+                    val ahead = predictor.predictHorizon(currentLatitude, currentLongitude, currentHeading, lookaheadDist * (1.0 - BEACON_ANCHOR_FRACTION), stepM)
+                    if (ahead != null && ahead.elevations.size >= 2) {
+                        val nb = Math.round(lookaheadDist * BEACON_ANCHOR_FRACTION / stepM).toInt()
+                        val behind = (nb downTo 1).map { k ->
+                            val d = liveDistanceAccumulated - k * stepM
+                            val h = freeRideHistory
+                            when {
+                                h.isEmpty() -> ahead.elevations.first()
+                                d <= h.first().first -> h.first().second.toFloat()
+                                else -> {
+                                    val j = h.indexOfLast { it.first <= d }.coerceAtLeast(0)
+                                    h[j].second.toFloat()
+                                }
+                            }
+                        }
+                        val elevs = behind + ahead.elevations
+                        val grades = (0 until elevs.size - 1).map { i ->
+                            (((elevs[i + 1] - elevs[i]) / stepM) * 100.0).coerceIn(-30.0, 30.0).toFloat()
+                        }
+                        val here = Pair(currentLatitude, currentLongitude)
+                        horizonResult = RoadHorizonPredictor.HorizonResult(
+                            elevations = elevs, grades = grades,
+                            coordinates = List(nb) { here } + ahead.coordinates,
+                            roadName = ahead.roadName,
+                            totalDistanceMeters = (elevs.size - 1) * stepM
+                        )
+                        horizonProgress = nb.toFloat() / (elevs.size - 1)
+                    }
                 } else {
-                    val predictor = RoadHorizonPredictor.getInstance(effectiveCtx)
-                    horizonResult = predictor.predictHorizon(
-                        lat = currentLatitude,
-                        lng = currentLongitude,
-                        headingDeg = currentHeading,
-                        distanceMeters = lookaheadDist,
-                        sampleStepMeters = (lookaheadDist / 40.0).coerceIn(15.0, 50.0)
-                    )
-                    heldHorizon = horizonResult
-                    heldHorizonLookahead = lookaheadDist
+                    // Baliza móvil: perfil estático que se conserva hasta que el ciclista llega al final y salta a la siguiente sección
+                    val held = heldHorizon
+                    val onHeld = if (held != null && heldHorizonLookahead == lookaheadDist) projectOnHorizon(held, currentLatitude, currentLongitude) else null
+                    if (held != null && onHeld != null && onHeld < 0.985f) {
+                        horizonResult = held
+                        horizonProgress = onHeld
+                    } else {
+                        horizonResult = predictor.predictHorizon(currentLatitude, currentLongitude, currentHeading, lookaheadDist, stepM)
+                        heldHorizon = horizonResult
+                        heldHorizonLookahead = lookaheadDist
+                    }
                 }
             }
 
