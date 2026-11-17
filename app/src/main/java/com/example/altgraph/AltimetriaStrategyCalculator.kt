@@ -459,6 +459,8 @@ class AltimetriaStrategyCalculator {
         return if (bestD <= 40.0) (bestPos / (c.size - 1)).toFloat() else null
     }
 
+    private var lastPosSaveMs = 0L
+
     fun updateCurrentLocation(lat: Double, lng: Double, orientation: Double? = null) {
         if (lat == 0.0 && lng == 0.0) return
         if (orientation != null && this.currentHeading == 0.0) this.currentHeading = (orientation + 360.0) % 360.0
@@ -470,7 +472,14 @@ class AltimetriaStrategyCalculator {
         }
         this.currentLatitude = lat
         this.currentLongitude = lng
-
+        val nowSave = System.currentTimeMillis()
+        if (nowSave - lastPosSaveMs > 15_000L) {
+            lastPosSaveMs = nowSave
+            appContext?.let { c ->
+                val p = AppPreferences.getInstance(c)
+                p.horizonLastLat = lat.toFloat(); p.horizonLastLng = lng.toFloat()
+            }
+        }
         // Rumbo estable: solo se recalcula tras desplazarse 15 m, para que el ruido del GPS no lo invierta
         if (anchorLat == 0.0 && anchorLng == 0.0) { anchorLat = lat; anchorLng = lng }
         else if (planarDistM(lat to lng, anchorLat to anchorLng) > 15.0) {

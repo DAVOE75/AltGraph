@@ -1716,23 +1716,48 @@ class MainActivity : Activity() {
         fun horizonButton(label: String, action: () -> Unit) = Button(this).apply {
             text = label; isAllCaps = false; setOnClickListener { action() }
         }
+        fun startHorizonDownload(lat: Double, lng: Double) {
+            val res = ElevationManager.getInstance(this).downloadNow(lat, lng) { ok ->
+                runOnUiThread {
+                    android.widget.Toast.makeText(this, getString(R.string.horizon_dl_done, ok), android.widget.Toast.LENGTH_LONG).show()
+                    refreshHorizonStatus()
+                }
+            }
+            val msg = when (res) {
+                ElevationManager.DL_STARTED -> R.string.horizon_dl_started
+                ElevationManager.DL_NO_NETWORK -> R.string.horizon_dl_no_network
+                else -> R.string.horizon_dl_nothing
+            }
+            android.widget.Toast.makeText(this, getString(msg), android.widget.Toast.LENGTH_LONG).show()
+        }
         addOpt(horizonButton(getString(R.string.horizon_btn_download)) {
             val lat = prefs.horizonLastLat.toDouble(); val lng = prefs.horizonLastLng.toDouble()
-            if (lat == 0.0 && lng == 0.0) {
-                android.widget.Toast.makeText(this, getString(R.string.horizon_dl_no_pos), android.widget.Toast.LENGTH_LONG).show()
+            if (lat != 0.0 || lng != 0.0) {
+                startHorizonDownload(lat, lng)
             } else {
-                val res = ElevationManager.getInstance(this).downloadNow(lat, lng) { ok ->
-                    runOnUiThread {
-                        android.widget.Toast.makeText(this, getString(R.string.horizon_dl_done, ok), android.widget.Toast.LENGTH_LONG).show()
-                        refreshHorizonStatus()
+                // Sin posición guardada: se pide una al sistema Karoo (solo una vez)
+                android.widget.Toast.makeText(this, getString(R.string.horizon_dl_locating), android.widget.Toast.LENGTH_SHORT).show()
+                val sys = io.hammerhead.karooext.KarooSystemService(this)
+                var got = false
+                sys.connect { connected ->
+                    if (!connected) return@connect
+                    var id: String? = null
+                    id = sys.addConsumer<io.hammerhead.karooext.models.OnLocationChanged> { ev ->
+                        if (got) return@addConsumer
+                        got = true
+                        prefs.horizonLastLat = ev.lat.toFloat(); prefs.horizonLastLng = ev.lng.toFloat()
+                        id?.let { sys.removeConsumer(it) }
+                        sys.disconnect()
+                        runOnUiThread { startHorizonDownload(ev.lat, ev.lng); refreshHorizonStatus() }
                     }
                 }
-                val msg = when (res) {
-                    ElevationManager.DL_STARTED -> R.string.horizon_dl_started
-                    ElevationManager.DL_NO_NETWORK -> R.string.horizon_dl_no_network
-                    else -> R.string.horizon_dl_nothing
-                }
-                android.widget.Toast.makeText(this, getString(msg), android.widget.Toast.LENGTH_LONG).show()
+                window.decorView.postDelayed({
+                    if (!got) {
+                        got = true
+                        sys.disconnect()
+                        android.widget.Toast.makeText(this, getString(R.string.horizon_dl_no_pos), android.widget.Toast.LENGTH_LONG).show()
+                    }
+                }, 8000)
             }
         })
         addOpt(horizonButton(getString(R.string.horizon_btn_diag)) {

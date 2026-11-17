@@ -119,6 +119,7 @@ File del terreno: %3$d (%4$d MB)
     <string name="horizon_diag_copied">Diagnostica copiata</string>
     <string name="horizon_diag_empty">Nessuna previsione ancora</string>
     <string name="horizon_btn_reset">Ripristina le opzioni dell\'orizzonte</string>
+    <string name="horizon_dl_locating">Rilevamento della posizione...</string>
     <string name="map_access_needed">Consenti l\'accesso a tutti i file affinché AltGraph legga le mappe offline del Karoo.</string>
     <string name="setting_smart_zoom">Attiva Smart Zoom Tattico (Auto-Scala)</string>
     <string name="setting_oasis_tracking">Attiva Oasis Tracking (Zone di Recupero)</string>

@@ -136,6 +136,7 @@ Terrain files: %3$d (%4$d MB)
     <string name="horizon_diag_copied">Diagnostics copied</string>
     <string name="horizon_diag_empty">No prediction yet</string>
     <string name="horizon_btn_reset">Reset horizon options</string>
+    <string name="horizon_dl_locating">Getting your position...</string>
     <string name="map_access_needed">Allow access to all files so AltGraph can read the Karoo offline maps.</string>
     <string name="setting_smart_zoom">Enable Tactical Smart Zoom (Auto-Scale)</string>
     <string name="setting_oasis_tracking">Enable Tactical Oasis Tracking (Recovery Zones)</string>

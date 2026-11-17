@@ -119,6 +119,7 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="horizon_diag_copied">Diagnostic copié</string>
     <string name="horizon_diag_empty">Pas encore de prédiction</string>
     <string name="horizon_btn_reset">Réinitialiser les options de l\'horizon</string>
+    <string name="horizon_dl_locating">Obtention de votre position...</string>
     <string name="map_access_needed">Autorisez l\'accès à tous les fichiers pour qu\'AltGraph lise les cartes hors ligne du Karoo.</string>
     <string name="setting_smart_zoom">Activer Smart Zoom tactique (auto-échelle)</string>
     <string name="setting_oasis_tracking">Activer Oasis Tracking (zones de récupération)</string>
