@@ -59,7 +59,9 @@ class MainActivity : Activity() {
             1 -> getString(R.string.horizon_conf_low)
             else -> getString(R.string.horizon_conf_unknown)
         }
+        val (dem5Files, dem5Bytes) = em.dem5Summary()
         tv.text = getString(R.string.horizon_status_fmt, perm, maps, files, bytes / 1_048_576, cover) + dl +
+            "\n" + getString(R.string.horizon_status_dem5, dem5Files, dem5Bytes / 1_048_576) +
             "\n" + getString(R.string.horizon_status_road, roadNow ?: getString(R.string.horizon_status_none)) +
             "\n" + getString(R.string.horizon_status_conf, confLabel)
 
@@ -117,6 +119,49 @@ class MainActivity : Activity() {
         PanelTheme.init(this, prefs.panelTheme)
         setTheme(if (PanelTheme.isLight) R.style.Theme_ALTGRAPH_Panel_Light else R.style.Theme_ALTGRAPH_Panel_Dark)
         super.onCreate(savedInstanceState)
+        // Ganchos de prueba por adb: solo en builds de depuración (en release se ignoran)
+        if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+            intent?.getStringExtra("terrain_index_url")?.let { prefs.terrainIndexUrl = it }
+            intent?.getStringExtra("terrain_install")?.let { id ->
+                Thread {
+                    val tp = TerrainPacks(this)
+                    val p = try { tp.fetchIndex().firstOrNull { it.id == id } } catch (e: Exception) { null }
+                    if (p == null) { android.util.Log.i("TerrainTest", "provincia $id no encontrada en el índice"); return@Thread }
+                    val t0 = System.currentTimeMillis()
+                    val ok = tp.install(p) { }
+                    val (n, b) = ElevationManager.getInstance(this).dem5Summary()
+                    android.util.Log.i("TerrainTest", "install=$ok tiles=$n MB=${b / 1048576} ms=${System.currentTimeMillis() - t0} installed=${tp.installedIds()}")
+                }.start()
+            }
+            intent?.getStringExtra("terrain_probe")?.let { pairs ->
+                Thread {
+                    val em = ElevationManager.getInstance(this)
+                    pairs.split(';').forEach { pair ->
+                        val c = pair.split(',').mapNotNull { it.trim().toDoubleOrNull() }
+                        if (c.size == 2) {
+                            val v = em.getElevation(c[0], c[1])
+                            android.util.Log.i("TerrainTest", "probe ${c[0]},${c[1]} = ${v?.let { "%.1f".format(it) }} src=${em.lastSource}")
+                        }
+                    }
+                }.start()
+            }
+            intent?.getIntExtra("terrain_clean_days", -1)?.takeIf { it > 0 }?.let { d ->
+                Thread {
+                    val em = ElevationManager.getInstance(this)
+                    val before = em.heldSummary().first
+                    val freed = em.cleanUnused(d)
+                    android.util.Log.i("TerrainTest", "clean days=$d freedMB=${freed / 1048576} hgtBefore=$before hgtAfter=${em.heldSummary().first}")
+                }.start()
+            }
+            intent?.getStringExtra("terrain_delete")?.let { id ->
+                Thread {
+                    val tp = TerrainPacks(this)
+                    tp.delete(id)
+                    val (n, b) = ElevationManager.getInstance(this).dem5Summary()
+                    android.util.Log.i("TerrainTest", "delete $id tiles=$n MB=${b / 1048576} installed=${tp.installedIds()}")
+                }.start()
+            }
+        }
         if (intent?.getBooleanExtra("horizon_replay", false) == true) {
             intent?.getIntExtra("junction_mode", -1)?.takeIf { it >= 0 }?.let { prefs.horizonJunctionMode = it }
             val tag = "mode=${prefs.horizonJunctionMode}"
@@ -1831,6 +1876,34 @@ class MainActivity : Activity() {
         horizonDownloadBtn = downloadBtn
         pendingDesc = R.string.horizon_desc_download
         addOpt(downloadBtn)
+        // Espacio: limpieza automática del terreno que ya no se usa y borrado manual
+        val cleanValues = listOf(0, 30, 60, 90, 180)
+        pendingDesc = R.string.horizon_desc_autoclean
+        addOpt(labelSpinner(getString(R.string.horizon_autoclean),
+            cleanValues.map { if (it == 0) getString(R.string.horizon_off) else getString(R.string.horizon_days_fmt, it) },
+            cleanValues.indexOf(prefs.horizonAutoCleanDays).coerceAtLeast(0)) { prefs.horizonAutoCleanDays = cleanValues[it] })
+        pendingDesc = R.string.horizon_desc_delete_terrain
+        addOpt(horizonButton(getString(R.string.horizon_btn_delete_terrain)) {
+            val em = ElevationManager.getInstance(this)
+            val mbHeld = (em.heldSummary().second / 1_048_576L).toInt()
+            if (em.heldSummary().first == 0) {
+                android.widget.Toast.makeText(this, getString(R.string.horizon_delete_nothing), android.widget.Toast.LENGTH_LONG).show()
+            } else {
+                android.app.AlertDialog.Builder(this)
+                    .setMessage(getString(R.string.horizon_delete_confirm, mbHeld))
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        Thread {
+                            val freed = (em.deleteDownloaded() / 1_048_576L).toInt()
+                            runOnUiThread {
+                                android.widget.Toast.makeText(this, getString(R.string.horizon_deleted, freed), android.widget.Toast.LENGTH_LONG).show()
+                                refreshHorizonStatus()
+                            }
+                        }.start()
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show()
+            }
+        })
         pendingDesc = R.string.horizon_desc_replay
         var replayBtn: Button? = null
         var lastReport: String? = null
@@ -1880,6 +1953,7 @@ class MainActivity : Activity() {
         })
         refreshHorizonStatus()
         tabProContainer.addView(roadHorizonCard)
+        if (hasSpainMap()) tabProContainer.addView(buildTerrainPackCard())
 
         // Smart Zoom
         val smartZoomCard = createCardContainer()
@@ -3089,6 +3163,116 @@ class MainActivity : Activity() {
 
         // Seleccionar pestaña por defecto (Tab 0: Estilo)
         selectTab(0)
+    }
+
+    private fun hasSpainMap(): Boolean =
+        java.io.File("/sdcard/offline/maps").listFiles { f -> f.name.equals("spain.map", ignoreCase = true) }?.isNotEmpty() == true
+
+    // Tarjeta para instalar el terreno de 5 m por provincias (solo para quien tiene el mapa de España en la Karoo)
+    private fun buildTerrainPackCard(): LinearLayout {
+        val card = createCardContainer()
+        val packs = TerrainPacks(this)
+        card.addView(TextView(this).apply {
+            text = getString(R.string.terrain_pack_title); textSize = 15f; setTextColor(Color.WHITE); setTypeface(typeface, Typeface.BOLD)
+        })
+        card.addView(TextView(this).apply {
+            text = Units.localize(this@MainActivity, getString(R.string.terrain_pack_desc)); textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 4, 0, 8)
+        })
+        val spinner = Spinner(this)
+        val status = TextView(this).apply { textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 8, 0, 6); text = getString(R.string.terrain_pack_loading) }
+        val button = Button(this).apply { isAllCaps = false; isEnabled = false; text = getString(R.string.terrain_pack_install) }
+        var list = emptyList<TerrainPacks.Province>()
+        var busy = false
+
+        fun mb(b: Long) = (b / 1_048_576L).toInt()
+        fun labelOf(p: TerrainPacks.Province, installed: Set<String>) =
+            "${p.name} · ${mb(p.bytes)} MB" + if (p.id in installed) " ✓" else ""
+
+        fun refreshUi(keepSelection: Boolean = true) {
+            val installed = packs.installedIds()
+            val sel = if (keepSelection) spinner.selectedItemPosition.coerceAtLeast(0) else 0
+            spinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, list.map { labelOf(it, installed) })
+            if (list.isNotEmpty()) spinner.setSelection(sel.coerceAtMost(list.size - 1))
+            val p = list.getOrNull(spinner.selectedItemPosition)
+            button.isEnabled = p != null
+            button.text = when {
+                busy -> getString(R.string.terrain_pack_cancel)
+                p != null && p.id in installed -> getString(R.string.terrain_pack_delete)
+                else -> getString(R.string.terrain_pack_install)
+            }
+            spinner.isEnabled = !busy
+            if (!busy && list.isNotEmpty()) {
+                status.text = getString(R.string.terrain_pack_installed_count, installed.size, list.size)
+            }
+        }
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                (view as? TextView)?.setTextColor(Color.parseColor("#4CAF50"))
+                val p = list.getOrNull(position) ?: return
+                if (!busy) button.text = if (p.id in packs.installedIds()) getString(R.string.terrain_pack_delete) else getString(R.string.terrain_pack_install)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        button.setOnClickListener {
+            if (busy) { packs.cancel.set(true); return@setOnClickListener }
+            val p = list.getOrNull(spinner.selectedItemPosition) ?: return@setOnClickListener
+            if (p.id in packs.installedIds()) {
+                button.isEnabled = false
+                Thread {
+                    packs.delete(p.id)
+                    runOnUiThread {
+                        android.widget.Toast.makeText(this, getString(R.string.terrain_pack_deleted), android.widget.Toast.LENGTH_LONG).show()
+                        refreshUi(); refreshHorizonStatus()
+                    }
+                }.start()
+                return@setOnClickListener
+            }
+            if (!ElevationManager.getInstance(this).isNetworkAllowed()) {
+                android.widget.Toast.makeText(this, getString(R.string.terrain_pack_no_network), android.widget.Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            if (packs.freeBytes() < p.bytes + 50L * 1_048_576L) {
+                android.widget.Toast.makeText(this, getString(R.string.terrain_pack_no_space, mb(p.bytes) + 50), android.widget.Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            busy = true
+            refreshUi()
+            Thread {
+                val ok = packs.install(p) { done ->
+                    runOnUiThread { status.text = getString(R.string.terrain_pack_progress, p.name, mb(done), mb(p.bytes)) }
+                }
+                runOnUiThread {
+                    busy = false
+                    val msg = when {
+                        ok -> R.string.terrain_pack_done
+                        packs.cancel.get() -> R.string.terrain_pack_cancelled
+                        else -> R.string.terrain_pack_failed
+                    }
+                    android.widget.Toast.makeText(this, getString(msg), android.widget.Toast.LENGTH_LONG).show()
+                    refreshUi(); refreshHorizonStatus()
+                }
+            }.start()
+        }
+
+        card.addView(spinner)
+        card.addView(status)
+        card.addView(button)
+        card.addView(TextView(this).apply {
+            text = getString(R.string.terrain_pack_attribution); textSize = 11f; setTextColor(Color.GRAY); setPadding(0, 10, 0, 2)
+        })
+
+        Thread {
+            try {
+                val result = packs.fetchIndex()
+                runOnUiThread { list = result; refreshUi(false) }
+            } catch (e: Exception) {
+                android.util.Log.w("TerrainPacks", "index failed: ${e.message}")
+                runOnUiThread { status.text = getString(R.string.terrain_pack_error) }
+            }
+        }.start()
+        return card
     }
 
     private fun createCardContainer(): LinearLayout {

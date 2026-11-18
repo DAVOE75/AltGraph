@@ -271,6 +271,11 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean("road_horizon_mobile_data", false)
         set(value) = prefs.edit().putBoolean("road_horizon_mobile_data", value).apply()
 
+    // URL alternativa de la lista de provincias: solo se puede fijar en builds de depuración (pruebas sin publicar)
+    var terrainIndexUrl: String
+        get() = prefs.getString("terrain_index_url", "") ?: ""
+        set(value) = prefs.edit().putString("terrain_index_url", value).apply()
+
     var horizonBaroCalib: Boolean
         get() = prefs.getBoolean("road_horizon_baro_calib", true)
         set(value) = prefs.edit().putBoolean("road_horizon_baro_calib", value).apply()
@@ -307,8 +312,14 @@ class AppPreferences(context: Context) {
         get() = prefs.getFloat("road_horizon_last_lng", 0f)
         set(value) = prefs.edit().putFloat("road_horizon_last_lng", value).apply()
 
+    // Días sin usar tras los que se borra el terreno de 30 m descargado (0 = nunca)
+    var horizonAutoCleanDays: Int
+        get() = prefs.getInt("road_horizon_autoclean_days", 90)
+        set(value) = prefs.edit().putInt("road_horizon_autoclean_days", value).apply()
+
     fun resetHorizonOptions() {
         prefs.edit()
+            .remove("road_horizon_autoclean_days")
             .remove("road_horizon_distance_m").remove("road_horizon_subblock_m").remove("road_horizon_junction_mode")
             .remove("road_horizon_smoothing").remove("road_horizon_dl_radius_km").remove("road_horizon_mobile_data")
             .remove("road_horizon_mark_guess").remove("road_horizon_alert_pct").remove("road_horizon_heading_mode")

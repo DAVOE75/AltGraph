@@ -51,7 +51,8 @@ def build(files, only_tile=None):
         tiles = [t for t in tiles if t == only_tile]
     total = 0; written = 0
     for (la, ln) in tiles:
-        rows = int(round(TILE / STEP_LAT)); cols = int(round(TILE / step_lng))
+        # +2 celdas: el trozo cubre algo mas que sus 0,1 grados para poder interpolar hasta el mismo limite (sin hueco en las costuras)
+        rows = int(math.ceil(TILE / STEP_LAT)) + 2; cols = int(math.ceil(TILE / step_lng)) + 2
         dst = np.full((rows, cols), np.nan, dtype=np.float32)
         dst_tf = from_origin(ln, la + TILE, step_lng, STEP_LAT)
         for r in srcs:
@@ -74,6 +75,13 @@ def build(files, only_tile=None):
     print('trozos:', written, ' total %.1f MB' % (total / 1e6))
 
 if __name__ == '__main__':
-    files = sorted(glob.glob(SRC + r'\**\*.tif', recursive=True))
-    only = (float(sys.argv[1]), float(sys.argv[2])) if len(sys.argv) == 3 else None
-    build(files, only)
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--src', default=SRC, help='carpeta con las hojas .tif de la provincia')
+    ap.add_argument('--out', default=OUT, help='carpeta de salida de los trozos')
+    ap.add_argument('--tile', nargs=2, type=float, help='solo este trozo: lat_sur lng_oeste')
+    a = ap.parse_args()
+    OUT = a.out
+    os.makedirs(OUT, exist_ok=True)
+    files = sorted(glob.glob(a.src + r'\**\*.tif', recursive=True))
+    build(files, tuple(a.tile) if a.tile else None)

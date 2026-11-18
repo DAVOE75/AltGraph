@@ -46,31 +46,54 @@ class ElevationManager(private val context: Context) {
     private var lastCheckMs = 0L
 
     // ---- Terreno de 5 m (trozos DEM5), con prioridad sobre el de 30 m ----
+    // Cada trozo se guarda como dem5_<lat>_<lng>@<provincia>.bin: dos provincias vecinas comparten trozos de borde,
+    // y cada una solo trae sus propias hojas, así que se combinan al leer en vez de sobrescribirse.
     private val dem5Dir: File by lazy { File(baseDir, "dem5").apply { mkdirs() } }
+    fun dem5Directory(): File = dem5Dir
+
     private val dem5Cache = object : LinkedHashMap<String, Optional<Dem5Tile>>(8, 0.75f, true) {
-        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Optional<Dem5Tile>>?): Boolean = size > 4
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Optional<Dem5Tile>>?): Boolean = size > 6
     }
-    private val dem5Missing = ConcurrentHashMap<String, Long>() // trozo no encontrado: no se vuelve a buscar en 30 s
+    @Volatile private var dem5Index: Map<String, List<File>>? = null
+    @Volatile private var dem5IndexAt = 0L
 
     @Volatile var lastSource: String = "30 m"
         private set
 
-    private fun dem5For(lat: Double, lng: Double): Dem5Tile? {
-        val name = Dem5Tile.nameFor(lat, lng)
-        synchronized(dem5Cache) {
-            val hit = dem5Cache[name]
-            if (hit != null) return hit.orElse(null)
+    private fun dem5Index(): Map<String, List<File>> {
+        val now = System.currentTimeMillis()
+        val cur = dem5Index
+        if (cur != null && now - dem5IndexAt < 60_000L) return cur
+        val m = HashMap<String, MutableList<File>>()
+        dem5Dir.listFiles { f -> f.name.endsWith(".bin") && f.canRead() }?.forEach { f ->
+            m.getOrPut(f.name.removeSuffix(".bin").substringBefore('@')) { ArrayList() }.add(f)
         }
-        val miss = dem5Missing[name]
-        if (miss != null && System.currentTimeMillis() - miss < 30_000L) return null
-        val f = File(dem5Dir, name)
-        val tile = if (f.isFile && f.canRead()) Dem5Tile.open(f) else null
-        if (tile == null) { dem5Missing[name] = System.currentTimeMillis(); return null }
-        synchronized(dem5Cache) { dem5Cache[name] = Optional.of(tile) }
-        return tile
+        dem5Index = m
+        dem5IndexAt = now
+        return m
     }
 
-    fun hasDem5(lat: Double, lng: Double): Boolean = File(dem5Dir, Dem5Tile.nameFor(lat, lng)).let { it.isFile && it.canRead() }
+    /** Vuelve a leer la carpeta de terreno de 5 m (tras instalar o borrar una provincia). */
+    fun refreshDem5() {
+        dem5Index = null
+        synchronized(dem5Cache) { dem5Cache.clear() }
+    }
+
+    private fun dem5TilesFor(lat: Double, lng: Double): List<Dem5Tile> {
+        val key = Dem5Tile.nameFor(lat, lng).removeSuffix(".bin")
+        val files = dem5Index()[key] ?: return emptyList()
+        val out = ArrayList<Dem5Tile>(files.size)
+        for (f in files) {
+            val hit = synchronized(dem5Cache) { dem5Cache[f.name] }
+            val tile = if (hit != null) hit.orElse(null) else Dem5Tile.open(f).also { t ->
+                synchronized(dem5Cache) { dem5Cache[f.name] = Optional.ofNullable(t) }
+            }
+            if (tile != null) out += tile
+        }
+        return out
+    }
+
+    fun hasDem5(lat: Double, lng: Double): Boolean = dem5Index()[Dem5Tile.nameFor(lat, lng).removeSuffix(".bin")] != null
 
     fun dem5Summary(): Pair<Int, Long> {
         val files = dem5Dir.listFiles { f -> f.name.endsWith(".bin") }?.toList().orEmpty()
@@ -79,12 +102,14 @@ class ElevationManager(private val context: Context) {
 
     fun getElevation(lat: Double, lng: Double): Double? {
         try {
-            val t = dem5For(lat, lng)
-            val v = t?.elevation(lat, lng)
-            if (v != null) { lastSource = "5 m"; return v }
+            for (t in dem5TilesFor(lat, lng)) {
+                val v = t.elevation(lat, lng)
+                if (v != null) { lastSource = "5 m"; return v }
+            }
         } catch (e: Exception) { }
         lastSource = "30 m"
         val name = HgtFile.nameFor(lat, lng)
+        markUsed(name)
         val cached = openFiles[name]
         val hgt = if (cached != null) cached.orElse(null) else {
             val f = locate(name)
@@ -96,6 +121,8 @@ class ElevationManager(private val context: Context) {
         return try { hgt?.getElevation(lat, lng) } catch (e: Exception) { null }
     }
 
+    private fun markUsed(name: String) { touch(name) }
+
     fun hasCoverageFor(lat: Double, lng: Double): Boolean = locate(HgtFile.nameFor(lat, lng)) != null
 
     fun getHeldFiles(): List<File> =
@@ -103,10 +130,66 @@ class ElevationManager(private val context: Context) {
             .flatMap { d -> d.listFiles { f -> f.name.endsWith(".hgt") && f.canRead() }?.toList().orEmpty() }
             .distinctBy { it.name }.sortedBy { it.name }
 
+    private val usage by lazy { context.getSharedPreferences("terrain_usage", Context.MODE_PRIVATE) }
+    private val touched = ConcurrentHashMap<String, Long>()
+
+    // Última vez que se usó un archivo de terreno (se anota como mucho cada 6 h por archivo)
+    private fun touch(name: String) {
+        val now = System.currentTimeMillis()
+        val last = touched[name]
+        if (last != null && now - last < 6 * 3_600_000L) return
+        touched[name] = now
+        usage.edit().putLong(name, now).apply()
+    }
+
+    /** Borra los archivos de 30 m que llevan más de [days] días sin usarse. Devuelve los bytes liberados. */
+    fun cleanUnused(days: Int): Long {
+        if (days <= 0) return 0L
+        val now = System.currentTimeMillis()
+        val limit = days * 86_400_000L
+        var freed = 0L
+        baseDir.listFiles { f -> f.name.endsWith(".hgt") }?.forEach { f ->
+            val last = usage.getLong(f.name, f.lastModified())
+            if (now - last > limit) {
+                val size = f.length()
+                if (f.delete()) {
+                    freed += size
+                    usage.edit().remove(f.name).apply()
+                    touched.remove(f.name)
+                    openFiles.remove(f.name)
+                }
+            }
+        }
+        baseDir.listFiles { f -> f.name.endsWith(".none") && now - f.lastModified() > 30L * 86_400_000L }?.forEach { it.delete() }
+        return freed
+    }
+
+    /** Borra todo el terreno de 30 m descargado (no toca el de 5 m por provincias). Devuelve los bytes liberados. */
+    fun deleteDownloaded(): Long {
+        var freed = 0L
+        for (d in listOf(baseDir, legacyDir)) {
+            d.listFiles { f -> f.name.endsWith(".hgt") || f.name.endsWith(".none") || f.name.endsWith(".part") }?.forEach { f ->
+                val size = f.length()
+                if (f.delete()) freed += size
+            }
+        }
+        openFiles.clear()
+        touched.clear()
+        usage.edit().clear().apply()
+        return freed
+    }
+
     fun considerDownload(lat: Double, lng: Double, radiusKm: Int = AppPreferences.getInstance(context).horizonDownloadRadiusKm) {
         val now = SystemClock.elapsedRealtime()
         if (now - lastCheckMs < 60_000L) return
         lastCheckMs = now
+        // Lo que está dentro del radio de donde estás cuenta como "en uso": solo se limpia lo que queda lejos de tus rutas
+        findNeededTileNames(lat, lng, radiusKm).forEach { if (File(baseDir, it).isFile) touch(it) }
+        val days = AppPreferences.getInstance(context).horizonAutoCleanDays
+        if (days > 0 && System.currentTimeMillis() - usage.getLong("_last_clean", 0L) > 86_400_000L) {
+            usage.edit().putLong("_last_clean", System.currentTimeMillis()).apply()
+            scope.launch { cleanUnused(days) }
+        }
         startDownload(lat, lng, radiusKm, null)
     }
 
@@ -175,7 +258,7 @@ class ElevationManager(private val context: Context) {
         return mark.isFile && (System.currentTimeMillis() - mark.lastModified() < 30L * 86_400_000L)
     }
 
-    private fun isNetworkAllowed(): Boolean {
+    fun isNetworkAllowed(): Boolean {
         if (isWifiConnected()) return true
         if (!AppPreferences.getInstance(context).horizonMobileData) return false
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager ?: return false
