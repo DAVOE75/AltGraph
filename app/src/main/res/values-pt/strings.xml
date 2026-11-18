@@ -155,8 +155,8 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="horizon_conf_low">baixa</string>
     <string name="horizon_conf_unknown">a medir...</string>
     <string name="horizon_btn_replay">Testar com um treino gravado (GPX)</string>
-    <string name="horizon_desc_replay">Reproduz o ficheiro /sdcard/altgraph/replay.gpx e mede quanto da estrada e das cotas previstas coincide com o treino real.</string>
-    <string name="horizon_replay_nofile">Copie primeiro o seu treino como /sdcard/altgraph/replay.gpx</string>
+    <string name="horizon_desc_replay">Reproduz o ficheiro Android/data/com.example.altgraph/files/replay.gpx e mede quanto da estrada e das cotas previstas coincide com o treino real.</string>
+    <string name="horizon_replay_nofile">Copie primeiro o seu treino como Android/data/com.example.altgraph/files/replay.gpx</string>
     <string name="horizon_replay_running">A analisar o treino...</string>
     <string name="horizon_replay_done">Teste concluído ✓ (toque: relatório, toque longo: repetir)</string>
     <string name="map_access_needed">Permita o acesso a todos os ficheiros para o AltGraph ler os mapas offline do Karoo.</string>

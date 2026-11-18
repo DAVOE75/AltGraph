@@ -82,6 +82,15 @@ class MainActivity : Activity() {
 
     private var horizonDownloadBtn: Button? = null
 
+    // En imperial las velocidades "8 km/h" del texto pasan a mph (Units.localize no convierte km/h)
+    private fun localizeSpeeds(text: String): String {
+        if (!Units.imperial(this)) return text
+        return Regex("(\\d+(?:[.,]\\d+)?)\\s?km/h").replace(text) { m ->
+            val v = m.groupValues[1].replace(',', '.').toDoubleOrNull() ?: return@replace m.value
+            Units.speed(this, v).replace(".0 mph", " mph")
+        }
+    }
+
     private var storagePrompted = false
 
     override fun onResume() {
@@ -109,7 +118,9 @@ class MainActivity : Activity() {
         setTheme(if (PanelTheme.isLight) R.style.Theme_ALTGRAPH_Panel_Light else R.style.Theme_ALTGRAPH_Panel_Dark)
         super.onCreate(savedInstanceState)
         if (intent?.getBooleanExtra("horizon_replay", false) == true) {
-            Thread { android.util.Log.i("RoadHorizonReplay", RoadHorizonReplay.run(this) ?: "no gpx") }.start()
+            intent?.getIntExtra("junction_mode", -1)?.takeIf { it >= 0 }?.let { prefs.horizonJunctionMode = it }
+            val tag = "mode=${prefs.horizonJunctionMode}"
+            Thread { try { android.util.Log.i("RoadHorizonReplay", tag + "\n" + (RoadHorizonReplay.run(this) ?: "no gpx")) } catch (e: Exception) { android.util.Log.e("RoadHorizonReplay", "error", e) } }.start()
         }
 
         FontHelper.init(this)
@@ -1670,7 +1681,8 @@ class MainActivity : Activity() {
         roadHorizonCard.addView(roadHorizonDesc)
 
         // Submenú: zoom del horizonte (de 500 en 500 m) y subbloque
-        fun fmtDist(m: Int) = if (m < 1000) "$m m" else if (m % 1000 == 0) "${m / 1000} km" else "${m / 1000.0} km"
+        fun fmtDist(m: Int) = if (Units.imperial(this)) Units.distImperial(m.toDouble(), 2)
+            else if (m < 1000) "$m m" else if (m % 1000 == 0) "${m / 1000} km" else "${m / 1000.0} km"
         fun horizonSpinner(title: String, values: List<Int>, current: Int, onPick: (Int) -> Unit): LinearLayout {
             val row = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(0, 8, 0, 4) }
             row.addView(TextView(this).apply { text = title; textSize = 13f; setTextColor(Color.WHITE) })
@@ -1696,7 +1708,7 @@ class MainActivity : Activity() {
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 2).apply { setMargins(0, 14, 0, 6) }
         }
         var pendingDesc: Int? = null
-        fun addDescNow(res: Int) { roadHorizonCard.addView(TextView(this).apply { text = getString(res); textSize = 11f; setTextColor(Color.GRAY); setPadding(0, 2, 0, 2) }) }
+        fun addDescNow(res: Int) { roadHorizonCard.addView(TextView(this).apply { text = Units.localize(this@MainActivity, getString(res)); textSize = 11f; setTextColor(Color.GRAY); setPadding(0, 2, 0, 2) }) }
         fun addOpt(v: View) {
             roadHorizonCard.addView(horizonDivider()); roadHorizonCard.addView(v)
             pendingDesc?.let { addDescNow(it); pendingDesc = null }
@@ -1730,7 +1742,7 @@ class MainActivity : Activity() {
             prefs.horizonJunctionMode) { prefs.horizonJunctionMode = it })
         pendingDesc = R.string.horizon_desc_smoothing
         addOpt(labelSpinner(getString(R.string.horizon_smoothing),
-            listOf(getString(R.string.horizon_level_low), getString(R.string.horizon_level_mid), getString(R.string.horizon_level_high)),
+            listOf(getString(R.string.horizon_level_low), getString(R.string.horizon_level_mid), getString(R.string.horizon_level_high)).map { Units.localize(this, it) },
             prefs.horizonSmoothing) { prefs.horizonSmoothing = it })
         pendingDesc = R.string.horizon_desc_heading
         addOpt(labelSpinner(getString(R.string.horizon_heading_mode),
@@ -1760,7 +1772,7 @@ class MainActivity : Activity() {
         val radiusValues = listOf(10, 30, 60, 120, 150, 180, 210)
         pendingDesc = R.string.horizon_desc_radius
         addOpt(labelSpinner(getString(R.string.horizon_dl_radius),
-            radiusValues.map { "$it km" }, radiusValues.indexOf(prefs.horizonDownloadRadiusKm).coerceAtLeast(0)) { prefs.horizonDownloadRadiusKm = radiusValues[it]; refreshHorizonStatus() })
+            radiusValues.map { Units.localize(this, "$it km") }, radiusValues.indexOf(prefs.horizonDownloadRadiusKm).coerceAtLeast(0)) { prefs.horizonDownloadRadiusKm = radiusValues[it]; refreshHorizonStatus() })
         pendingDesc = R.string.horizon_desc_mobile
         addOpt(horizonSwitch(getString(R.string.horizon_mobile_data), prefs.horizonMobileData) { prefs.horizonMobileData = it })
 
@@ -1826,8 +1838,8 @@ class MainActivity : Activity() {
             val b = replayBtn!!
             if (lastReport != null) {
                 // Ya probado: el botón en verde vuelve a mostrar el informe; mantener pulsado no hace falta, se repite con otro toque largo
-                android.app.AlertDialog.Builder(this).setMessage(lastReport).setPositiveButton(android.R.string.ok, null).show()
-            } else if (!RoadHorizonReplay.gpxFile().isFile) {
+                android.app.AlertDialog.Builder(this).setMessage(Units.localize(this, lastReport ?: "")).setPositiveButton(android.R.string.ok, null).show()
+            } else if (!RoadHorizonReplay.gpxFile(this).isFile) {
                 android.widget.Toast.makeText(this, getString(R.string.horizon_replay_nofile), android.widget.Toast.LENGTH_LONG).show()
             } else {
                 b.isEnabled = false
@@ -1840,7 +1852,7 @@ class MainActivity : Activity() {
                         b.text = getString(R.string.horizon_replay_done)
                         b.setBackgroundColor(Color.parseColor("#2E7D32"))
                         b.setTextColor(Color.WHITE)
-                        android.app.AlertDialog.Builder(this).setMessage(report ?: "").setPositiveButton(android.R.string.ok, null).show()
+                        android.app.AlertDialog.Builder(this).setMessage(Units.localize(this, report ?: "")).setPositiveButton(android.R.string.ok, null).show()
                     }
                 }.start()
             }
@@ -1892,7 +1904,7 @@ class MainActivity : Activity() {
         }
         speedZoomCard.addView(switchSpeedZoom)
         speedZoomCard.addView(TextView(this).apply {
-            text = getString(R.string.horizon_speed_zoom_desc); textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 4, 0, 4)
+            text = localizeSpeeds(Units.localize(this@MainActivity, getString(R.string.horizon_speed_zoom_desc))); textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 4, 0, 4)
         })
         tabProContainer.addView(speedZoomCard)
 

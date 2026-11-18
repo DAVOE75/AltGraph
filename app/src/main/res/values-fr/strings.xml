@@ -155,8 +155,8 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="horizon_conf_low">faible</string>
     <string name="horizon_conf_unknown">mesure en cours...</string>
     <string name="horizon_btn_replay">Tester avec une sortie enregistrée (GPX)</string>
-    <string name="horizon_desc_replay">Rejoue le fichier /sdcard/altgraph/replay.gpx et mesure quelle part de la route et des altitudes prédites correspond à la sortie réelle.</string>
-    <string name="horizon_replay_nofile">Copiez d\'abord votre sortie en /sdcard/altgraph/replay.gpx</string>
+    <string name="horizon_desc_replay">Rejoue le fichier Android/data/com.example.altgraph/files/replay.gpx et mesure quelle part de la route et des altitudes prédites correspond à la sortie réelle.</string>
+    <string name="horizon_replay_nofile">Copiez d\'abord votre sortie en Android/data/com.example.altgraph/files/replay.gpx</string>
     <string name="horizon_replay_running">Analyse de la sortie...</string>
     <string name="horizon_replay_done">Test terminé ✓ (toucher : rapport, appui long : refaire)</string>
     <string name="map_access_needed">Autorisez l\'accès à tous les fichiers pour qu\'AltGraph lise les cartes hors ligne du Karoo.</string>

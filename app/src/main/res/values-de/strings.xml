@@ -155,8 +155,8 @@ Gel?ndedateien: %3$d (%4$d MB)
     <string name="horizon_conf_low">niedrig</string>
     <string name="horizon_conf_unknown">wird gemessen...</string>
     <string name="horizon_btn_replay">Mit aufgezeichneter Fahrt testen (GPX)</string>
-    <string name="horizon_desc_replay">Spielt die Datei /sdcard/altgraph/replay.gpx ab und misst, wie viel der vorhergesagten Straße und Höhen zur realen Fahrt passt.</string>
-    <string name="horizon_replay_nofile">Lege zuerst deine Fahrt als /sdcard/altgraph/replay.gpx ab</string>
+    <string name="horizon_desc_replay">Spielt die Datei Android/data/com.example.altgraph/files/replay.gpx ab und misst, wie viel der vorhergesagten Straße und Höhen zur realen Fahrt passt.</string>
+    <string name="horizon_replay_nofile">Lege zuerst deine Fahrt als Android/data/com.example.altgraph/files/replay.gpx ab</string>
     <string name="horizon_replay_running">Fahrt wird analysiert...</string>
     <string name="horizon_replay_done">Test abgeschlossen ✓ (Tippen: Bericht, lang drücken: wiederholen)</string>
     <string name="map_access_needed">Erlaube den Zugriff auf alle Dateien, damit AltGraph die Offline-Karten des Karoo lesen kann.</string>

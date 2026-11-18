@@ -6,7 +6,7 @@ import java.io.File
 /**
  * Prueba del horizonte con una salida grabada: reproduce un GPX punto a punto, predice el camino por delante
  * en cada punto y lo compara con lo que de verdad se recorrió. Sirve para medir con datos reales cuánto acierta.
- * Entrada: /sdcard/altgraph/replay.gpx. Salida: /sdcard/altgraph/replay_report.txt
+ * Entrada: Android/data/com.example.altgraph/files/replay.gpx. Salida: replay_report.txt en la misma carpeta
  */
 object RoadHorizonReplay {
 
@@ -16,7 +16,12 @@ object RoadHorizonReplay {
     private val TRKPT_LON_FIRST = Regex("<trkpt[^>]*?lon=\"([-0-9.]+)\"[^>]*?lat=\"([-0-9.]+)\"[^>]*?>(.*?)</trkpt>", RegexOption.DOT_MATCHES_ALL)
     private val ELE = Regex("<ele>([-0-9.]+)</ele>")
 
-    fun gpxFile(): File = File("/sdcard/altgraph/replay.gpx")
+    fun gpxFile(context: Context): File {
+        val own = File(context.getExternalFilesDir(null), "replay.gpx")
+        if (own.isFile && own.canRead()) return own
+        val legacy = File("/sdcard/altgraph/replay.gpx")
+        return if (legacy.isFile && legacy.canRead()) legacy else own
+    }
 
     private fun parse(text: String): List<Fix> {
         val out = ArrayList<Fix>()
@@ -35,7 +40,7 @@ object RoadHorizonReplay {
 
     /** Devuelve el informe en texto, o null si no hay GPX. */
     fun run(context: Context, stepM: Double = 25.0, horizonM: Double = 500.0): String? {
-        val file = gpxFile()
+        val file = gpxFile(context)
         if (!file.isFile) return null
         val raw = parse(file.readText())
         if (raw.size < 10) return "GPX demasiado corto / too short (${raw.size} pts)"
@@ -53,6 +58,7 @@ object RoadHorizonReplay {
         val ahead = Math.ceil(horizonM / stepM).toInt()
 
         var tested = 0; var detected = 0; var good = 0
+        var wrongNow = 0; var wrongLater = 0; var shortPaths = 0
         var matchSum = 0.0
         val err250 = ArrayList<Double>(); val err500 = ArrayList<Double>()
         val hasEle = fixes.count { it.ele != null } > fixes.size / 2
@@ -69,6 +75,7 @@ object RoadHorizonReplay {
             if (res != null && res.coordinates.size >= 3) {
                 detected++
                 var ok = 0
+                var firstBad = -1
                 val n = minOf(res.coordinates.size, ahead + 1)
                 for (k in 0 until n) {
                     val c = GeoPoint(res.coordinates[k].first, res.coordinates[k].second)
@@ -77,11 +84,14 @@ object RoadHorizonReplay {
                         val d = c.distanceTo(fixes[j].p)
                         if (d < best) best = d
                     }
-                    if (best <= 35.0) ok++
+                    if (best <= 35.0) ok++ else if (firstBad < 0) firstBad = k
                 }
                 val frac = ok.toDouble() / n
                 matchSum += frac
                 if (frac >= 0.9) good++
+                else if (firstBad in 0..4) wrongNow++ // la calle en la que estás ya está mal (primeros 100 m)
+                else wrongLater++ // la calle es buena pero el cruce se adivinó mal
+                if (res.coordinates.size < ahead + 1) shortPaths++
                 if (hasEle) {
                     val e0a = fixes[i].ele; val e0p = res.elevations[0]
                     if (e0a != null) {
@@ -105,12 +115,15 @@ object RoadHorizonReplay {
         sb.appendLine("Prediction available: ${if (tested == 0) 0 else 100 * detected / tested} %")
         sb.appendLine("Path matches the real track (avg): ${if (detected == 0) 0 else Math.round(100 * matchSum / detected)} %")
         sb.appendLine("Positions with >= 90 % path match: ${if (detected == 0) 0 else 100 * good / detected} %")
+        sb.appendLine("Failures - road under you wrong (first 100 m): ${if (detected == 0) 0 else 100 * wrongNow / detected} %")
+        sb.appendLine("Failures - junction guessed wrong (later): ${if (detected == 0) 0 else 100 * wrongLater / detected} %")
+        sb.appendLine("Predictions shorter than asked (dead end): ${if (detected == 0) 0 else 100 * shortPaths / detected} %")
         if (hasEle) {
             sb.appendLine("Median relative height error at 250 m: ${"%.1f".format(median(err250))} m")
             sb.appendLine("Median relative height error at 500 m: ${"%.1f".format(median(err500))} m")
         } else sb.appendLine("GPX without elevations: height error not measured")
         val report = sb.toString()
-        runCatching { File("/sdcard/altgraph/replay_report.txt").writeText(report) }
+        runCatching { File(context.getExternalFilesDir(null), "replay_report.txt").writeText(report) }
         return report
     }
 }
