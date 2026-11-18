@@ -24,7 +24,9 @@ data class Snapshot(
     // W'bal: batería anaeróbica actual (julios). Null si no hay potenciómetro o FTP=0.
     val wbal: Double? = null,
     // Distancia desde posición actual (metros) donde W'bal llega a 0 al ritmo actual. Null = no aplica.
-    val wbalFailureMeters: Double? = null
+    val wbalFailureMeters: Double? = null,
+    // Hay ruta cargada (trazado o perfil), no solo "navegando"
+    val hasRoute: Boolean = false
 )
 
 /**
@@ -111,7 +113,9 @@ class AltgraphCore(val calculator: AltimetriaStrategyCalculator = AltimetriaStra
             ghostGap = if (ghostFinished) null else rawGap,
             ghostFinished = ghostFinished,
             wbal = wbal,
-            wbalFailureMeters = wbalFailureMeters
+            wbalFailureMeters = wbalFailureMeters,
+            hasRoute = calculator.isNavigatingRoute &&
+                (calculator.routePoints.isNotEmpty() || calculator.routeElevationProfile.isNotEmpty())
         )
     }
 
