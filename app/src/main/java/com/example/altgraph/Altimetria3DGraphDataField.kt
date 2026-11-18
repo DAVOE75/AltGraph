@@ -262,7 +262,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             0.0 
                         }
                 
-                        val isNavigatingRoute = snap.routeTotalLength > 0.0 || strategy.routeCoords.isNotEmpty()
+                        val isNavigatingRoute = snap.isNavigatingRoute || snap.routeTotalLength > 0.0 || strategy.routeTotalLength > 0.0 || strategy.routeCoords.isNotEmpty()
                         altimetria3DView.update3DData(
                             blocks = strategy.nextBlocks,
                             elevation = startElev,
