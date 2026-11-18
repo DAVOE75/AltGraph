@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Optional
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.GZIPInputStream
@@ -32,20 +33,22 @@ class ElevationManager(private val context: Context) {
         else File(context.filesDir, "elevation").apply { mkdirs() }
     }
 
-    private val openFiles = ConcurrentHashMap<String, HgtFile?>()
+    private val openFiles = ConcurrentHashMap<String, Optional<HgtFile>>()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val isFetching = AtomicBoolean(false)
     private var lastCheckMs = 0L
 
     fun getElevation(lat: Double, lng: Double): Double? {
         val name = HgtFile.nameFor(lat, lng)
-        val hgt = openFiles.getOrPut(name) {
+        val cached = openFiles[name]
+        val hgt = if (cached != null) cached.orElse(null) else {
             val f = File(baseDir, name)
-            if (f.isFile && f.length() > 0) {
-                runCatching { HgtFile(f) }.getOrNull()
-            } else null
+            val opened = if (f.isFile && f.length() > 0) runCatching { HgtFile(f) }.getOrNull() else null
+            // Solo se recuerda el archivo si existe; si falta se vuelve a mirar (puede descargarse después)
+            if (opened != null) openFiles[name] = Optional.of(opened)
+            opened
         }
-        return hgt?.getElevation(lat, lng)
+        return try { hgt?.getElevation(lat, lng) } catch (e: Exception) { null }
     }
 
     fun hasCoverageFor(lat: Double, lng: Double): Boolean {

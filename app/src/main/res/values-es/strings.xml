@@ -147,10 +147,10 @@ Archivos de terreno: %3$d (%4$d MB)
     <string name="horizon_desc_smoothing">Suaviza pequeños saltos del terreno (edificios, árboles) que crean rampas falsas. Alto para llano; bajo para subidas.</string>
     <string name="horizon_desc_heading">Cómo se elige la carretera mientras estás parado: la más cercana, o la dirección que indica el GPS.</string>
     <string name="horizon_desc_target">Dónde se muestra el perfil de la carretera por delante: radar altimétrico, vista 3D o ambos.</string>
-    <string name="horizon_desc_alert">Avisa cuando aparece por delante una subida más fuerte que la pendiente elegida. Desactivado por defecto.</string>
+    <string name="horizon_desc_alert">Avisa cuando aparece por delante una subida más fuerte que la pendiente elegida.</string>
     <string name="horizon_desc_mark">Muestra un \"?\" donde el perfil empieza a ser una suposición en un cruce.</string>
     <string name="horizon_desc_radius">Zona alrededor de ti para la que se descargan los archivos de terreno. Más radio = más almacenamiento (unos 25 MB por cuadrícula).</string>
-    <string name="horizon_desc_mobile">Por defecto el terreno solo se descarga con Wi-Fi. Actívalo para usar también datos móviles.</string>
+    <string name="horizon_desc_mobile">El terreno solo se descarga con Wi-Fi. Actívalo para usar también datos móviles.</string>
     <string name="horizon_desc_download">Descarga ahora los archivos de terreno de tu zona, para que el perfil funcione sin esperar al Wi-Fi durante la salida.</string>
     <string name="horizon_desc_diag">Copia al portapapeles los datos técnicos de la última predicción, útil para informar de un problema.</string>
     <string name="horizon_desc_reset">Devuelve todas las opciones del horizonte a sus valores por defecto.</string>
@@ -545,13 +545,13 @@ Archivos de terreno: %3$d (%4$d MB)
     <string name="preset_reset_done">Ajustes visuales restablecidos</string>
     <string name="label_route_next_resupply">Próx. avit.</string>
     <string name="setting_next_resupply">Mostrar distancia al próximo punto de agua o avituallamiento</string>
-    <string name="setting_next_resupply_desc">Cuenta agua, estación de ayuda, comida, cafetería, tienda, gasolinera y bar de tu ruta, según los tipos activos en el filtro de puntos de interés. Desactivado por defecto.</string>
+    <string name="setting_next_resupply_desc">Cuenta agua, estación de ayuda, comida, cafetería, tienda, gasolinera y bar de tu ruta, según los tipos activos en el filtro de puntos de interés.</string>
     <string name="label_climb_difficulty">Dif.</string>
     <string name="setting_climb_difficulty">Mostrar nota de dificultad del puerto</string>
-    <string name="setting_climb_difficulty_desc">Añade una nota de dificultad al encabezado del visor de puertos (desnivel al cuadrado / (10 x longitud), parecida al índice Fiets). Cuanto más alta, más duro: en torno a 2 es fácil, 5 es duro y 8 o más, muy duro. Desactivado por defecto.</string>
+    <string name="setting_climb_difficulty_desc">Añade una nota de dificultad al encabezado del visor de puertos (desnivel al cuadrado / (10 x longitud), parecida al índice Fiets). Cuanto más alta, más duro: en torno a 2 es fácil, 5 es duro y 8 o más, muy duro.</string>
     <string name="label_route_eta">Llegada</string>
     <string name="setting_show_eta">Mostrar hora estimada de llegada</string>
-    <string name="setting_show_eta_desc">Estima la hora de llegada a meta con tu velocidad media en movimiento (unos 10 minutos de memoria) y la distancia que queda. Desactivado por defecto.</string>
+    <string name="setting_show_eta_desc">Estima la hora de llegada a meta con tu velocidad media en movimiento (unos 10 minutos de memoria) y la distancia que queda.</string>
     <string name="elite_voice_climb_summary_title">Resumen al coronar el puerto</string>
     <string name="elite_voice_climb_summary_desc">Al terminar un puerto, anuncia tu tiempo, la pendiente media y la VAM. Requiere tener activado el aviso de puertos.</string>
     <string name="voice_climb_summit_altitude">Cima %1$s, %2$s metros.</string>
@@ -559,7 +559,7 @@ Archivos de terreno: %3$d (%4$d MB)
     <string name="voice_climb_summary_cadence">Cadencia media %1$s pedaladas por minuto.</string>
     <string name="label_route_ascent_pace">Desnivel/h</string>
     <string name="setting_show_ascent_pace">Mostrar ritmo de desnivel (m/h)</string>
-    <string name="setting_show_ascent_pace_desc">Desnivel subido desde el inicio de la ruta dividido por tu tiempo en movimiento. Necesita 5 minutos de marcha. Desactivado por defecto.</string>
+    <string name="setting_show_ascent_pace_desc">Desnivel subido desde el inicio de la ruta dividido por tu tiempo en movimiento. Necesita 5 minutos de marcha.</string>
     <string name="setting_units_title">Unidades</string>
     <string name="units_metric">Métricas</string>
     <string name="units_imperial">Imperiales</string>

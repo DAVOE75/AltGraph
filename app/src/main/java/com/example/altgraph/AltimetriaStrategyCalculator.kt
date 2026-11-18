@@ -2281,7 +2281,7 @@ class AltimetriaStrategyCalculator {
 
             if (advance && horizonEnabled && elevationEverSet && currentLatitude != 0.0 && effectiveCtx != null) {
                 // Calibración barométrica: desfase entre la altitud real y la del MDT en tu posición (suavizado)
-                val d = RoadHorizonPredictor.getInstance(effectiveCtx).recordActual(currentLatitude, currentLongitude, currentElevation)
+                val d = try { RoadHorizonPredictor.getInstance(effectiveCtx).recordActual(currentLatitude, currentLongitude, currentElevation) } catch (e: Exception) { null }
                 if (d != null) {
                     baroOffset = if (!baroOffsetValid) d else baroOffset + (d - baroOffset) * 0.05
                     baroOffsetValid = true
