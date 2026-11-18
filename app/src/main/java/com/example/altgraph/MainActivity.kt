@@ -1820,19 +1820,40 @@ class MainActivity : Activity() {
         pendingDesc = R.string.horizon_desc_download
         addOpt(downloadBtn)
         pendingDesc = R.string.horizon_desc_replay
-        addOpt(horizonButton(getString(R.string.horizon_btn_replay)) {
-            if (!RoadHorizonReplay.gpxFile().isFile) {
+        var replayBtn: Button? = null
+        var lastReport: String? = null
+        replayBtn = horizonButton(getString(R.string.horizon_btn_replay)) {
+            val b = replayBtn!!
+            if (lastReport != null) {
+                // Ya probado: el botón en verde vuelve a mostrar el informe; mantener pulsado no hace falta, se repite con otro toque largo
+                android.app.AlertDialog.Builder(this).setMessage(lastReport).setPositiveButton(android.R.string.ok, null).show()
+            } else if (!RoadHorizonReplay.gpxFile().isFile) {
                 android.widget.Toast.makeText(this, getString(R.string.horizon_replay_nofile), android.widget.Toast.LENGTH_LONG).show()
             } else {
-                android.widget.Toast.makeText(this, getString(R.string.horizon_replay_running), android.widget.Toast.LENGTH_LONG).show()
+                b.isEnabled = false
+                b.text = getString(R.string.horizon_replay_running)
                 Thread {
                     val report = try { RoadHorizonReplay.run(this) } catch (e: Exception) { "Error: ${e.message}" }
                     runOnUiThread {
+                        lastReport = report ?: ""
+                        b.isEnabled = true
+                        b.text = getString(R.string.horizon_replay_done)
+                        b.setBackgroundColor(Color.parseColor("#2E7D32"))
+                        b.setTextColor(Color.WHITE)
                         android.app.AlertDialog.Builder(this).setMessage(report ?: "").setPositiveButton(android.R.string.ok, null).show()
                     }
                 }.start()
             }
-        })
+        }
+        replayBtn.setOnLongClickListener {
+            // Pulsación larga: vuelve a lanzar la prueba (por ejemplo con otro GPX)
+            lastReport = null
+            replayBtn.text = getString(R.string.horizon_btn_replay)
+            replayBtn.setBackgroundResource(android.R.drawable.btn_default)
+            replayBtn.setTextColor(Color.BLACK)
+            true
+        }
+        addOpt(replayBtn)
         pendingDesc = R.string.horizon_desc_diag
         addOpt(horizonButton(getString(R.string.horizon_btn_diag)) {
             val diag = RoadHorizonPredictor.getInstance(this).lastDiagnostic.ifEmpty { getString(R.string.horizon_diag_empty) }

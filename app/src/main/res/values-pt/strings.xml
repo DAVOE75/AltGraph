@@ -158,6 +158,7 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="horizon_desc_replay">Reproduz o ficheiro /sdcard/altgraph/replay.gpx e mede quanto da estrada e das cotas previstas coincide com o treino real.</string>
     <string name="horizon_replay_nofile">Copie primeiro o seu treino como /sdcard/altgraph/replay.gpx</string>
     <string name="horizon_replay_running">A analisar o treino...</string>
+    <string name="horizon_replay_done">Teste concluído ✓ (toque: relatório, toque longo: repetir)</string>
     <string name="map_access_needed">Permita o acesso a todos os ficheiros para o AltGraph ler os mapas offline do Karoo.</string>
     <string name="setting_smart_zoom">Ativar Smart Zoom Tático (Auto-Escala)</string>
     <string name="setting_oasis_tracking">Ativar Oasis Tracking (Zonas de Recuperação)</string>

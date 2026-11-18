@@ -158,6 +158,7 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="horizon_desc_replay">Rejoue le fichier /sdcard/altgraph/replay.gpx et mesure quelle part de la route et des altitudes prédites correspond à la sortie réelle.</string>
     <string name="horizon_replay_nofile">Copiez d\'abord votre sortie en /sdcard/altgraph/replay.gpx</string>
     <string name="horizon_replay_running">Analyse de la sortie...</string>
+    <string name="horizon_replay_done">Test terminé ✓ (toucher : rapport, appui long : refaire)</string>
     <string name="map_access_needed">Autorisez l\'accès à tous les fichiers pour qu\'AltGraph lise les cartes hors ligne du Karoo.</string>
     <string name="setting_smart_zoom">Activer Smart Zoom tactique (auto-échelle)</string>
     <string name="setting_oasis_tracking">Activer Oasis Tracking (zones de récupération)</string>

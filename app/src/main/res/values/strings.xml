@@ -175,6 +175,7 @@ Terrain files: %3$d (%4$d MB)
     <string name="horizon_desc_replay">Replays the file /sdcard/altgraph/replay.gpx and measures how much of the predicted road and heights match the real ride.</string>
     <string name="horizon_replay_nofile">Put your ride as /sdcard/altgraph/replay.gpx first</string>
     <string name="horizon_replay_running">Analyzing the ride...</string>
+    <string name="horizon_replay_done">Test completed ✓ (tap: report, long press: repeat)</string>
     <string name="map_access_needed">Allow access to all files so AltGraph can read the Karoo offline maps.</string>
     <string name="setting_smart_zoom">Enable Tactical Smart Zoom (Auto-Scale)</string>
     <string name="setting_oasis_tracking">Enable Tactical Oasis Tracking (Recovery Zones)</string>

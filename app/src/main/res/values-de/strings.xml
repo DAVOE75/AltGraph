@@ -158,6 +158,7 @@ Gel?ndedateien: %3$d (%4$d MB)
     <string name="horizon_desc_replay">Spielt die Datei /sdcard/altgraph/replay.gpx ab und misst, wie viel der vorhergesagten Straße und Höhen zur realen Fahrt passt.</string>
     <string name="horizon_replay_nofile">Lege zuerst deine Fahrt als /sdcard/altgraph/replay.gpx ab</string>
     <string name="horizon_replay_running">Fahrt wird analysiert...</string>
+    <string name="horizon_replay_done">Test abgeschlossen ✓ (Tippen: Bericht, lang drücken: wiederholen)</string>
     <string name="map_access_needed">Erlaube den Zugriff auf alle Dateien, damit AltGraph die Offline-Karten des Karoo lesen kann.</string>
     <string name="setting_smart_zoom">Taktischen Smart Zoom aktivieren (Auto-Skalierung)</string>
     <string name="setting_oasis_tracking">Oasis Tracking aktivieren (Erholungszonen)</string>
