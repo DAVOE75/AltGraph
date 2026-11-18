@@ -668,6 +668,7 @@ class Altimetria3DView @JvmOverloads constructor(
         style = Paint.Style.FILL
         color = Color.argb(120, 0, 0, 0)
     }
+    private var isNavigatingRoute: Boolean = true
     private var windowStartMeters: Double = 0.0
     private var subBlocks: List<Float> = emptyList()
     private var subBlockSizeMeters: Double = 50.0
@@ -839,6 +840,7 @@ class Altimetria3DView @JvmOverloads constructor(
         isHeadingUp: Boolean = false,
         showSurfaceTextures: Boolean = false,
         routeTotalLength: Double = 0.0,
+        isNavigatingRoute: Boolean = true,
         panButtonsPosition: String = "bottom",
         beaconColor: Int = 0xFF38BDF8.toInt(),
         beaconSize: String = "medium",
@@ -888,6 +890,7 @@ class Altimetria3DView @JvmOverloads constructor(
         this.showHeaderStats = showHeaderStats
         this.showRouteName = showRouteName
         this.showGradeStats = showGradeStats
+        this.isNavigatingRoute = isNavigatingRoute
         this.mapRotationAngle = mapRotationAngle
         this.isHeadingUp = isHeadingUp
         this.showSurfaceTextures = showSurfaceTextures
@@ -1099,8 +1102,14 @@ class Altimetria3DView @JvmOverloads constructor(
 
         subTitleLabelPaint.textSize = ((h * 0.050f) * fontScale).coerceIn(10f, fsHi(15f))
         val headerPrefs = AppPreferences.getInstance(context)
+        val hasRoute = isNavigatingRoute && routeTotalLength > 0.0
+        val rawSlotKeys = if (hasRoute) {
+            listOf(headerPrefs.headerStat1, headerPrefs.headerStat2, headerPrefs.headerStat3, headerPrefs.headerStat4, headerPrefs.headerStat5)
+        } else {
+            listOf(headerPrefs.headerStatRouteless1, headerPrefs.headerStatRouteless2, headerPrefs.headerStatRouteless3, headerPrefs.headerStatRouteless4, headerPrefs.headerStatRouteless5)
+        }
         // Vertical: hasta 3 métricas (campos 1-3); apaisado: hasta 5. Los campos en "ninguno" se omiten y el resto se reparte el ancho
-        val slotKeys = listOf(headerPrefs.headerStat1, headerPrefs.headerStat2, headerPrefs.headerStat3, headerPrefs.headerStat4, headerPrefs.headerStat5)
+        val slotKeys = rawSlotKeys
             .take(if (rotate90) 5 else 3)
             .filter { it != AppPreferences.HEADER_STAT_NONE }
         val numCols = slotKeys.size.coerceAtLeast(1)
@@ -1113,11 +1122,11 @@ class Altimetria3DView @JvmOverloads constructor(
             when (key) {
                 AppPreferences.HEADER_STAT_AVG -> Triple(context.getString(R.string.label_avg_gradient_tramo), "%.1f%%".format(tramoAvgGrade), lightComp(GradeColorScale.getTelemetryColor(tramoAvgGrade)))
                 AppPreferences.HEADER_STAT_MAX -> Triple(context.getString(R.string.label_max_gradient_tramo), "%.1f%%".format(tramoMaxGrade), lightComp(GradeColorScale.getTelemetryColor(tramoMaxGrade)))
-                AppPreferences.HEADER_STAT_ROUTE -> Triple(context.getString(R.string.label_route_total).uppercase(), if (routeTotalLength > 0.0) formatRouteKm(routeTotalLength) else "--", lightComp(Color.WHITE))
-                AppPreferences.HEADER_STAT_LEFT -> Triple(context.getString(R.string.label_route_left).uppercase(), if (routeTotalLength > 0.0) formatRouteKm(routeLeft) else "--", lightComp(Color.WHITE))
-                AppPreferences.HEADER_STAT_DIST -> Triple(context.getString(R.string.label_header_dist), if (routeTotalLength > 0.0) formatRouteKm((routeTotalLength - routeLeft).coerceAtLeast(0.0)) else "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_ROUTE -> Triple(context.getString(R.string.label_route_total).uppercase(), if (hasRoute) formatRouteKm(routeTotalLength) else "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_LEFT -> Triple(context.getString(R.string.label_route_left).uppercase(), if (hasRoute) formatRouteKm(routeLeft) else "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_DIST -> Triple(context.getString(R.string.label_header_dist), if (hasRoute) formatRouteKm((routeTotalLength - routeLeft).coerceAtLeast(0.0)) else if (windowStartMeters > 0.0) formatRouteKm(windowStartMeters) else "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_ASC_TOTAL -> Triple(context.getString(R.string.hdr_asc_total), routeTotalAscent?.let { Units.elev(context, it, true) } ?: "--", lightComp(Color.WHITE))
-                AppPreferences.HEADER_STAT_ASC_LEFT -> Triple(context.getString(R.string.hdr_asc_left), routeRemainingAscent?.let { Units.elev(context, it, true) } ?: "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_ASC_LEFT -> Triple(context.getString(R.string.hdr_asc_left), if (hasRoute) (routeRemainingAscent?.let { Units.elev(context, it, true) } ?: "--") else "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_ELEV -> Triple(context.getString(R.string.hdr_elev), Units.elev(context, beaconProfileElevation() ?: beaconElevation ?: currentElevation, true), lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_TOP_DIST -> Triple(context.getString(R.string.hdr_top_dist), distToClimbTop?.let { formatRouteKm(it) } ?: "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_TOP_ELEV -> Triple(context.getString(R.string.hdr_top_elev), elevToClimbTop?.let { Units.elev(context, it, true) } ?: "--", lightComp(Color.WHITE))

@@ -53,6 +53,9 @@
     <string name="setting_ramp_min_slope">Mindeststeigung für Rampenpfeil (%)</string>
     <string name="setting_ramp_max_slope">Maximalsteigung für Rampenpfeil (%)</string>
     <string name="setting_show_3d_header_stats">Daten im 3D-Kopf anzeigen</string>
+    <string name="setting_show_3d_header_stats_route">3D-Kopf (Mit geladener Route)</string>
+    <string name="setting_show_3d_header_stats_routeless">3D-Kopf (Routenfrei / Freeride)</string>
+    <string name="setting_header_stats_routeless_desc">Sitzungsmesswerte für den 3D-Kopf ohne geladene Route (routenabhängige Daten ausgeschlossen):</string>
     <string name="setting_show_3d_route_name">Routennamen im 3D-Kopf anzeigen</string>
     <string name="setting_show_3d_scale_bar">Skalenleiste im 3D-Routendiagramm anzeigen</string>
     <string name="setting_adapt_grade_text">Textfarbe der Steigung an die Blockfarbe anpassen (schwarz auf Gelb/Orange)</string>

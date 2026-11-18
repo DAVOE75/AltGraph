@@ -262,6 +262,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             0.0 
                         }
                 
+                        val isNavigatingRoute = snap.routeTotalLength > 0.0 || strategy.routeCoords.isNotEmpty()
                         altimetria3DView.update3DData(
                             blocks = strategy.nextBlocks,
                             elevation = startElev,
@@ -297,9 +298,10 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             visibleAvgGrade = strategy.visibleAvgGrade,
                             visibleMaxGrade = strategy.visibleMaxGrade,
                             routeName = strategy.routeName,
-                            showHeaderStats = prefs.show3dHeaderStats || prefs.show3dRouteName,
+                            showHeaderStats = if (isNavigatingRoute) (prefs.show3dHeaderStats || prefs.show3dRouteName) else (prefs.show3dHeaderStatsRouteless || prefs.show3dRouteName),
                             showRouteName = prefs.show3dRouteName,
-                            showGradeStats = prefs.show3dHeaderStats,
+                            showGradeStats = if (isNavigatingRoute) prefs.show3dHeaderStats else prefs.show3dHeaderStatsRouteless,
+                            isNavigatingRoute = isNavigatingRoute,
                             routeCoords = strategy.routeCoords,
                             mapRotationAngle = mapRotAngle,
                             isHeadingUp = isHeadingUp,

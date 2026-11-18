@@ -53,6 +53,9 @@
     <string name="setting_ramp_min_slope">Pendenza Minima per Freccia Rampa (%)</string>
     <string name="setting_ramp_max_slope">Pendenza Massima per Freccia Rampa (%)</string>
     <string name="setting_show_3d_header_stats">Mostra dati nell\'intestazione 3D</string>
+    <string name="setting_show_3d_header_stats_route">Intestazione 3D (Percorso caricato)</string>
+    <string name="setting_show_3d_header_stats_routeless">Intestazione 3D (Senza percorso / Freeride)</string>
+    <string name="setting_header_stats_routeless_desc">Metriche di sessione per l\'intestazione 3D senza percorso precaricato (escluse metriche di percorso):</string>
     <string name="setting_show_3d_route_name">Mostra nome del percorso nell\'intestazione 3D</string>
     <string name="setting_show_3d_scale_bar">Mostra barra di scala nel grafico del percorso 3D</string>
     <string name="setting_adapt_grade_text">Adatta il colore del testo della pendenza a quello del blocco (nero su giallo/arancione)</string>

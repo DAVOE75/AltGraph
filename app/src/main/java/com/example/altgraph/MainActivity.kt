@@ -930,7 +930,7 @@ class MainActivity : Activity() {
         // Opción: Mostrar pendientes (actual, media y máxima) en el encabezado 3D
         val showHeaderStatsCard = createCardContainer()
         val switchShowHeaderStats = Switch(this).apply {
-            text = getString(R.string.setting_show_3d_header_stats)
+            text = getString(R.string.setting_show_3d_header_stats_route)
             textSize = 15f
             setTextColor(Color.WHITE)
             isChecked = prefs.show3dHeaderStats
@@ -2018,6 +2018,61 @@ class MainActivity : Activity() {
         }
         energyCard.addView(switchEnergy)
         tabProContainer.addView(energyCard)
+
+        // Encabezado 3D (Rutas sin precarga / Freeride)
+        val showHeaderStatsRoutelessCard = createCardContainer()
+        val switchShowHeaderStatsRouteless = Switch(this).apply {
+            text = getString(R.string.setting_show_3d_header_stats_routeless)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.show3dHeaderStatsRouteless
+            setOnCheckedChangeListener { _, isChecked ->
+                prefs.show3dHeaderStatsRouteless = isChecked
+            }
+        }
+        showHeaderStatsRoutelessCard.addView(switchShowHeaderStatsRouteless)
+        showHeaderStatsRoutelessCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_header_stats_routeless_desc)
+            textSize = 13f
+            setTextColor(Color.WHITE)
+            setPadding(0, 8, 0, 0)
+        })
+        val headerStatRoutelessLabels = listOf(
+            getString(R.string.hdr_none),
+            getString(R.string.label_current_gradient),
+            getString(R.string.label_avg_gradient_tramo),
+            getString(R.string.label_max_gradient_tramo),
+            getString(R.string.setting_header_stat_dist),
+            getString(R.string.hdr_asc_total),
+            getString(R.string.hdr_elev)
+        )
+        val headerStatRoutelessAccess = listOf(
+            Pair({ prefs.headerStatRouteless1 }, { v: String -> prefs.headerStatRouteless1 = v }),
+            Pair({ prefs.headerStatRouteless2 }, { v: String -> prefs.headerStatRouteless2 = v }),
+            Pair({ prefs.headerStatRouteless3 }, { v: String -> prefs.headerStatRouteless3 = v }),
+            Pair({ prefs.headerStatRouteless4 }, { v: String -> prefs.headerStatRouteless4 = v }),
+            Pair({ prefs.headerStatRouteless5 }, { v: String -> prefs.headerStatRouteless5 = v })
+        )
+        for ((slotIdx, acc) in headerStatRoutelessAccess.withIndex()) {
+            val (get, set) = acc
+            showHeaderStatsRoutelessCard.addView(TextView(this).apply {
+                text = getString(if (slotIdx < 3) R.string.setting_header_slot else R.string.setting_header_slot_landscape, slotIdx + 1)
+                textSize = 12f
+                setTextColor(Color.LTGRAY)
+                setPadding(0, 6, 0, 0)
+            })
+            showHeaderStatsRoutelessCard.addView(Spinner(this).apply {
+                adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, headerStatRoutelessLabels)
+                setSelection(AppPreferences.HEADER_STAT_ROUTELESS_KEYS.indexOf(get()).coerceAtLeast(0))
+                onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        set(AppPreferences.HEADER_STAT_ROUTELESS_KEYS[position])
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
+            })
+        }
+        tabProContainer.addView(showHeaderStatsRoutelessCard)
 
         // ==========================================
         // PESTAÑA 6: ELITE (PAYWALL)
