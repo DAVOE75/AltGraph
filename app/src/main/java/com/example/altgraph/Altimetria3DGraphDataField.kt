@@ -41,6 +41,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
 
     // Zoom por toque: los toques sueltos repiten el sentido actual (acercar al principio); un doble toque rápido lo invierte
     private var lastTapAt = 0L
+    private var lastHeaderRouteMode: Boolean? = null
     private var tapPrevLookahead: Int? = null
     private var tapZoomOut = false
 
@@ -262,7 +263,11 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             0.0 
                         }
                 
-                        val isNavigatingRoute = snap.isNavigatingRoute && (snap.routeTotalLength > 0.0 || strategy.routeTotalLength > 0.0 || strategy.routeCoords.isNotEmpty())
+                        val isNavigatingRoute = snap.routeTotalLength > 0.0 || strategy.routeTotalLength > 0.0
+                        if (isNavigatingRoute != lastHeaderRouteMode) {
+                            lastHeaderRouteMode = isNavigatingRoute
+                            android.util.Log.d("HeaderMode", "route=$isNavigatingRoute nav=${snap.isNavigatingRoute} snapLen=${snap.routeTotalLength} stratLen=${strategy.routeTotalLength} coords=${strategy.routeCoords.size}")
+                        }
                         altimetria3DView.update3DData(
                             blocks = strategy.nextBlocks,
                             elevation = startElev,
