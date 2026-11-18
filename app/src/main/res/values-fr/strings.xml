@@ -53,9 +53,6 @@
     <string name="setting_ramp_min_slope">Pente minimale pour flèche de rampe (%)</string>
     <string name="setting_ramp_max_slope">Pente maximale pour flèche de rampe (%)</string>
     <string name="setting_show_3d_header_stats">Afficher les données dans l\'en-tête 3D</string>
-    <string name="setting_show_3d_header_stats_route">En-tête 3D (Parcours chargé)</string>
-    <string name="setting_show_3d_header_stats_routeless">En-tête 3D (Sans parcours / Freeride)</string>
-    <string name="setting_header_stats_routeless_desc">Métriques de session pour l\'en-tête 3D sans parcours préchargé (métriques dépendantes du parcours exclues):</string>
     <string name="setting_show_3d_route_name">Afficher le nom de l\'itinéraire dans l\'en-tête 3D</string>
     <string name="setting_show_3d_scale_bar">Afficher la barre d\'échelle dans le graphique d\'itinéraire 3D</string>
     <string name="setting_adapt_grade_text">Adapter la couleur du texte de pente à celle du bloc (noir sur jaune/orange)</string>

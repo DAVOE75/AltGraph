@@ -53,9 +53,6 @@
     <string name="setting_ramp_min_slope">Inclinação Mínima para Seta de Rampa (%)</string>
     <string name="setting_ramp_max_slope">Inclinação Máxima para Seta de Rampa (%)</string>
     <string name="setting_show_3d_header_stats">Mostrar dados no cabeçalho 3D</string>
-    <string name="setting_show_3d_header_stats_route">Cabeçalho 3D (Rota carregada)</string>
-    <string name="setting_show_3d_header_stats_routeless">Cabeçalho 3D (Sem rota / Freeride)</string>
-    <string name="setting_header_stats_routeless_desc">Métricas de sessão para o cabeçalho 3D sem rota pré-carregada (excluídas métricas de rota):</string>
     <string name="setting_show_3d_route_name">Mostrar Nome da Rota no Cabeçalho 3D</string>
     <string name="setting_show_3d_scale_bar">Mostrar barra de escala no gráfico de rota 3D</string>
     <string name="setting_adapt_grade_text">Adaptar a cor do texto da inclinação à do bloco (preto sobre amarelo/laranja)</string>

@@ -67,9 +67,6 @@
     <string name="setting_ramp_min_slope">Pendiente Mínima para Flecha de Rampa (%)</string>
     <string name="setting_ramp_max_slope">Pendiente Máxima para Flecha de Rampa (%)</string>
     <string name="setting_show_3d_header_stats">Mostrar datos en el encabezado 3D</string>
-    <string name="setting_show_3d_header_stats_route">Encabezado 3D (Ruta con carga / GPX)</string>
-    <string name="setting_show_3d_header_stats_routeless">Encabezado 3D (Ruta sin precarga / Freeride)</string>
-    <string name="setting_header_stats_routeless_desc">Métricas de la sesión para el encabezado 3D al rodar sin ruta precargada (excluidas métricas de ruta):</string>
     <string name="setting_show_3d_route_name">Mostrar Nombre de la Ruta en Encabezado 3D</string>
     <string name="setting_show_3d_scale_bar">Mostrar barra de escala en la gráfica de ruta 3D</string>
     <string name="setting_adapt_grade_text">Adaptar el color del texto de pendiente al del bloque (negro sobre amarillo/naranja)</string>

@@ -109,11 +109,6 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_SHOW_3D_HEADER_STATS, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_HEADER_STATS, value).apply()
 
-    // Encabezado 3D para rutas sin precarga (Freeride / Routeless)
-    var show3dHeaderStatsRouteless: Boolean
-        get() = prefs.getBoolean(KEY_SHOW_3D_HEADER_STATS_ROUTELESS, true)
-        set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_HEADER_STATS_ROUTELESS, value).apply()
-
     // Métrica de cada una de las tres columnas del encabezado 3D (HEADER_STAT_*)
     var headerStat1: String
         get() = prefs.getString(KEY_HEADER_STAT_1, HEADER_STAT_CURRENT) ?: HEADER_STAT_CURRENT
@@ -135,27 +130,6 @@ class AppPreferences(context: Context) {
     var headerStat5: String
         get() = prefs.getString(KEY_HEADER_STAT_5, HEADER_STAT_NONE) ?: HEADER_STAT_NONE
         set(value) = prefs.edit().putString(KEY_HEADER_STAT_5, value).apply()
-
-    // Métricas del encabezado 3D en rutas sin precarga (Freeride / Routeless)
-    var headerStatRouteless1: String
-        get() = prefs.getString(KEY_HEADER_STAT_ROUTELESS_1, HEADER_STAT_CURRENT) ?: HEADER_STAT_CURRENT
-        set(value) = prefs.edit().putString(KEY_HEADER_STAT_ROUTELESS_1, value).apply()
-
-    var headerStatRouteless2: String
-        get() = prefs.getString(KEY_HEADER_STAT_ROUTELESS_2, HEADER_STAT_ASC_TOTAL) ?: HEADER_STAT_ASC_TOTAL
-        set(value) = prefs.edit().putString(KEY_HEADER_STAT_ROUTELESS_2, value).apply()
-
-    var headerStatRouteless3: String
-        get() = prefs.getString(KEY_HEADER_STAT_ROUTELESS_3, HEADER_STAT_ELEV) ?: HEADER_STAT_ELEV
-        set(value) = prefs.edit().putString(KEY_HEADER_STAT_ROUTELESS_3, value).apply()
-
-    var headerStatRouteless4: String
-        get() = prefs.getString(KEY_HEADER_STAT_ROUTELESS_4, HEADER_STAT_MAX) ?: HEADER_STAT_MAX
-        set(value) = prefs.edit().putString(KEY_HEADER_STAT_ROUTELESS_4, value).apply()
-
-    var headerStatRouteless5: String
-        get() = prefs.getString(KEY_HEADER_STAT_ROUTELESS_5, HEADER_STAT_DIST) ?: HEADER_STAT_DIST
-        set(value) = prefs.edit().putString(KEY_HEADER_STAT_ROUTELESS_5, value).apply()
 
     var showRouteCompass: Boolean
         get() = prefs.getBoolean(KEY_SHOW_ROUTE_COMPASS, true)
@@ -648,9 +622,7 @@ class AppPreferences(context: Context) {
     // Estado efectivo de todos los ajustes visuales que tocan las plantillas, como texto comparable
     private fun visualState(): String = listOf(
         altimetriaStyle.key, showBlockPercentages, show3dCotas, show3dRamps, show3dScaleBar, showClimbScaleBar,
-        adaptGradeTextColors, show3dBlockLegend, show3dRouteName, show3dHeaderStats, headerStat1, headerStat2, headerStat3, headerStat4, headerStat5,
-        show3dHeaderStatsRouteless, headerStatRouteless1, headerStatRouteless2, headerStatRouteless3, headerStatRouteless4, headerStatRouteless5,
-        showHairpins, show3dZoomControls, chartFitAxis, showExaggerationTag,
+        adaptGradeTextColors, show3dBlockLegend, show3dRouteName, show3dHeaderStats, headerStat1, headerStat2, headerStat3, headerStat4, headerStat5, showHairpins, show3dZoomControls, chartFitAxis, showExaggerationTag,
         chartLightBackground, chartLightStyle, showSurfaceTextures, showRouteDistances3d, mergeBlocksMode3d, pctLabelStyle3d,
         mergeMarginPct3d, showBlockAvgPct3d, hideGradeRangeEnabled3d, hideGradeMin3d, hideGradeMax3d, showGearBadge, showRouteCompass, showRouteElevation3d,
         panButtonsPosition
@@ -670,9 +642,7 @@ class AppPreferences(context: Context) {
         prefs.edit()
             .remove(KEY_ALTIMETRIA_STYLE).remove(KEY_SHOW_BLOCK_PERCENTAGES).remove(KEY_SHOW_3D_COTAS).remove(KEY_SHOW_3D_RAMPS)
             .remove(KEY_SHOW_3D_SCALE_BAR).remove(KEY_SHOW_3D_BLOCK_LEGEND).remove(KEY_SHOW_CLIMB_SCALE_BAR).remove(KEY_ADAPT_GRADE_TEXT).remove(KEY_SHOW_3D_ROUTE_NAME)
-            .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_HEADER_STAT_1).remove(KEY_HEADER_STAT_2).remove(KEY_HEADER_STAT_3).remove(KEY_HEADER_STAT_4).remove(KEY_HEADER_STAT_5)
-            .remove(KEY_SHOW_3D_HEADER_STATS_ROUTELESS).remove(KEY_HEADER_STAT_ROUTELESS_1).remove(KEY_HEADER_STAT_ROUTELESS_2).remove(KEY_HEADER_STAT_ROUTELESS_3).remove(KEY_HEADER_STAT_ROUTELESS_4).remove(KEY_HEADER_STAT_ROUTELESS_5)
-            .remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM).remove(KEY_CHART_FIT_AXIS).remove(KEY_SHOW_EXAGGERATION_TAG)
+            .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_HEADER_STAT_1).remove(KEY_HEADER_STAT_2).remove(KEY_HEADER_STAT_3).remove(KEY_HEADER_STAT_4).remove(KEY_HEADER_STAT_5).remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM)            .remove(KEY_CHART_FIT_AXIS).remove(KEY_SHOW_EXAGGERATION_TAG)
             .remove(KEY_CHART_LIGHT_BG).remove(KEY_CHART_LIGHT_STYLE).remove(KEY_SHOW_SURFACE_TEXTURES).remove(KEY_SHOW_ROUTE_DISTANCES_3D)
             .remove(KEY_MERGE_MODE_3D).remove(KEY_MERGE_SIMILAR_BLOCKS_3D).remove(KEY_PCT_LABEL_STYLE_3D).remove(KEY_MERGE_MARGIN_3D).remove(KEY_BLOCK_AVG_PCT_3D)
             .remove(KEY_HIDE_GRADE_RANGE_ENABLED_3D).remove(KEY_HIDE_GRADE_MIN_3D).remove(KEY_HIDE_GRADE_MAX_3D)
@@ -780,14 +750,6 @@ class AppPreferences(context: Context) {
         private const val KEY_HEADER_STAT_3 = "header_stat_3"
         private const val KEY_HEADER_STAT_4 = "header_stat_4"
         private const val KEY_HEADER_STAT_5 = "header_stat_5"
-
-        private const val KEY_SHOW_3D_HEADER_STATS_ROUTELESS = "show_3d_header_stats_routeless"
-        private const val KEY_HEADER_STAT_ROUTELESS_1 = "header_stat_routeless_1"
-        private const val KEY_HEADER_STAT_ROUTELESS_2 = "header_stat_routeless_2"
-        private const val KEY_HEADER_STAT_ROUTELESS_3 = "header_stat_routeless_3"
-        private const val KEY_HEADER_STAT_ROUTELESS_4 = "header_stat_routeless_4"
-        private const val KEY_HEADER_STAT_ROUTELESS_5 = "header_stat_routeless_5"
-
         const val HEADER_STAT_NONE = "none"
         const val HEADER_STAT_CURRENT = "current"
         const val HEADER_STAT_AVG = "avg"
@@ -812,9 +774,6 @@ class AppPreferences(context: Context) {
             HEADER_STAT_ASC_TOTAL, HEADER_STAT_ASC_LEFT, HEADER_STAT_ELEV, HEADER_STAT_TOP_DIST, HEADER_STAT_TOP_ELEV,
             HEADER_STAT_NEXT_DIST, HEADER_STAT_NEXT_LEN, HEADER_STAT_NEXT_GAIN, HEADER_STAT_NEXT_GRADE,
             HEADER_STAT_RESUPPLY, HEADER_STAT_ETA, HEADER_STAT_PACE
-        )
-        val HEADER_STAT_ROUTELESS_KEYS = listOf(
-            HEADER_STAT_NONE, HEADER_STAT_CURRENT, HEADER_STAT_AVG, HEADER_STAT_MAX, HEADER_STAT_DIST, HEADER_STAT_ASC_TOTAL, HEADER_STAT_ELEV
         )
         private const val KEY_SHOW_3D_ROUTE_NAME = "show_3d_route_name"
         private const val KEY_SHOW_3D_SCALE_BAR = "show_3d_scale_bar"

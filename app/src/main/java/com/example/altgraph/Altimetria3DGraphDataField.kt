@@ -41,7 +41,6 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
 
     // Zoom por toque: los toques sueltos repiten el sentido actual (acercar al principio); un doble toque rápido lo invierte
     private var lastTapAt = 0L
-    private var lastHeaderRouteMode: Boolean? = null
     private var tapPrevLookahead: Int? = null
     private var tapZoomOut = false
 
@@ -263,11 +262,6 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             0.0 
                         }
                 
-                        val isNavigatingRoute = snap.hasRoute || snap.routeTotalLength > 0.0 || strategy.routeTotalLength > 0.0
-                        if (isNavigatingRoute != lastHeaderRouteMode) {
-                            lastHeaderRouteMode = isNavigatingRoute
-                            android.util.Log.d("HeaderMode", "route=$isNavigatingRoute hasRoute=${snap.hasRoute} nav=${snap.isNavigatingRoute} snapLen=${snap.routeTotalLength} stratLen=${strategy.routeTotalLength} coords=${strategy.routeCoords.size}")
-                        }
                         altimetria3DView.update3DData(
                             blocks = strategy.nextBlocks,
                             elevation = startElev,
@@ -303,15 +297,14 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             visibleAvgGrade = strategy.visibleAvgGrade,
                             visibleMaxGrade = strategy.visibleMaxGrade,
                             routeName = strategy.routeName,
-                            showHeaderStats = if (isNavigatingRoute) (prefs.show3dHeaderStats || prefs.show3dRouteName) else (prefs.show3dHeaderStatsRouteless || prefs.show3dRouteName),
+                            showHeaderStats = prefs.show3dHeaderStats || prefs.show3dRouteName,
                             showRouteName = prefs.show3dRouteName,
-                            showGradeStats = if (isNavigatingRoute) prefs.show3dHeaderStats else prefs.show3dHeaderStatsRouteless,
-                            isNavigatingRoute = isNavigatingRoute,
+                            showGradeStats = prefs.show3dHeaderStats,
                             routeCoords = strategy.routeCoords,
                             mapRotationAngle = mapRotAngle,
                             isHeadingUp = isHeadingUp,
                             showSurfaceTextures = prefs.showSurfaceTextures,
-                            routeTotalLength = maxOf(snap.routeTotalLength, strategy.routeTotalLength),
+                            routeTotalLength = snap.routeTotalLength,
                             panButtonsPosition = prefs.panButtonsPosition,
                             beaconColor = prefs.beaconColor,
                             beaconSize = prefs.beaconSize,

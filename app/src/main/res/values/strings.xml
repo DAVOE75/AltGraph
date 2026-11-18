@@ -68,9 +68,6 @@
     <string name="setting_ramp_min_slope">Ramp Minimum Slope Alert (%)</string>
     <string name="setting_ramp_max_slope">Ramp Maximum Slope Alert (%)</string>
     <string name="setting_show_3d_header_stats">Show stats in 3D header</string>
-    <string name="setting_show_3d_header_stats_route">3D Header (Pre-loaded Route / GPX)</string>
-    <string name="setting_show_3d_header_stats_routeless">3D Header (Routeless / Freeride)</string>
-    <string name="setting_header_stats_routeless_desc">Select session metrics for 3D header when riding without a pre-loaded route (route-dependent metrics excluded):</string>
     <string name="setting_show_3d_route_name">Show Route Name in 3D Header</string>
     <string name="setting_show_3d_scale_bar">Show scale bar in the 3D route chart</string>
     <string name="setting_adapt_grade_text">Adapt gradient text colour to the block colour (black on yellow/orange)</string>
