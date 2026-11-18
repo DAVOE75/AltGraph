@@ -63,6 +63,8 @@ object RoadHorizonReplay {
             val cur = fixes[i].p
             val back = fixes[i - 2].p
             val heading = back.bearingTo(cur)
+            predictor.recordFix(fixes[i - 1].p.lat, fixes[i - 1].p.lng)
+            predictor.recordFix(cur.lat, cur.lng)
             val res = predictor.predictHorizon(cur.lat, cur.lng, heading, horizonM, stepM)
             if (res != null && res.coordinates.size >= 3) {
                 detected++

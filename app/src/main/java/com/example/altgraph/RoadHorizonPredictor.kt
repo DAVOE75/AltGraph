@@ -45,6 +45,153 @@ class RoadHorizonPredictor(private val context: Context) {
     private var pendingCount = 0
     private val SWITCH_READINGS = 2
     private val SWITCH_NOW_MARGIN = 12.0
+    private val FOOT_KINDS = setOf("footway", "path", "steps", "pedestrian", "track", "bridleway")
+
+    // ---------- Rapidez: cálculo en segundo plano y precarga ----------
+    private val executor = java.util.concurrent.Executors.newSingleThreadExecutor { r -> Thread(r, "RoadHorizonCalc").apply { isDaemon = true } }
+    private val computing = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+    private class Cached(val result: HorizonResult?, val lat: Double, val lng: Double)
+    private val cachedMap = java.util.concurrent.ConcurrentHashMap<String, Cached>()
+
+    /**
+     * Pide el cálculo en segundo plano y devuelve el último resultado válido cerca de esta posición (o null si aún no hay),
+     * para que el hilo principal nunca espere al mapa ni al terreno. La caché es por distancia pedida (radar y 3D piden distintas).
+     */
+    fun predictAsync(lat: Double, lng: Double, heading: Double, dist: Double, step: Double, speedMps: Double): HorizonResult? {
+        val key = "${dist.toInt()}_${step.toInt()}"
+        if (computing.add(key)) {
+            executor.execute {
+                try {
+                    val r = predictHorizon(lat, lng, heading, dist, step, speedMps)
+                    cachedMap[key] = Cached(r, lat, lng)
+                } catch (e: Exception) {
+                    android.util.Log.e("RoadHorizon", "predict failed", e)
+                } finally {
+                    computing.remove(key)
+                }
+            }
+        }
+        val c = cachedMap[key] ?: return null
+        return if (GeoPoint(c.lat, c.lng).distanceTo(GeoPoint(lat, lng)) < 40.0) c.result else null
+    }
+
+    /** Precarga el lector de mapas, las calles de la última posición y el archivo de terreno al arrancar. */
+    fun warmUp() {
+        executor.execute {
+            try {
+                val reader = ensureMapReader() ?: return@execute
+                val lat = appPrefs.horizonLastLat.toDouble(); val lng = appPrefs.horizonLastLng.toDouble()
+                if (lat != 0.0 || lng != 0.0) {
+                    reader.getRoadsNear(GeoPoint(lat, lng), radiusMeters = 150.0)
+                    elevationManager.getElevation(lat, lng)
+                }
+            } catch (e: Exception) { }
+        }
+    }
+
+    // ---------- Precisión de calle: trayectoria reciente ----------
+    private val trail = ArrayList<GeoPoint>()
+
+    /** Guarda las últimas posiciones (150 m de recorrido) para emparejar la trayectoria con las calles. */
+    fun recordFix(lat: Double, lng: Double) {
+        synchronized(trail) {
+            val p = GeoPoint(lat, lng)
+            if (trail.isEmpty() || trail.last().distanceTo(p) >= 8.0) {
+                trail.add(p)
+                var len = 0.0
+                for (i in 1 until trail.size) len += trail[i - 1].distanceTo(trail[i])
+                while (len > 150.0 && trail.size > 2) { len -= trail[0].distanceTo(trail[1]); trail.removeAt(0) }
+            }
+        }
+    }
+
+    private fun trailSnapshot(): List<GeoPoint> = synchronized(trail) { ArrayList(trail) }
+
+    // Rumbo medido sobre la trayectoria real (más de 25 m atrás): más estable que el del GPS
+    private fun trailHeading(cur: GeoPoint, t: List<GeoPoint>): Double? {
+        for (i in t.indices.reversed()) if (t[i].distanceTo(cur) >= 25.0) return t[i].bearingTo(cur)
+        return null
+    }
+
+    // Distancia media de la trayectoria reciente a la calle (limitada a 40 m): una calle paralela encaja peor que la real
+    private fun trailCostFor(road: RoadSegment, t: List<GeoPoint>): Double {
+        if (t.size < 3) return 0.0
+        var sum = 0.0
+        for (p in t) {
+            var best = 40.0
+            for (i in 0 until road.points.size - 1) {
+                val d = distanceToSegment(p, road.points[i], road.points[i + 1])
+                if (d < best) best = d
+            }
+            sum += best
+        }
+        return sum / t.size
+    }
+
+    // ---------- Precisión de cota: calibración con pendiente y aprendizaje propio ----------
+    @Volatile var calibOffset = 0.0
+        private set
+    @Volatile var calibSlope = 0.0 // metros de corrección por metro recorrido, acotada
+        private set
+    @Volatile var calibValid = false
+        private set
+    private val xs = ArrayDeque<Double>()
+    private var cumDist = 0.0
+    private val corr = java.util.concurrent.ConcurrentHashMap<Long, Float>() // corrección aprendida por celda de ~12 m
+    @Volatile private var corrDirty = false
+    private var lastCorrSaveMs = 0L
+    private val corrFile = File(context.filesDir, "dem_corr.bin")
+
+    init {
+        try {
+            if (corrFile.isFile) java.io.DataInputStream(corrFile.inputStream().buffered()).use { input ->
+                val n = input.readInt()
+                for (i in 0 until n.coerceAtMost(400_000)) corr[input.readLong()] = input.readFloat()
+            }
+        } catch (e: Exception) { corr.clear() }
+    }
+
+    private fun cellKey(lat: Double, lng: Double): Long =
+        Math.round(lat * 9000.0) * 4_000_000L + Math.round((lng + 180.0) * 9000.0)
+
+    private fun maybeSaveCorr() {
+        val now = System.currentTimeMillis()
+        if (!corrDirty || now - lastCorrSaveMs < 60_000L) return
+        lastCorrSaveMs = now
+        corrDirty = false
+        executor.execute {
+            try {
+                java.io.DataOutputStream(corrFile.outputStream().buffered()).use { out ->
+                    val snap = corr.entries.toList().take(400_000)
+                    out.writeInt(snap.size)
+                    for (e in snap) { out.writeLong(e.key); out.writeFloat(e.value) }
+                }
+            } catch (e: Exception) { }
+        }
+    }
+
+    private fun updateCalibration() {
+        val n = minOf(20, diffs.size)
+        if (n < 8) return
+        val d = diffs.toList().takeLast(n)
+        val x = xs.toList().takeLast(n)
+        calibOffset = d.sorted()[n / 2]
+        val mx = x.average(); val my = d.average()
+        var num = 0.0; var den = 0.0
+        for (i in 0 until n) { num += (x[i] - mx) * (d[i] - my); den += (x[i] - mx) * (x[i] - mx) }
+        val slope = if (den > 1.0 && x.last() - x.first() >= 60.0) num / den else 0.0
+        calibSlope = slope.coerceIn(-0.005, 0.005)
+        calibValid = true
+    }
+
+    private fun learn(lat: Double, lng: Double, diff: Double) {
+        val resid = (diff - calibOffset).coerceIn(-6.0, 6.0).toFloat()
+        val k = cellKey(lat, lng)
+        val old = corr[k]
+        corr[k] = if (old == null) resid * 0.5f else old * 0.6f + resid * 0.4f
+        corrDirty = true
+        maybeSaveCorr()
+    }
 
     data class HorizonResult(
         val elevations: List<Float>,
@@ -79,9 +226,10 @@ class RoadHorizonPredictor(private val context: Context) {
     fun predictHorizon(
         lat: Double,
         lng: Double,
-        headingDeg: Double,
+        headingIn: Double,
         distanceMeters: Double = 3000.0,
-        sampleStepMeters: Double = 25.0
+        sampleStepMeters: Double = 25.0,
+        speedMps: Double = -1.0
     ): HorizonResult? {
         // Disparar en segundo plano la descarga si estamos en Wi-Fi
         elevationManager.considerDownload(lat, lng)
@@ -89,6 +237,9 @@ class RoadHorizonPredictor(private val context: Context) {
         val reader = ensureMapReader()
         if (reader == null) { android.util.Log.w("RoadHorizon", "no map reader (permission/maps?)"); lastStatus = Status.NO_MAP; return null }
         val currentPoint = GeoPoint(lat, lng)
+        val trailPts = trailSnapshot()
+        // Rumbo de la trayectoria real si la hay; si no, el que llega del GPS
+        val headingDeg = trailHeading(currentPoint, trailPts) ?: headingIn
         val nowMs = System.currentTimeMillis()
         if (nowMs - lastPosSaveMs > 30_000L) {
             lastPosSaveMs = nowMs
@@ -115,7 +266,9 @@ class RoadHorizonPredictor(private val context: Context) {
 
         for (road in nearbyRoads) {
             // Caminos, pistas y accesos pierden frente a una calle al lado
-            val minorCost = if (road.kind in MINOR_KINDS) MINOR_COST_M else 0.0
+            val minorCost = (if (road.kind in MINOR_KINDS) MINOR_COST_M else 0.0) +
+                (if (speedMps > 3.3 && road.kind in FOOT_KINDS) 25.0 else 0.0) // a más de ~12 km/h no se va por un sendero
+            val trailCost = if (stationary) 0.0 else trailCostFor(road, trailPts) * 0.5
             val cycleBonus = if (road.kind == "cycleway") cyclewayBonus else 0.0
             val isPrev = roadKey(road) == lastRoadKey
             for (i in 0 until road.points.size - 1) {
@@ -131,7 +284,7 @@ class RoadHorizonPredictor(private val context: Context) {
                     val distToSeg = distanceToSegment(currentPoint, p1, p2)
                     // Parado el rumbo no es fiable: gana la vía más cercana (la longitud solo desempata)
                     val score = (if (stationary) distToSeg - road.lengthMeters * 1e-4
-                                 else distToSeg + bearingDiff * 0.3) + minorCost - cycleBonus
+                                 else distToSeg + bearingDiff * 0.3) + minorCost + trailCost - cycleBonus
                     if (distToSeg < 30.0 && score < bestScore) {
                         bestScore = score
                         bestRoad = road
@@ -292,7 +445,9 @@ class RoadHorizonPredictor(private val context: Context) {
 
         for (p in samplePoints) {
             val elev = elevationManager.getElevation(p.lat, p.lng)
-            elevations.add(elev?.toFloat() ?: -999f)
+            // La corrección aprendida de tus propias pasadas se suma a la cota del terreno
+            val learned = corr[cellKey(p.lat, p.lng)] ?: 0f
+            elevations.add(if (elev != null) elev.toFloat() + learned else -999f)
         }
         if (elevations.all { it <= -900f }) { lastStatus = Status.NO_TERRAIN; return null }
 
@@ -444,13 +599,17 @@ class RoadHorizonPredictor(private val context: Context) {
         val dem = demAt(lat, lng) ?: return null
         val diff = actual - dem
         if (lastSampleLat == 0.0 || GeoPoint(lastSampleLat, lastSampleLng).distanceTo(GeoPoint(lat, lng)) >= 5.0) {
+            if (lastSampleLat != 0.0) cumDist += GeoPoint(lastSampleLat, lastSampleLng).distanceTo(GeoPoint(lat, lng))
             lastSampleLat = lat; lastSampleLng = lng
+            xs.addLast(cumDist)
             diffs.addLast(diff)
-            if (diffs.size > 60) diffs.removeFirst()
+            if (diffs.size > 60) { diffs.removeFirst(); xs.removeFirst() }
             if (diffs.size >= 12) {
                 val mean = diffs.average()
                 val std = Math.sqrt(diffs.sumOf { (it - mean) * (it - mean) } / diffs.size)
                 confidence = if (std < 2.5) 3 else if (std < 5.0) 2 else 1
+                updateCalibration()
+                if (confidence >= 2) learn(lat, lng, diff)
             }
         }
         return diff

@@ -125,6 +125,7 @@ object AltgraphRepository {
         s.launch { backoff.clear(); recovered.clear(); lastReAddAt.clear(); core.kghostTime = null; core.kghostDist = null; _snapshot.value = null }
         val gen = ++generation
 
+        try { RoadHorizonPredictor.getInstance(ctx).warmUp() } catch (e: Exception) { }
         val system = KarooSystemService(ctx)
         karooSystem = system
         val registry = ConsumerRegistry(

@@ -461,8 +461,6 @@ class AltimetriaStrategyCalculator {
 
     private var lastPosSaveMs = 0L
     private var elevationEverSet = false
-    private var baroOffset = 0.0
-    private var baroOffsetValid = false
     // Mensaje claro cuando el horizonte no puede predecir (sin mapa, sin calle o sin terreno) en vez de un perfil plano engañoso
     private fun horizonStatusMessage(enabled: Boolean, ctx: Context?): String? {
         if (!enabled || ctx == null || currentLatitude == 0.0) return null
@@ -488,6 +486,7 @@ class AltimetriaStrategyCalculator {
         }
         this.currentLatitude = lat
         this.currentLongitude = lng
+        if (!isNavigatingRoute) appContext?.let { RoadHorizonPredictor.getInstance(it).recordFix(lat, lng) }
         val nowSave = System.currentTimeMillis()
         if (nowSave - lastPosSaveMs > 15_000L) {
             lastPosSaveMs = nowSave
@@ -2245,7 +2244,7 @@ class AltimetriaStrategyCalculator {
                     }
                     val canGrow = held != null && held.totalDistanceMeters >= lookaheadDist * 1.9
                     if (held == null || s < 0.0 || s >= held.elevations.size - 2 || (canGrow && s + (count - nb) > held.elevations.size - 1)) {
-                        held = predictor.predictHorizon(currentLatitude, currentLongitude, if (travelHeadingValid) travelHeading else currentHeading, lookaheadDist * 2.0, stepM)
+                        held = predictor.predictAsync(currentLatitude, currentLongitude, if (travelHeadingValid) travelHeading else currentHeading, lookaheadDist * 2.0, stepM, currentSpeed)
                         heldAnchor = held
                         heldAnchorLookahead = lookaheadDist
                         s = 0.0
@@ -2272,7 +2271,7 @@ class AltimetriaStrategyCalculator {
                         horizonResult = held
                         horizonProgress = onHeld
                     } else {
-                        horizonResult = predictor.predictHorizon(currentLatitude, currentLongitude, if (travelHeadingValid) travelHeading else currentHeading, lookaheadDist, stepM)
+                        horizonResult = predictor.predictAsync(currentLatitude, currentLongitude, if (travelHeadingValid) travelHeading else currentHeading, lookaheadDist, stepM, currentSpeed)
                         heldHorizon = horizonResult
                         heldHorizonLookahead = lookaheadDist
                     }
@@ -2280,18 +2279,22 @@ class AltimetriaStrategyCalculator {
             }
 
             if (advance && horizonEnabled && elevationEverSet && currentLatitude != 0.0 && effectiveCtx != null) {
-                // Calibración barométrica: desfase entre la altitud real y la del MDT en tu posición (suavizado)
-                val d = try { RoadHorizonPredictor.getInstance(effectiveCtx).recordActual(currentLatitude, currentLongitude, currentElevation) } catch (e: Exception) { null }
-                if (d != null) {
-                    baroOffset = if (!baroOffsetValid) d else baroOffset + (d - baroOffset) * 0.05
-                    baroOffsetValid = true
-                }
+                // Calibración barométrica y aprendizaje de cotas propias (el predictor lleva la mediana y la pendiente)
+                try { RoadHorizonPredictor.getInstance(effectiveCtx).recordActual(currentLatitude, currentLongitude, currentElevation) } catch (e: Exception) { }
             }
 
             if (horizonResult != null && horizonResult.elevations.size >= 3) {
                 // --- PREDICCIÓN HORIZONTE DE CARRETERA (ROAD HORIZON 3D) ---
-                val calibOffset = if ((prefs?.horizonBaroCalib ?: true) && baroOffsetValid) baroOffset.toFloat() else 0f
-                val hElevs = if (calibOffset != 0f) horizonResult.elevations.map { it + calibOffset } else horizonResult.elevations
+                val calibPred = effectiveCtx?.let { RoadHorizonPredictor.getInstance(it) }
+                val calibOn = (prefs?.horizonBaroCalib ?: true) && calibPred?.calibValid == true
+                val nElev = horizonResult.elevations.size
+                val stepForCalib = horizonResult.totalDistanceMeters / (nElev - 1)
+                val riderIdx = horizonProgress * (nElev - 1)
+                val hElevs = if (calibOn && calibPred != null) {
+                    val off = calibPred.calibOffset.toFloat(); val slope = calibPred.calibSlope
+                    // Desfase a la altura actual más la tendencia reciente, aplicada hacia delante y hacia atrás desde el ciclista
+                    horizonResult.elevations.mapIndexed { i, e -> e + off + (slope * (i - riderIdx) * stepForCalib).toFloat() }
+                } else horizonResult.elevations
                 val hGrades = horizonResult.grades
                 val stepMeters = horizonResult.totalDistanceMeters / (hElevs.size - 1)
                 val majorBlockSize = (Math.round(getMajorBlockSize(lookaheadDist) / stepMeters).toInt().coerceAtLeast(1)) * stepMeters
