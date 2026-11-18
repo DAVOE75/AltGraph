@@ -27,11 +27,18 @@ import kotlin.math.sqrt
  */
 class ElevationManager(private val context: Context) {
 
+    // Carpeta propia de la app: siempre accesible, sin permisos de almacenamiento. Aquí se descarga.
     private val baseDir: File by lazy {
-        val sdcard = File("/sdcard/altgraph/elevation")
-        if (sdcard.exists() || sdcard.mkdirs()) sdcard
-        else File(context.filesDir, "elevation").apply { mkdirs() }
+        val dir = context.getExternalFilesDir("elevation") ?: File(context.filesDir, "elevation")
+        dir.apply { mkdirs() }
     }
+
+    // Carpeta de versiones anteriores: solo se lee si el sistema deja acceder a ella
+    private val legacyDir = File("/sdcard/altgraph/elevation")
+
+    // Archivo realmente legible (isFile puede ser true sin permiso de lectura)
+    private fun locate(name: String): File? =
+        listOf(baseDir, legacyDir).map { File(it, name) }.firstOrNull { it.isFile && it.canRead() && it.length() > 0 }
 
     private val openFiles = ConcurrentHashMap<String, Optional<HgtFile>>()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -42,8 +49,8 @@ class ElevationManager(private val context: Context) {
         val name = HgtFile.nameFor(lat, lng)
         val cached = openFiles[name]
         val hgt = if (cached != null) cached.orElse(null) else {
-            val f = File(baseDir, name)
-            val opened = if (f.isFile && f.length() > 0) runCatching { HgtFile(f) }.getOrNull() else null
+            val f = locate(name)
+            val opened = if (f != null) runCatching { HgtFile(f) }.getOrNull() else null
             // Solo se recuerda el archivo si existe; si falta se vuelve a mirar (puede descargarse después)
             if (opened != null) openFiles[name] = Optional.of(opened)
             opened
@@ -51,13 +58,12 @@ class ElevationManager(private val context: Context) {
         return try { hgt?.getElevation(lat, lng) } catch (e: Exception) { null }
     }
 
-    fun hasCoverageFor(lat: Double, lng: Double): Boolean {
-        val name = HgtFile.nameFor(lat, lng)
-        return File(baseDir, name).isFile
-    }
+    fun hasCoverageFor(lat: Double, lng: Double): Boolean = locate(HgtFile.nameFor(lat, lng)) != null
 
     fun getHeldFiles(): List<File> =
-        baseDir.listFiles { f -> f.name.endsWith(".hgt") }?.sortedBy { it.name }.orEmpty()
+        listOf(baseDir, legacyDir)
+            .flatMap { d -> d.listFiles { f -> f.name.endsWith(".hgt") && f.canRead() }?.toList().orEmpty() }
+            .distinctBy { it.name }.sortedBy { it.name }
 
     fun considerDownload(lat: Double, lng: Double, radiusKm: Int = AppPreferences.getInstance(context).horizonDownloadRadiusKm) {
         val now = SystemClock.elapsedRealtime()
@@ -75,7 +81,7 @@ class ElevationManager(private val context: Context) {
 
     private fun startDownload(lat: Double, lng: Double, radiusKm: Int, onDone: ((Int) -> Unit)?): Boolean {
         val neededFiles = findNeededTileNames(lat, lng, radiusKm)
-        val missing = neededFiles.filter { !File(baseDir, it).isFile && (onDone != null || !isKnownMissing(it)) }
+        val missing = neededFiles.filter { locate(it) == null && (onDone != null || !isKnownMissing(it)) }
         if (missing.isEmpty() || !isNetworkAllowed()) return false
 
         if (!isFetching.compareAndSet(false, true)) return false
@@ -99,7 +105,7 @@ class ElevationManager(private val context: Context) {
     /** true si ya están todas las cuadrículas necesarias alrededor de la posición (o no existen datos para ellas). */
     fun isUpToDate(lat: Double, lng: Double): Boolean {
         val radius = AppPreferences.getInstance(context).horizonDownloadRadiusKm
-        return findNeededTileNames(lat, lng, radius).all { File(baseDir, it).isFile || isKnownMissing(it) }
+        return findNeededTileNames(lat, lng, radius).all { locate(it) != null || isKnownMissing(it) }
     }
 
     fun heldSummary(): Pair<Int, Long> {
