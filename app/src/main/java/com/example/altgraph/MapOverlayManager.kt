@@ -59,21 +59,25 @@ class MapOverlayManager(
 
     private fun updateOverlay(navEvent: OnNavigationState, emitter: Emitter<MapEffect>) {
         if (stopped) return
-        val state = navEvent.state as? OnNavigationState.NavigationState.NavigatingRoute
-        
+        val nav = navEvent.state
+        val route = nav as? OnNavigationState.NavigationState.NavigatingRoute
+        val dest = nav as? OnNavigationState.NavigationState.NavigatingToDestination
+        val polyEnc: String? = route?.routePolyline ?: dest?.polyline
+        val elevEnc0: String? = route?.routeElevationPolyline ?: dest?.elevationPolyline
+        val routeDist: Double = route?.routeDistance ?: 0.0
+        val state = if (polyEnc != null) nav else null
+
         val mode = prefs.eliteMapOverlayMode
-        Log.d("MapOverlayManager", "updateOverlay: mode=$mode, unlocked=${prefs.isEliteUnlocked}, state=${state != null}")
+        Log.d("MapOverlayManager", "updateOverlay: mode=$mode, unlocked=${prefs.isEliteUnlocked}, state=${state != null}, type=${nav.javaClass.simpleName}")
         if (mode == "off" || !prefs.isEliteUnlocked || state == null) {
             clearPolylines(emitter)
             return
         }
 
-        // Just use polyline hash as routeId since NavigatingRoute doesn't expose routeId natively here
-        // La clave incluye los ajustes: al cambiarlos hay que redibujar la ruta aunque sea la misma
-        val routeId = state.routePolyline.take(30) +
+        val routeId = polyEnc!!.take(30) +
             "|$mode|${prefs.eliteSmoothMapOverlayEnabled}|${prefs.eliteRadarResolution}"
         Log.d("MapOverlayManager", "updateOverlay: routeId=$routeId, last=$lastRouteId")
-        if (state.routePolyline.isEmpty()) {
+        if (polyEnc.isEmpty()) {
             clearPolylines(emitter)
             lastRouteId = null
             return
@@ -82,11 +86,11 @@ class MapOverlayManager(
         if (routeId == lastRouteId) return
         lastRouteId = routeId
 
-        var elevEncoded = state.routeElevationPolyline
-        if (elevEncoded.isNullOrEmpty()) {
-            elevEncoded = (state.javaClass.methods.find { it.name == "getElevationPolyline" }?.invoke(state) as? String)
+        var elevEncoded = elevEnc0
+        if (elevEncoded.isNullOrEmpty() && route != null) {
+            elevEncoded = (route.javaClass.methods.find { it.name == "getElevationPolyline" }?.invoke(route) as? String)
         }
-        val pathEncoded = state.routePolyline
+        val pathEncoded = polyEnc
         Log.d("MapOverlayManager", "updateOverlay: elevLength=${elevEncoded?.length}, pathLength=${pathEncoded?.length}")
 
         if (elevEncoded.isNullOrEmpty() || pathEncoded.isNullOrEmpty()) {
@@ -95,7 +99,7 @@ class MapOverlayManager(
         }
 
         try {
-            val safeRouteDist = state.routeDistance ?: 0.0
+            val safeRouteDist = routeDist
             val elevResult = ElevationPolylineDecoder.decodeSafe(elevEncoded, safeRouteDist)
             if (elevResult !is ElevationPolylineDecoder.DecodeResult.Success) return
 

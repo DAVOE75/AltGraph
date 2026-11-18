@@ -66,9 +66,21 @@ object NavigationSync {
                 val dist = (state.javaClass.methods.find { it.name == "getDestinationDistance" || it.name == "getDistance" }?.invoke(state) as? Double) ?: 0.0
                 Log.d(TAG, "NAV: Destino dinámico detectado, dist=${dist}m")
                 calc.isNavigatingRoute = true
-                // Rutas a destino no suelen tener routePolyline, pero sí elevationPolyline
+                calc.activeRouteName = state.destination.name
+                val poly = state.polyline
+                if (!poly.isNullOrEmpty()) calc.setRouteFromPolyline(poly, state.destination.name)
                 calc.setRouteElevationProfile(state.elevationPolyline)
-                calc.syncRouteDistance(dist)
+                calc.setRoutePois(emptyList())
+                calc.syncRouteClimbs("dest:${state.destination.name}:${poly?.length ?: 0}", state.climbs.map { climb ->
+                    RouteClimb(
+                        startDistance = climb.startDistance,
+                        endDistance = climb.startDistance + climb.length,
+                        length = climb.length,
+                        totalElevation = climb.totalElevation,
+                        avgGrade = climb.grade
+                    )
+                })
+                if (dist > 0.0) calc.syncRouteDistance(dist)
 
             } else if (state.javaClass.simpleName == "Idle" || state is OnNavigationState.NavigationState.Idle) {
                 Log.d(TAG, "NAV: Idle (sin ruta cargada)")
