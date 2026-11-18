@@ -133,10 +133,11 @@ class MainActivity : Activity() {
                     android.util.Log.i("TerrainTest", "install=$ok tiles=$n MB=${b / 1048576} ms=${System.currentTimeMillis() - t0} installed=${tp.installedIds()}")
                 }.start()
             }
-            intent?.getStringExtra("terrain_probe")?.let { pairs ->
+            intent?.getStringExtra("terrain_probe")?.let { first ->
+                val all = listOfNotNull(first, intent?.getStringExtra("terrain_probe2"), intent?.getStringExtra("terrain_probe3"))
                 Thread {
                     val em = ElevationManager.getInstance(this)
-                    pairs.split(';').forEach { pair ->
+                    all.forEach { pair ->
                         val c = pair.split(',').mapNotNull { it.trim().toDoubleOrNull() }
                         if (c.size == 2) {
                             val v = em.getElevation(c[0], c[1])
