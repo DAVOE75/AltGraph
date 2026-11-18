@@ -53,8 +53,15 @@ class MainActivity : Activity() {
             else if (em.hasCoverageFor(lat, lng)) getString(R.string.horizon_cover_yes) else getString(R.string.horizon_cover_no)
         val dl = if (em.isDownloading()) "\n" + getString(R.string.horizon_downloading) else ""
         val roadNow = RoadHorizonPredictor.getInstance(this).lastRoadName
+        val confLabel = when (RoadHorizonPredictor.getInstance(this).confidence) {
+            3 -> getString(R.string.horizon_conf_high)
+            2 -> getString(R.string.horizon_conf_mid)
+            1 -> getString(R.string.horizon_conf_low)
+            else -> getString(R.string.horizon_conf_unknown)
+        }
         tv.text = getString(R.string.horizon_status_fmt, perm, maps, files, bytes / 1_048_576, cover) + dl +
-            "\n" + getString(R.string.horizon_status_road, roadNow ?: getString(R.string.horizon_status_none))
+            "\n" + getString(R.string.horizon_status_road, roadNow ?: getString(R.string.horizon_status_none)) +
+            "\n" + getString(R.string.horizon_status_conf, confLabel)
 
         // Botón de descarga: verde y "ya descargado" cuando no falta ninguna cuadrícula
         val btn = horizonDownloadBtn ?: return
@@ -101,6 +108,9 @@ class MainActivity : Activity() {
         PanelTheme.init(this, prefs.panelTheme)
         setTheme(if (PanelTheme.isLight) R.style.Theme_ALTGRAPH_Panel_Light else R.style.Theme_ALTGRAPH_Panel_Dark)
         super.onCreate(savedInstanceState)
+        if (intent?.getBooleanExtra("horizon_replay", false) == true) {
+            Thread { android.util.Log.i("RoadHorizonReplay", RoadHorizonReplay.run(this) ?: "no gpx") }.start()
+        }
 
         FontHelper.init(this)
 
@@ -1737,6 +1747,8 @@ class MainActivity : Activity() {
             alertValues.indexOf(prefs.horizonAlertPct).coerceAtLeast(0)) { prefs.horizonAlertPct = alertValues[it] })
         pendingDesc = R.string.horizon_desc_mark
         addOpt(horizonSwitch(getString(R.string.horizon_mark_guess), prefs.horizonMarkGuess) { prefs.horizonMarkGuess = it })
+        pendingDesc = R.string.horizon_desc_baro
+        addOpt(horizonSwitch(getString(R.string.horizon_baro_calib), prefs.horizonBaroCalib) { prefs.horizonBaroCalib = it })
         val maxGradeValues = listOf(20, 30, 45)
         pendingDesc = R.string.horizon_desc_max_grade
         addOpt(labelSpinner(getString(R.string.horizon_max_grade),
@@ -1807,6 +1819,20 @@ class MainActivity : Activity() {
         horizonDownloadBtn = downloadBtn
         pendingDesc = R.string.horizon_desc_download
         addOpt(downloadBtn)
+        pendingDesc = R.string.horizon_desc_replay
+        addOpt(horizonButton(getString(R.string.horizon_btn_replay)) {
+            if (!RoadHorizonReplay.gpxFile().isFile) {
+                android.widget.Toast.makeText(this, getString(R.string.horizon_replay_nofile), android.widget.Toast.LENGTH_LONG).show()
+            } else {
+                android.widget.Toast.makeText(this, getString(R.string.horizon_replay_running), android.widget.Toast.LENGTH_LONG).show()
+                Thread {
+                    val report = try { RoadHorizonReplay.run(this) } catch (e: Exception) { "Error: ${e.message}" }
+                    runOnUiThread {
+                        android.app.AlertDialog.Builder(this).setMessage(report ?: "").setPositiveButton(android.R.string.ok, null).show()
+                    }
+                }.start()
+            }
+        })
         pendingDesc = R.string.horizon_desc_diag
         addOpt(horizonButton(getString(R.string.horizon_btn_diag)) {
             val diag = RoadHorizonPredictor.getInstance(this).lastDiagnostic.ifEmpty { getString(R.string.horizon_diag_empty) }

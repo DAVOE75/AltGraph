@@ -430,6 +430,32 @@ class RoadHorizonPredictor(private val context: Context) {
         return from.bearingTo(target)
     }
 
+    // Confianza del terreno: se compara la altitud real con la del MDT mientras se avanza (0 = desconocida, 1 baja, 2 media, 3 alta)
+    private val diffs = ArrayDeque<Double>()
+    private var lastSampleLat = 0.0
+    private var lastSampleLng = 0.0
+    @Volatile var confidence: Int = 0
+        private set
+
+    fun demAt(lat: Double, lng: Double): Double? = elevationManager.getElevation(lat, lng)
+
+    /** Registra la altitud real frente al MDT y devuelve el desfase (real - MDT), o null si no hay terreno aquí. */
+    fun recordActual(lat: Double, lng: Double, actual: Double): Double? {
+        val dem = demAt(lat, lng) ?: return null
+        val diff = actual - dem
+        if (lastSampleLat == 0.0 || GeoPoint(lastSampleLat, lastSampleLng).distanceTo(GeoPoint(lat, lng)) >= 5.0) {
+            lastSampleLat = lat; lastSampleLng = lng
+            diffs.addLast(diff)
+            if (diffs.size > 60) diffs.removeFirst()
+            if (diffs.size >= 12) {
+                val mean = diffs.average()
+                val std = Math.sqrt(diffs.sumOf { (it - mean) * (it - mean) } / diffs.size)
+                confidence = if (std < 2.5) 3 else if (std < 5.0) 2 else 1
+            }
+        }
+        return diff
+    }
+
     private fun roadKey(r: RoadSegment) = "${r.name}_${r.lengthMeters.toInt()}_${r.points.first().lat}_${r.points.first().lng}"
 
     private fun projectOnSegment(p: GeoPoint, a: GeoPoint, b: GeoPoint): GeoPoint {

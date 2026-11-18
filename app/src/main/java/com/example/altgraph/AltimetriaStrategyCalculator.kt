@@ -360,7 +360,7 @@ class AltimetriaStrategyCalculator {
         }
         lastElevationSample = elev
         this.currentElevation = elev
-
+        elevationEverSet = true
         if (!isNavigatingRoute && routePoints.isEmpty()) {
             if (liveElevationHistory.size < 20) {
                 liveElevationHistory.add(elev)
@@ -460,7 +460,9 @@ class AltimetriaStrategyCalculator {
     }
 
     private var lastPosSaveMs = 0L
-
+    private var elevationEverSet = false
+    private var baroOffset = 0.0
+    private var baroOffsetValid = false
     // Mensaje claro cuando el horizonte no puede predecir (sin mapa, sin calle o sin terreno) en vez de un perfil plano engañoso
     private fun horizonStatusMessage(enabled: Boolean, ctx: Context?): String? {
         if (!enabled || ctx == null || currentLatitude == 0.0) return null
@@ -2277,9 +2279,19 @@ class AltimetriaStrategyCalculator {
                 }
             }
 
+            if (advance && horizonEnabled && elevationEverSet && currentLatitude != 0.0 && effectiveCtx != null) {
+                // Calibración barométrica: desfase entre la altitud real y la del MDT en tu posición (suavizado)
+                val d = RoadHorizonPredictor.getInstance(effectiveCtx).recordActual(currentLatitude, currentLongitude, currentElevation)
+                if (d != null) {
+                    baroOffset = if (!baroOffsetValid) d else baroOffset + (d - baroOffset) * 0.05
+                    baroOffsetValid = true
+                }
+            }
+
             if (horizonResult != null && horizonResult.elevations.size >= 3) {
                 // --- PREDICCIÓN HORIZONTE DE CARRETERA (ROAD HORIZON 3D) ---
-                val hElevs = horizonResult.elevations
+                val calibOffset = if ((prefs?.horizonBaroCalib ?: true) && baroOffsetValid) baroOffset.toFloat() else 0f
+                val hElevs = if (calibOffset != 0f) horizonResult.elevations.map { it + calibOffset } else horizonResult.elevations
                 val hGrades = horizonResult.grades
                 val stepMeters = horizonResult.totalDistanceMeters / (hElevs.size - 1)
                 val majorBlockSize = (Math.round(getMajorBlockSize(lookaheadDist) / stepMeters).toInt().coerceAtLeast(1)) * stepMeters

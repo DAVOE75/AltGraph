@@ -147,6 +147,17 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="horizon_desc_cycleway">Quando uma ciclovia e uma estrada seguem lado a lado, segue-se a ciclovia.</string>
     <string name="horizon_status_road">Estrada detetada: %1$s</string>
     <string name="horizon_status_none">ainda nenhuma</string>
+    <string name="horizon_baro_calib">Calibrar a altitude com o barómetro</string>
+    <string name="horizon_desc_baro">Desloca o perfil do terreno para coincidir com a sua altitude real. A forma e as inclinações não mudam.</string>
+    <string name="horizon_status_conf">Confiança do terreno: %1$s</string>
+    <string name="horizon_conf_high">alta</string>
+    <string name="horizon_conf_mid">média</string>
+    <string name="horizon_conf_low">baixa</string>
+    <string name="horizon_conf_unknown">a medir...</string>
+    <string name="horizon_btn_replay">Testar com um treino gravado (GPX)</string>
+    <string name="horizon_desc_replay">Reproduz o ficheiro /sdcard/altgraph/replay.gpx e mede quanto da estrada e das cotas previstas coincide com o treino real.</string>
+    <string name="horizon_replay_nofile">Copie primeiro o seu treino como /sdcard/altgraph/replay.gpx</string>
+    <string name="horizon_replay_running">A analisar o treino...</string>
     <string name="map_access_needed">Permita o acesso a todos os ficheiros para o AltGraph ler os mapas offline do Karoo.</string>
     <string name="setting_smart_zoom">Ativar Smart Zoom Tático (Auto-Escala)</string>
     <string name="setting_oasis_tracking">Ativar Oasis Tracking (Zonas de Recuperação)</string>

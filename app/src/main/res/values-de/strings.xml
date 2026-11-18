@@ -147,6 +147,17 @@ Gel?ndedateien: %3$d (%4$d MB)
     <string name="horizon_desc_cycleway">Verlaufen Radweg und Straße parallel, wird dem Radweg gefolgt.</string>
     <string name="horizon_status_road">Erkannte Straße: %1$s</string>
     <string name="horizon_status_none">noch keine</string>
+    <string name="horizon_baro_calib">Höhe mit dem Barometer kalibrieren</string>
+    <string name="horizon_desc_baro">Verschiebt das Geländeprofil auf deine reale Höhe. Form und Steigungen bleiben gleich.</string>
+    <string name="horizon_status_conf">Geländevertrauen: %1$s</string>
+    <string name="horizon_conf_high">hoch</string>
+    <string name="horizon_conf_mid">mittel</string>
+    <string name="horizon_conf_low">niedrig</string>
+    <string name="horizon_conf_unknown">wird gemessen...</string>
+    <string name="horizon_btn_replay">Mit aufgezeichneter Fahrt testen (GPX)</string>
+    <string name="horizon_desc_replay">Spielt die Datei /sdcard/altgraph/replay.gpx ab und misst, wie viel der vorhergesagten Straße und Höhen zur realen Fahrt passt.</string>
+    <string name="horizon_replay_nofile">Lege zuerst deine Fahrt als /sdcard/altgraph/replay.gpx ab</string>
+    <string name="horizon_replay_running">Fahrt wird analysiert...</string>
     <string name="map_access_needed">Erlaube den Zugriff auf alle Dateien, damit AltGraph die Offline-Karten des Karoo lesen kann.</string>
     <string name="setting_smart_zoom">Taktischen Smart Zoom aktivieren (Auto-Skalierung)</string>
     <string name="setting_oasis_tracking">Oasis Tracking aktivieren (Erholungszonen)</string>
