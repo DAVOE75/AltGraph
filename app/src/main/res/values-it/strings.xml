@@ -160,7 +160,7 @@ File del terreno: %3$d (%4$d MB)
     <string name="horizon_replay_running">Analisi dell\'uscita...</string>
     <string name="horizon_replay_done">Prova completata ✓ (tocco: rapporto, pressione lunga: ripeti)</string>
     <string name="terrain_pack_title">Terreno ad alta risoluzione per provincia (5 m)</string>
-    <string name="terrain_pack_desc">Installa il terreno a 5 m delle province scelte. Pendenze e dislivelli del profilo diventano molto più precisi, con o senza percorso. La dimensione di ogni provincia è indicata nell\'elenco.</string>
+    <string name="terrain_pack_desc">Installa il terreno a 5 m delle province scelte. Pendenze e dislivelli del profilo diventano molto più precisi, con o senza percorso.</string>
     <string name="terrain_pack_loading">Caricamento dell\'elenco delle province...</string>
     <string name="terrain_pack_error">Impossibile caricare l\'elenco delle province. Controlla la connessione e riapri il pannello.</string>
     <string name="terrain_pack_install">Installa provincia</string>

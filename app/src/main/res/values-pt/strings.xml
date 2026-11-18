@@ -160,7 +160,7 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="horizon_replay_running">A analisar o treino...</string>
     <string name="horizon_replay_done">Teste concluído ✓ (toque: relatório, toque longo: repetir)</string>
     <string name="terrain_pack_title">Terreno de alta resolução por província (5 m)</string>
-    <string name="terrain_pack_desc">Instala o terreno de 5 m das províncias escolhidas. As inclinações e os desníveis do perfil ficam muito mais precisos, com ou sem rota. O tamanho de cada província aparece na lista.</string>
+    <string name="terrain_pack_desc">Instala o terreno de 5 m das províncias escolhidas. As inclinações e os desníveis do perfil ficam muito mais precisos, com ou sem rota.</string>
     <string name="terrain_pack_loading">A carregar a lista de províncias...</string>
     <string name="terrain_pack_error">Não foi possível carregar a lista de províncias. Verifique a ligação e reabra o painel.</string>
     <string name="terrain_pack_install">Instalar província</string>

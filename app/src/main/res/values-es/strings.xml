@@ -176,7 +176,7 @@ Archivos de terreno: %3$d (%4$d MB)
     <string name="horizon_replay_running">Analizando la salida...</string>
     <string name="horizon_replay_done">Prueba completada ✓ (toque: informe, pulsación larga: repetir)</string>
     <string name="terrain_pack_title">Terreno de alta resolución por provincias (5 m)</string>
-    <string name="terrain_pack_desc">Instala el terreno de 5 m de las provincias que elijas. Las pendientes y los desniveles del perfil son mucho más precisos, con o sin ruta. El tamaño de cada provincia aparece en la lista.</string>
+    <string name="terrain_pack_desc">Instala el terreno de 5 m de las provincias que elijas. Las pendientes y los desniveles del perfil son mucho más precisos, con o sin ruta.</string>
     <string name="terrain_pack_loading">Cargando la lista de provincias...</string>
     <string name="terrain_pack_error">No se pudo cargar la lista de provincias. Comprueba la conexión y vuelve a abrir el panel.</string>
     <string name="terrain_pack_install">Instalar provincia</string>

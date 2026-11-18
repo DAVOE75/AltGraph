@@ -160,7 +160,7 @@ Gel?ndedateien: %3$d (%4$d MB)
     <string name="horizon_replay_running">Fahrt wird analysiert...</string>
     <string name="horizon_replay_done">Test abgeschlossen ✓ (Tippen: Bericht, lang drücken: wiederholen)</string>
     <string name="terrain_pack_title">Hochauflösendes Gelände nach Provinz (5 m)</string>
-    <string name="terrain_pack_desc">Installiert 5-m-Gelände für die gewählten Provinzen. Steigungen und Höhenmeter im Profil werden deutlich genauer, mit oder ohne Route. Die Größe jeder Provinz steht in der Liste.</string>
+    <string name="terrain_pack_desc">Installiert 5-m-Gelände für die gewählten Provinzen. Steigungen und Höhenmeter im Profil werden deutlich genauer, mit oder ohne Route.</string>
     <string name="terrain_pack_loading">Provinzliste wird geladen...</string>
     <string name="terrain_pack_error">Provinzliste konnte nicht geladen werden. Verbindung prüfen und Panel erneut öffnen.</string>
     <string name="terrain_pack_install">Provinz installieren</string>

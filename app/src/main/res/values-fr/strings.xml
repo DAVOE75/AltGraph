@@ -160,7 +160,7 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="horizon_replay_running">Analyse de la sortie...</string>
     <string name="horizon_replay_done">Test terminé ✓ (toucher : rapport, appui long : refaire)</string>
     <string name="terrain_pack_title">Terrain haute résolution par province (5 m)</string>
-    <string name="terrain_pack_desc">Installe le terrain à 5 m des provinces choisies. Les pentes et dénivelés du profil sont bien plus précis, avec ou sans itinéraire. La taille de chaque province figure dans la liste.</string>
+    <string name="terrain_pack_desc">Installe le terrain à 5 m des provinces choisies. Les pentes et dénivelés du profil sont bien plus précis, avec ou sans itinéraire.</string>
     <string name="terrain_pack_loading">Chargement de la liste des provinces...</string>
     <string name="terrain_pack_error">Impossible de charger la liste des provinces. Vérifiez la connexion et rouvrez le panneau.</string>
     <string name="terrain_pack_install">Installer la province</string>

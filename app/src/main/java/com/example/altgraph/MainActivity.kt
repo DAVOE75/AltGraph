@@ -3186,7 +3186,7 @@ class MainActivity : Activity() {
 
         fun mb(b: Long) = (b / 1_048_576L).toInt()
         fun labelOf(p: TerrainPacks.Province, installed: Set<String>) =
-            "${p.name} · ${mb(p.bytes)} MB" + if (p.id in installed) " ✓" else ""
+            p.name + if (p.id in installed) " ✓" else ""
 
         fun refreshUi(keepSelection: Boolean = true) {
             val installed = packs.installedIds()

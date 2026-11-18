@@ -177,7 +177,7 @@ Terrain files: %3$d (%4$d MB)
     <string name="horizon_replay_running">Analyzing the ride...</string>
     <string name="horizon_replay_done">Test completed ✓ (tap: report, long press: repeat)</string>
     <string name="terrain_pack_title">High-resolution terrain by province (5 m)</string>
-    <string name="terrain_pack_desc">Installs 5 m terrain for the provinces you choose. Grades and climbs in the profile become much more accurate, with or without a route. The size of each province is shown in the list.</string>
+    <string name="terrain_pack_desc">Installs 5 m terrain for the provinces you choose. Grades and climbs in the profile become much more accurate, with or without a route.</string>
     <string name="terrain_pack_loading">Loading province list...</string>
     <string name="terrain_pack_error">Could not load the province list. Check your connection and reopen the panel.</string>
     <string name="terrain_pack_install">Install province</string>
