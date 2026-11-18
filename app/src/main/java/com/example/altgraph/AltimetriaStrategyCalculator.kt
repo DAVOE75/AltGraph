@@ -436,6 +436,25 @@ class AltimetriaStrategyCalculator {
 
     private var heldAnchor: RoadHorizonPredictor.HorizonResult? = null
     private var heldAnchorLookahead = 0.0
+    private var heldAnchorStep = 0.0
+    private var horizonSig = ""
+    private var horizonPending = false
+    private var horizonOffTicks = 0
+    private var horizonLastReqMs = 0L
+
+    // Si el trazado es más corto que la ventana (fin de camino) se rellena con la última cota para que la longitud mostrada sea siempre la pedida
+    private fun padHorizon(r: RoadHorizonPredictor.HorizonResult, count: Int, step: Double): RoadHorizonPredictor.HorizonResult {
+        if (r.elevations.size >= count) return r
+        val missing = count - r.elevations.size
+        return RoadHorizonPredictor.HorizonResult(
+            elevations = r.elevations + List(missing) { r.elevations.last() },
+            grades = r.grades + List(missing) { 0f },
+            coordinates = r.coordinates + List(missing) { r.coordinates.last() },
+            roadName = r.roadName,
+            totalDistanceMeters = (count - 1) * step,
+            guessFromMeters = r.guessFromMeters
+        )
+    }
     private var heldHorizon: RoadHorizonPredictor.HorizonResult? = null
     private var heldHorizonLookahead = 0.0
 
@@ -2227,53 +2246,96 @@ class AltimetriaStrategyCalculator {
             val horizonEnabled = horizonActive
             var horizonResult: RoadHorizonPredictor.HorizonResult? = null
             var horizonProgress = 0f
+            var horizonWindowStart = 0.0
+            var horizonGridOffset = 0.0
             if (horizonEnabled && currentLatitude != 0.0 && currentLongitude != 0.0 && effectiveCtx != null) {
                 val pagedBeacon = prefs?.beaconMode3d == AppPreferences.BEACON_MODE_PAGED
                 val predictor = RoadHorizonPredictor.getInstance(effectiveCtx)
                 val stepM = horizonSubBlockM.coerceAtMost(lookaheadDist / 2.0)
-                if (!pagedBeacon) {
-                    // Baliza ancla: marcador al 20% de la ventana. Las cotas y pendientes salen de un trazado retenido (cuadrícula fija),
-                    // así que los bloques no cambian mientras se recorren; la ventana solo se desplaza de bloque en bloque.
-                    val count = Math.round(lookaheadDist / stepM).toInt() + 1
-                    val nb = Math.round(lookaheadDist * BEACON_ANCHOR_FRACTION / stepM).toInt()
-                    var held = heldAnchor
-                    var s = -1.0
-                    if (held != null && heldAnchorLookahead == lookaheadDist) {
-                        val frac = projectOnHorizon(held, currentLatitude, currentLongitude)
-                        if (frac != null) s = frac.toDouble() * (held.elevations.size - 1)
+                val count = Math.round(lookaheadDist / stepM).toInt() + 1
+                val nb = Math.round(lookaheadDist * BEACON_ANCHOR_FRACTION / stepM).toInt()
+                val headingNow = if (travelHeadingValid) travelHeading else currentHeading
+                val nowReq = System.currentTimeMillis()
+
+                // Si cambia una opción que modifica el trazado (cruces, suavizado...) se descarta el retenido y se recalcula limpio
+                val sig = "${prefs?.horizonJunctionMode}_${prefs?.horizonPreferCycleway}_${prefs?.horizonSmoothing}_${prefs?.horizonMaxGradePct}_${prefs?.horizonHeadingMode}_$pagedBeacon"
+                if (sig != horizonSig) {
+                    horizonSig = sig
+                    heldAnchor = null; heldHorizon = null; horizonPending = false; horizonOffTicks = 0
+                    predictor.invalidate()
+                }
+
+                val held = if (pagedBeacon) heldHorizon else heldAnchor
+                val sameScale = held != null && heldAnchorLookahead == lookaheadDist && heldAnchorStep == stepM
+                var s = -1.0
+                if (held != null && sameScale) {
+                    val frac = projectOnHorizon(held, currentLatitude, currentLongitude)
+                    if (frac != null) s = frac.toDouble() * (held.elevations.size - 1)
+                }
+
+                // ¿Hay que recalcular? Fuera del trazado dos lecturas seguidas, ventana que se acaba o escala distinta
+                var need = false
+                if (held == null || !sameScale) need = true
+                else if (s < 0.0) { horizonOffTicks++; if (horizonOffTicks >= 2) need = true }
+                else {
+                    horizonOffTicks = 0
+                    val size = held.elevations.size
+                    if (pagedBeacon) { if (s / (size - 1) >= 0.985) need = true }
+                    else {
+                        val aheadSteps = size - 1 - nb
+                        val canGrow = aheadSteps >= (2.0 * lookaheadDist / stepM) * 0.95
+                        if (s >= size - 2) need = true
+                        else if (canGrow && s + (count - nb) > size - 3) need = true
                     }
-                    val canGrow = held != null && held.totalDistanceMeters >= lookaheadDist * 1.9
-                    if (held == null || s < 0.0 || s >= held.elevations.size - 2 || (canGrow && s + (count - nb) > held.elevations.size - 1)) {
-                        held = predictor.predictAsync(currentLatitude, currentLongitude, if (travelHeadingValid) travelHeading else currentHeading, lookaheadDist * 2.0, stepM, currentSpeed)
-                        heldAnchor = held
-                        heldAnchorLookahead = lookaheadDist
-                        s = 0.0
+                }
+
+                var fresh = false
+                if (advance && need && !horizonPending && nowReq - horizonLastReqMs > 2000L) {
+                    horizonPending = true; horizonLastReqMs = nowReq; fresh = true
+                }
+                if (horizonPending) {
+                    val r = if (pagedBeacon) predictor.predictAsync(currentLatitude, currentLongitude, headingNow, lookaheadDist, stepM, currentSpeed, 0, fresh)
+                            else predictor.predictAsync(currentLatitude, currentLongitude, headingNow, lookaheadDist * 2.0, stepM, currentSpeed, nb, fresh)
+                    if (r != null) {
+                        if (pagedBeacon) heldHorizon = r else heldAnchor = r
+                        heldAnchorLookahead = lookaheadDist; heldAnchorStep = stepM
+                        horizonPending = false; horizonOffTicks = 0
+                    } else if (nowReq - horizonLastReqMs > 6000L) horizonPending = false // el cálculo no llegó: se reintenta
+                }
+
+                // Siempre se trabaja con el último trazado válido: un cálculo en curso nunca deja la pantalla sin perfil
+                val cur = if (pagedBeacon) heldHorizon else heldAnchor
+                if (cur != null && cur.elevations.size >= 3 && heldAnchorLookahead == lookaheadDist && heldAnchorStep == stepM) {
+                    val size = cur.elevations.size
+                    if (s < 0.0) {
+                        val frac = projectOnHorizon(cur, currentLatitude, currentLongitude)
+                        s = if (frac != null) frac.toDouble() * (size - 1) else if (pagedBeacon) 0.0 else nb.toDouble()
                     }
-                    if (held != null && held.elevations.size >= 3) {
-                        val total = held.elevations.size
-                        val start = (Math.floor(s).toInt() - nb).coerceIn(0, maxOf(0, total - count))
-                        val end = minOf(total, start + count)
-                        horizonResult = RoadHorizonPredictor.HorizonResult(
-                            elevations = held.elevations.subList(start, end),
-                            grades = held.grades.subList(start, minOf(held.grades.size, end - 1)),
-                            coordinates = held.coordinates.subList(start, end),
-                            roadName = held.roadName,
-                            totalDistanceMeters = (end - start - 1) * stepM,
-                            guessFromMeters = if (held.guessFromMeters >= 0.0) held.guessFromMeters - start * stepM else -1.0
-                        )
-                        horizonProgress = ((s - start) / (end - start - 1)).toFloat().coerceIn(0f, 1f)
-                    }
-                } else {
-                    // Baliza móvil: perfil estático que se conserva hasta que el ciclista llega al final y salta a la siguiente sección
-                    val held = heldHorizon
-                    val onHeld = if (held != null && heldHorizonLookahead == lookaheadDist) projectOnHorizon(held, currentLatitude, currentLongitude) else null
-                    if (held != null && onHeld != null && onHeld < 0.985f) {
-                        horizonResult = held
-                        horizonProgress = onHeld
+                    if (pagedBeacon) {
+                        // Baliza móvil: perfil estático que se conserva hasta llegar al final; longitud siempre igual a la pedida
+                        val padded = padHorizon(cur, count, stepM)
+                        horizonResult = padded
+                        horizonProgress = (s / (padded.elevations.size - 1)).toFloat().coerceIn(0f, 1f)
                     } else {
-                        horizonResult = predictor.predictAsync(currentLatitude, currentLongitude, if (travelHeadingValid) travelHeading else currentHeading, lookaheadDist, stepM, currentSpeed)
-                        heldHorizon = horizonResult
-                        heldHorizonLookahead = lookaheadDist
+                        // Baliza ancla: ventana de longitud fija con el ciclista siempre al 20 %. La rejilla de bloques queda anclada
+                        // al trazado y la vista compensa la fracción (gridOffset): los bloques no se mueven ni cambian de color.
+                        val startF = s - nb
+                        val i0 = Math.floor(startF).toInt()
+                        fun idx(i: Int) = i.coerceIn(0, size - 1)
+                        val elevs = List(count) { j -> cur.elevations[idx(i0 + j)] }
+                        val grades = List(count - 1) { j ->
+                            val k = i0 + j
+                            if (k < 0 || k >= cur.grades.size) 0f else cur.grades[k]
+                        }
+                        val coords = List(count) { j -> cur.coordinates[idx(i0 + j)] }
+                        horizonGridOffset = (startF - i0) * stepM
+                        horizonWindowStart = Math.max(0.0, startF * stepM)
+                        horizonResult = RoadHorizonPredictor.HorizonResult(
+                            elevations = elevs, grades = grades, coordinates = coords, roadName = cur.roadName,
+                            totalDistanceMeters = (count - 1) * stepM,
+                            guessFromMeters = if (cur.guessFromMeters >= 0.0) cur.guessFromMeters - startF * stepM else -1.0
+                        )
+                        horizonProgress = nb.toFloat() / (count - 1)
                     }
                 }
             }
@@ -2288,12 +2350,10 @@ class AltimetriaStrategyCalculator {
                 val calibPred = effectiveCtx?.let { RoadHorizonPredictor.getInstance(it) }
                 val calibOn = (prefs?.horizonBaroCalib ?: true) && calibPred?.calibValid == true
                 val nElev = horizonResult.elevations.size
-                val stepForCalib = horizonResult.totalDistanceMeters / (nElev - 1)
-                val riderIdx = horizonProgress * (nElev - 1)
                 val hElevs = if (calibOn && calibPred != null) {
-                    val off = calibPred.calibOffset.toFloat(); val slope = calibPred.calibSlope
-                    // Desfase a la altura actual más la tendencia reciente, aplicada hacia delante y hacia atrás desde el ciclista
-                    horizonResult.elevations.mapIndexed { i, e -> e + off + (slope * (i - riderIdx) * stepForCalib).toFloat() }
+                    // Solo desfase vertical: la forma y las pendientes del perfil no deben cambiar con la calibración
+                    val off = calibPred.calibOffset.toFloat()
+                    horizonResult.elevations.map { it + off }
                 } else horizonResult.elevations
                 val hGrades = horizonResult.grades
                 val stepMeters = horizonResult.totalDistanceMeters / (hElevs.size - 1)
@@ -2319,7 +2379,7 @@ class AltimetriaStrategyCalculator {
                     pois = guessPois,
                     curvatureOffsets = List(hElevs.size) { 0f },
                     riderProgress = horizonProgress,
-                    windowStartMeters = 0.0,
+                    windowStartMeters = horizonWindowStart,
                     windowStartElevation = hElevs.first().toDouble(),
                     beaconElevation = currentElevation,
                     subBlocks = hGrades,
@@ -2330,7 +2390,8 @@ class AltimetriaStrategyCalculator {
                     profileElevations = hElevs,
                     activeClimbs = emptyList(),
                     routeName = horizonResult.roadName ?: "Horizonte Libre",
-                    routeTotalLength = horizonResult.totalDistanceMeters,
+                    routeTotalLength = 0.0, // sin ruta: la vista no debe dibujar bandera de meta ni totales de ruta
+                    gridOffsetMeters = horizonGridOffset,
                     routeCoords = horizonResult.coordinates
                 )
             }

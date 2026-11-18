@@ -57,12 +57,17 @@ class RoadHorizonPredictor(private val context: Context) {
      * Pide el cálculo en segundo plano y devuelve el último resultado válido cerca de esta posición (o null si aún no hay),
      * para que el hilo principal nunca espere al mapa ni al terreno. La caché es por distancia pedida (radar y 3D piden distintas).
      */
-    fun predictAsync(lat: Double, lng: Double, heading: Double, dist: Double, step: Double, speedMps: Double): HorizonResult? {
-        val key = "${dist.toInt()}_${step.toInt()}"
+    fun predictAsync(
+        lat: Double, lng: Double, heading: Double, dist: Double, step: Double, speedMps: Double,
+        behindCount: Int = 0, fresh: Boolean = false
+    ): HorizonResult? {
+        val key = "${dist.toInt()}_${step.toInt()}_$behindCount"
+        // fresh: se descarta el resultado antiguo para no devolver un trazado de otra posición o de otra calle
+        if (fresh && !computing.contains(key)) cachedMap.remove(key)
         if (computing.add(key)) {
             executor.execute {
                 try {
-                    val r = predictHorizon(lat, lng, heading, dist, step, speedMps)
+                    val r = predictHorizon(lat, lng, heading, dist, step, speedMps, behindCount)
                     cachedMap[key] = Cached(r, lat, lng)
                 } catch (e: Exception) {
                     android.util.Log.e("RoadHorizon", "predict failed", e)
@@ -72,7 +77,7 @@ class RoadHorizonPredictor(private val context: Context) {
             }
         }
         val c = cachedMap[key] ?: return null
-        return if (GeoPoint(c.lat, c.lng).distanceTo(GeoPoint(lat, lng)) < 40.0) c.result else null
+        return if (GeoPoint(c.lat, c.lng).distanceTo(GeoPoint(lat, lng)) < 60.0) c.result else null
     }
 
     /** Precarga el lector de mapas, las calles de la última posición y el archivo de terreno al arrancar. */
@@ -91,6 +96,7 @@ class RoadHorizonPredictor(private val context: Context) {
 
     // ---------- Precisión de calle: trayectoria reciente ----------
     private val trail = ArrayList<GeoPoint>()
+    private val trailLong = ArrayList<GeoPoint>() // últimos ~1,2 km recorridos: el 20 % de atrás del perfil sale de aquí
 
     /** Guarda las últimas posiciones (150 m de recorrido) para emparejar la trayectoria con las calles. */
     fun recordFix(lat: Double, lng: Double) {
@@ -102,10 +108,60 @@ class RoadHorizonPredictor(private val context: Context) {
                 for (i in 1 until trail.size) len += trail[i - 1].distanceTo(trail[i])
                 while (len > 150.0 && trail.size > 2) { len -= trail[0].distanceTo(trail[1]); trail.removeAt(0) }
             }
+            if (trailLong.isEmpty() || trailLong.last().distanceTo(p) >= 10.0) {
+                trailLong.add(p)
+                var len = 0.0
+                for (i in 1 until trailLong.size) len += trailLong[i - 1].distanceTo(trailLong[i])
+                while (len > 1200.0 && trailLong.size > 2) { len -= trailLong[0].distanceTo(trailLong[1]); trailLong.removeAt(0) }
+            }
         }
     }
 
     private fun trailSnapshot(): List<GeoPoint> = synchronized(trail) { ArrayList(trail) }
+    private fun trailLongSnapshot(): List<GeoPoint> = synchronized(trail) { ArrayList(trailLong) }
+
+    private fun offsetPoint(p: GeoPoint, bearingDeg: Double, meters: Double): GeoPoint {
+        val rad = Math.toRadians(bearingDeg)
+        return GeoPoint(
+            p.lat + meters * Math.cos(rad) / 111320.0,
+            p.lng + meters * Math.sin(rad) / (111320.0 * Math.cos(Math.toRadians(p.lat)))
+        )
+    }
+
+    /**
+     * Puntos de la trayectoria ya recorrida, cada [step] m hacia atrás desde [cur], de más antiguo a más reciente
+     * (el último está a [step] m). Si la trayectoria guardada es más corta, se prolonga en línea recta.
+     */
+    private fun behindSamples(cur: GeoPoint, heading: Double, count: Int, step: Double): List<GeoPoint> {
+        val tr = trailLongSnapshot()
+        val back = ArrayList<GeoPoint>()
+        back.add(cur)
+        for (i in tr.indices.reversed()) if (back.last().distanceTo(tr[i]) > 0.5) back.add(tr[i])
+        val need = count * step
+        var len = 0.0
+        for (i in 1 until back.size) len += back[i - 1].distanceTo(back[i])
+        if (len < need) {
+            val dir = if (back.size >= 2) back[back.size - 2].bearingTo(back.last()) else (heading + 180.0) % 360.0
+            back.add(offsetPoint(back.last(), dir, need - len + step))
+        }
+        val out = ArrayList<GeoPoint>()
+        for (k in count downTo 1) {
+            val target = k * step
+            var acc = 0.0
+            var pt = back.last()
+            for (i in 1 until back.size) {
+                val d = back[i - 1].distanceTo(back[i])
+                if (acc + d >= target) {
+                    val f = if (d <= 0.0) 0.0 else (target - acc) / d
+                    pt = GeoPoint(back[i - 1].lat + (back[i].lat - back[i - 1].lat) * f, back[i - 1].lng + (back[i].lng - back[i - 1].lng) * f)
+                    break
+                }
+                acc += d
+            }
+            out.add(pt)
+        }
+        return out
+    }
 
     // Rumbo medido sobre la trayectoria real (más de 25 m atrás): más estable que el del GPS
     private fun trailHeading(cur: GeoPoint, t: List<GeoPoint>): Double? {
@@ -202,6 +258,8 @@ class RoadHorizonPredictor(private val context: Context) {
         val guessFromMeters: Double = -1.0 // distancia desde la que el trazado es una suposición en un cruce (-1 = ninguna)
     )
 
+    fun invalidate() { cachedMap.clear() }
+
     private fun ensureMapReader(): KarooMapReader? {
         val now = System.currentTimeMillis()
         if (mapReader == null || now - lastMapCheckMs > 60_000L) {
@@ -229,7 +287,8 @@ class RoadHorizonPredictor(private val context: Context) {
         headingIn: Double,
         distanceMeters: Double = 3000.0,
         sampleStepMeters: Double = 25.0,
-        speedMps: Double = -1.0
+        speedMps: Double = -1.0,
+        behindCount: Int = 0
     ): HorizonResult? {
         // Disparar en segundo plano la descarga si estamos en Wi-Fi
         elevationManager.considerDownload(lat, lng)
@@ -454,6 +513,18 @@ class RoadHorizonPredictor(private val context: Context) {
         // Puentes y túneles: el MDT mide el suelo, así que se une con una recta la cota de entrada y la de salida
         flattenBridges(elevations, projectedPoints, flatFlags, sampleStepMeters)
 
+        // El 20 % de atrás sale de la trayectoria real recorrida; va delante del trazado y se suaviza junto con él
+        var allPoints: List<GeoPoint> = samplePoints
+        if (behindCount > 0) {
+            val behind = behindSamples(currentPoint, headingDeg, behindCount, sampleStepMeters)
+            val behindElev = behind.map { p ->
+                val e = elevationManager.getElevation(p.lat, p.lng)
+                if (e != null) e.toFloat() + (corr[cellKey(p.lat, p.lng)] ?: 0f) else -999f
+            }
+            elevations.addAll(0, behindElev)
+            allPoints = behind + samplePoints
+        }
+
         // Si faltan algunas cotas puntuales, interpolar
         fixMissingElevations(elevations)
         smoothElevations(elevations, sampleStepMeters)
@@ -472,10 +543,10 @@ class RoadHorizonPredictor(private val context: Context) {
         return HorizonResult(
             elevations = elevations,
             grades = grades,
-            coordinates = samplePoints.map { Pair(it.lat, it.lng) },
+            coordinates = allPoints.map { Pair(it.lat, it.lng) },
             roadName = mainRoadName,
             totalDistanceMeters = (elevations.size - 1) * sampleStepMeters,
-            guessFromMeters = guessFrom
+            guessFromMeters = if (guessFrom >= 0.0) guessFrom + behindCount * sampleStepMeters else -1.0
         ).also {
             lastDiagnostic = "road=$mainRoadName dist=${accumulatedDist.toInt()}m step=${sampleStepMeters.toInt()}m " +
                 "elev=${"%.0f".format(elevations.minOrNull() ?: 0f)}..${"%.0f".format(elevations.maxOrNull() ?: 0f)} " +
