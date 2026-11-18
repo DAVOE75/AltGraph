@@ -138,6 +138,15 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="horizon_desc_download">Télécharge maintenant les fichiers de terrain de votre zone, pour que le profil fonctionne sans attendre le Wi-Fi en sortie.</string>
     <string name="horizon_desc_diag">Copie dans le presse-papiers les données techniques de la dernière prédiction, utile pour signaler un problème.</string>
     <string name="horizon_desc_reset">Rétablit toutes les options de l\'horizon à leurs valeurs par défaut.</string>
+    <string name="horizon_msg_no_map">Pas de carte hors ligne ici</string>
+    <string name="horizon_msg_no_road">Aucune route détectée</string>
+    <string name="horizon_msg_no_terrain">Pas de données de terrain : téléchargez-les dans le panneau</string>
+    <string name="horizon_max_grade">Pente maximale affichée</string>
+    <string name="horizon_desc_max_grade">Limite les valeurs de pente du profil. À augmenter pour les rampes courtes très raides.</string>
+    <string name="horizon_cycleway">Préférer les pistes cyclables</string>
+    <string name="horizon_desc_cycleway">Quand une piste cyclable et une route sont côte à côte, on suit la piste cyclable.</string>
+    <string name="horizon_status_road">Route détectée : %1$s</string>
+    <string name="horizon_status_none">aucune pour l\'instant</string>
     <string name="map_access_needed">Autorisez l\'accès à tous les fichiers pour qu\'AltGraph lise les cartes hors ligne du Karoo.</string>
     <string name="setting_smart_zoom">Activer Smart Zoom tactique (auto-échelle)</string>
     <string name="setting_oasis_tracking">Activer Oasis Tracking (zones de récupération)</string>

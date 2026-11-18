@@ -271,6 +271,14 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean("road_horizon_mobile_data", false)
         set(value) = prefs.edit().putBoolean("road_horizon_mobile_data", value).apply()
 
+    var horizonMaxGradePct: Int
+        get() = prefs.getInt("road_horizon_max_grade", 30)
+        set(value) = prefs.edit().putInt("road_horizon_max_grade", value).apply()
+
+    var horizonPreferCycleway: Boolean
+        get() = prefs.getBoolean("road_horizon_prefer_cycleway", false)
+        set(value) = prefs.edit().putBoolean("road_horizon_prefer_cycleway", value).apply()
+
     var horizonMarkGuess: Boolean
         get() = prefs.getBoolean("road_horizon_mark_guess", true)
         set(value) = prefs.edit().putBoolean("road_horizon_mark_guess", value).apply()
@@ -300,7 +308,7 @@ class AppPreferences(context: Context) {
             .remove("road_horizon_distance_m").remove("road_horizon_subblock_m").remove("road_horizon_junction_mode")
             .remove("road_horizon_smoothing").remove("road_horizon_dl_radius_km").remove("road_horizon_mobile_data")
             .remove("road_horizon_mark_guess").remove("road_horizon_alert_pct").remove("road_horizon_heading_mode")
-            .remove("road_horizon_target").apply()
+            .remove("road_horizon_target").remove("road_horizon_max_grade").remove("road_horizon_prefer_cycleway").apply()
     }
 
     // --- PRO FEATURES (NIVEL SDK MÁXIMO) ---

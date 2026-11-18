@@ -138,6 +138,15 @@ File del terreno: %3$d (%4$d MB)
     <string name="horizon_desc_download">Scarica ora i file del terreno della tua zona, così il profilo funziona senza attendere il Wi-Fi durante l\'uscita.</string>
     <string name="horizon_desc_diag">Copia negli appunti i dati tecnici dell\'ultima previsione, utile per segnalare un problema.</string>
     <string name="horizon_desc_reset">Ripristina tutte le opzioni dell\'orizzonte ai valori predefiniti.</string>
+    <string name="horizon_msg_no_map">Nessuna mappa offline qui</string>
+    <string name="horizon_msg_no_road">Nessuna strada rilevata</string>
+    <string name="horizon_msg_no_terrain">Nessun dato del terreno: scaricalo dal pannello</string>
+    <string name="horizon_max_grade">Pendenza massima mostrata</string>
+    <string name="horizon_desc_max_grade">Limita i valori di pendenza del profilo. Aumentalo per rampe brevi molto ripide.</string>
+    <string name="horizon_cycleway">Preferire le ciclabili</string>
+    <string name="horizon_desc_cycleway">Quando ciclabile e strada corrono affiancate, si segue la ciclabile.</string>
+    <string name="horizon_status_road">Strada rilevata: %1$s</string>
+    <string name="horizon_status_none">ancora nessuna</string>
     <string name="map_access_needed">Consenti l\'accesso a tutti i file affinché AltGraph legga le mappe offline del Karoo.</string>
     <string name="setting_smart_zoom">Attiva Smart Zoom Tattico (Auto-Scala)</string>
     <string name="setting_oasis_tracking">Attiva Oasis Tracking (Zone di Recupero)</string>

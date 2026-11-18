@@ -439,7 +439,7 @@ class AltimetriaStrategyCalculator {
     private var heldHorizon: RoadHorizonPredictor.HorizonResult? = null
     private var heldHorizonLookahead = 0.0
 
-    // Progreso (0..1) del ciclista sobre el horizonte retenido; null si está a más de 40 m del trazado
+    // Progreso (0..1) del ciclista sobre el horizonte retenido; null si está a más de 25 m del trazado (recalcula pronto al cambiar de calle)
     private fun projectOnHorizon(h: RoadHorizonPredictor.HorizonResult, lat: Double, lng: Double): Float? {
         val c = h.coordinates
         if (c.size < 2) return null
@@ -456,10 +456,21 @@ class AltimetriaStrategyCalculator {
             val d = Math.hypot(ax + t * dx, ay + t * dy)
             if (d < bestD) { bestD = d; bestPos = i + t }
         }
-        return if (bestD <= 40.0) (bestPos / (c.size - 1)).toFloat() else null
+        return if (bestD <= 25.0) (bestPos / (c.size - 1)).toFloat() else null
     }
 
     private var lastPosSaveMs = 0L
+
+    // Mensaje claro cuando el horizonte no puede predecir (sin mapa, sin calle o sin terreno) en vez de un perfil plano engañoso
+    private fun horizonStatusMessage(enabled: Boolean, ctx: Context?): String? {
+        if (!enabled || ctx == null || currentLatitude == 0.0) return null
+        return when (RoadHorizonPredictor.getInstance(ctx).lastStatus) {
+            RoadHorizonPredictor.Status.NO_MAP -> ctx.getString(R.string.horizon_msg_no_map)
+            RoadHorizonPredictor.Status.NO_ROAD -> ctx.getString(R.string.horizon_msg_no_road)
+            RoadHorizonPredictor.Status.NO_TERRAIN -> ctx.getString(R.string.horizon_msg_no_terrain)
+            RoadHorizonPredictor.Status.OK -> null
+        }
+    }
     private var speedZoomEma = 0.0
     private var speedZoomCurrent = 0.0
     private var speedZoomChangeMs = 0L
@@ -2232,7 +2243,7 @@ class AltimetriaStrategyCalculator {
                     }
                     val canGrow = held != null && held.totalDistanceMeters >= lookaheadDist * 1.9
                     if (held == null || s < 0.0 || s >= held.elevations.size - 2 || (canGrow && s + (count - nb) > held.elevations.size - 1)) {
-                        held = predictor.predictHorizon(currentLatitude, currentLongitude, currentHeading, lookaheadDist * 2.0, stepM)
+                        held = predictor.predictHorizon(currentLatitude, currentLongitude, if (travelHeadingValid) travelHeading else currentHeading, lookaheadDist * 2.0, stepM)
                         heldAnchor = held
                         heldAnchorLookahead = lookaheadDist
                         s = 0.0
@@ -2259,7 +2270,7 @@ class AltimetriaStrategyCalculator {
                         horizonResult = held
                         horizonProgress = onHeld
                     } else {
-                        horizonResult = predictor.predictHorizon(currentLatitude, currentLongitude, currentHeading, lookaheadDist, stepM)
+                        horizonResult = predictor.predictHorizon(currentLatitude, currentLongitude, if (travelHeadingValid) travelHeading else currentHeading, lookaheadDist, stepM)
                         heldHorizon = horizonResult
                         heldHorizonLookahead = lookaheadDist
                     }
@@ -2382,7 +2393,7 @@ class AltimetriaStrategyCalculator {
                 majorBlockSizeMeters = majorBlockSize,
                 profileElevations = freeElevations,
                 activeClimbs = emptyList(),
-                routeName = activeRouteName,
+                routeName = horizonStatusMessage(horizonEnabled, effectiveCtx) ?: activeRouteName,
                 routeTotalLength = 0.0
             )
         }

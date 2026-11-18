@@ -33,6 +33,19 @@ class RoadHorizonPredictor(private val context: Context) {
     private val MINOR_COST_M = 8.0
     private val MINOR_KINDS = setOf("service", "track", "path", "footway", "pedestrian", "steps", "bridleway", "living_street")
 
+    // Estado de la última predicción, para mostrar un mensaje claro en vez de un perfil plano engañoso
+    enum class Status { OK, NO_MAP, NO_ROAD, NO_TERRAIN }
+    @Volatile var lastStatus: Status = Status.OK
+        private set
+    @Volatile var lastRoadName: String? = null
+        private set
+
+    // Histéresis al cambiar de calle: la nueva debe ganar varias lecturas seguidas
+    private var pendingRoadKey: String? = null
+    private var pendingCount = 0
+    private val SWITCH_READINGS = 2
+    private val SWITCH_NOW_MARGIN = 12.0
+
     data class HorizonResult(
         val elevations: List<Float>,
         val grades: List<Float>,
@@ -74,7 +87,7 @@ class RoadHorizonPredictor(private val context: Context) {
         elevationManager.considerDownload(lat, lng)
 
         val reader = ensureMapReader()
-        if (reader == null) { android.util.Log.w("RoadHorizon", "no map reader (permission/maps?)"); return null }
+        if (reader == null) { android.util.Log.w("RoadHorizon", "no map reader (permission/maps?)"); lastStatus = Status.NO_MAP; return null }
         val currentPoint = GeoPoint(lat, lng)
         val nowMs = System.currentTimeMillis()
         if (nowMs - lastPosSaveMs > 30_000L) {
@@ -82,21 +95,29 @@ class RoadHorizonPredictor(private val context: Context) {
             appPrefs.horizonLastLat = lat.toFloat(); appPrefs.horizonLastLng = lng.toFloat()
         }
         if (anchorLat == 0.0) { anchorLat = lat; anchorLng = lng }
-        if (!hasMoved && GeoPoint(anchorLat, anchorLng).distanceTo(currentPoint) > 15.0) hasMoved = true
+        if (!hasMoved && GeoPoint(anchorLat, anchorLng).distanceTo(currentPoint) > 6.0) hasMoved = true
         val stationary = !hasMoved && !(appPrefs.horizonHeadingMode == 1 && headingDeg != 0.0)
         val nearbyRoads = reader.getRoadsNear(currentPoint, radiusMeters = 80.0)
         android.util.Log.i("RoadHorizon", "roads near=${nearbyRoads.size} heading=$headingDeg")
-        if (nearbyRoads.isEmpty()) return null
+        if (nearbyRoads.isEmpty()) { lastStatus = Status.NO_ROAD; return null }
 
         // 1. Snapping: la vía más cercana que va en nuestro sentido, en cualquiera de los dos sentidos de digitalización
         var bestRoad: RoadSegment? = null
         var bestIndex = 0
         var bestForward = true
         var bestScore = Double.MAX_VALUE
+        // Mejor tramo de la calle que ya seguíamos, por si la nueva no gana de forma sostenida
+        var prevRoad: RoadSegment? = null
+        var prevIndex = 0
+        var prevForward = true
+        var prevScore = Double.MAX_VALUE
+        val cyclewayBonus = if (appPrefs.horizonPreferCycleway) 8.0 else 0.0
 
         for (road in nearbyRoads) {
             // Caminos, pistas y accesos pierden frente a una calle al lado
             val minorCost = if (road.kind in MINOR_KINDS) MINOR_COST_M else 0.0
+            val cycleBonus = if (road.kind == "cycleway") cyclewayBonus else 0.0
+            val isPrev = roadKey(road) == lastRoadKey
             for (i in 0 until road.points.size - 1) {
                 val p1 = road.points[i]
                 val p2 = road.points[i + 1]
@@ -108,23 +129,37 @@ class RoadHorizonPredictor(private val context: Context) {
 
                 if (bearingDiff < SNAP_MAX_ANGLE) {
                     val distToSeg = distanceToSegment(currentPoint, p1, p2)
-                    val sticky = if (roadKey(road) == lastRoadKey) STICKY_BONUS_M else 0.0
                     // Parado el rumbo no es fiable: gana la vía más cercana (la longitud solo desempata)
                     val score = (if (stationary) distToSeg - road.lengthMeters * 1e-4
-                                 else distToSeg + bearingDiff * 0.3) + minorCost - sticky
+                                 else distToSeg + bearingDiff * 0.3) + minorCost - cycleBonus
                     if (distToSeg < 30.0 && score < bestScore) {
                         bestScore = score
                         bestRoad = road
                         bestIndex = i
                         bestForward = forward
                     }
+                    if (isPrev && distToSeg < 35.0 && score < prevScore) {
+                        prevScore = score
+                        prevRoad = road
+                        prevIndex = i
+                        prevForward = forward
+                    }
                 }
             }
         }
 
-        if (bestRoad == null) { android.util.Log.w("RoadHorizon", "no road aligned with heading"); return null }
-        lastRoadKey = roadKey(bestRoad)
+        if (bestRoad == null) { android.util.Log.w("RoadHorizon", "no road aligned with heading"); lastStatus = Status.NO_ROAD; return null }
 
+        // Histéresis: cambiar de calle exige que la nueva gane varias lecturas seguidas (evita saltar al carril o calle paralela)
+        val bestKey = roadKey(bestRoad)
+        if (prevRoad != null && bestKey != lastRoadKey) {
+            if (pendingRoadKey == bestKey) pendingCount++ else { pendingRoadKey = bestKey; pendingCount = 1 }
+            if (pendingCount < SWITCH_READINGS && prevScore - bestScore < SWITCH_NOW_MARGIN) {
+                bestRoad = prevRoad; bestIndex = prevIndex; bestForward = prevForward
+            } else { pendingRoadKey = null; pendingCount = 0 }
+        } else { pendingRoadKey = null; pendingCount = 0 }
+        lastRoadKey = roadKey(bestRoad)
+        lastRoadName = bestRoad.name ?: bestRoad.ref
         // El trazado parte del punto proyectado sobre la vía (no del GPS crudo) para no quedar en el carril contiguo
         val snapped = projectOnSegment(currentPoint, bestRoad.points[bestIndex], bestRoad.points[bestIndex + 1])
         val snapDist = currentPoint.distanceTo(snapped)
@@ -141,6 +176,9 @@ class RoadHorizonPredictor(private val context: Context) {
         // 2. Extender camino hacia adelante (Road Following)
         val projectedPoints = mutableListOf<GeoPoint>()
         projectedPoints.add(if (snapDist < 30.0) snapped else currentPoint)
+        val flatFlags = mutableListOf(false) // punto i llegado por un puente o túnel
+        var ringEntryBearing: Double? = null
+        var ringEntryName: String? = null
 
         var currentRoad = bestRoad
         var currentIndex = bestIndex + 1
@@ -159,6 +197,7 @@ class RoadHorizonPredictor(private val context: Context) {
                 val d = prevPt.distanceTo(pt)
                 accumulatedDist += d
                 projectedPoints.add(pt)
+                flatFlags.add(currentRoad.isBridge || currentRoad.isTunnel)
                 prevPt = pt
                 currentIndex++
             }
@@ -205,12 +244,23 @@ class RoadHorizonPredictor(private val context: Context) {
                             klass * 1000.0 + (if (sameName) 0.0 else 300.0) + turnAngle
                         }
                     }
-                    val score = if (continuation) (if (sameName) 0.0 else 500.0) + turnAngle else 100_000.0 + baseScore
+                    val onRing = currentRoad.isRoundabout
+                    val score = when {
+                        // Rotonda: se sale por la calle que sigue el rumbo de entrada (mismo nombre o menor desvío); si no, se sigue en el anillo
+                        onRing && cand.isRoundabout -> 5_000.0
+                        onRing -> {
+                            val d = abs(angleDifference(ringEntryBearing ?: currentBearing, nextBearing))
+                            if (d <= 70.0) (if (cand.name != null && cand.name == ringEntryName) 0.0 else 60.0) + d else 10_000.0 + d
+                        }
+                        continuation -> (if (sameName) 0.0 else 500.0) + turnAngle
+                        else -> 100_000.0 + baseScore
+                    }
+                    val isContinuation = continuation || (onRing && score < 10_000.0)
                     val revisits = projectedPoints.any { it.distanceTo(nextPt) < 8.0 }
                     if (!revisits && turnAngle < MAX_TURN) eligibleCount++
                     if (!revisits && turnAngle < MAX_TURN && score < bestNextAngle) {
                         bestNextAngle = score
-                        bestIsContinuation = continuation
+                        bestIsContinuation = isContinuation
                         bestNextRoad = if (fromStart) cand else RoadSegment(
                             cand.points.reversed(), cand.name, cand.ref, cand.kind, cand.oneway,
                             cand.isRoundabout, cand.isBridge, cand.isTunnel
@@ -223,6 +273,10 @@ class RoadHorizonPredictor(private val context: Context) {
 
             if (bestNextRoad != null && !bestIsContinuation && eligibleCount >= 1 && guessFrom < 0.0) guessFrom = accumulatedDist
             if (bestNextRoad != null) {
+                if (!currentRoad.isRoundabout && bestNextRoad.isRoundabout) {
+                    ringEntryBearing = currentBearing
+                    ringEntryName = currentRoad.name
+                }
                 currentRoad = bestNextRoad
                 currentIndex = 1
             } else {
@@ -230,7 +284,7 @@ class RoadHorizonPredictor(private val context: Context) {
             }
         }
 
-        if (projectedPoints.size < 2 || accumulatedDist < 100.0) return null
+        if (projectedPoints.size < 2 || accumulatedDist < 100.0) { lastStatus = Status.NO_ROAD; return null }
 
         // 3. Muestrear elevación del MDT a lo largo de la polilínea proyectada
         val samplePoints = resamplePath(projectedPoints, sampleStepMeters, distanceMeters)
@@ -240,10 +294,16 @@ class RoadHorizonPredictor(private val context: Context) {
             val elev = elevationManager.getElevation(p.lat, p.lng)
             elevations.add(elev?.toFloat() ?: -999f)
         }
+        if (elevations.all { it <= -900f }) { lastStatus = Status.NO_TERRAIN; return null }
+
+        // Puentes y túneles: el MDT mide el suelo, así que se une con una recta la cota de entrada y la de salida
+        flattenBridges(elevations, projectedPoints, flatFlags, sampleStepMeters)
 
         // Si faltan algunas cotas puntuales, interpolar
         fixMissingElevations(elevations)
         smoothElevations(elevations, sampleStepMeters)
+        lastStatus = Status.OK
+        val maxGrade = appPrefs.horizonMaxGradePct.toDouble()
         android.util.Log.i("RoadHorizon", "road=$mainRoadName pts=${samplePoints.size} step=$sampleStepMeters dist=$accumulatedDist elev=${elevations.minOrNull()}..${elevations.maxOrNull()} first=${samplePoints.first().lat},${samplePoints.first().lng} last=${samplePoints.last().lat},${samplePoints.last().lng}")
 
         // Calcular pendientes (%)
@@ -251,7 +311,7 @@ class RoadHorizonPredictor(private val context: Context) {
         for (i in 0 until elevations.size - 1) {
             val dE = (elevations[i + 1] - elevations[i]).toDouble()
             val grade = (dE / sampleStepMeters) * 100.0
-            grades.add(grade.coerceIn(-30.0, 30.0).toFloat())
+            grades.add(grade.coerceIn(-maxGrade, maxGrade).toFloat())
         }
 
         return HorizonResult(
@@ -307,9 +367,38 @@ class RoadHorizonPredictor(private val context: Context) {
         }
     }
 
-    // El MDT es de 1 m de resolución vertical y recoge edificios/arbolado: sin suavizar salen rampas falsas en llano
+    // Puentes y túneles: se sustituye la cota del suelo por una recta entre la cota de entrada y la de salida
+    private fun flattenBridges(e: MutableList<Float>, path: List<GeoPoint>, flags: List<Boolean>, step: Double) {
+        if (flags.none { it } || e.size < 3) return
+        val cum = DoubleArray(path.size)
+        for (i in 1 until path.size) cum[i] = cum[i - 1] + path[i - 1].distanceTo(path[i])
+        fun flatAt(k: Int): Boolean {
+            val d = k * step
+            var j = 1
+            while (j < cum.size - 1 && cum[j] < d) j++
+            return flags.getOrElse(j) { false }
+        }
+        var k = 1
+        while (k < e.size - 1) {
+            if (flatAt(k)) {
+                val a = k - 1
+                var b = k
+                while (b < e.size - 1 && flatAt(b)) b++
+                if (e[a] > -900f && e[b] > -900f) {
+                    for (m in a + 1 until b) e[m] = e[a] + (e[b] - e[a]) * (m - a) / (b - a).toFloat()
+                }
+                k = b
+            } else k++
+        }
+    }
+
+    // El MDT recoge edificios y arbolado: una mediana quita los picos sueltos y la media suaviza lo que queda
     private fun smoothElevations(e: MutableList<Float>, stepM: Double) {
         if (e.size < 3) return
+        val med = e.toList()
+        for (i in 1 until med.size - 1) {
+            e[i] = listOf(med[i - 1], med[i], med[i + 1]).sorted()[1]
+        }
         val radius = Math.ceil(when (appPrefs.horizonSmoothing) { 0 -> 30.0; 2 -> 120.0; else -> 60.0 } / stepM).toInt().coerceAtLeast(1)
         val src = e.toList()
         for (i in src.indices) {

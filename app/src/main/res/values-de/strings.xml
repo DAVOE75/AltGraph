@@ -138,6 +138,15 @@ Gel?ndedateien: %3$d (%4$d MB)
     <string name="horizon_desc_download">Lädt jetzt die Geländedateien deiner Gegend, damit das Profil unterwegs nicht auf WLAN warten muss.</string>
     <string name="horizon_desc_diag">Kopiert technische Daten der letzten Vorhersage in die Zwischenablage, nützlich für Fehlermeldungen.</string>
     <string name="horizon_desc_reset">Setzt alle Horizont-Optionen auf die Standardwerte zurück.</string>
+    <string name="horizon_msg_no_map">Hier keine Offline-Karte</string>
+    <string name="horizon_msg_no_road">Keine Straße erkannt</string>
+    <string name="horizon_msg_no_terrain">Keine Geländedaten: im Panel laden</string>
+    <string name="horizon_max_grade">Maximal angezeigte Steigung</string>
+    <string name="horizon_desc_max_grade">Begrenzt die Steigungswerte des Profils. Erhöhen bei sehr steilen kurzen Rampen.</string>
+    <string name="horizon_cycleway">Radwege bevorzugen</string>
+    <string name="horizon_desc_cycleway">Verlaufen Radweg und Straße parallel, wird dem Radweg gefolgt.</string>
+    <string name="horizon_status_road">Erkannte Straße: %1$s</string>
+    <string name="horizon_status_none">noch keine</string>
     <string name="map_access_needed">Erlaube den Zugriff auf alle Dateien, damit AltGraph die Offline-Karten des Karoo lesen kann.</string>
     <string name="setting_smart_zoom">Taktischen Smart Zoom aktivieren (Auto-Skalierung)</string>
     <string name="setting_oasis_tracking">Oasis Tracking aktivieren (Erholungszonen)</string>

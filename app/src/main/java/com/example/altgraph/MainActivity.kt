@@ -52,7 +52,9 @@ class MainActivity : Activity() {
         val cover = if (lat == 0.0 && lng == 0.0) getString(R.string.horizon_cover_unknown)
             else if (em.hasCoverageFor(lat, lng)) getString(R.string.horizon_cover_yes) else getString(R.string.horizon_cover_no)
         val dl = if (em.isDownloading()) "\n" + getString(R.string.horizon_downloading) else ""
-        tv.text = getString(R.string.horizon_status_fmt, perm, maps, files, bytes / 1_048_576, cover) + dl
+        val roadNow = RoadHorizonPredictor.getInstance(this).lastRoadName
+        tv.text = getString(R.string.horizon_status_fmt, perm, maps, files, bytes / 1_048_576, cover) + dl +
+            "\n" + getString(R.string.horizon_status_road, roadNow ?: getString(R.string.horizon_status_none))
 
         // Botón de descarga: verde y "ya descargado" cuando no falta ninguna cuadrícula
         val btn = horizonDownloadBtn ?: return
@@ -1735,6 +1737,12 @@ class MainActivity : Activity() {
             alertValues.indexOf(prefs.horizonAlertPct).coerceAtLeast(0)) { prefs.horizonAlertPct = alertValues[it] })
         pendingDesc = R.string.horizon_desc_mark
         addOpt(horizonSwitch(getString(R.string.horizon_mark_guess), prefs.horizonMarkGuess) { prefs.horizonMarkGuess = it })
+        val maxGradeValues = listOf(20, 30, 45)
+        pendingDesc = R.string.horizon_desc_max_grade
+        addOpt(labelSpinner(getString(R.string.horizon_max_grade),
+            maxGradeValues.map { "$it %" }, maxGradeValues.indexOf(prefs.horizonMaxGradePct).coerceAtLeast(1)) { prefs.horizonMaxGradePct = maxGradeValues[it] })
+        pendingDesc = R.string.horizon_desc_cycleway
+        addOpt(horizonSwitch(getString(R.string.horizon_cycleway), prefs.horizonPreferCycleway) { prefs.horizonPreferCycleway = it })
 
         // Descarga del terreno (MDT)
         val radiusValues = listOf(10, 30, 60, 120, 150, 180, 210)
