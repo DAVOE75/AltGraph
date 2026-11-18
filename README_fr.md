@@ -11,6 +11,45 @@ Elle révolutionne le concept traditionnel de l'altimétrie cycliste en intégra
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />
 </p>
 
+## VERSION 3.0.27 : HORIZON TACTIQUE (ROAD HORIZON) ET TERRAIN À 5 m POUR L'ESPAGNE
+Les dernières versions ajoutent la prévision de la route devant vous quand aucun itinéraire n'est chargé, un terrain plus précis et les outils pour le gérer.
+
+### Horizon tactique (Road Horizon) : prévision sans itinéraire
+
+* Affiche le profil d'élévation de la route devant vous quand aucun itinéraire n'est chargé, dans la vue 3D et dans le radar altimétrique. Il suit la route sur laquelle vous roulez grâce aux cartes hors ligne du Karoo et à un modèle de terrain, et dessine les kilomètres suivants avec les couleurs de pente habituelles.
+* Utilise les mêmes modes de balise que les itinéraires : balise fixe à 20 % de la fenêtre (20 % derrière vous, 80 % devant) ou balise mobile avec sauts de page. La grille de blocs reste ancrée à la route, donc les pourcentages et les couleurs ne changent pas pendant que vous avancez.
+* Carrefours : quand la suite est incertaine, le profil continue de se dessiner. Choisissez la règle suivie : gauche, tout droit, droite ; la rue du même nom ; ou le plus petit virage. Un « ? » optionnel indique où commence la supposition, et si vous quittez la route, le calcul se refait tout seul.
+* Reconnaît la route sur laquelle vous êtes à partir de votre trajectoire récente, quel que soit le sens dans lequel elle est dessinée dans les données de la carte, et préfère la plus proche. Préférence optionnelle pour les pistes cyclables. Les ponts et les tunnels sont dessinés plats, et les ronds-points prennent la sortie qui prolonge votre direction.
+* Des messages clairs au lieu d'un profil plat trompeur : pas de carte hors ligne, aucune route détectée ou pas de données de terrain.
+* Calibre les altitudes avec le baromètre, affiche un niveau de « confiance du terrain » et peut apprendre de petites corrections à partir de vos propres sorties.
+* Options dans l'**onglet PRO** (carte Horizon tactique) : zoom de l'horizon (par pas de 500 m jusqu'à 30 km), taille des sous-blocs (50, 100, 250 ou 500 m), lissage du terrain, cap à l'arrêt, où l'afficher (radar, 3D ou les deux), alerte de forte montée, pente maximale et un bouton de réinitialisation. Chaque option a une courte description et respecte les unités métriques ou impériales.
+* Ne s'applique qu'aux sorties libres : avec un itinéraire chargé, tout fonctionne comme avant.
+
+### Terrain à 5 m par province (Espagne)
+
+* Terrain optionnel à la résolution de 5 m, issu du **MDT05** de l'Instituto Geográfico Nacional (CNIG), installé province par province depuis l'onglet PRO. Le sélecteur apparaît quand la carte d'Espagne (`spain.map`) se trouve dans les cartes hors ligne du Karoo.
+* Disponibles maintenant : Alicante, Almería, Murcia et Valence. D'autres provinces sont ajoutées progressivement. Vous pouvez supprimer une province à tout moment pour libérer de la place, et là où aucune n'est installée, le terrain à 30 m est utilisé.
+* Lors de tests sur environ 58 km de sorties enregistrées autour d'Alicante, l'erreur typique du dénivelé prévu sur les 500 m suivants est passée d'environ 2,3 m à moins de 1 m. Les résultats peuvent varier dans d'autres régions.
+* Données de terrain : Obra derivada de MDT05 CC-BY 4.0 scne.es (Instituto Geográfico Nacional).
+
+### Gestion du terrain
+
+* Le terrain à 30 m se télécharge en Wi-Fi (et, si vous l'autorisez, en données mobiles) pour la zone autour de vous, avec un rayon de 10 à 210 km. Le bouton « Télécharger le terrain » devient vert quand tout est là.
+* Supprimez le terrain téléchargé d'un seul bouton, ou laissez AltGraph supprimer celui que vous n'utilisez plus après 30, 60, 90 ou 180 jours.
+* Le terrain est enregistré dans le dossier propre à AltGraph, il ne demande donc aucune autorisation de stockage.
+
+### Zoom et commandes
+
+* Zoom avant et zoom arrière sont disponibles comme actions supplémentaires du Karoo, pour les télécommandes capables de les déclencher (le Karoo réserve ses propres boutons au changement de page).
+* Le radar altimétrique suit toujours le zoom de la carte, et le 3D Global peut suivre en option le zoom du radar.
+* Zoom selon la vitesse en option pour les itinéraires chargés : de 250 m à faible vitesse jusqu'à 5 km à grande vitesse.
+
+### Test avec une sortie enregistrée
+
+* Un bouton de l'onglet PRO rejoue un fichier GPX et indique quelle part de la route et des altitudes prévues correspond à la sortie réelle.
+
+---
+
 ## VERSION 3.0 : ÉVOLUTION
 
 La version 3.0 rend AltGraph plus simple à régler, plus lisible au soleil et plus utile sur la route.

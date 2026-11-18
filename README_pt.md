@@ -11,6 +11,45 @@ Revoluciona o conceito tradicional de altimetria de ciclismo incorporando um **C
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logotipo ALTGRAPH" width="350" />
 </p>
 
+## VERSÃO 3.0.27: HORIZONTE TÁTICO (ROAD HORIZON) E TERRENO DE 5 m PARA ESPANHA
+As últimas versões acrescentam a previsão da estrada à frente quando não há rota carregada, um terreno mais preciso e as ferramentas para o gerir.
+
+### Horizonte Tático (Road Horizon): previsão sem rota
+
+* Mostra o perfil de elevação da estrada à sua frente quando não há rota carregada, na vista 3D e no radar altimétrico. Segue a estrada por onde vai com os mapas offline do próprio Karoo e um modelo de terreno, e desenha os quilómetros seguintes com as cores de inclinação habituais.
+* Usa os mesmos modos de baliza das rotas: baliza fixa a 20 % da janela (20 % atrás de si, 80 % à frente) ou baliza móvel com saltos de página. A grelha de blocos fica ancorada à estrada, por isso as percentagens e as cores não mudam enquanto avança.
+* Cruzamentos: quando o caminho não é claro, o perfil continua a desenhar. Escolha a regra que segue: esquerda, em frente, direita; a rua com o mesmo nome; ou a menor curva. Um « ? » opcional marca onde começa a suposição, e se sair do caminho, recalcula sozinho.
+* Reconhece a estrada em que está a partir do seu percurso recente, seja qual for o sentido em que está desenhada nos dados do mapa, e prefere a mais próxima. Preferência opcional por ciclovias. As pontes e os túneis são desenhados planos e as rotundas saem pela saída que segue a sua direção.
+* Mensagens claras em vez de um perfil plano enganador: sem mapa offline, sem estrada detetada ou sem dados de terreno.
+* Calibra as altitudes com o barómetro, mostra um nível de «confiança do terreno» e pode aprender pequenas correções das suas próprias saídas.
+* Opções no **separador PRO** (cartão do Horizonte Tático): zoom do horizonte (de 500 em 500 m até 30 km), tamanho dos sub-blocos (50, 100, 250 ou 500 m), suavização do terreno, direção quando parado, onde mostrar (radar, 3D ou ambos), aviso de subida forte, inclinação máxima e um botão para repor. Cada opção tem uma breve descrição e respeita as unidades métricas ou imperiais.
+* Só se aplica às saídas livres: com uma rota carregada, tudo funciona como antes.
+
+### Terreno de 5 m por províncias (Espanha)
+
+* Terreno opcional com resolução de 5 m, proveniente do **MDT05** do Instituto Geográfico Nacional (CNIG), instalado província a província a partir do separador PRO. O seletor aparece quando o mapa de Espanha (`spain.map`) está nos mapas offline do Karoo.
+* Disponíveis agora: Alicante, Almería, Murcia e Valencia. Vão sendo acrescentadas mais províncias. Pode apagar uma província a qualquer momento para libertar espaço, e onde não houver nenhuma instalada usa-se o terreno de 30 m.
+* Em testes com cerca de 58 km de saídas gravadas em redor de Alicante, o erro típico do desnível previsto nos 500 m seguintes desceu de cerca de 2,3 m para menos de 1 m. Os resultados podem variar noutras zonas.
+* Dados de terreno: Obra derivada de MDT05 CC-BY 4.0 scne.es (Instituto Geográfico Nacional).
+
+### Gestão do terreno
+
+* O terreno de 30 m é descarregado por Wi-Fi (e, se permitir, com dados móveis) para a zona à sua volta, com um raio de 10 a 210 km. O botão «Descarregar terreno agora» fica verde quando está tudo.
+* Apague o terreno descarregado com um só botão, ou deixe o AltGraph apagar o que já não usa ao fim de 30, 60, 90 ou 180 dias.
+* O terreno é guardado na pasta própria do AltGraph, por isso não precisa de permissão de armazenamento.
+
+### Zoom e controlos
+
+* Aumentar e diminuir estão disponíveis como ações extra do Karoo, para comandos que as possam ativar (o Karoo reserva os seus próprios botões para mudar de página).
+* O radar altimétrico segue sempre o zoom do mapa, e o 3D Global pode seguir opcionalmente o zoom do radar.
+* Zoom por velocidade opcional para rotas carregadas: de 250 m a baixa velocidade até 5 km a alta velocidade.
+
+### Teste com uma saída gravada
+
+* Um botão do separador PRO reproduz um ficheiro GPX e indica quanto da estrada e das altitudes previstas coincide com a saída real.
+
+---
+
 ## VERSÃO 3.0: EVOLUÇÃO
 
 A 3.0 torna o AltGraph mais fácil de configurar, mais claro ao sol e mais útil na estrada.

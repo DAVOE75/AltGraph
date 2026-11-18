@@ -19,6 +19,45 @@ It revolutionizes traditional cycling elevation profiles by featuring a **Suite 
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
+## VERSION 3.0.27: ROAD HORIZON AND 5 m TERRAIN FOR SPAIN
+The latest releases add a forecast of the road ahead when no route is loaded, more accurate terrain, and the tools to manage it.
+
+### Road Horizon (forecast without a route)
+
+* Shows the elevation profile of the road ahead when no route is loaded, in the 3D view and in the altimetry radar. It follows the road you are on using the Karoo's own offline maps and a terrain model, and draws the next kilometres with the usual gradient colours.
+* Uses the same beacon modes as routes: a fixed beacon at 20% of the window (20% behind you, 80% ahead) or a moving beacon with page jumps. The block grid stays anchored to the road, so percentages and colours do not change as you ride.
+* Junctions: when the road ahead is unclear, the profile keeps drawing. Choose the rule it follows: left, straight, right; the street with the same name; or the smallest turn. An optional "?" marks where the guess begins, and if you turn off, it recalculates by itself.
+* Recognises the road you are on from your recent track, whichever way it is drawn in the map data, and prefers the nearest road. Optional preference for cycle lanes. Bridges and tunnels are drawn flat, and roundabouts take the exit that continues your direction.
+* Clear messages instead of a misleading flat profile: no offline map, no road detected or no terrain data.
+* Calibrates the heights with the barometer, shows a "terrain confidence" level and can learn small corrections from your own rides.
+* Options in the **PRO tab** (Road Horizon card): horizon zoom (500 m steps up to 30 km), sub-block size (50, 100, 250 or 500 m), terrain smoothing, heading when stopped, where to show it (radar, 3D or both), steep-climb alert, maximum grade, and a reset button. Every option has a short description and follows the metric or imperial setting.
+* It only applies to free rides: with a route loaded, everything works as before.
+
+### 5 m terrain by province (Spain)
+
+* Optional terrain with 5 m resolution from the **MDT05** of the Instituto Geográfico Nacional (CNIG), installed province by province from the PRO tab. The selector appears when the Spain map (`spain.map`) is in the Karoo's offline maps.
+* Available now: Alicante, Almería, Murcia and Valencia. More provinces are being added. You can delete a province at any time to free space, and where none is installed the 30 m terrain is used.
+* In tests on about 58 km of recorded rides around Alicante, the typical error of the predicted height change over the next 500 m dropped from about 2.3 m to under 1 m. Results may vary in other areas.
+* Terrain data: Obra derivada de MDT05 CC-BY 4.0 scne.es (Instituto Geográfico Nacional).
+
+### Terrain management
+
+* The 30 m terrain downloads over Wi-Fi (optionally over mobile data) for the area around you, with a radius from 10 to 210 km. A "Download terrain now" button turns green when everything is there.
+* Delete the downloaded terrain with one button, or let AltGraph delete the terrain you no longer use after 30, 60, 90 or 180 days.
+* Terrain is stored in AltGraph's own folder, so it needs no storage permission.
+
+### Zoom and controls
+
+* Zoom in and zoom out are available as Karoo bonus actions, for remotes that can trigger them (the Karoo keeps its own buttons for page navigation).
+* The altimetry radar always follows the map zoom, and the Global 3D can optionally follow the radar zoom.
+* Optional zoom by speed for loaded routes: from 250 m at low speed up to 5 km at high speed.
+
+### Test with a recorded ride
+
+* A button in the PRO tab replays a GPX file and reports how much of the predicted road and heights match the real ride.
+
+---
+
 ## VERSION 3.0: EVOLUTION
 
 Version 3.0 makes AltGraph easier to set up, clearer in sunlight and more useful on the road.

@@ -11,6 +11,45 @@ Rivoluziona il concetto tradizionale di altimetria ciclistica integrando una **S
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="Logo ALTGRAPH" width="350" />
 </p>
 
+## VERSIONE 3.0.27: ORIZZONTE TATTICO (ROAD HORIZON) E TERRENO A 5 m PER LA SPAGNA
+Le ultime versioni aggiungono la previsione della strada davanti a te quando non c'è un percorso caricato, un terreno più preciso e gli strumenti per gestirlo.
+
+### Orizzonte tattico (Road Horizon): previsione senza percorso
+
+* Mostra il profilo altimetrico della strada che hai davanti quando non c'è un percorso caricato, nella vista 3D e nel radar altimetrico. Segue la strada su cui ti trovi usando le mappe offline del Karoo e un modello del terreno, e disegna i chilometri successivi con i consueti colori di pendenza.
+* Usa gli stessi modi di baliza dei percorsi: baliza fissa al 20 % della finestra (20 % dietro di te, 80 % davanti) oppure baliza mobile con salti di pagina. La griglia dei blocchi resta ancorata alla strada, quindi percentuali e colori non cambiano mentre avanzi.
+* Incroci: quando la strada davanti non è chiara, il profilo continua a disegnarsi. Scegli la regola da seguire: sinistra, dritto, destra; la via con lo stesso nome; oppure la svolta minore. Un « ? » opzionale indica dove inizia l'ipotesi, e se esci dal percorso, il calcolo si rifa da solo.
+* Riconosce la strada su cui ti trovi dalla tua traiettoria recente, in qualunque verso sia disegnata nei dati della mappa, e preferisce la più vicina. Preferenza opzionale per le piste ciclabili. Ponti e gallerie sono disegnati piatti e le rotatorie prendono l'uscita che prosegue nella tua direzione.
+* Messaggi chiari invece di un profilo piatto ingannevole: nessuna mappa offline, nessuna strada rilevata o nessun dato del terreno.
+* Calibra le quote con il barometro, mostra un livello di «affidabilità del terreno» e può imparare piccole correzioni dalle tue uscite.
+* Opzioni nella **scheda PRO** (riquadro Orizzonte tattico): zoom dell'orizzonte (a passi di 500 m fino a 30 km), dimensione dei sotto-blocchi (50, 100, 250 o 500 m), levigatura del terreno, direzione da fermo, dove mostrarlo (radar, 3D o entrambi), avviso di salita ripida, pendenza massima e un pulsante di ripristino. Ogni opzione ha una breve descrizione e rispetta le unità metriche o imperiali.
+* Si applica solo alle uscite libere: con un percorso caricato, tutto funziona come prima.
+
+### Terreno a 5 m per provincia (Spagna)
+
+* Terreno opzionale con risoluzione di 5 m, ricavato dal **MDT05** dell'Instituto Geográfico Nacional (CNIG), che si installa provincia per provincia dalla scheda PRO. Il selettore compare quando la mappa della Spagna (`spain.map`) è nelle mappe offline del Karoo.
+* Disponibili ora: Alicante, Almería, Murcia e Valencia. Si aggiungono altre province a poco a poco. Puoi eliminare una provincia in qualsiasi momento per liberare spazio, e dove non ne è installata nessuna si usa il terreno a 30 m.
+* In prove su circa 58 km di uscite registrate intorno ad Alicante, l'errore tipico del dislivello previsto nei 500 m successivi è sceso da circa 2,3 m a meno di 1 m. I risultati possono variare in altre zone.
+* Dati del terreno: Obra derivada de MDT05 CC-BY 4.0 scne.es (Instituto Geográfico Nacional).
+
+### Gestione del terreno
+
+* Il terreno a 30 m si scarica via Wi-Fi (e, se lo consenti, con dati mobili) per la zona intorno a te, con un raggio da 10 a 210 km. Il pulsante «Scarica il terreno ora» diventa verde quando c'è tutto.
+* Elimina il terreno scaricato con un solo pulsante, oppure lascia che AltGraph elimini quello che non usi più dopo 30, 60, 90 o 180 giorni.
+* Il terreno è salvato nella cartella propria di AltGraph, quindi non richiede alcun permesso di archiviazione.
+
+### Zoom e comandi
+
+* Ingrandisci e riduci sono disponibili come azioni extra del Karoo, per i telecomandi che possono attivarle (il Karoo riserva i propri pulsanti al cambio di pagina).
+* Il radar altimetrico segue sempre lo zoom della mappa, e il 3D Globale può seguire facoltativamente lo zoom del radar.
+* Zoom in base alla velocità, opzionale per i percorsi caricati: da 250 m a bassa velocità fino a 5 km ad alta velocità.
+
+### Prova con un'uscita registrata
+
+* Un pulsante della scheda PRO riproduce un file GPX e indica quanta parte della strada e delle quote previste coincide con l'uscita reale.
+
+---
+
 ## VERSIONE 3.0: EVOLUZIONE
 
 La versione 3.0 rende AltGraph più facile da configurare, più chiaro al sole e più utile in strada.

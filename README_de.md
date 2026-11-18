@@ -11,6 +11,45 @@ Es revolutioniert die Radsport-Höhenmessung durch eine **Suite von 7 3D-Höhenv
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo-1.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
+## VERSION 3.0.27: TAKTISCHER HORIZONT (ROAD HORIZON) UND 5-m-GELÄNDE FÜR SPANIEN
+Die neuesten Versionen bringen die Vorschau der Strecke vor dir, wenn keine Route geladen ist, ein genaueres Gelände und die Werkzeuge, es zu verwalten.
+
+### Taktischer Horizont (Road Horizon): Vorschau ohne Route
+
+* Zeigt das Höhenprofil der Straße vor dir, wenn keine Route geladen ist, in der 3D-Ansicht und im Höhenradar. Er folgt der Straße, auf der du fährst, mit den Offline-Karten des Karoo und einem Geländemodell und zeichnet die nächsten Kilometer in den gewohnten Steigungsfarben.
+* Nutzt dieselben Baken-Modi wie Routen: feste Bake bei 20 % des Fensters (20 % hinter dir, 80 % vor dir) oder bewegliche Bake mit Seitensprüngen. Das Blockraster bleibt an der Straße verankert, deshalb ändern sich Prozentwerte und Farben beim Fahren nicht.
+* Kreuzungen: Ist der Weg unklar, zeichnet das Profil trotzdem weiter. Wähle die Regel: links, geradeaus, rechts; die Straße mit demselben Namen; oder die kleinste Abbiegung. Ein optionales „?“ zeigt, wo die Vermutung beginnt, und wenn du abbiegst, wird von selbst neu berechnet.
+* Erkennt die Straße, auf der du bist, anhand deiner letzten Strecke, in welcher Richtung sie auch in den Kartendaten gezeichnet ist, und bevorzugt die nächstgelegene. Optionale Bevorzugung von Radwegen. Brücken und Tunnel werden flach gezeichnet, und Kreisverkehre nehmen die Ausfahrt, die deine Richtung fortsetzt.
+* Klare Meldungen statt eines irreführenden flachen Profils: keine Offline-Karte, keine Straße erkannt oder keine Geländedaten.
+* Kalibriert die Höhen mit dem Barometer, zeigt eine „Geländezuverlässigkeit“ an und kann kleine Korrekturen aus deinen eigenen Fahrten lernen.
+* Optionen im **PRO-Tab** (Karte Taktischer Horizont): Horizont-Zoom (in 500-m-Schritten bis 30 km), Größe der Unterblöcke (50, 100, 250 oder 500 m), Geländeglättung, Richtung im Stand, wo er angezeigt wird (Radar, 3D oder beides), Warnung bei starkem Anstieg, maximale Steigung und eine Zurücksetzen-Schaltfläche. Jede Option hat eine kurze Beschreibung und folgt der metrischen oder imperialen Einstellung.
+* Gilt nur für freie Fahrten: Mit geladener Route funktioniert alles wie bisher.
+
+### 5-m-Gelände nach Provinz (Spanien)
+
+* Optionales Gelände mit 5 m Auflösung aus dem **MDT05** des Instituto Geográfico Nacional (CNIG), das provinzweise über den PRO-Tab installiert wird. Die Auswahl erscheint, wenn die Spanien-Karte (`spain.map`) in den Offline-Karten des Karoo liegt.
+* Jetzt verfügbar: Alicante, Almería, Murcia und Valencia. Weitere Provinzen kommen nach und nach hinzu. Du kannst eine Provinz jederzeit löschen, um Platz zu schaffen, und wo keine installiert ist, wird das 30-m-Gelände verwendet.
+* In Tests mit rund 58 km aufgezeichneter Fahrten um Alicante sank der typische Fehler des vorhergesagten Höhenunterschieds auf den nächsten 500 m von etwa 2,3 m auf unter 1 m. In anderen Gebieten können die Ergebnisse abweichen.
+* Geländedaten: Obra derivada de MDT05 CC-BY 4.0 scne.es (Instituto Geográfico Nacional).
+
+### Geländeverwaltung
+
+* Das 30-m-Gelände wird per WLAN (und, wenn du es erlaubst, über mobile Daten) für das Gebiet um dich herum geladen, mit einem Radius von 10 bis 210 km. Die Schaltfläche „Gelände jetzt laden“ wird grün, wenn alles da ist.
+* Lösche das heruntergeladene Gelände mit einer Schaltfläche, oder lass AltGraph das nicht mehr genutzte Gelände nach 30, 60, 90 oder 180 Tagen löschen.
+* Das Gelände liegt im eigenen Ordner von AltGraph und braucht daher keine Speicherberechtigung.
+
+### Zoom und Bedienung
+
+* Hinein- und Herauszoomen gibt es als Zusatzaktionen des Karoo, für Fernbedienungen, die sie auslösen können (der Karoo hält seine eigenen Tasten für den Seitenwechsel frei).
+* Das Höhenradar folgt immer dem Kartenzoom, und das Globale 3D kann optional dem Radarzoom folgen.
+* Optionaler Zoom nach Geschwindigkeit für geladene Routen: von 250 m bei niedriger Geschwindigkeit bis 5 km bei hoher Geschwindigkeit.
+
+### Test mit einer aufgezeichneten Fahrt
+
+* Eine Schaltfläche im PRO-Tab spielt eine GPX-Datei ab und zeigt, wie viel der vorhergesagten Straße und Höhen mit der echten Fahrt übereinstimmt.
+
+---
+
 ## VERSION 3.0: EVOLUTION
 
 Version 3.0 macht AltGraph einfacher einzustellen, bei Sonne besser lesbar und unterwegs nützlicher.
