@@ -1102,7 +1102,7 @@ class Altimetria3DView @JvmOverloads constructor(
 
         subTitleLabelPaint.textSize = ((h * 0.050f) * fontScale).coerceIn(10f, fsHi(15f))
         val headerPrefs = AppPreferences.getInstance(context)
-        val hasRoute = isNavigatingRoute || routeTotalLength > 0.0
+        val hasRoute = isNavigatingRoute
         val rawSlotKeys = if (hasRoute) {
             listOf(headerPrefs.headerStat1, headerPrefs.headerStat2, headerPrefs.headerStat3, headerPrefs.headerStat4, headerPrefs.headerStat5)
         } else {
