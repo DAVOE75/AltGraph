@@ -688,6 +688,10 @@ class Altimetria3DView @JvmOverloads constructor(
     private var routeName: String? = null
     private var routeCoords: List<Pair<Double, Double>> = emptyList()
     var routeTotalLength: Double = 0.0
+    // Sin ruta cargada (Road Horizon) el encabezado usa los campos de sesion
+    var hasLoadedRoute: Boolean = true
+    var rideAscentM: Double = 0.0
+    var rideDistanceM: Double = 0.0
     var oasisDistanceToNextCrucible: Double? = null
     var energyBatteryLevel: Double = 100.0
     
@@ -1100,7 +1104,8 @@ class Altimetria3DView @JvmOverloads constructor(
         subTitleLabelPaint.textSize = ((h * 0.050f) * fontScale).coerceIn(10f, fsHi(15f))
         val headerPrefs = AppPreferences.getInstance(context)
         // Vertical: hasta 3 métricas (campos 1-3); apaisado: hasta 5. Los campos en "ninguno" se omiten y el resto se reparte el ancho
-        val slotKeys = listOf(headerPrefs.headerStat1, headerPrefs.headerStat2, headerPrefs.headerStat3, headerPrefs.headerStat4, headerPrefs.headerStat5)
+        val slotKeys = (if (hasLoadedRoute) listOf(headerPrefs.headerStat1, headerPrefs.headerStat2, headerPrefs.headerStat3, headerPrefs.headerStat4, headerPrefs.headerStat5)
+            else (1..5).map { headerPrefs.headerStatNoRoute(it) })
             .take(if (rotate90) 5 else 3)
             .filter { it != AppPreferences.HEADER_STAT_NONE }
         val numCols = slotKeys.size.coerceAtLeast(1)
@@ -1128,6 +1133,8 @@ class Altimetria3DView @JvmOverloads constructor(
                 AppPreferences.HEADER_STAT_RESUPPLY -> Triple(context.getString(R.string.hdr_resupply), nextResupplyMeters?.let { formatRouteKm(it) } ?: "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_ETA -> Triple(context.getString(R.string.hdr_eta), etaFinishMinutes?.let { android.text.format.DateFormat.getTimeFormat(context).format(java.util.Date(it * 60000L)) } ?: "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_PACE -> Triple(context.getString(R.string.hdr_pace), ascentPaceMetersPerHour?.let { Units.climbRate(context, it) } ?: "--", lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_RIDE_ASC -> Triple(context.getString(R.string.hdr_ride_asc), Units.elev(context, rideAscentM, true), lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_RIDE_DIST -> Triple(context.getString(R.string.hdr_ride_dist), formatRouteKm(rideDistanceM), lightComp(Color.WHITE))
                 else -> Triple(context.getString(R.string.label_current_gradient), "%.1f%%".format(currentGrade), lightComp(GradeColorScale.getTelemetryColor(currentGrade)))
             }
         }

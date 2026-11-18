@@ -184,6 +184,10 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="horizon_delete_confirm">Supprimer le terrain téléchargé (environ %1$d Mo) ?</string>
     <string name="horizon_deleted">%1$d Mo libérés</string>
     <string name="horizon_delete_nothing">Aucun terrain téléchargé à supprimer</string>
+    <string name="hdr_ride_asc">D+ SORTIE</string>
+    <string name="hdr_ride_dist">DISTANCE SORTIE</string>
+    <string name="setting_header_noroute_title">En-tête 3D sans parcours</string>
+    <string name="setting_header_noroute_desc">Champs au-dessus du profil quand aucun parcours n\'est chargé (Road Horizon). Avec un parcours, ceux de l\'onglet 3D sont utilisés.</string>
     <string name="map_access_needed">Autorisez l\'accès à tous les fichiers pour qu\'AltGraph lise les cartes hors ligne du Karoo.</string>
     <string name="setting_smart_zoom">Activer Smart Zoom tactique (auto-échelle)</string>
     <string name="setting_oasis_tracking">Activer Oasis Tracking (zones de récupération)</string>

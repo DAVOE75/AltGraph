@@ -131,6 +131,14 @@ class AppPreferences(context: Context) {
         get() = prefs.getString(KEY_HEADER_STAT_5, HEADER_STAT_NONE) ?: HEADER_STAT_NONE
         set(value) = prefs.edit().putString(KEY_HEADER_STAT_5, value).apply()
 
+    // Campos del encabezado 3D cuando no hay ruta cargada (Road Horizon): 1-3 en vertical, 1-5 en apaisado
+    fun headerStatNoRoute(slot: Int): String =
+        prefs.getString("header_noroute_$slot", NOROUTE_DEFAULTS[slot - 1]) ?: NOROUTE_DEFAULTS[slot - 1]
+
+    fun setHeaderStatNoRoute(slot: Int, value: String) {
+        prefs.edit().putString("header_noroute_$slot", value).apply()
+    }
+
     var showRouteCompass: Boolean
         get() = prefs.getBoolean(KEY_SHOW_ROUTE_COMPASS, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_ROUTE_COMPASS, value).apply()
@@ -642,7 +650,7 @@ class AppPreferences(context: Context) {
         prefs.edit()
             .remove(KEY_ALTIMETRIA_STYLE).remove(KEY_SHOW_BLOCK_PERCENTAGES).remove(KEY_SHOW_3D_COTAS).remove(KEY_SHOW_3D_RAMPS)
             .remove(KEY_SHOW_3D_SCALE_BAR).remove(KEY_SHOW_3D_BLOCK_LEGEND).remove(KEY_SHOW_CLIMB_SCALE_BAR).remove(KEY_ADAPT_GRADE_TEXT).remove(KEY_SHOW_3D_ROUTE_NAME)
-            .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_HEADER_STAT_1).remove(KEY_HEADER_STAT_2).remove(KEY_HEADER_STAT_3).remove(KEY_HEADER_STAT_4).remove(KEY_HEADER_STAT_5).remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM)            .remove(KEY_CHART_FIT_AXIS).remove(KEY_SHOW_EXAGGERATION_TAG)
+            .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_HEADER_STAT_1).remove(KEY_HEADER_STAT_2).remove(KEY_HEADER_STAT_3).remove(KEY_HEADER_STAT_4).remove(KEY_HEADER_STAT_5).remove("header_noroute_1").remove("header_noroute_2").remove("header_noroute_3").remove("header_noroute_4").remove("header_noroute_5").remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM)            .remove(KEY_CHART_FIT_AXIS).remove(KEY_SHOW_EXAGGERATION_TAG)
             .remove(KEY_CHART_LIGHT_BG).remove(KEY_CHART_LIGHT_STYLE).remove(KEY_SHOW_SURFACE_TEXTURES).remove(KEY_SHOW_ROUTE_DISTANCES_3D)
             .remove(KEY_MERGE_MODE_3D).remove(KEY_MERGE_SIMILAR_BLOCKS_3D).remove(KEY_PCT_LABEL_STYLE_3D).remove(KEY_MERGE_MARGIN_3D).remove(KEY_BLOCK_AVG_PCT_3D)
             .remove(KEY_HIDE_GRADE_RANGE_ENABLED_3D).remove(KEY_HIDE_GRADE_MIN_3D).remove(KEY_HIDE_GRADE_MAX_3D)
@@ -769,6 +777,14 @@ class AppPreferences(context: Context) {
         const val HEADER_STAT_RESUPPLY = "resupply"
         const val HEADER_STAT_ETA = "eta"
         const val HEADER_STAT_PACE = "pace"
+        const val HEADER_STAT_RIDE_ASC = "ride_asc"
+        const val HEADER_STAT_RIDE_DIST = "ride_dist"
+        // Metricas que tienen sentido sin ruta, en el orden del selector
+        val NOROUTE_STAT_KEYS = listOf(
+            HEADER_STAT_NONE, HEADER_STAT_CURRENT, HEADER_STAT_AVG, HEADER_STAT_MAX,
+            HEADER_STAT_ELEV, HEADER_STAT_RIDE_ASC, HEADER_STAT_RIDE_DIST
+        )
+        val NOROUTE_DEFAULTS = listOf(HEADER_STAT_RIDE_ASC, HEADER_STAT_ELEV, HEADER_STAT_RIDE_DIST, HEADER_STAT_CURRENT, HEADER_STAT_MAX)
         val HEADER_STAT_KEYS = listOf(
             HEADER_STAT_NONE, HEADER_STAT_CURRENT, HEADER_STAT_AVG, HEADER_STAT_MAX, HEADER_STAT_ROUTE, HEADER_STAT_LEFT, HEADER_STAT_DIST,
             HEADER_STAT_ASC_TOTAL, HEADER_STAT_ASC_LEFT, HEADER_STAT_ELEV, HEADER_STAT_TOP_DIST, HEADER_STAT_TOP_ELEV,

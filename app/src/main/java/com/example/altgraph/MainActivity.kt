@@ -2019,6 +2019,50 @@ class MainActivity : Activity() {
         energyCard.addView(switchEnergy)
         tabProContainer.addView(energyCard)
 
+        // Encabezado 3D sin ruta cargada (Road Horizon)
+        val noRouteHeaderCard = createCardContainer()
+        noRouteHeaderCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_header_noroute_title)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+        })
+        noRouteHeaderCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_header_noroute_desc)
+            textSize = 13f
+            setTextColor(Color.WHITE)
+            setPadding(0, 8, 0, 0)
+        })
+        val noRouteLabels = AppPreferences.NOROUTE_STAT_KEYS.map { key ->
+            getString(when (key) {
+                AppPreferences.HEADER_STAT_CURRENT -> R.string.label_current_gradient
+                AppPreferences.HEADER_STAT_AVG -> R.string.label_avg_gradient_tramo
+                AppPreferences.HEADER_STAT_MAX -> R.string.label_max_gradient_tramo
+                AppPreferences.HEADER_STAT_ELEV -> R.string.hdr_elev
+                AppPreferences.HEADER_STAT_RIDE_ASC -> R.string.hdr_ride_asc
+                AppPreferences.HEADER_STAT_RIDE_DIST -> R.string.hdr_ride_dist
+                else -> R.string.hdr_none
+            })
+        }
+        for (slot in 1..5) {
+            noRouteHeaderCard.addView(TextView(this).apply {
+                text = getString(if (slot <= 3) R.string.setting_header_slot else R.string.setting_header_slot_landscape, slot)
+                textSize = 12f
+                setTextColor(Color.LTGRAY)
+                setPadding(0, 6, 0, 0)
+            })
+            noRouteHeaderCard.addView(Spinner(this).apply {
+                adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, noRouteLabels)
+                setSelection(AppPreferences.NOROUTE_STAT_KEYS.indexOf(prefs.headerStatNoRoute(slot)).coerceAtLeast(0))
+                onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        prefs.setHeaderStatNoRoute(slot, AppPreferences.NOROUTE_STAT_KEYS[position])
+                    }
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
+            })
+        }
+        tabProContainer.addView(noRouteHeaderCard)
+
         // ==========================================
         // PESTAÑA 6: ELITE (PAYWALL)
         // ==========================================

@@ -184,6 +184,10 @@ File del terreno: %3$d (%4$d MB)
     <string name="horizon_delete_confirm">Eliminare il terreno scaricato (circa %1$d MB)?</string>
     <string name="horizon_deleted">Liberati %1$d MB</string>
     <string name="horizon_delete_nothing">Non c\'è terreno scaricato da eliminare</string>
+    <string name="hdr_ride_asc">DISLIVELLO USCITA</string>
+    <string name="hdr_ride_dist">DISTANZA USCITA</string>
+    <string name="setting_header_noroute_title">Intestazione 3D senza percorso</string>
+    <string name="setting_header_noroute_desc">Campi sopra il profilo quando non c\'è un percorso caricato (Road Horizon). Con un percorso si usano quelli della scheda 3D.</string>
     <string name="map_access_needed">Consenti l\'accesso a tutti i file affinché AltGraph legga le mappe offline del Karoo.</string>
     <string name="setting_smart_zoom">Attiva Smart Zoom Tattico (Auto-Scala)</string>
     <string name="setting_oasis_tracking">Attiva Oasis Tracking (Zone di Recupero)</string>

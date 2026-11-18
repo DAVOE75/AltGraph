@@ -494,6 +494,26 @@ class AltimetriaStrategyCalculator {
     private var speedZoomCurrent = 0.0
     private var speedZoomChangeMs = 0L
 
+    var rideDistanceM = 0.0
+        private set
+    var rideAscentM = 0.0
+        private set
+    private var ascentRef = Double.NaN
+
+    // Distancia y desnivel positivo de la salida; el desnivel solo suma subidas de 3 m o mas para no contar ruido
+    private fun accumulateRide(lat: Double, lng: Double) {
+        if (currentLatitude != 0.0 && currentLongitude != 0.0) {
+            val dy = (lat - currentLatitude) * 111_320.0
+            val dx = (lng - currentLongitude) * 111_320.0 * Math.cos(Math.toRadians(lat))
+            val step = Math.hypot(dx, dy)
+            if (step in 1.0..200.0) rideDistanceM += step
+        }
+        val e = currentElevation
+        if (ascentRef.isNaN()) ascentRef = e
+        else if (e >= ascentRef + 3.0) { rideAscentM += e - ascentRef; ascentRef = e }
+        else if (e < ascentRef) ascentRef = e
+    }
+
     fun updateCurrentLocation(lat: Double, lng: Double, orientation: Double? = null) {
         if (lat == 0.0 && lng == 0.0) return
         if (orientation != null && this.currentHeading == 0.0) this.currentHeading = (orientation + 360.0) % 360.0
@@ -503,6 +523,7 @@ class AltimetriaStrategyCalculator {
                 this.currentHeading = bearing(this.currentLatitude, this.currentLongitude, lat, lng)
             }
         }
+        accumulateRide(lat, lng)
         this.currentLatitude = lat
         this.currentLongitude = lng
         if (!isNavigatingRoute) appContext?.let { RoadHorizonPredictor.getInstance(it).recordFix(lat, lng) }
