@@ -26,6 +26,12 @@ class RoadHorizonPredictor(private val context: Context) {
     private var hasMoved = false
     private var lastRoadKey: String? = null
     private val STICKY_BONUS_M = 15.0
+    private val BEARING_LOOK_M = 15.0
+    private val STRAIGHT_ANGLE = 30.0
+    private val MAX_TURN = 110.0
+    private val SNAP_MAX_ANGLE = 50.0
+    private val MINOR_COST_M = 8.0
+    private val MINOR_KINDS = setOf("service", "track", "path", "footway", "pedestrian", "steps", "bridleway", "living_street")
 
     data class HorizonResult(
         val elevations: List<Float>,
@@ -82,29 +88,35 @@ class RoadHorizonPredictor(private val context: Context) {
         android.util.Log.i("RoadHorizon", "roads near=${nearbyRoads.size} heading=$headingDeg")
         if (nearbyRoads.isEmpty()) return null
 
-        // 1. Snapping: Encontrar el tramo de carretera más alineado con nuestro rumbo
+        // 1. Snapping: la vía más cercana que va en nuestro sentido, en cualquiera de los dos sentidos de digitalización
         var bestRoad: RoadSegment? = null
         var bestIndex = 0
+        var bestForward = true
         var bestScore = Double.MAX_VALUE
 
         for (road in nearbyRoads) {
+            // Caminos, pistas y accesos pierden frente a una calle al lado
+            val minorCost = if (road.kind in MINOR_KINDS) MINOR_COST_M else 0.0
             for (i in 0 until road.points.size - 1) {
                 val p1 = road.points[i]
                 val p2 = road.points[i + 1]
                 val segmentBearing = p1.bearingTo(p2)
-                val bearingDiff = if (stationary) 0.0 else abs(angleDifference(headingDeg, segmentBearing))
+                val off = if (stationary) 0.0 else abs(angleDifference(headingDeg, segmentBearing))
+                val forward = off <= 90.0
+                if (!forward && road.oneway) continue
+                val bearingDiff = if (forward) off else 180.0 - off
 
-                // Solo consideramos tramos que van más o menos en nuestra dirección (< 60 grados)
-                if (bearingDiff < 60.0) {
+                if (bearingDiff < SNAP_MAX_ANGLE) {
                     val distToSeg = distanceToSegment(currentPoint, p1, p2)
                     val sticky = if (roadKey(road) == lastRoadKey) STICKY_BONUS_M else 0.0
                     // Parado el rumbo no es fiable: gana la vía más cercana (la longitud solo desempata)
-                    val score = if (stationary) distToSeg - sticky - road.lengthMeters * 1e-4
-                                else distToSeg + bearingDiff * 0.3 - sticky
+                    val score = (if (stationary) distToSeg - road.lengthMeters * 1e-4
+                                 else distToSeg + bearingDiff * 0.3) + minorCost - sticky
                     if (distToSeg < 30.0 && score < bestScore) {
                         bestScore = score
                         bestRoad = road
                         bestIndex = i
+                        bestForward = forward
                     }
                 }
             }
@@ -117,6 +129,15 @@ class RoadHorizonPredictor(private val context: Context) {
         val snapped = projectOnSegment(currentPoint, bestRoad.points[bestIndex], bestRoad.points[bestIndex + 1])
         val snapDist = currentPoint.distanceTo(snapped)
 
+        // Si se circula contra el sentido en que está dibujada la vía, se sigue por la copia invertida
+        if (!bestForward) {
+            val n = bestRoad.points.size
+            bestIndex = n - 2 - bestIndex
+            bestRoad = RoadSegment(
+                bestRoad.points.reversed(), bestRoad.name, bestRoad.ref, bestRoad.kind, bestRoad.oneway,
+                bestRoad.isRoundabout, bestRoad.isBridge, bestRoad.isTunnel
+            )
+        }
         // 2. Extender camino hacia adelante (Road Following)
         val projectedPoints = mutableListOf<GeoPoint>()
         projectedPoints.add(if (snapDist < 30.0) snapped else currentPoint)
@@ -151,9 +172,9 @@ class RoadHorizonPredictor(private val context: Context) {
 
             var bestNextRoad: RoadSegment? = null
             var bestNextAngle = Double.MAX_VALUE
-            val currentBearing = if (projectedPoints.size >= 2) {
-                projectedPoints[projectedPoints.size - 2].bearingTo(junctionPoint)
-            } else headingDeg
+            var bestIsContinuation = false
+            // Rumbo de llegada leído sobre los últimos ~15 m, para que un segmento corto y torcido no decida
+            val currentBearing = bearingBack(projectedPoints, BEARING_LOOK_M) ?: headingDeg
 
             var eligibleCount = 0
             for (tol in doubleArrayOf(25.0, 90.0)) {
@@ -163,13 +184,16 @@ class RoadHorizonPredictor(private val context: Context) {
                 val fromEnd = !cand.oneway && cand.points.last().distanceTo(junctionPoint) < tol
 
                 if (fromStart || fromEnd) {
-                    val nextPt = if (fromStart) cand.points[1] else cand.points[cand.points.size - 2]
-                    val nextBearing = junctionPoint.bearingTo(nextPt)
+                    val oriented = if (fromStart) cand.points else cand.points.reversed()
+                    val nextPt = oriented[1]
+                    val nextBearing = bearingForward(junctionPoint, oriented, BEARING_LOOK_M)
                     val signedTurn = angleDifference(currentBearing, nextBearing)
                     val turnAngle = abs(signedTurn)
                     val sameName = (currentRoad.name != null && currentRoad.name == cand.name)
+                    // Seguir por la misma calle o por la que sigue recta no es una suposición: solo hay duda en bifurcaciones y T
+                    val continuation = (sameName && turnAngle <= MAX_TURN) || turnAngle <= STRAIGHT_ANGLE
 
-                    val score = when (appPrefs.horizonJunctionMode) {
+                    val baseScore = when (appPrefs.horizonJunctionMode) {
                         1 -> (if (sameName) 0.0 else 300.0) + turnAngle // misma calle por nombre, luego menor giro
                         2 -> turnAngle // menor giro
                         else -> { // izquierda, recto, derecha (a igualdad de clase, mismo nombre y menor giro)
@@ -181,10 +205,12 @@ class RoadHorizonPredictor(private val context: Context) {
                             klass * 1000.0 + (if (sameName) 0.0 else 300.0) + turnAngle
                         }
                     }
+                    val score = if (continuation) (if (sameName) 0.0 else 500.0) + turnAngle else 100_000.0 + baseScore
                     val revisits = projectedPoints.any { it.distanceTo(nextPt) < 8.0 }
-                    if (!revisits && turnAngle < 135.0) eligibleCount++
-                    if (!revisits && turnAngle < 135.0 && score < bestNextAngle) {
+                    if (!revisits && turnAngle < MAX_TURN) eligibleCount++
+                    if (!revisits && turnAngle < MAX_TURN && score < bestNextAngle) {
                         bestNextAngle = score
+                        bestIsContinuation = continuation
                         bestNextRoad = if (fromStart) cand else RoadSegment(
                             cand.points.reversed(), cand.name, cand.ref, cand.kind, cand.oneway,
                             cand.isRoundabout, cand.isBridge, cand.isTunnel
@@ -195,19 +221,16 @@ class RoadHorizonPredictor(private val context: Context) {
             if (bestNextRoad != null) break
             }
 
-            if (bestNextRoad != null && eligibleCount >= 2 && guessFrom < 0.0) guessFrom = accumulatedDist
+            if (bestNextRoad != null && !bestIsContinuation && eligibleCount >= 1 && guessFrom < 0.0) guessFrom = accumulatedDist
             if (bestNextRoad != null) {
                 currentRoad = bestNextRoad
                 currentIndex = 1
             } else {
-                val near = candidateRoads.map { minOf(it.points.first().distanceTo(junctionPoint), it.points.last().distanceTo(junctionPoint)) to it }.sortedBy { it.first }.take(3)
-                android.util.Log.i("RoadHorizon", "path ends at ${junctionPoint.lat},${junctionPoint.lng} after ${accumulatedDist.toInt()} m, candidates=${candidateRoads.size} road=${currentRoad.name} pts=${currentRoad.points.size} nearest=" + near.joinToString { "%.0fm/%s/oneway=%s/pts=%d".format(it.first, it.second.name, it.second.oneway, it.second.points.size) })
                 break // Fin de la vía o no hay continuación transitable
             }
         }
 
         if (projectedPoints.size < 2 || accumulatedDist < 100.0) return null
-        android.util.Log.i("RoadHorizon", "path=" + projectedPoints.filterIndexed { i, _ -> i % 3 == 0 }.joinToString(";") { "%.5f,%.5f".format(it.lat, it.lng) })
 
         // 3. Muestrear elevación del MDT a lo largo de la polilínea proyectada
         val samplePoints = resamplePath(projectedPoints, sampleStepMeters, distanceMeters)
@@ -297,6 +320,25 @@ class RoadHorizonPredictor(private val context: Context) {
         }
         e[0] = src[0]
         e[e.size - 1] = src[src.size - 1]
+    }
+
+    // Rumbo con el que se llega al final del trazado, medido sobre los últimos lookM metros
+    private fun bearingBack(pts: List<GeoPoint>, lookM: Double): Double? {
+        if (pts.size < 2) return null
+        val end = pts.last()
+        var i = pts.size - 2
+        while (i > 0 && pts[i].distanceTo(end) < lookM) i--
+        return if (pts[i].distanceTo(end) < 1.0) null else pts[i].bearingTo(end)
+    }
+
+    // Rumbo con el que sale una vía de un punto, medido sobre los primeros lookM metros
+    private fun bearingForward(from: GeoPoint, pts: List<GeoPoint>, lookM: Double): Double {
+        var target = pts[1]
+        for (k in 1 until pts.size) {
+            target = pts[k]
+            if (from.distanceTo(pts[k]) >= lookM) break
+        }
+        return from.bearingTo(target)
     }
 
     private fun roadKey(r: RoadSegment) = "${r.name}_${r.lengthMeters.toInt()}_${r.points.first().lat}_${r.points.first().lng}"
