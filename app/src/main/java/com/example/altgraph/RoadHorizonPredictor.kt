@@ -530,7 +530,7 @@ class RoadHorizonPredictor(private val context: Context) {
         smoothElevations(elevations, sampleStepMeters)
         lastStatus = Status.OK
         val maxGrade = appPrefs.horizonMaxGradePct.toDouble()
-        android.util.Log.i("RoadHorizon", "road=$mainRoadName pts=${samplePoints.size} step=$sampleStepMeters dist=$accumulatedDist elev=${elevations.minOrNull()}..${elevations.maxOrNull()} first=${samplePoints.first().lat},${samplePoints.first().lng} last=${samplePoints.last().lat},${samplePoints.last().lng}")
+        android.util.Log.i("RoadHorizon", "road=$mainRoadName terrain=${elevationManager.lastSource} pts=${samplePoints.size} step=$sampleStepMeters dist=$accumulatedDist elev=${elevations.minOrNull()}..${elevations.maxOrNull()}")
 
         // Calcular pendientes (%)
         val grades = mutableListOf<Float>()
@@ -550,7 +550,7 @@ class RoadHorizonPredictor(private val context: Context) {
         ).also {
             lastDiagnostic = "road=$mainRoadName dist=${accumulatedDist.toInt()}m step=${sampleStepMeters.toInt()}m " +
                 "elev=${"%.0f".format(elevations.minOrNull() ?: 0f)}..${"%.0f".format(elevations.maxOrNull() ?: 0f)} " +
-                "pos=${"%.5f".format(lat)},${"%.5f".format(lng)} heading=${headingDeg.toInt()} maps=$mapFileCount guess=${guessFrom.toInt()}"
+                "pos=${"%.5f".format(lat)},${"%.5f".format(lng)} heading=${headingDeg.toInt()} maps=$mapFileCount guess=${guessFrom.toInt()} terrain=${elevationManager.lastSource}"
         }
     }
 

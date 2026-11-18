@@ -22,3 +22,6 @@ io/
 # Datos de terreno de prueba (grandes)
 *.tif
 *.tiff
+
+MDT5x5_Spain/
+terrain_out/

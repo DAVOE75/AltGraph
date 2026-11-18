@@ -45,7 +45,45 @@ class ElevationManager(private val context: Context) {
     private val isFetching = AtomicBoolean(false)
     private var lastCheckMs = 0L
 
+    // ---- Terreno de 5 m (trozos DEM5), con prioridad sobre el de 30 m ----
+    private val dem5Dir: File by lazy { File(baseDir, "dem5").apply { mkdirs() } }
+    private val dem5Cache = object : LinkedHashMap<String, Optional<Dem5Tile>>(8, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Optional<Dem5Tile>>?): Boolean = size > 4
+    }
+    private val dem5Missing = ConcurrentHashMap<String, Long>() // trozo no encontrado: no se vuelve a buscar en 30 s
+
+    @Volatile var lastSource: String = "30 m"
+        private set
+
+    private fun dem5For(lat: Double, lng: Double): Dem5Tile? {
+        val name = Dem5Tile.nameFor(lat, lng)
+        synchronized(dem5Cache) {
+            val hit = dem5Cache[name]
+            if (hit != null) return hit.orElse(null)
+        }
+        val miss = dem5Missing[name]
+        if (miss != null && System.currentTimeMillis() - miss < 30_000L) return null
+        val f = File(dem5Dir, name)
+        val tile = if (f.isFile && f.canRead()) Dem5Tile.open(f) else null
+        if (tile == null) { dem5Missing[name] = System.currentTimeMillis(); return null }
+        synchronized(dem5Cache) { dem5Cache[name] = Optional.of(tile) }
+        return tile
+    }
+
+    fun hasDem5(lat: Double, lng: Double): Boolean = File(dem5Dir, Dem5Tile.nameFor(lat, lng)).let { it.isFile && it.canRead() }
+
+    fun dem5Summary(): Pair<Int, Long> {
+        val files = dem5Dir.listFiles { f -> f.name.endsWith(".bin") }?.toList().orEmpty()
+        return files.size to files.sumOf { it.length() }
+    }
+
     fun getElevation(lat: Double, lng: Double): Double? {
+        try {
+            val t = dem5For(lat, lng)
+            val v = t?.elevation(lat, lng)
+            if (v != null) { lastSource = "5 m"; return v }
+        } catch (e: Exception) { }
+        lastSource = "30 m"
         val name = HgtFile.nameFor(lat, lng)
         val cached = openFiles[name]
         val hgt = if (cached != null) cached.orElse(null) else {
