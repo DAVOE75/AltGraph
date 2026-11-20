@@ -2378,6 +2378,7 @@ class AltimetriaStrategyCalculator {
                 } else horizonResult.elevations
                 val hGrades = horizonResult.grades
                 val stepMeters = horizonResult.totalDistanceMeters / (hElevs.size - 1)
+                if (advance) HorizonOverlayBus.publish(horizonResult.coordinates, hGrades, stepMeters, horizonProgress.toDouble() * (nElev - 1))
                 val majorBlockSize = (Math.round(getMajorBlockSize(lookaheadDist) / stepMeters).toInt().coerceAtLeast(1)) * stepMeters
 
                 val alertPct = prefs?.horizonAlertPct ?: 0

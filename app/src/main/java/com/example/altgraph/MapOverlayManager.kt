@@ -14,6 +14,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.math.*
 
@@ -49,6 +51,59 @@ class MapOverlayManager(
         consumerId = karooSystem.addConsumer<OnNavigationState> { navEvent ->
             scope.launch(worker + job) { updateOverlay(navEvent, emitter) }
         }
+        scope.launch(worker + job) {
+            while (isActive) {
+                delay(1500)
+                try { drawHorizon(emitter) } catch (e: Exception) { Log.w("MapOverlayManager", "horizon overlay failed", e) }
+            }
+        }
+    }
+
+    // Sin ruta cargada: el trazado previsto del Road Horizon se pinta en el mapa con el color de la pendiente
+    @Volatile private var routeOnMap = false
+    private var horizonSig: String? = null
+
+    private fun drawHorizon(emitter: Emitter<MapEffect>) {
+        if (stopped) return
+        val snap = HorizonOverlayBus.latest
+        val mode = prefs.eliteMapOverlayMode
+        val fresh = snap != null && System.currentTimeMillis() - snap.timeMs < 6000L
+        if (routeOnMap || mode == "off" || !prefs.isEliteUnlocked || !fresh || snap == null) {
+            if (horizonSig != null && !routeOnMap) { clearPolylines(emitter); horizonSig = null }
+            return
+        }
+        val i0 = Math.floor(snap.riderIndex).toInt().coerceIn(0, snap.coords.size - 2)
+        val coords = snap.coords.subList(i0, snap.coords.size)
+        if (coords.size < 2) return
+        val grades = snap.grades
+        val sig = "${"%.5f".format(coords.first().first)},${"%.5f".format(coords.first().second)}|${coords.size}|${"%.5f".format(coords.last().first)}|${prefs.eliteRadarResolution}"
+        if (sig == horizonSig) return
+
+        val step = snap.stepMeters
+        val segs = ArrayList<GradeSegment>()
+        for (k in 0 until coords.size - 1) {
+            val g = grades.getOrNull(i0 + k)?.toDouble() ?: 0.0
+            segs.add(GradeSegment(k * step, (k + 1) * step, g))
+        }
+        val minSeg = if (prefs.eliteRadarResolution > 0) prefs.eliteRadarResolution.toDouble() else 100.0
+        val merged = mergeShortSegments(segs, minSeg)
+
+        if (stopped) return
+        clearPolylines(emitter)
+        horizonSig = sig
+        var n = 0
+        for (seg in merged) {
+            val a = Math.round(seg.startDist / step).toInt().coerceIn(0, coords.size - 1)
+            val b = Math.round(seg.endDist / step).toInt().coerceIn(0, coords.size - 1)
+            if (b <= a) continue
+            val encoded = PolylineCodec.encode(coords.subList(a, b + 1), 1e5)
+            val id = "altgraph-grade-${n++}"
+            if (!emit(emitter, ShowPolyline(id = id, encodedPolyline = encoded, color = Color.parseColor(GradeColorScale.getColorHex(seg.grade)), width = 8))) return
+            activePolylines.add(id)
+        }
+        if (n > highWaterPolylines) highWaterPolylines = n
+        val hw = context.getSharedPreferences(HW_PREFS, Context.MODE_PRIVATE)
+        if (n > hw.getInt(HW_KEY, 0) || !hw.contains(HW_KEY)) hw.edit().putInt(HW_KEY, n).apply()
     }
 
     fun stop() {
@@ -63,6 +118,7 @@ class MapOverlayManager(
         val route = nav as? OnNavigationState.NavigationState.NavigatingRoute
         val dest = nav as? OnNavigationState.NavigationState.NavigatingToDestination
         val polyEnc: String? = route?.routePolyline ?: dest?.polyline
+        routeOnMap = !polyEnc.isNullOrEmpty()
         val elevEnc0: String? = route?.routeElevationPolyline ?: dest?.elevationPolyline
         val routeDist: Double = route?.routeDistance ?: 0.0
         val state = if (polyEnc != null) nav else null
@@ -208,6 +264,7 @@ class MapOverlayManager(
         }
         activePolylines.clear()
         lastRouteId = null
+        horizonSig = null
     }
 
     private fun getElevationAt(points: List<ElevationPolylineDecoder.ElevationPoint>, distance: Double): Double {
