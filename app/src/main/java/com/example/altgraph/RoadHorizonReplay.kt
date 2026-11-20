@@ -54,10 +54,11 @@ object RoadHorizonReplay {
             val d = fixes.last().p.distanceTo(f.p)
             if (d >= stepM) { total += d; fixes += f; cum += total }
         }
-        val predictor = RoadHorizonPredictor(context)
+        val predictor = RoadHorizonPredictor(context).also { it.ignoreMissingTerrain = true }
         val ahead = Math.ceil(horizonM / stepM).toInt()
 
         var tested = 0; var detected = 0; var good = 0
+        val fails = HashMap<String, Int>()
         var wrongNow = 0; var wrongLater = 0; var shortPaths = 0
         var matchSum = 0.0
         val err250 = ArrayList<Double>(); val err500 = ArrayList<Double>()
@@ -72,6 +73,7 @@ object RoadHorizonReplay {
             predictor.recordFix(fixes[i - 1].p.lat, fixes[i - 1].p.lng)
             predictor.recordFix(cur.lat, cur.lng)
             val res = predictor.predictHorizon(cur.lat, cur.lng, heading, horizonM, stepM)
+            if (res == null) fails.merge(predictor.lastFail.ifEmpty { predictor.lastStatus.name }, 1, Int::plus)
             if (res != null && res.coordinates.size >= 3) {
                 detected++
                 var ok = 0
@@ -89,7 +91,7 @@ object RoadHorizonReplay {
                 val frac = ok.toDouble() / n
                 matchSum += frac
                 if (frac >= 0.9) good++
-                else if (firstBad in 0..4) wrongNow++ // la calle en la que estás ya está mal (primeros 100 m)
+                else if (firstBad in 0..4) { wrongNow++; if (wrongNow <= 40) android.util.Log.i("ReplayBad", "i=$i pos=${"%.5f".format(cur.lat)},${"%.5f".format(cur.lng)} hd=${heading.toInt()} road=${predictor.lastRoadName} kind=${predictor.lastRoadKind} snap=${predictor.lastSnapDist.toInt()} first=${"%.5f".format(res.coordinates[0].first)},${"%.5f".format(res.coordinates[0].second)} ok=$ok/$n firstBad=$firstBad") } // la calle en la que estás ya está mal (primeros 100 m)
                 else wrongLater++ // la calle es buena pero el cruce se adivinó mal
                 if (res.coordinates.size < ahead + 1) shortPaths++
                 if (hasEle) {
@@ -113,6 +115,7 @@ object RoadHorizonReplay {
         sb.appendLine("GPX points: ${raw.size}, used: ${fixes.size}, route: ${"%.1f".format(total / 1000.0)} km")
         sb.appendLine("Tested positions: $tested")
         sb.appendLine("Prediction available: ${if (tested == 0) 0 else 100 * detected / tested} %")
+        for ((k, v) in fails) sb.appendLine("  no prediction: $k = $v")
         sb.appendLine("Path matches the real track (avg): ${if (detected == 0) 0 else Math.round(100 * matchSum / detected)} %")
         sb.appendLine("Positions with >= 90 % path match: ${if (detected == 0) 0 else 100 * good / detected} %")
         sb.appendLine("Failures - road under you wrong (first 100 m): ${if (detected == 0) 0 else 100 * wrongNow / detected} %")

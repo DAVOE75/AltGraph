@@ -20,6 +20,11 @@ class RoadHorizonPredictor(private val context: Context) {
     @Volatile var mapFileCount: Int = 0
         private set
     private var mapReader: KarooMapReader? = null
+    // Solo pruebas de repeticion: medir la calle reconocida aunque falte el terreno
+    @Volatile var ignoreMissingTerrain = false
+    @Volatile var lastFail: String = ""
+    @Volatile var lastRoadKind: String? = null
+    @Volatile var lastSnapDist: Double = 0.0
     private var lastMapCheckMs = 0L
     private var anchorLat = 0.0
     private var anchorLng = 0.0
@@ -309,7 +314,7 @@ class RoadHorizonPredictor(private val context: Context) {
         val stationary = !hasMoved && !(appPrefs.horizonHeadingMode == 1 && headingDeg != 0.0)
         val nearbyRoads = reader.getRoadsNear(currentPoint, radiusMeters = 80.0)
         android.util.Log.i("RoadHorizon", "roads near=${nearbyRoads.size} heading=$headingDeg")
-        if (nearbyRoads.isEmpty()) { lastStatus = Status.NO_ROAD; return null }
+        if (nearbyRoads.isEmpty()) { lastStatus = Status.NO_ROAD; lastFail = "no roads in 80 m"; return null }
 
         // 1. Snapping: la vía más cercana que va en nuestro sentido, en cualquiera de los dos sentidos de digitalización
         var bestRoad: RoadSegment? = null
@@ -322,35 +327,44 @@ class RoadHorizonPredictor(private val context: Context) {
         var prevForward = true
         var prevScore = Double.MAX_VALUE
         val cyclewayBonus = if (appPrefs.horizonPreferCycleway) 8.0 else 0.0
+        val prevRoadObj = nearbyRoads.firstOrNull { roadKey(it) == lastRoadKey }
 
+        // Tres pasadas cada vez mas permisivas: siempre se reconoce una calle si hay alguna cerca, aunque el rumbo del GPS sea malo
+        for ((maxAngle, maxDist) in listOf(SNAP_MAX_ANGLE to 30.0, 90.0 to 45.0, 181.0 to 80.0)) {
         for (road in nearbyRoads) {
             // Caminos, pistas y accesos pierden frente a una calle al lado
             val minorCost = (if (road.kind in MINOR_KINDS) MINOR_COST_M else 0.0) +
                 (if (speedMps > 3.3 && road.kind in FOOT_KINDS) 25.0 else 0.0) // a más de ~12 km/h no se va por un sendero
-            val trailCost = if (stationary) 0.0 else trailCostFor(road, trailPts) * 0.5
+            val trailCost = if (stationary) 0.0 else trailCostFor(road, trailPts) * 0.8
             val cycleBonus = if (road.kind == "cycleway") cyclewayBonus else 0.0
             val isPrev = roadKey(road) == lastRoadKey
+            // Calle ya seguida o conectada con ella: gana a una vecina equivalente (evita saltos en cruces y carriles)
+            val stickyBonus = when {
+                isPrev -> STICKY_BONUS_M * 0.4
+                prevRoadObj != null && connected(prevRoadObj, road) -> STICKY_BONUS_M * 0.25
+                else -> 0.0
+            }
             for (i in 0 until road.points.size - 1) {
                 val p1 = road.points[i]
                 val p2 = road.points[i + 1]
                 val segmentBearing = p1.bearingTo(p2)
                 val off = if (stationary) 0.0 else abs(angleDifference(headingDeg, segmentBearing))
                 val forward = off <= 90.0
-                if (!forward && road.oneway) continue
+                if (!forward && road.oneway && maxAngle < 181.0) continue
                 val bearingDiff = if (forward) off else 180.0 - off
 
-                if (bearingDiff < SNAP_MAX_ANGLE) {
+                if (bearingDiff < maxAngle) {
                     val distToSeg = distanceToSegment(currentPoint, p1, p2)
                     // Parado el rumbo no es fiable: gana la vía más cercana (la longitud solo desempata)
                     val score = (if (stationary) distToSeg - road.lengthMeters * 1e-4
-                                 else distToSeg + bearingDiff * 0.3) + minorCost + trailCost - cycleBonus
-                    if (distToSeg < 30.0 && score < bestScore) {
+                                 else distToSeg + bearingDiff * 0.3) + minorCost + trailCost - cycleBonus - stickyBonus
+                    if (distToSeg < maxDist && score < bestScore) {
                         bestScore = score
                         bestRoad = road
                         bestIndex = i
                         bestForward = forward
                     }
-                    if (isPrev && distToSeg < 35.0 && score < prevScore) {
+                    if (isPrev && distToSeg < maxDist + 5.0 && score < prevScore) {
                         prevScore = score
                         prevRoad = road
                         prevIndex = i
@@ -359,8 +373,17 @@ class RoadHorizonPredictor(private val context: Context) {
                 }
             }
         }
+        if (bestRoad != null) break
+        }
 
-        if (bestRoad == null) { android.util.Log.w("RoadHorizon", "no road aligned with heading"); lastStatus = Status.NO_ROAD; return null }
+        var forceDead = false
+        if (bestRoad == null) {
+            if (stationary) { android.util.Log.w("RoadHorizon", "no road near"); lastStatus = Status.NO_ROAD; lastFail = "no road within 80 m aligned"; return null }
+            // Sin ninguna via cerca (camino que no esta en el mapa): se sigue en recta el rumbo real
+            forceDead = true
+            bestRoad = RoadSegment(listOf(currentPoint, offsetPoint(currentPoint, headingDeg, 25.0)), null, null, "unknown", false, false, false, false)
+            bestIndex = 0; bestForward = true
+        }
 
         // Histéresis: cambiar de calle exige que la nueva gane varias lecturas seguidas (evita saltar al carril o calle paralela)
         val bestKey = roadKey(bestRoad)
@@ -372,10 +395,27 @@ class RoadHorizonPredictor(private val context: Context) {
         } else { pendingRoadKey = null; pendingCount = 0 }
         lastRoadKey = roadKey(bestRoad)
         lastRoadName = bestRoad.name ?: bestRoad.ref
+        lastRoadKind = bestRoad.kind
         // El trazado parte del punto proyectado sobre la vía (no del GPS crudo) para no quedar en el carril contiguo
         val snapped = projectOnSegment(currentPoint, bestRoad.points[bestIndex], bestRoad.points[bestIndex + 1])
         val snapDist = currentPoint.distanceTo(snapped)
+        lastSnapDist = snapDist
 
+        // Ninguna via bajo el ciclista (camino que no esta en el mapa): mejor seguir en recta el rumbo real que una calle lejana
+        var deadReckon = false
+        if (snapDist > 40.0 && !stationary || forceDead) {
+            deadReckon = true
+            val pts = ArrayList<GeoPoint>()
+            pts.add(currentPoint)
+            var m = 25.0
+            while (m <= minOf(distanceMeters, 1000.0)) { pts.add(offsetPoint(currentPoint, headingDeg, m)); m += 25.0 }
+            bestRoad = RoadSegment(pts, null, null, "unknown", false, false, false, false)
+            bestIndex = 0
+            bestForward = true
+            lastRoadKey = null
+            lastRoadName = null
+            lastRoadKind = "unknown"
+        }
         // Si se circula contra el sentido en que está dibujada la vía, se sigue por la copia invertida
         if (!bestForward) {
             val n = bestRoad.points.size
@@ -396,7 +436,7 @@ class RoadHorizonPredictor(private val context: Context) {
         var currentIndex = bestIndex + 1
         var accumulatedDist = 0.0
         val visitedRoads = mutableSetOf<String>()
-        var guessFrom = -1.0
+        var guessFrom = if (deadReckon) 0.0 else -1.0
         var mainRoadName = bestRoad.name ?: bestRoad.ref
 
         while (accumulatedDist < distanceMeters && currentRoad != null) {
@@ -430,12 +470,14 @@ class RoadHorizonPredictor(private val context: Context) {
             var eligibleCount = 0
             for (tol in doubleArrayOf(25.0, 90.0)) {
             for (cand in candidateRoads) {
-                // Verificar si empieza cerca del junction (con huecos en los datos del mapa se amplía la tolerancia)
-                val fromStart = cand.points.first().distanceTo(junctionPoint) < tol
-                val fromEnd = !cand.oneway && cand.points.last().distanceTo(junctionPoint) < tol
+                // La via candidata puede empezar, acabar o cruzar por un vertice cercano al cruce (con huecos en el mapa se amplia la tolerancia)
+                val jv = cand.points.indices.minByOrNull { cand.points[it].distanceTo(junctionPoint) } ?: continue
+                if (cand.points[jv].distanceTo(junctionPoint) >= tol) continue
+                val variants = ArrayList<List<GeoPoint>>()
+                if (cand.points.size - jv >= 2) variants.add(cand.points.subList(jv, cand.points.size))
+                if (!cand.oneway && jv >= 1) variants.add(cand.points.subList(0, jv + 1).reversed())
 
-                if (fromStart || fromEnd) {
-                    val oriented = if (fromStart) cand.points else cand.points.reversed()
+                for (oriented in variants) {
                     val nextPt = oriented[1]
                     val nextBearing = bearingForward(junctionPoint, oriented, BEARING_LOOK_M)
                     val signedTurn = angleDifference(currentBearing, nextBearing)
@@ -473,8 +515,8 @@ class RoadHorizonPredictor(private val context: Context) {
                     if (!revisits && turnAngle < MAX_TURN && score < bestNextAngle) {
                         bestNextAngle = score
                         bestIsContinuation = isContinuation
-                        bestNextRoad = if (fromStart) cand else RoadSegment(
-                            cand.points.reversed(), cand.name, cand.ref, cand.kind, cand.oneway,
+                        bestNextRoad = RoadSegment(
+                            oriented, cand.name, cand.ref, cand.kind, cand.oneway,
                             cand.isRoundabout, cand.isBridge, cand.isTunnel
                         )
                     }
@@ -496,7 +538,7 @@ class RoadHorizonPredictor(private val context: Context) {
             }
         }
 
-        if (projectedPoints.size < 2 || accumulatedDist < 100.0) { lastStatus = Status.NO_ROAD; return null }
+        if (projectedPoints.size < 2 || accumulatedDist < 100.0) { lastStatus = Status.NO_ROAD; lastFail = "path shorter than 100 m (${accumulatedDist.toInt()})"; return null }
 
         // 3. Muestrear elevación del MDT a lo largo de la polilínea proyectada
         val samplePoints = resamplePath(projectedPoints, sampleStepMeters, distanceMeters)
@@ -508,7 +550,10 @@ class RoadHorizonPredictor(private val context: Context) {
             val learned = corr[cellKey(p.lat, p.lng)] ?: 0f
             elevations.add(if (elev != null) elev.toFloat() + learned else -999f)
         }
-        if (elevations.all { it <= -900f }) { lastStatus = Status.NO_TERRAIN; return null }
+        if (elevations.all { it <= -900f }) {
+            if (!ignoreMissingTerrain) { lastStatus = Status.NO_TERRAIN; return null }
+            for (k in elevations.indices) elevations[k] = 0f
+        }
 
         // Puentes y túneles: el MDT mide el suelo, así que se une con una recta la cota de entrada y la de salida
         flattenBridges(elevations, projectedPoints, flatFlags, sampleStepMeters)
@@ -684,6 +729,13 @@ class RoadHorizonPredictor(private val context: Context) {
             }
         }
         return diff
+    }
+
+    // Dos vias se tocan si un extremo de una esta a menos de 25 m de algun vertice de la otra
+    private fun connected(a: RoadSegment, b: RoadSegment): Boolean {
+        val ea = listOf(a.points.first(), a.points.last())
+        val eb = listOf(b.points.first(), b.points.last())
+        return ea.any { e -> b.points.any { it.distanceTo(e) < 25.0 } } || eb.any { e -> a.points.any { it.distanceTo(e) < 25.0 } }
     }
 
     private fun roadKey(r: RoadSegment) = "${r.name}_${r.lengthMeters.toInt()}_${r.points.first().lat}_${r.points.first().lng}"
