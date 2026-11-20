@@ -250,6 +250,10 @@ class AppPreferences(context: Context) {
         set(value) = prefs.edit().putBoolean(KEY_ROAD_HORIZON_ENABLED, value).apply()
 
     // Dibujar en el mapa el trazado previsto del Road Horizon cuando no hay ruta (requiere Elite)
+    var horizonMapSmooth: Boolean
+        get() = prefs.getBoolean("horizon_map_smooth", false)
+        set(value) = prefs.edit().putBoolean("horizon_map_smooth", value).apply()
+
     var horizonMapLine: Boolean
         get() = prefs.getBoolean("horizon_map_line", true)
         set(value) = prefs.edit().putBoolean("horizon_map_line", value).apply()

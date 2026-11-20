@@ -1741,6 +1741,20 @@ class MainActivity : Activity() {
             setTextColor(Color.LTGRAY)
             setPadding(0, 4, 0, 4)
         })
+        roadHorizonCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_horizon_map_smooth)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            setPadding(0, 10, 0, 0)
+            isChecked = prefs.horizonMapSmooth
+            setOnCheckedChangeListener { _, isChecked -> prefs.horizonMapSmooth = isChecked }
+        })
+        roadHorizonCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_horizon_map_smooth_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 4)
+        })
 
         // Submenú: zoom del horizonte (de 500 en 500 m) y subbloque
         fun fmtDist(m: Int) = if (Units.imperial(this)) Units.distImperial(m.toDouble(), 2)

@@ -190,6 +190,8 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="setting_header_noroute_desc">Champs au-dessus du profil quand aucun parcours n\'est chargé (Road Horizon). Avec un parcours, ceux de l\'onglet 3D sont utilisés.</string>
     <string name="setting_horizon_map_line">Ligne prédictive sur la carte</string>
     <string name="setting_horizon_map_line_desc">Sans parcours, trace sur la carte de base la route prévue devant vous, colorée selon la pente et de la longueur du zoom de l\'horizon. Nécessite Elite et la superposition de carte activée.</string>
+    <string name="setting_horizon_map_smooth">Adoucir les transitions de couleur</string>
+    <string name="setting_horizon_map_smooth_desc">Fond la couleur entre les sections de pente différente sur la ligne prédictive.</string>
     <string name="map_access_needed">Autorisez l\'accès à tous les fichiers pour qu\'AltGraph lise les cartes hors ligne du Karoo.</string>
     <string name="setting_smart_zoom">Activer Smart Zoom tactique (auto-échelle)</string>
     <string name="setting_oasis_tracking">Activer Oasis Tracking (zones de récupération)</string>

@@ -76,7 +76,7 @@ class MapOverlayManager(
         val coords = snap.coords.subList(i0, snap.coords.size)
         if (coords.size < 2) return
         val grades = snap.grades
-        val sig = "${"%.5f".format(coords.first().first)},${"%.5f".format(coords.first().second)}|${coords.size}|${"%.5f".format(coords.last().first)}|${prefs.eliteRadarResolution}"
+        val sig = "${"%.5f".format(coords.first().first)},${"%.5f".format(coords.first().second)}|${coords.size}|${"%.5f".format(coords.last().first)}|${prefs.eliteRadarResolution}|${prefs.horizonMapSmooth}"
         if (sig == horizonSig) return
 
         val step = snap.stepMeters
@@ -92,14 +92,45 @@ class MapOverlayManager(
         clearPolylines(emitter)
         horizonSig = sig
         var n = 0
-        for (seg in merged) {
-            val a = Math.round(seg.startDist / step).toInt().coerceIn(0, coords.size - 1)
-            val b = Math.round(seg.endDist / step).toInt().coerceIn(0, coords.size - 1)
-            if (b <= a) continue
-            val encoded = PolylineCodec.encode(coords.subList(a, b + 1), 1e5)
+        val smooth = prefs.horizonMapSmooth
+        // Puntos del trazado entre dos distancias (interpolando los extremos)
+        fun pointAt(d: Double): Pair<Double, Double> {
+            val f = (d / step).coerceIn(0.0, (coords.size - 1).toDouble())
+            val i = Math.floor(f).toInt().coerceAtMost(coords.size - 2)
+            val t = f - i
+            return Pair(coords[i].first + (coords[i + 1].first - coords[i].first) * t, coords[i].second + (coords[i + 1].second - coords[i].second) * t)
+        }
+        fun sub(d0: Double, d1: Double): List<Pair<Double, Double>> {
+            val out = ArrayList<Pair<Double, Double>>()
+            out.add(pointAt(d0))
+            var k = Math.floor(d0 / step).toInt() + 1
+            while (k * step < d1 && k < coords.size) { out.add(coords[k]); k++ }
+            out.add(pointAt(d1))
+            return out
+        }
+        fun show(pts: List<Pair<Double, Double>>, color: Int): Boolean {
+            if (pts.size < 2) return true
             val id = "altgraph-grade-${n++}"
-            if (!emit(emitter, ShowPolyline(id = id, encodedPolyline = encoded, color = Color.parseColor(GradeColorScale.getColorHex(seg.grade)), width = 8))) return
+            if (!emit(emitter, ShowPolyline(id = id, encodedPolyline = PolylineCodec.encode(pts, 1e5), color = color, width = 8))) return false
             activePolylines.add(id)
+            return true
+        }
+        for ((idx, seg) in merged.withIndex()) {
+            val c1 = Color.parseColor(GradeColorScale.getColorHex(seg.grade))
+            val next = merged.getOrNull(idx + 1)
+            val len = seg.endDist - seg.startDist
+            if (smooth && next != null && next.startDist == seg.endDist && len >= 80.0) {
+                // Igual que el coloreado de ruta de Elite: tramo base y zona de difuminado en 3 pasos hacia el color siguiente
+                val c2 = Color.parseColor(GradeColorScale.getColorHex(next.grade))
+                val blend = minOf(60.0, len * 0.4)
+                val solidEnd = seg.endDist - blend
+                if (!show(sub(seg.startDist, solidEnd), c1)) return
+                for (s in 0 until 3) {
+                    val p0 = solidEnd + s * blend / 3
+                    val p1 = solidEnd + (s + 1) * blend / 3
+                    if (!show(sub(p0, p1), blendColors(c1, c2, (s + 0.5f) / 3f))) return
+                }
+            } else if (!show(sub(seg.startDist, seg.endDist), c1)) return
         }
         if (n > highWaterPolylines) highWaterPolylines = n
         val hw = context.getSharedPreferences(HW_PREFS, Context.MODE_PRIVATE)
