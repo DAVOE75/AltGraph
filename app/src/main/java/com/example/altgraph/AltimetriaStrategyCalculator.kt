@@ -2419,12 +2419,21 @@ class AltimetriaStrategyCalculator {
             }
 
             // Fallback histórico cuando no hay carretera detectada o está desactivado:
-            // La ventana ahora mira hacia atrás desde la posición actual
-            val windowStartDist = (liveDistanceAccumulated - lookaheadDist).coerceAtLeast(0.0)
-            
-            // El ciclista avanza hacia la derecha al empezar, y luego se queda en el borde derecho
+            // Respeta el mismo comportamiento de baliza que el perfil normal. Con baliza fija
+            // el ciclista permanece al 20 % y la ventana avanza continuamente; solo paged salta.
+            val pagedBeacon = prefs?.beaconMode3d == AppPreferences.BEACON_MODE_PAGED
+            val windowStartDist = if (pagedBeacon) {
+                val pageStart = Math.floor(liveDistanceAccumulated / lookaheadDist) * lookaheadDist
+                pageStart
+            } else {
+                (liveDistanceAccumulated - lookaheadDist * BEACON_ANCHOR_FRACTION).coerceAtLeast(0.0)
+            }
             val riderDistInWindow = (liveDistanceAccumulated - windowStartDist).coerceAtLeast(0.0)
-            val riderProgress = (riderDistInWindow / lookaheadDist).toFloat().coerceIn(0f, 1f)
+            val riderProgress = if (pagedBeacon) {
+                (riderDistInWindow / lookaheadDist).toFloat().coerceIn(0f, 1f)
+            } else {
+                BEACON_ANCHOR_FRACTION.toFloat()
+            }
 
             val customResolution = if (horizonEnabled) horizonSubBlockM.toInt() else (prefs?.eliteRadarResolution ?: 0)
             val subBlockSize = getSubBlockSize(lookaheadDist, customResolution)

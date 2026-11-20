@@ -504,15 +504,23 @@ class RoadHorizonPredictor(private val context: Context) {
                         onRing && cand.isRoundabout -> 5_000.0
                         onRing -> {
                             val d = abs(angleDifference(ringEntryBearing ?: currentBearing, nextBearing))
-                            if (d <= 70.0) (if (cand.name != null && cand.name == ringEntryName) 0.0 else 60.0) + d else 10_000.0 + d
+                            val refMatch = cand.ref != null && cand.ref == currentRoad.ref
+                            val nameMatch = cand.name != null && ringEntryName != null &&
+                                cand.name.equals(ringEntryName, ignoreCase = true)
+                            if (d <= 110.0) {
+                                (if (nameMatch || refMatch) 0.0 else 60.0) + d
+                            } else {
+                                10_000.0 + d
+                            }
                         }
                         continuation -> (if (sameName) 0.0 else 500.0) + turnAngle
                         else -> 100_000.0 + baseScore
                     }
                     val isContinuation = continuation || (onRing && score < 10_000.0)
                     val revisits = projectedPoints.any { it.distanceTo(nextPt) < 8.0 }
-                    if (!revisits && turnAngle < MAX_TURN) eligibleCount++
-                    if (!revisits && turnAngle < MAX_TURN && score < bestNextAngle) {
+                    val eligibleTurn = turnAngle < MAX_TURN || (onRing && turnAngle <= 170.0)
+                    if (!revisits && eligibleTurn) eligibleCount++
+                    if (!revisits && eligibleTurn && score < bestNextAngle) {
                         bestNextAngle = score
                         bestIsContinuation = isContinuation
                         bestNextRoad = RoadSegment(
