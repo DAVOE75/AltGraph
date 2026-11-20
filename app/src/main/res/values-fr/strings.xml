@@ -186,6 +186,8 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="horizon_delete_nothing">Aucun terrain téléchargé à supprimer</string>
     <string name="hdr_ride_asc">D+ SORTIE</string>
     <string name="hdr_ride_dist">DISTANCE SORTIE</string>
+    <string name="hdr_speed">VITESSE</string>
+    <string name="hdr_avg_speed">VIT. MOY.</string>
     <string name="setting_header_noroute_title">En-tête 3D sans parcours</string>
     <string name="setting_header_noroute_desc">Champs au-dessus du profil quand aucun parcours n\'est chargé (Road Horizon). Avec un parcours, ceux de l\'onglet 3D sont utilisés.</string>
     <string name="setting_horizon_map_line">Ligne prédictive sur la carte</string>

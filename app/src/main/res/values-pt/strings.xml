@@ -186,6 +186,8 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="horizon_delete_nothing">Não há terreno descarregado para apagar</string>
     <string name="hdr_ride_asc">DESNÍVEL SAÍDA</string>
     <string name="hdr_ride_dist">DISTÂNCIA SAÍDA</string>
+    <string name="hdr_speed">VELOCIDADE</string>
+    <string name="hdr_avg_speed">VEL. MÉDIA</string>
     <string name="setting_header_noroute_title">Cabeçalho 3D sem rota</string>
     <string name="setting_header_noroute_desc">Campos sobre o perfil quando não há rota carregada (Road Horizon). Com rota usam-se os do separador 3D.</string>
     <string name="setting_horizon_map_line">Linha preditiva no mapa</string>

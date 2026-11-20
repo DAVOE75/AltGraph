@@ -186,6 +186,8 @@ Gel?ndedateien: %3$d (%4$d MB)
     <string name="horizon_delete_nothing">Es gibt kein heruntergeladenes Gelände zum Löschen</string>
     <string name="hdr_ride_asc">AUFSTIEG TOUR</string>
     <string name="hdr_ride_dist">DISTANZ TOUR</string>
+    <string name="hdr_speed">GESCHWINDIGKEIT</string>
+    <string name="hdr_avg_speed">DURCHSCHN.</string>
     <string name="setting_header_noroute_title">3D-Kopfzeile ohne Route</string>
     <string name="setting_header_noroute_desc">Felder über dem Profil, wenn keine Route geladen ist (Road Horizon). Mit Route gelten die Felder des 3D-Tabs.</string>
     <string name="setting_horizon_map_line">Prognoselinie auf der Karte</string>

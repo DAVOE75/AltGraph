@@ -36,7 +36,7 @@ The latest releases add a forecast of the road ahead when no route is loaded, mo
 ### 5 m terrain by province (Spain)
 
 * Optional terrain with 5 m resolution from the **MDT05** of the Instituto Geográfico Nacional (CNIG), installed province by province from the PRO tab. The selector appears when the Spain map (`spain.map`) is in the Karoo's offline maps.
-* Available now: Alicante, Almería, Murcia and Valencia. More provinces are being added. You can delete a province at any time to free space, and where none is installed the 30 m terrain is used.
+* Available now: A Coruña, Albacete, Alicante, Almería, Asturias, Badajoz, Barcelona, Bizkaia, Burgos, Cantabria, Castellón, Ceuta, Ciudad Real, Cuenca, Cáceres, Cádiz, Córdoba, Madrid, Murcia, Valencia, Álava and Ávila. You can delete a province at any time to free space, and where none is installed the 30 m terrain is used.
 * In tests on about 58 km of recorded rides around Alicante, the typical error of the predicted height change over the next 500 m dropped from about 2.3 m to under 1 m. Results may vary in other areas.
 * Terrain data: Obra derivada de MDT05 CC-BY 4.0 scne.es (Instituto Geográfico Nacional).
 
@@ -387,3 +387,11 @@ If you enjoy ALTGRAPH and would like to support ongoing development:
  <img src="https://img.shields.io/badge/_Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black" alt="Buy Me A Coffee" />
  </a>
 </div>
+## VERSIÓN 3.0.29: TACTICAL HORIZON, NO-ROUTE MAP AND 5 m TERRAIN ACROSS SPAIN
+
+* **3D header without a route**: you can now choose current speed and average speed, alongside ascent, distance, elevation and grade fields. Configure them under **PRO > 3D header without a route**.
+* **Improved Road Horizon**: more reliable road recognition beneath the rider at junctions, connected streets and areas with sparse road data, with sticky road selection and better off-map recovery.
+* **Predicted map line**: when no route is loaded, displays the predicted road ahead coloured by gradient. It can be enabled or disabled and supports smooth colour transitions under **PRO**.
+* **Loaded routes**: routes continue to work as destination navigation, preserving the route polyline, climbs and map overlay.
+* **5 m terrain**: available for 22 provinces: A Coruña, Albacete, Alicante, Almería, Asturias, Badajoz, Barcelona, Bizkaia, Burgos, Cantabria, Castellón, Ceuta, Ciudad Real, Cuenca, Cáceres, Cádiz, Córdoba, Madrid, Murcia, Valencia, Álava and Ávila.
+

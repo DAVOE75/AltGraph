@@ -265,6 +265,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         altimetria3DView.hasLoadedRoute = snap.hasRoute
                         altimetria3DView.rideAscentM = snap.rideAscentM
                         altimetria3DView.rideDistanceM = snap.rideDistanceM
+                        altimetria3DView.rideAverageSpeedMs = snap.rideAverageSpeed
                         altimetria3DView.update3DData(
                             blocks = strategy.nextBlocks,
                             elevation = startElev,

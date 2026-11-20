@@ -19,6 +19,14 @@ Revoluciona el concepto tradicional de altimetría ciclista incorporando una **S
  <img src="https://raw.githubusercontent.com/DAVOE75/ALTGRAPH/main/art/logo.png" alt="ALTGRAPH Logo" width="350" />
 </p>
 
+## VERSIÓN 3.0.29: HORIZONTE TÁCTICO, MAPA SIN RUTA Y TERRENO DE 5 m EN TODA ESPAÑA
+
+* **Encabezado 3D sin ruta**: ahora puedes elegir velocidad actual y velocidad media, además de desnivel, distancia, altura y pendientes. Las opciones están en **PRO > Encabezado 3D sin ruta**.
+* **Road Horizon mejorado**: reconocimiento más fiable de la calle bajo el ciclista en cruces, calles conectadas y tramos sin datos cercanos; mantenimiento de la calle actual y recuperación más estable fuera del mapa.
+* **Línea predictiva en el mapa**: sin ruta cargada, muestra la carretera prevista coloreada por pendiente. Se puede activar o desactivar y usar degradado suave desde **PRO**.
+* **Rutas cargadas**: las rutas se mantienen como navegación con su trazado, puertos y superposición en el mapa.
+* **Terreno 5 m**: disponible para 22 provincias: A Coruña, Albacete, Alicante, Almería, Asturias, Badajoz, Barcelona, Bizkaia, Burgos, Cantabria, Castellón, Ceuta, Ciudad Real, Cuenca, Cáceres, Cádiz, Córdoba, Madrid, Murcia, Valencia, Álava y Ávila.
+
 ## VERSIÓN 3.0.27: HORIZONTE TÁCTICO (ROAD HORIZON) Y TERRENO DE 5 m PARA ESPAÑA
 Las últimas versiones añaden la previsión de la carretera por delante cuando no hay ruta cargada, un terreno más preciso y las herramientas para gestionarlo.
 
@@ -36,7 +44,7 @@ Las últimas versiones añaden la previsión de la carretera por delante cuando 
 ### Terreno de 5 m por provincias (España)
 
 * Terreno opcional con resolución de 5 m, procedente del **MDT05** del Instituto Geográfico Nacional (CNIG), que se instala provincia a provincia desde la pestaña PRO. El desplegable aparece cuando el mapa de España (`spain.map`) está en los mapas offline de la Karoo.
-* Disponibles ahora: Alicante, Almería, Murcia y Valencia. Se van añadiendo más provincias. Puedes borrar una provincia en cualquier momento para liberar espacio, y donde no haya ninguna instalada se usa el terreno de 30 m.
+* Disponibles ahora: A Coruña, Albacete, Alicante, Almería, Asturias, Badajoz, Barcelona, Bizkaia, Burgos, Cantabria, Castellón, Ceuta, Ciudad Real, Cuenca, Cáceres, Cádiz, Córdoba, Madrid, Murcia, Valencia, Álava y Ávila. Puedes borrar una provincia en cualquier momento para liberar espacio, y donde no haya ninguna instalada se usa el terreno de 30 m.
 * En pruebas con unos 58 km de salidas grabadas por Alicante, el error típico del desnivel previsto en los siguientes 500 m bajó de unos 2,3 m a menos de 1 m. Los resultados pueden variar en otras zonas.
 * Datos de terreno: Obra derivada de MDT05 CC-BY 4.0 scne.es (Instituto Geográfico Nacional).
 

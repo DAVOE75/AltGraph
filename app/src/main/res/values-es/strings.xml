@@ -202,6 +202,8 @@ Archivos de terreno: %3$d (%4$d MB)
     <string name="horizon_delete_nothing">No hay terreno descargado que borrar</string>
     <string name="hdr_ride_asc">DESNIVEL SALIDA</string>
     <string name="hdr_ride_dist">DISTANCIA SALIDA</string>
+    <string name="hdr_speed">VELOCIDAD</string>
+    <string name="hdr_avg_speed">VEL. MEDIA</string>
     <string name="setting_header_noroute_title">Encabezado 3D sin ruta</string>
     <string name="setting_header_noroute_desc">Campos sobre el perfil cuando no hay ruta cargada (Road Horizon). Con ruta se usan los de la pestaña 3D.</string>
     <string name="setting_horizon_map_line">Línea predictiva en el mapa</string>

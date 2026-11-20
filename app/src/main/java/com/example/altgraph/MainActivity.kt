@@ -2070,6 +2070,8 @@ class MainActivity : Activity() {
                 AppPreferences.HEADER_STAT_ELEV -> R.string.hdr_elev
                 AppPreferences.HEADER_STAT_RIDE_ASC -> R.string.hdr_ride_asc
                 AppPreferences.HEADER_STAT_RIDE_DIST -> R.string.hdr_ride_dist
+                AppPreferences.HEADER_STAT_SPEED -> R.string.hdr_speed
+                AppPreferences.HEADER_STAT_AVG_SPEED -> R.string.hdr_avg_speed
                 else -> R.string.hdr_none
             })
         }

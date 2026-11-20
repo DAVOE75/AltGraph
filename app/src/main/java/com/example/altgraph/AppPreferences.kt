@@ -788,10 +788,13 @@ class AppPreferences(context: Context) {
         const val HEADER_STAT_PACE = "pace"
         const val HEADER_STAT_RIDE_ASC = "ride_asc"
         const val HEADER_STAT_RIDE_DIST = "ride_dist"
+        const val HEADER_STAT_SPEED = "speed"
+        const val HEADER_STAT_AVG_SPEED = "avg_speed"
         // Metricas que tienen sentido sin ruta, en el orden del selector
         val NOROUTE_STAT_KEYS = listOf(
             HEADER_STAT_NONE, HEADER_STAT_CURRENT, HEADER_STAT_AVG, HEADER_STAT_MAX,
-            HEADER_STAT_ELEV, HEADER_STAT_RIDE_ASC, HEADER_STAT_RIDE_DIST
+            HEADER_STAT_ELEV, HEADER_STAT_RIDE_ASC, HEADER_STAT_RIDE_DIST,
+            HEADER_STAT_SPEED, HEADER_STAT_AVG_SPEED
         )
         val NOROUTE_DEFAULTS = listOf(HEADER_STAT_RIDE_ASC, HEADER_STAT_ELEV, HEADER_STAT_RIDE_DIST, HEADER_STAT_CURRENT, HEADER_STAT_MAX)
         val HEADER_STAT_KEYS = listOf(

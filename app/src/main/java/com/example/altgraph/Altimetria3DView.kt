@@ -692,6 +692,7 @@ class Altimetria3DView @JvmOverloads constructor(
     var hasLoadedRoute: Boolean = true
     var rideAscentM: Double = 0.0
     var rideDistanceM: Double = 0.0
+    var rideAverageSpeedMs: Double = 0.0
     var oasisDistanceToNextCrucible: Double? = null
     var energyBatteryLevel: Double = 100.0
     
@@ -1135,6 +1136,8 @@ class Altimetria3DView @JvmOverloads constructor(
                 AppPreferences.HEADER_STAT_PACE -> Triple(context.getString(R.string.hdr_pace), ascentPaceMetersPerHour?.let { Units.climbRate(context, it) } ?: "--", lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_RIDE_ASC -> Triple(context.getString(R.string.hdr_ride_asc), Units.elev(context, rideAscentM, true), lightComp(Color.WHITE))
                 AppPreferences.HEADER_STAT_RIDE_DIST -> Triple(context.getString(R.string.hdr_ride_dist), formatRouteKm(rideDistanceM), lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_SPEED -> Triple(context.getString(R.string.hdr_speed), Units.speed(context, currentSpeedMs * 3.6), lightComp(Color.WHITE))
+                AppPreferences.HEADER_STAT_AVG_SPEED -> Triple(context.getString(R.string.hdr_avg_speed), Units.speed(context, rideAverageSpeedMs * 3.6), lightComp(Color.WHITE))
                 else -> Triple(context.getString(R.string.label_current_gradient), "%.1f%%".format(currentGrade), lightComp(GradeColorScale.getTelemetryColor(currentGrade)))
             }
         }
