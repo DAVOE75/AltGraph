@@ -205,6 +205,8 @@ Terrain files: %3$d (%4$d MB)
     <string name="hdr_ride_dist">RIDE DISTANCE</string>
     <string name="setting_header_noroute_title">3D header without a route</string>
     <string name="setting_header_noroute_desc">Fields shown above the profile when no route is loaded (Road Horizon). With a route, the 3D tab fields are used.</string>
+    <string name="setting_horizon_map_line">Predicted line on the map</string>
+    <string name="setting_horizon_map_line_desc">Without a route, draws the predicted road ahead on the base map, coloured by grade and as long as the horizon zoom. Needs Elite and the map overlay on.</string>
     <string name="map_access_needed">Allow access to all files so AltGraph can read the Karoo offline maps.</string>
     <string name="setting_smart_zoom">Enable Tactical Smart Zoom (Auto-Scale)</string>
     <string name="setting_oasis_tracking">Enable Tactical Oasis Tracking (Recovery Zones)</string>

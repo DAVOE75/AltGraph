@@ -188,6 +188,8 @@ File del terreno: %3$d (%4$d MB)
     <string name="hdr_ride_dist">DISTANZA USCITA</string>
     <string name="setting_header_noroute_title">Intestazione 3D senza percorso</string>
     <string name="setting_header_noroute_desc">Campi sopra il profilo quando non c\'è un percorso caricato (Road Horizon). Con un percorso si usano quelli della scheda 3D.</string>
+    <string name="setting_horizon_map_line">Linea predittiva sulla mappa</string>
+    <string name="setting_horizon_map_line_desc">Senza percorso, disegna sulla mappa di base la strada prevista davanti a te, colorata per pendenza e lunga quanto lo zoom dell\'orizzonte. Richiede Elite e la sovrapposizione mappa attiva.</string>
     <string name="map_access_needed">Consenti l\'accesso a tutti i file affinché AltGraph legga le mappe offline del Karoo.</string>
     <string name="setting_smart_zoom">Attiva Smart Zoom Tattico (Auto-Scala)</string>
     <string name="setting_oasis_tracking">Attiva Oasis Tracking (Zone di Recupero)</string>

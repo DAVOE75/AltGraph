@@ -249,6 +249,11 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_ROAD_HORIZON_ENABLED, true)
         set(value) = prefs.edit().putBoolean(KEY_ROAD_HORIZON_ENABLED, value).apply()
 
+    // Dibujar en el mapa el trazado previsto del Road Horizon cuando no hay ruta (requiere Elite)
+    var horizonMapLine: Boolean
+        get() = prefs.getBoolean("horizon_map_line", true)
+        set(value) = prefs.edit().putBoolean("horizon_map_line", value).apply()
+
     // Zoom del horizonte sin ruta (metros, de 500 en 500) y tamaño de subbloque (50/100/250/500)
     var horizonDistanceM: Int
         get() = prefs.getInt("road_horizon_distance_m", 2000)

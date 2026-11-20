@@ -188,6 +188,8 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="hdr_ride_dist">DISTÂNCIA SAÍDA</string>
     <string name="setting_header_noroute_title">Cabeçalho 3D sem rota</string>
     <string name="setting_header_noroute_desc">Campos sobre o perfil quando não há rota carregada (Road Horizon). Com rota usam-se os do separador 3D.</string>
+    <string name="setting_horizon_map_line">Linha preditiva no mapa</string>
+    <string name="setting_horizon_map_line_desc">Sem rota, desenha no mapa base a estrada prevista à frente, colorida por inclinação e com o comprimento do zoom do horizonte. Requer Elite e a sobreposição do mapa ativa.</string>
     <string name="map_access_needed">Permita o acesso a todos os ficheiros para o AltGraph ler os mapas offline do Karoo.</string>
     <string name="setting_smart_zoom">Ativar Smart Zoom Tático (Auto-Escala)</string>
     <string name="setting_oasis_tracking">Ativar Oasis Tracking (Zonas de Recuperação)</string>

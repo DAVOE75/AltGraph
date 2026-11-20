@@ -68,7 +68,7 @@ class MapOverlayManager(
         val snap = HorizonOverlayBus.latest
         val mode = prefs.eliteMapOverlayMode
         val fresh = snap != null && System.currentTimeMillis() - snap.timeMs < 6000L
-        if (routeOnMap || mode == "off" || !prefs.isEliteUnlocked || !fresh || snap == null) {
+        if (routeOnMap || !prefs.horizonMapLine || !prefs.roadHorizonEnabled || mode == "off" || !prefs.isEliteUnlocked || !fresh || snap == null) {
             if (horizonSig != null && !routeOnMap) { clearPolylines(emitter); horizonSig = null }
             return
         }

@@ -1726,6 +1726,22 @@ class MainActivity : Activity() {
         roadHorizonCard.addView(switchRoadHorizon)
         roadHorizonCard.addView(roadHorizonDesc)
 
+        val switchHorizonMapLine = Switch(this).apply {
+            text = getString(R.string.setting_horizon_map_line)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            setPadding(0, 10, 0, 0)
+            isChecked = prefs.horizonMapLine
+            setOnCheckedChangeListener { _, isChecked -> prefs.horizonMapLine = isChecked }
+        }
+        roadHorizonCard.addView(switchHorizonMapLine)
+        roadHorizonCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_horizon_map_line_desc)
+            textSize = 12f
+            setTextColor(Color.LTGRAY)
+            setPadding(0, 4, 0, 4)
+        })
+
         // Submenú: zoom del horizonte (de 500 en 500 m) y subbloque
         fun fmtDist(m: Int) = if (Units.imperial(this)) Units.distImperial(m.toDouble(), 2)
             else if (m < 1000) "$m m" else if (m % 1000 == 0) "${m / 1000} km" else "${m / 1000.0} km"
