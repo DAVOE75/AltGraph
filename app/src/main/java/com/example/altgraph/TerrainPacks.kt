@@ -31,6 +31,8 @@ class TerrainPacks(private val context: Context) {
     private fun open(url: String): URLConnection = URL(url).openConnection().apply {
         connectTimeout = 15_000
         readTimeout = 30_000
+        setRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate")
+        setRequestProperty("Pragma", "no-cache")
     }
 
     /** Descarga la lista de provincias (bloqueante: llamar fuera del hilo principal). */
@@ -41,7 +43,7 @@ class TerrainPacks(private val context: Context) {
         return (0 until arr.length()).map { i ->
             val o = arr.getJSONObject(i)
             val u = o.getString("url")
-            val abs = if (u.contains("://")) u else base.substringBeforeLast('/') + "/" + u
+            val abs = if (u.contains("://")) u else base.substringBefore('?').substringBeforeLast('/') + "/" + u
             Province(o.getString("id"), o.getString("name"), abs, o.optLong("bytes"), o.optInt("tiles"))
         }
     }
@@ -111,6 +113,6 @@ class TerrainPacks(private val context: Context) {
     }
 
     companion object {
-        const val DEFAULT_INDEX_URL = "https://github.com/DAVOE75/ALTGRAPH/releases/download/terrain-v1/provincias.json"
+        const val DEFAULT_INDEX_URL = "https://github.com/DAVOE75/ALTGRAPH/releases/download/terrain-v1/provincias.json?v=3.0.30"
     }
 }
