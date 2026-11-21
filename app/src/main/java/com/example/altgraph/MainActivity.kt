@@ -165,6 +165,11 @@ class MainActivity : Activity() {
         }
         if (intent?.getBooleanExtra("horizon_replay", false) == true) {
             intent?.getIntExtra("junction_mode", -1)?.takeIf { it >= 0 }?.let { prefs.horizonJunctionMode = it }
+            val liveFrom = intent?.getIntExtra("live_from", -1) ?: -1
+            if (liveFrom >= 0) {
+                val liveTo = intent?.getIntExtra("live_to", liveFrom + 900) ?: (liveFrom + 900)
+                Thread { try { RoadHorizonReplay.runLive(this, liveFrom, liveTo) } catch (e: Exception) { android.util.Log.e("ReplayLive", "error", e) } }.start()
+            }
             val tag = "mode=${prefs.horizonJunctionMode}"
             Thread { try { android.util.Log.i("RoadHorizonReplay", tag + "\n" + (RoadHorizonReplay.run(this) ?: "no gpx")) } catch (e: Exception) { android.util.Log.e("RoadHorizonReplay", "error", e) } }.start()
         }

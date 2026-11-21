@@ -38,6 +38,32 @@ object RoadHorizonReplay {
         return out
     }
 
+    /** Reproduce un tramo del GPX fix a fix (1 Hz, sin adelgazar) y registra en logcat el rumbo y la vía elegida en cada lectura. */
+    fun runLive(context: Context, from: Int, to: Int) {
+        val file = gpxFile(context)
+        if (!file.isFile) return
+        val raw = parse(file.readText())
+        val predictor = RoadHorizonPredictor(context).also { it.ignoreMissingTerrain = true }
+        var wrong = 0; var n = 0
+        for (i in maxOf(3, from) until minOf(to, raw.size - 10)) {
+            val cur = raw[i].p
+            predictor.recordFix(cur.lat, cur.lng)
+            if (i % 2 != 0) continue
+            val gpsHeading = raw[i - 3].p.bearingTo(cur)
+            val res = predictor.predictHorizon(cur.lat, cur.lng, gpsHeading, 300.0, 25.0, 1.7)
+            val truth = cur.bearingTo(raw[i + 8].p)
+            var predDir = Double.NaN
+            if (res != null && res.coordinates.size >= 5) {
+                predDir = GeoPoint(res.coordinates[0].first, res.coordinates[0].second)
+                    .bearingTo(GeoPoint(res.coordinates[4].first, res.coordinates[4].second))
+            }
+            val diff = if (predDir.isNaN()) -1.0 else Math.abs((predDir - truth + 540.0) % 360.0 - 180.0)
+            n++; if (diff > 90.0) wrong++
+            android.util.Log.i("ReplayLive", "i=$i gps=${gpsHeading.toInt()} truth=${truth.toInt()} pred=${if (predDir.isNaN()) -1 else predDir.toInt()} diff=${diff.toInt()} road=${predictor.lastRoadName} kind=${predictor.lastRoadKind} snap=${predictor.lastSnapDist.toInt()}${if (diff > 90.0) " REVERSED" else ""}")
+        }
+        android.util.Log.i("ReplayLive", "done reversed=$wrong of $n")
+    }
+
     /** Devuelve el informe en texto, o null si no hay GPX. */
     fun run(context: Context, stepM: Double = 25.0, horizonM: Double = 500.0): String? {
         val file = gpxFile(context)

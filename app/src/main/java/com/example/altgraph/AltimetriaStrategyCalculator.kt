@@ -440,6 +440,8 @@ class AltimetriaStrategyCalculator {
     private var horizonSig = ""
     private var horizonPending = false
     private var horizonOffTicks = 0
+    private var horizonPrevS = -1.0
+    private var horizonBackM = 0.0
     private var horizonLastReqMs = 0L
 
     // Si el trazado es más corto que la ventana (fin de camino) se rellena con la última cota para que la longitud mostrada sea siempre la pedida
@@ -2282,7 +2284,7 @@ class AltimetriaStrategyCalculator {
                 val sig = "${prefs?.horizonJunctionMode}_${prefs?.horizonPreferCycleway}_${prefs?.horizonSmoothing}_${prefs?.horizonMaxGradePct}_${prefs?.horizonHeadingMode}_$pagedBeacon"
                 if (sig != horizonSig) {
                     horizonSig = sig
-                    heldAnchor = null; heldHorizon = null; horizonPending = false; horizonOffTicks = 0
+                    heldAnchor = null; heldHorizon = null;                     horizonPending = false; horizonOffTicks = 0; horizonPrevS = -1.0; horizonBackM = 0.0
                     predictor.invalidate()
                 }
 
@@ -2300,6 +2302,13 @@ class AltimetriaStrategyCalculator {
                 else if (s < 0.0) { horizonOffTicks++; if (horizonOffTicks >= 2) need = true }
                 else {
                     horizonOffTicks = 0
+                    // Giro de 180° por la misma vía: el ciclista sigue "sobre" el trazado retenido pero avanzando hacia atrás
+                    if (horizonPrevS >= 0.0) {
+                        val ds = s - horizonPrevS
+                        if (ds < 0.0) horizonBackM += -ds * stepM else if (ds > 0.0) horizonBackM = 0.0
+                        if (horizonBackM > 25.0) need = true
+                    }
+                    horizonPrevS = s
                     val size = held.elevations.size
                     if (pagedBeacon) { if (s / (size - 1) >= 0.985) need = true }
                     else {
@@ -2320,7 +2329,7 @@ class AltimetriaStrategyCalculator {
                     if (r != null) {
                         if (pagedBeacon) heldHorizon = r else heldAnchor = r
                         heldAnchorLookahead = lookaheadDist; heldAnchorStep = stepM
-                        horizonPending = false; horizonOffTicks = 0
+                        horizonPending = false; horizonOffTicks = 0; horizonPrevS = -1.0; horizonBackM = 0.0
                     } else if (nowReq - horizonLastReqMs > 6000L) horizonPending = false // el cálculo no llegó: se reintenta
                 }
 

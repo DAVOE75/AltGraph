@@ -170,7 +170,16 @@ class RoadHorizonPredictor(private val context: Context) {
 
     // Rumbo medido sobre la trayectoria real (más de 25 m atrás): más estable que el del GPS
     private fun trailHeading(cur: GeoPoint, t: List<GeoPoint>): Double? {
-        for (i in t.indices.reversed()) if (t[i].distanceTo(cur) >= 25.0) return t[i].bearingTo(cur)
+        var path = 0.0
+        var next = cur
+        for (i in t.indices.reversed()) {
+            path += t[i].distanceTo(next)
+            next = t[i]
+            val chord = t[i].distanceTo(cur)
+            // Tras un giro de 180° la trayectoria se pliega sobre sí misma: el recorrido es mucho mayor que la cuerda y esa cuerda apunta al revés
+            if (path > 40.0 && path > chord * 1.6) return null
+            if (chord >= 25.0) return t[i].bearingTo(cur)
+        }
         return null
     }
 
