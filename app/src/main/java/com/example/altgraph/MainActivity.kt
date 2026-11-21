@@ -604,6 +604,29 @@ class MainActivity : Activity() {
         }
         showZoomCard.addView(switchShowZoom)
 
+        // Zoom según la velocidad: solo Ruta Global (con ruta precargada); el Horizonte Táctico usa su distancia fija
+        val speedZoomCard = createCardContainer()
+        speedZoomCard.addView(Switch(this).apply {
+            text = getString(R.string.horizon_speed_zoom)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.speedZoomEnabled
+            setOnCheckedChangeListener { _, isChecked -> prefs.speedZoomEnabled = isChecked }
+        })
+        speedZoomCard.addView(TextView(this).apply {
+            text = localizeSpeeds(Units.localize(this@MainActivity, getString(R.string.horizon_speed_zoom_desc))); textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 4, 0, 4)
+        })
+
+        // Botones de zoom del Visor de Puertos
+        val showClimbZoomCard = createCardContainer()
+        showClimbZoomCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_show_climb_zoom)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.showClimbZoomControls
+            setOnCheckedChangeListener { _, isChecked -> prefs.showClimbZoomControls = isChecked }
+        })
+
         // Plantillas de ajustes visuales: aplican un conjunto de opciones de una vez (no tocan FTP, peso, licencia ni voz)
         val presetsCard = createCardContainer()
         presetsCard.addView(createSectionLabel(getString(R.string.setting_presets_title)))
@@ -695,6 +718,7 @@ class MainActivity : Activity() {
             setPadding(0, 4, 0, 4)
         })
         tabEstiloContainer.addView(climbDifficultyCard)
+        tabEstiloContainer.addView(showClimbZoomCard)
         tabEstiloContainer.addView(climbZoomTopCard)
 
         // ==========================================
@@ -1502,6 +1526,7 @@ class MainActivity : Activity() {
         tab3dContainer.addView(routeDistancesCard)
         tab3dContainer.addView(blockCleanCard)
         tab3dContainer.addView(showZoomCard)
+        tab3dContainer.addView(speedZoomCard)
         tab3dContainer.addView(panPositionCard)
         tab3dContainer.addView(gearCard)
         tab3dContainer.addView(beaconCard)
@@ -1798,6 +1823,7 @@ class MainActivity : Activity() {
         addDescNow(R.string.horizon_desc_zoom)
         pendingDesc = R.string.horizon_desc_subblock
         addOpt(horizonSpinner(getString(R.string.setting_horizon_subblock), listOf(50, 100, 250, 500), prefs.horizonSubBlockM) { prefs.horizonSubBlockM = it })
+        addOpt(horizonSwitch(getString(R.string.setting_show_horizon_zoom), prefs.showHorizonZoomControls) { prefs.showHorizonZoomControls = it })
 
         fun labelSpinner(title: String, labels: List<String>, current: Int, onPick: (Int) -> Unit): LinearLayout {
             val row = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(0, 8, 0, 4) }
@@ -2002,21 +2028,6 @@ class MainActivity : Activity() {
         }
         smartZoomCard.addView(switchSmartZoom)
         tabProContainer.addView(smartZoomCard)
-
-        // Zoom según la velocidad (ruta precargada y horizonte táctico)
-        val speedZoomCard = createCardContainer()
-        val switchSpeedZoom = Switch(this).apply {
-            text = getString(R.string.horizon_speed_zoom)
-            textSize = 15f
-            setTextColor(Color.WHITE)
-            isChecked = prefs.speedZoomEnabled
-            setOnCheckedChangeListener { _, isChecked -> prefs.speedZoomEnabled = isChecked }
-        }
-        speedZoomCard.addView(switchSpeedZoom)
-        speedZoomCard.addView(TextView(this).apply {
-            text = localizeSpeeds(Units.localize(this@MainActivity, getString(R.string.horizon_speed_zoom_desc))); textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 4, 0, 4)
-        })
-        tabProContainer.addView(speedZoomCard)
 
         // Oasis Tracking
         val oasisCard = createCardContainer()

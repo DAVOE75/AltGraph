@@ -2200,6 +2200,7 @@ class AltimetriaStrategyCalculator {
         val speedZoomOn = (prefs?.speedZoomEnabled ?: false) && isNavigatingRoute && (routePoints.isNotEmpty() || routeElevationProfile.isNotEmpty())
         if (speedZoomOn && advance) {
             // Zoom por velocidad: despacio (subiendo) = zoom cercano; rápido = zoom lejano. Pasos de 500 m con histéresis
+            if (speedZoomEma == 0.0) speedZoomEma = currentSpeed * 3.6 // arranque: sin partir de 0 km/h, que dejaba el zoom al mínimo un buen rato
             speedZoomEma += (currentSpeed * 3.6 - speedZoomEma) * 0.1
             val t = ((speedZoomEma - 8.0) / (40.0 - 8.0)).coerceIn(0.0, 1.0)
             val target = Math.round((250.0 + t * 4750.0) / 250.0) * 250.0

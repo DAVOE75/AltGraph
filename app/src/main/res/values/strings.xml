@@ -87,7 +87,9 @@
     <string name="setting_poi_water">Water Springs</string>
     <string name="setting_poi_viewpoints">Viewpoints</string>
     <string name="setting_poi_summits">Summits &amp; Passes</string>
-    <string name="setting_show_3d_zoom">Enable Touch Zoom Controls on 3D Graph</string>
+    <string name="setting_show_3d_zoom">Enable Touch Zoom Controls on Global Route 3D</string>
+    <string name="setting_show_horizon_zoom">Enable Touch Zoom Controls on Tactical Horizon 3D</string>
+    <string name="setting_show_climb_zoom">Enable Touch Zoom Controls on Climb Viewer</string>
     <string name="setting_custom_maps_title">Custom Cartography Management</string>
     <string name="setting_custom_maps_desc">Discovers and imports high-resolution vector map packs (.mbtiles / .map) for Karoo</string>
 
@@ -139,7 +141,7 @@ Terrain files: %3$d (%4$d MB)
     <string name="horizon_dl_locating">Getting your position...</string>
     <string name="horizon_btn_downloaded">Terrain downloaded ✓</string>
     <string name="horizon_dl_not_needed">Terrain already downloaded: no need to download again</string>
-    <string name="horizon_speed_zoom">Speed-based zoom</string>
+    <string name="horizon_speed_zoom">Speed-based zoom (Global Route)</string>
     <string name="horizon_speed_zoom_desc">Slower = closer zoom (climbing); faster = farther zoom to see more terrain ahead. From 250 m (8 km/h or less) to 5 km (40 km/h or more). Only with a loaded route.</string>
     <string name="horizon_btn_update_radius">Update download for new radius</string>
     <string name="horizon_desc_zoom">Distance of road shown ahead when no route is loaded (500 m steps).</string>

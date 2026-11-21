@@ -505,7 +505,10 @@ class ClimbViewerDataType(extension: String) : DataTypeImpl(extension, "climb_3d
                 }
 
                 // Alternar posicion de zoom: encabezado superior vs inferior/lateral
-                if (prefs.climbViewerZoomAtTop) {
+                if (!prefs.showClimbZoomControls) {
+                    remoteViews.setViewVisibility(R.id.zoom_controls_top, View.GONE)
+                    remoteViews.setViewVisibility(R.id.zoom_controls_bottom, View.GONE)
+                } else if (prefs.climbViewerZoomAtTop) {
                     remoteViews.setViewVisibility(R.id.zoom_controls_top, View.VISIBLE)
                     remoteViews.setViewVisibility(R.id.zoom_controls_bottom, View.GONE)
                 } else {

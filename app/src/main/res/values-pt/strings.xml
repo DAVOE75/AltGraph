@@ -72,7 +72,9 @@
     <string name="setting_poi_water">Fontes de Água</string>
     <string name="setting_poi_viewpoints">Mirantes e Panorâmicas</string>
     <string name="setting_poi_summits">Cumes e Passos</string>
-    <string name="setting_show_3d_zoom">Mostrar Controles de Zoom de Toque no Gráfico 3D</string>
+    <string name="setting_show_3d_zoom">Mostrar Controles de Zoom de Toque na Rota Global 3D</string>
+    <string name="setting_show_horizon_zoom">Mostrar Controles de Zoom de Toque no Horizonte Tático 3D</string>
+    <string name="setting_show_climb_zoom">Mostrar Controles de Zoom de Toque no Visor de Subidas</string>
     <string name="setting_custom_maps_title">Gestão de Cartografia Personalizada</string>
     <string name="setting_custom_maps_desc">Descobre e importa pacotes de mapas vetoriais de alta resolução (.mbtiles / .map) para Karoo</string>
     <string name="setting_road_horizon">Horizonte Tático 3D (Previsão sem rota)</string>
@@ -122,7 +124,7 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="horizon_dl_locating">A obter a sua posição...</string>
     <string name="horizon_btn_downloaded">Terreno descarregado ✓</string>
     <string name="horizon_dl_not_needed">Terreno já descarregado: não é preciso descarregar de novo</string>
-    <string name="horizon_speed_zoom">Zoom conforme a velocidade</string>
+    <string name="horizon_speed_zoom">Zoom conforme a velocidade (Rota Global)</string>
     <string name="horizon_speed_zoom_desc">Mais lento = zoom mais próximo (a subir); mais rápido = zoom mais afastado para ver mais terreno à frente. De 250 m (8 km/h ou menos) a 5 km (40 km/h ou mais). Só com uma rota carregada.</string>
     <string name="horizon_btn_update_radius">Atualizar download para o novo raio</string>
     <string name="horizon_desc_zoom">Distância de estrada mostrada à frente sem rota carregada (passos de 500 m).</string>

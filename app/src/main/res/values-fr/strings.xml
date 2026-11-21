@@ -72,7 +72,9 @@
     <string name="setting_poi_water">Points d\'Eau</string>
     <string name="setting_poi_viewpoints">Points de Vue</string>
     <string name="setting_poi_summits">Sommets et Cols</string>
-    <string name="setting_show_3d_zoom">Activer le Zoom Tactile sur Graphique 3D</string>
+    <string name="setting_show_3d_zoom">Activer le Zoom Tactile sur la Route Globale 3D</string>
+    <string name="setting_show_horizon_zoom">Activer le Zoom Tactile sur l\'Horizon Tactique 3D</string>
+    <string name="setting_show_climb_zoom">Activer le Zoom Tactile sur le Visualiseur de Cols</string>
     <string name="setting_custom_maps_title">Gestionnaire de Cartographie Personnalisée</string>
     <string name="setting_custom_maps_desc">Permet de détecter et d\'importer des cartes vectorielles hors ligne haute définition (.mbtiles / .map) pour Karoo</string>
     <string name="setting_road_horizon">Horizon Tactique 3D (Aperçu sans itinéraire)</string>
@@ -122,7 +124,7 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="horizon_dl_locating">Obtention de votre position...</string>
     <string name="horizon_btn_downloaded">Terrain téléchargé ✓</string>
     <string name="horizon_dl_not_needed">Terrain déjà téléchargé : inutile de le télécharger à nouveau</string>
-    <string name="horizon_speed_zoom">Zoom selon la vitesse</string>
+    <string name="horizon_speed_zoom">Zoom selon la vitesse (Route Globale)</string>
     <string name="horizon_speed_zoom_desc">Plus lent = zoom plus proche (montée) ; plus rapide = zoom plus lointain pour voir plus de terrain devant. De 250 m (8 km/h ou moins) à 5 km (40 km/h ou plus). Uniquement avec un itinéraire chargé.</string>
     <string name="horizon_btn_update_radius">Mettre à jour le téléchargement pour le nouveau rayon</string>
     <string name="horizon_desc_zoom">Distance de route affichée devant vous sans itinéraire chargé (par pas de 500 m).</string>

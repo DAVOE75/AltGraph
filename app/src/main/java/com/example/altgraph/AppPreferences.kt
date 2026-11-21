@@ -200,6 +200,16 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_SHOW_3D_ZOOM, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_3D_ZOOM, value).apply()
 
+    // Botones de zoom del Horizonte Táctico (sin ruta). Hasta que se elija, hereda el ajuste anterior, que era único para 3D
+    var showHorizonZoomControls: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_HORIZON_ZOOM, prefs.getBoolean(KEY_SHOW_3D_ZOOM, true))
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_HORIZON_ZOOM, value).apply()
+
+    // Botones de zoom del Visor de Puertos
+    var showClimbZoomControls: Boolean
+        get() = prefs.getBoolean(KEY_SHOW_CLIMB_ZOOM, true)
+        set(value) = prefs.edit().putBoolean(KEY_SHOW_CLIMB_ZOOM, value).apply()
+
     // Sincronizar el zoom del mapa global 3D con el zoom del radar altimétrico / mapa
     var match3dToRadarZoom: Boolean
         get() = prefs.getBoolean(KEY_MATCH_3D_TO_RADAR_ZOOM, false)
@@ -639,7 +649,7 @@ class AppPreferences(context: Context) {
     // Estado efectivo de todos los ajustes visuales que tocan las plantillas, como texto comparable
     private fun visualState(): String = listOf(
         altimetriaStyle.key, showBlockPercentages, show3dCotas, show3dRamps, show3dScaleBar, showClimbScaleBar,
-        adaptGradeTextColors, show3dBlockLegend, show3dRouteName, show3dHeaderStats, headerStat1, headerStat2, headerStat3, headerStat4, headerStat5, showHairpins, show3dZoomControls, chartFitAxis, showExaggerationTag,
+        adaptGradeTextColors, show3dBlockLegend, show3dRouteName, show3dHeaderStats, headerStat1, headerStat2, headerStat3, headerStat4, headerStat5, showHairpins, show3dZoomControls, showHorizonZoomControls, showClimbZoomControls, chartFitAxis, showExaggerationTag,
         chartLightBackground, chartLightStyle, showSurfaceTextures, showRouteDistances3d, mergeBlocksMode3d, pctLabelStyle3d,
         mergeMarginPct3d, showBlockAvgPct3d, hideGradeRangeEnabled3d, hideGradeMin3d, hideGradeMax3d, showGearBadge, showRouteCompass, showRouteElevation3d,
         panButtonsPosition
@@ -659,7 +669,7 @@ class AppPreferences(context: Context) {
         prefs.edit()
             .remove(KEY_ALTIMETRIA_STYLE).remove(KEY_SHOW_BLOCK_PERCENTAGES).remove(KEY_SHOW_3D_COTAS).remove(KEY_SHOW_3D_RAMPS)
             .remove(KEY_SHOW_3D_SCALE_BAR).remove(KEY_SHOW_3D_BLOCK_LEGEND).remove(KEY_SHOW_CLIMB_SCALE_BAR).remove(KEY_ADAPT_GRADE_TEXT).remove(KEY_SHOW_3D_ROUTE_NAME)
-            .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_HEADER_STAT_1).remove(KEY_HEADER_STAT_2).remove(KEY_HEADER_STAT_3).remove(KEY_HEADER_STAT_4).remove(KEY_HEADER_STAT_5).remove("header_noroute_1").remove("header_noroute_2").remove("header_noroute_3").remove("header_noroute_4").remove("header_noroute_5").remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM)            .remove(KEY_CHART_FIT_AXIS).remove(KEY_SHOW_EXAGGERATION_TAG)
+            .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_HEADER_STAT_1).remove(KEY_HEADER_STAT_2).remove(KEY_HEADER_STAT_3).remove(KEY_HEADER_STAT_4).remove(KEY_HEADER_STAT_5).remove("header_noroute_1").remove("header_noroute_2").remove("header_noroute_3").remove("header_noroute_4").remove("header_noroute_5").remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM).remove(KEY_SHOW_HORIZON_ZOOM).remove(KEY_SHOW_CLIMB_ZOOM)            .remove(KEY_CHART_FIT_AXIS).remove(KEY_SHOW_EXAGGERATION_TAG)
             .remove(KEY_CHART_LIGHT_BG).remove(KEY_CHART_LIGHT_STYLE).remove(KEY_SHOW_SURFACE_TEXTURES).remove(KEY_SHOW_ROUTE_DISTANCES_3D)
             .remove(KEY_MERGE_MODE_3D).remove(KEY_MERGE_SIMILAR_BLOCKS_3D).remove(KEY_PCT_LABEL_STYLE_3D).remove(KEY_MERGE_MARGIN_3D).remove(KEY_BLOCK_AVG_PCT_3D)
             .remove(KEY_HIDE_GRADE_RANGE_ENABLED_3D).remove(KEY_HIDE_GRADE_MIN_3D).remove(KEY_HIDE_GRADE_MAX_3D)
@@ -691,6 +701,7 @@ class AppPreferences(context: Context) {
                 show3dRouteName = false
                 show3dCotas = false
                 show3dZoomControls = false
+                showHorizonZoomControls = false
                 showRouteCompass = false
                 pctLabelStyle3d = PCT_STYLE_CLEAN
             }
@@ -829,6 +840,8 @@ class AppPreferences(context: Context) {
         private const val KEY_SHOW_POIS = "show_pois"
         private const val KEY_POI_TYPES_ENABLED = "poi_types_enabled"
         private const val KEY_SHOW_3D_ZOOM = "show_3d_zoom_controls"
+        private const val KEY_SHOW_HORIZON_ZOOM = "show_horizon_zoom_controls"
+        private const val KEY_SHOW_CLIMB_ZOOM = "show_climb_zoom_controls"
         private const val KEY_MATCH_3D_TO_RADAR_ZOOM = "match_3d_to_radar_zoom"
         private const val KEY_GEAR_CHAINRINGS = "gear_chainrings"
         private const val KEY_GEAR_CASSETTE = "gear_cassette"

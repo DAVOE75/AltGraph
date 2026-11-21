@@ -72,7 +72,9 @@
     <string name="setting_poi_water">Wasserquellen</string>
     <string name="setting_poi_viewpoints">Aussichtspunkte</string>
     <string name="setting_poi_summits">Gipfel &amp; Pässe</string>
-    <string name="setting_show_3d_zoom">Touch-Zoom-Steuerung im 3D-Diagramm aktivieren</string>
+    <string name="setting_show_3d_zoom">Touch-Zoom-Steuerung in der globalen 3D-Route aktivieren</string>
+    <string name="setting_show_horizon_zoom">Touch-Zoom-Steuerung im taktischen 3D-Horizont aktivieren</string>
+    <string name="setting_show_climb_zoom">Touch-Zoom-Steuerung im Anstiegs-Viewer aktivieren</string>
     <string name="setting_custom_maps_title">Benutzerdefinierte Kartenverwaltung</string>
     <string name="setting_custom_maps_desc">Hochauflösende Offline-Vektorkarten (.mbtiles / .map) für Karoo erkennen und importieren</string>
     <string name="setting_road_horizon">Taktischer 3D-Horizont (Vorschau ohne Route)</string>
@@ -122,7 +124,7 @@ Gel?ndedateien: %3$d (%4$d MB)
     <string name="horizon_dl_locating">Position wird ermittelt...</string>
     <string name="horizon_btn_downloaded">Gelände geladen ✓</string>
     <string name="horizon_dl_not_needed">Gelände bereits geladen: kein erneuter Download nötig</string>
-    <string name="horizon_speed_zoom">Geschwindigkeitsabhängiger Zoom</string>
+    <string name="horizon_speed_zoom">Geschwindigkeitsabhängiger Zoom (Globale Route)</string>
     <string name="horizon_speed_zoom_desc">Langsamer = näherer Zoom (Anstieg); schneller = weiterer Zoom, um mehr Gelände voraus zu sehen. Von 250 m (8 km/h oder weniger) bis 5 km (40 km/h oder mehr). Nur mit geladener Route.</string>
     <string name="horizon_btn_update_radius">Download für neuen Radius aktualisieren</string>
     <string name="horizon_desc_zoom">Strecke, die ohne geladene Route voraus angezeigt wird (500-m-Schritte).</string>

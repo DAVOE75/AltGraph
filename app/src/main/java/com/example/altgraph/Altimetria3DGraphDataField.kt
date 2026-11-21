@@ -132,12 +132,14 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             prefs.lookaheadMeters3d = next
                         }
                         prefs.smartZoomEnabled = false
+                        if (routeMaxMeters != null) prefs.speedZoomEnabled = false
                     } else if (intent?.action == ACTION_ZOOM_IN && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
                         val curr = prefs.lookaheadMeters3d
                         val nextVal = zoomInStep(curr)
                         prefs.lookaheadMeters3d = nextVal
                         prefs.smartZoomEnabled = false
+                        if (routeMaxMeters != null) prefs.speedZoomEnabled = false
                     } else if (intent?.action == ACTION_ZOOM_OUT && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
                         val curr = prefs.lookaheadMeters3d
@@ -148,6 +150,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         }
                         prefs.lookaheadMeters3d = zoomOutStep(curr, routeMaxMeters)
                         prefs.smartZoomEnabled = false
+                        if (routeMaxMeters != null) prefs.speedZoomEnabled = false
                     } else if (intent?.action == ACTION_TOGGLE_COMPASS && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
                         prefs.routeMapHeadingUp = !prefs.routeMapHeadingUp
@@ -204,6 +207,8 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         // Suspend (con paneo calcula en el hilo del calculador); dentro de safeUpdate para que un fallo no mate el bucle
                         val strategy = AltgraphRepository.strategyFor3D(snap)
                         val prefs = AppPreferences.getInstance(context)
+                        // Sin ruta el gráfico es el Horizonte Táctico; con ruta, la Ruta Global: cada uno tiene su propio ajuste de botones de zoom
+                        val zoomControls = if (strategy.routeTotalLength <= 0.0) prefs.showHorizonZoomControls else prefs.show3dZoomControls
                         val startElev = if (strategy.windowStartElevation > 0.0) strategy.windowStartElevation else snap.currentElevation
 
                         // Nada ha cambiado (parado, sin ruta...): no redibujar ni reenviar el bitmap.
@@ -286,7 +291,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             showPois = prefs.showPois && prefs.poiTypesEnabled.isNotEmpty(),
                             hairpins = strategy.hairpins,
                             pois = strategy.pois,
-                            showZoomControls = prefs.show3dZoomControls,
+                            showZoomControls = zoomControls,
                             curvatureOffsets = strategy.curvatureOffsets,
                             riderProgress = strategy.riderProgress,
                             windowStartMeters = strategy.windowStartMeters,
@@ -413,7 +418,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         val remoteViews = RemoteViews(context.packageName, layoutId)
                         remoteViews.setImageViewBitmap(R.id.img_graphic, currentBmp)
 
-                        if (prefs.show3dZoomControls) {
+                        if (zoomControls) {
                             val intentZoomIn = Intent(ACTION_ZOOM_IN).apply { setPackage(context.packageName) }
                             val pendingZoomIn = PendingIntent.getBroadcast(context, 4, intentZoomIn, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
