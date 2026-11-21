@@ -8,6 +8,8 @@ import java.io.IOException
 import java.io.InputStream
 import java.net.URL
 import java.net.URLConnection
+import java.text.Collator
+import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipInputStream
 
@@ -40,12 +42,14 @@ class TerrainPacks(private val context: Context) {
         val base = indexUrl()
         val text = open(base).getInputStream().bufferedReader().use { it.readText() }
         val arr = JSONObject(text).getJSONArray("provinces")
-        return (0 until arr.length()).map { i ->
+        val provinces = (0 until arr.length()).map { i ->
             val o = arr.getJSONObject(i)
             val u = o.getString("url")
             val abs = if (u.contains("://")) u else base.substringBefore('?').substringBeforeLast('/') + "/" + u
             Province(o.getString("id"), o.getString("name"), abs, o.optLong("bytes"), o.optInt("tiles"))
         }
+        val collator = Collator.getInstance(Locale.getDefault()).apply { strength = Collator.PRIMARY }
+        return provinces.sortedWith(compareBy(collator) { it.name })
     }
 
     fun installedIds(): Set<String> =
