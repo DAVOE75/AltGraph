@@ -1,4 +1,4 @@
-package com.example.altgraph
+﻿package com.example.altgraph
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -110,11 +110,15 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                 override fun onReceive(ctx: Context?, intent: Intent?) {
                     // Redibujar en cuanto cambia el ajuste (después de guardarlo), sin esperar al siguiente ciclo de 1 s
                     try {
-                    val routeMaxMeters = AltgraphRepository.snapshot.value?.routeTotalLength?.takeIf { it > 500.0 }?.toInt()
+                    // Sin ruta, el zoom máximo es la distancia predictiva del horizonte
+                    val routeMaxMeters = AltgraphRepository.snapshot.value?.let { s ->
+                        s.routeTotalLength.takeIf { it > 500.0 }?.toInt()
+                            ?: if (s.strategy.isHorizon && ctx != null) AppPreferences.getInstance(ctx).horizonDistanceM else null
+                    }
                     if (intent?.action == ACTION_TAP_ZOOM && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
                         val now = SystemClock.elapsedRealtime()
-                        val curr = prefs.lookaheadMeters3d
+                        val curr = routeMaxMeters?.let { minOf(prefs.lookaheadMeters3d, it) } ?: prefs.lookaheadMeters3d
                         if (tapPrevLookahead != null && now - lastTapAt <= DOUBLE_TAP_MS) {
                             // Doble toque rápido: deshace el paso del primer toque, invierte el sentido (acercar <-> alejar) y da un paso en el nuevo
                             tapZoomOut = !tapZoomOut
@@ -132,17 +136,17 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             prefs.lookaheadMeters3d = next
                         }
                         prefs.smartZoomEnabled = false
-                        if (routeMaxMeters != null) prefs.speedZoomEnabled = false
+                        if (AltgraphRepository.snapshot.value?.hasRoute == true) prefs.speedZoomEnabled = false
                     } else if (intent?.action == ACTION_ZOOM_IN && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
-                        val curr = prefs.lookaheadMeters3d
+                        val curr = routeMaxMeters?.let { minOf(prefs.lookaheadMeters3d, it) } ?: prefs.lookaheadMeters3d
                         val nextVal = zoomInStep(curr)
                         prefs.lookaheadMeters3d = nextVal
                         prefs.smartZoomEnabled = false
-                        if (routeMaxMeters != null) prefs.speedZoomEnabled = false
+                        if (AltgraphRepository.snapshot.value?.hasRoute == true) prefs.speedZoomEnabled = false
                     } else if (intent?.action == ACTION_ZOOM_OUT && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
-                        val curr = prefs.lookaheadMeters3d
+                        val curr = routeMaxMeters?.let { minOf(prefs.lookaheadMeters3d, it) } ?: prefs.lookaheadMeters3d
                         val maxAllowed = routeMaxMeters ?: 200000
                         if (curr >= maxAllowed) {
                             // Ya estamos al zoom máximo permitido (ruta completa o 200km)
@@ -150,7 +154,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         }
                         prefs.lookaheadMeters3d = zoomOutStep(curr, routeMaxMeters)
                         prefs.smartZoomEnabled = false
-                        if (routeMaxMeters != null) prefs.speedZoomEnabled = false
+                        if (AltgraphRepository.snapshot.value?.hasRoute == true) prefs.speedZoomEnabled = false
                     } else if (intent?.action == ACTION_TOGGLE_COMPASS && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
                         prefs.routeMapHeadingUp = !prefs.routeMapHeadingUp

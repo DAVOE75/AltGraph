@@ -66,9 +66,9 @@ class MapOverlayManager(
     private fun drawHorizon(emitter: Emitter<MapEffect>) {
         if (stopped) return
         val snap = HorizonOverlayBus.latest
-        val mode = prefs.eliteMapOverlayMode
+        // Tiene su propio interruptor (horizonMapLine): no depende del modo de coloreado de puertos/ruta
         val fresh = snap != null && System.currentTimeMillis() - snap.timeMs < 6000L
-        if (routeOnMap || !prefs.horizonMapLine || !prefs.roadHorizonEnabled || mode == "off" || !prefs.isEliteUnlocked || !fresh || snap == null) {
+        if (routeOnMap || !prefs.horizonMapLine || !prefs.roadHorizonEnabled || !prefs.isEliteUnlocked || !fresh || snap == null) {
             if (horizonSig != null && !routeOnMap) { clearPolylines(emitter); horizonSig = null }
             return
         }

@@ -79,7 +79,7 @@
     <string name="setting_custom_maps_desc">Hochauflösende Offline-Vektorkarten (.mbtiles / .map) für Karoo erkennen und importieren</string>
     <string name="setting_road_horizon">Taktischer 3D-Horizont (Vorschau ohne Route)</string>
     <string name="setting_road_horizon_desc">Sagt den kommenden Straßenverlauf und das Höhenprofil anhand von Vektorkarten und DEM-Daten (.hgt) ohne geladene Route voraus.</string>
-    <string name="setting_horizon_zoom">Horizont-Zoom (ohne Route)</string>
+    <string name="setting_horizon_zoom">Vorhersagedistanz (ohne Route)</string>
     <string name="setting_horizon_subblock">Unterblockgröße</string>
     <string name="horizon_junction_mode">Priorität bei Kreuzungen</string>
     <string name="horizon_junction_lsr">Links, geradeaus, rechts</string>
@@ -127,7 +127,7 @@ Gel?ndedateien: %3$d (%4$d MB)
     <string name="horizon_speed_zoom">Geschwindigkeitsabhängiger Zoom (Globale Route)</string>
     <string name="horizon_speed_zoom_desc">Langsamer = näherer Zoom (Anstieg); schneller = weiterer Zoom, um mehr Gelände voraus zu sehen. Von 250 m (8 km/h oder weniger) bis 5 km (40 km/h oder mehr). Nur mit geladener Route.</string>
     <string name="horizon_btn_update_radius">Download für neuen Radius aktualisieren</string>
-    <string name="horizon_desc_zoom">Strecke, die ohne geladene Route voraus angezeigt wird (500-m-Schritte).</string>
+    <string name="horizon_desc_zoom">Wie weit die Straße voraus vorhergesagt wird, wenn keine Route geladen ist (500-m-Schritte). Der sichtbare Zoom ist ein Teil davon: per Zoom-Tasten oder, wenn diese ausgeblendet sind, über den Kartenzoom.</string>
     <string name="horizon_desc_subblock">Länge jedes farbigen Blocks im Profil. Kleiner = mehr Details.</string>
     <string name="horizon_desc_junction">Welche Straße an einer Kreuzung angenommen wird, wenn der Weg unklar ist.</string>
     <string name="horizon_desc_smoothing">Glättet kleine Geländesprünge (Gebäude, Bäume), die falsche Rampen erzeugen. Hoch für Flachstücke, niedrig für Anstiege.</string>
@@ -193,8 +193,7 @@ Gel?ndedateien: %3$d (%4$d MB)
     <string name="setting_header_noroute_title">3D-Kopfzeile ohne Route</string>
     <string name="setting_header_noroute_desc">Felder über dem Profil, wenn keine Route geladen ist (Road Horizon). Mit Route gelten die Felder des 3D-Tabs.</string>
     <string name="setting_horizon_map_line">Prognoselinie auf der Karte</string>
-    <string name="setting_horizon_map_line_desc">Ohne Route wird die vorhergesagte Straße voraus auf der Basiskarte gezeichnet, nach Steigung eingefärbt und so lang wie der Horizont-Zoom. Benötigt Elite und das aktive Karten-Overlay.</string>
-    <string name="setting_horizon_map_smooth">Farbübergänge weichzeichnen</string>
+    <string name="setting_horizon_map_line_desc">Ohne Route wird die vorhergesagte Straße voraus auf der Basiskarte gezeichnet, nach Steigung eingefärbt und so lang wie die Vorhersagedistanz. Benötigt Elite.</string>    <string name="setting_horizon_map_smooth">Farbübergänge weichzeichnen</string>
     <string name="setting_horizon_map_smooth_desc">Mischt die Farbe zwischen Abschnitten mit unterschiedlicher Steigung auf der Prognoselinie.</string>
     <string name="map_access_needed">Erlaube den Zugriff auf alle Dateien, damit AltGraph die Offline-Karten des Karoo lesen kann.</string>
     <string name="setting_smart_zoom">Taktischen Smart Zoom aktivieren (Auto-Skalierung)</string>

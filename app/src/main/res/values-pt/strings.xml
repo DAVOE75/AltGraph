@@ -79,7 +79,7 @@
     <string name="setting_custom_maps_desc">Descobre e importa pacotes de mapas vetoriais de alta resolução (.mbtiles / .map) para Karoo</string>
     <string name="setting_road_horizon">Horizonte Tático 3D (Previsão sem rota)</string>
     <string name="setting_road_horizon_desc">Prevê a estrada e o perfil de elevação à frente usando mapas vetoriais e dados MDT (.hgt) sem rota carregada.</string>
-    <string name="setting_horizon_zoom">Zoom do horizonte (sem rota)</string>
+    <string name="setting_horizon_zoom">Distância preditiva (sem rota)</string>
     <string name="setting_horizon_subblock">Tamanho do sub-bloco</string>
     <string name="horizon_junction_mode">Prioridade nos cruzamentos</string>
     <string name="horizon_junction_lsr">Esquerda, em frente, direita</string>
@@ -127,7 +127,7 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="horizon_speed_zoom">Zoom conforme a velocidade (Rota Global)</string>
     <string name="horizon_speed_zoom_desc">Mais lento = zoom mais próximo (a subir); mais rápido = zoom mais afastado para ver mais terreno à frente. De 250 m (8 km/h ou menos) a 5 km (40 km/h ou mais). Só com uma rota carregada.</string>
     <string name="horizon_btn_update_radius">Atualizar download para o novo raio</string>
-    <string name="horizon_desc_zoom">Distância de estrada mostrada à frente sem rota carregada (passos de 500 m).</string>
+    <string name="horizon_desc_zoom">Até onde a estrada é prevista à frente sem rota carregada (passos de 500 m). O zoom visível é uma parte dela: definido pelos botões de zoom ou, se estiverem ocultos, pelo zoom do mapa.</string>
     <string name="horizon_desc_subblock">Comprimento de cada bloco colorido do perfil. Menor = mais detalhe.</string>
     <string name="horizon_desc_junction">Que estrada assumir num cruzamento quando o caminho não é claro.</string>
     <string name="horizon_desc_smoothing">Suaviza pequenos saltos do terreno (edifícios, árvores) que criam rampas falsas. Alto para plano; baixo para subidas.</string>
@@ -193,8 +193,7 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="setting_header_noroute_title">Cabeçalho 3D sem rota</string>
     <string name="setting_header_noroute_desc">Campos sobre o perfil quando não há rota carregada (Road Horizon). Com rota usam-se os do separador 3D.</string>
     <string name="setting_horizon_map_line">Linha preditiva no mapa</string>
-    <string name="setting_horizon_map_line_desc">Sem rota, desenha no mapa base a estrada prevista à frente, colorida por inclinação e com o comprimento do zoom do horizonte. Requer Elite e a sobreposição do mapa ativa.</string>
-    <string name="setting_horizon_map_smooth">Suavizar transições de cor</string>
+    <string name="setting_horizon_map_line_desc">Sem rota, desenha no mapa base a estrada prevista à frente, colorida por inclinação e com o comprimento da distância preditiva. Requer Elite.</string>    <string name="setting_horizon_map_smooth">Suavizar transições de cor</string>
     <string name="setting_horizon_map_smooth_desc">Mistura a cor entre troços de inclinação diferente na linha preditiva.</string>
     <string name="map_access_needed">Permita o acesso a todos os ficheiros para o AltGraph ler os mapas offline do Karoo.</string>
     <string name="setting_smart_zoom">Ativar Smart Zoom Tático (Auto-Escala)</string>

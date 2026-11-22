@@ -37,10 +37,17 @@ class TerrainPacks(private val context: Context) {
         setRequestProperty("Pragma", "no-cache")
     }
 
-    /** Descarga la lista de provincias (bloqueante: llamar fuera del hilo principal). */
+    /** Descarga la lista de provincias (bloqueante: llamar fuera del hilo principal). Sin red usa la última copia o la incluida en la app. */
     fun fetchIndex(): List<Province> {
         val base = indexUrl()
-        val text = open(base).getInputStream().bufferedReader().use { it.readText() }
+        val cache = File(packsDir, "_index.json")
+        val text = try {
+            open(base).getInputStream().bufferedReader().use { it.readText() }.also { runCatching { cache.writeText(it) } }
+        } catch (e: Exception) {
+            android.util.Log.w("TerrainPacks", "index offline, using fallback: ${e.message}")
+            if (cache.isFile) cache.readText()
+            else context.assets.open("provincias.json").bufferedReader().use { it.readText() }
+        }
         val arr = JSONObject(text).getJSONArray("provinces")
         val provinces = (0 until arr.length()).map { i ->
             val o = arr.getJSONObject(i)

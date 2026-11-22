@@ -45,7 +45,9 @@ data class RouteClimb(
     var apm: Double = 0.0,
     var category: String = "",
     val name: String? = null,
-    val isCustom: Boolean = false
+    val isCustom: Boolean = false,
+    // Subida detectada en el horizonte (sin ruta) que sigue al salir de la ventana: no se sabe dónde está la cima
+    val openEnded: Boolean = false
 ) {
     // Nota de dificultad tipo índice Fiets (sin el término de altitud): desnivel² / (10 × longitud)
     val difficultyIndex: Double get() = if (length > 0.0) totalElevation * totalElevation / (10.0 * length) else 0.0
@@ -127,6 +129,8 @@ data class StrategyData(
     val majorBlockSizeMeters: Double = 100.0,
     val profileElevations: List<Float> = emptyList(),
     val activeClimbs: List<RouteClimb> = emptyList(),
+    // Datos del Horizonte Táctico (sin ruta): activeClimbs usa un eje relativo al ciclista (0 = su posición)
+    val isHorizon: Boolean = false,
     val visibleAvgGrade: Double = 0.0,
     val visibleMaxGrade: Double = 0.0,
     val routeName: String? = null,
@@ -311,11 +315,26 @@ class AltimetriaStrategyCalculator {
     
     var currentHeading: Double = 0.0
     var mapZoomLevel: Double? = null
+    // Solo lo activa el 3D mientras sus botones de zoom están visibles: en el Horizonte Táctico el zoom lo fija el usuario
+    var horizonManualZoom: Boolean = false
     var manualPanOffsetMeters: Double = 0.0
     private var pageStartDist = 0.0
     private var pageLengthDist = 0.0
     private var pageBaseLookahead = -1.0
     var appContext: Context? = null
+
+    // Metros que abarca la vista con el zoom del mapa dado
+    private fun mapZoomMeters(zoom: Double): Double {
+        // El mapa dibuja 480 píxeles a pantalla completa con esta resolución.
+        // Para que la escala encaje en nuestro view (que puede ser 480, 240, etc.),
+        // calculamos los metros por píxel y los multiplicamos por el ancho real del view.
+        val mapMetersPerPixel = 119911.96 / Math.pow(2.0, zoom)
+        val actualViewWidth = if (viewWidth > 0) viewWidth.toDouble() else 480.0
+        // La pantalla de Karoo tiene doble densidad de píxeles (2x), por lo que 1 píxel físico
+        // equivale a medio píxel lógico de Mapbox. Por tanto, dividimos entre 2 el factor.
+        val calibrationFactor = 0.416
+        return (actualViewWidth * mapMetersPerPixel * calibrationFactor).coerceIn(50.0, 100000.0)
+    }
 
     fun updateLiveGrade(grade: Double) {
         this.instantBarometricGrade = grade
@@ -440,6 +459,8 @@ class AltimetriaStrategyCalculator {
     private var horizonSig = ""
     private var horizonPending = false
     private var horizonOffTicks = 0
+    private val HORIZON_CLIMB_MIN_M = 500.0
+    private val HORIZON_CLIMB_MIN_GRADE = 3.0
     private var horizonPrevS = -1.0
     private var horizonBackM = 0.0
     private var horizonLastReqMs = 0L
@@ -544,6 +565,19 @@ class AltimetriaStrategyCalculator {
             travelHeadingValid = true
             anchorLat = lat; anchorLng = lng
         }        
+        if (progressResetPending && routePoints.isNotEmpty()) {
+            progressResetPending = false
+            // Nueva salida con la misma ruta cargada: el avance de la salida anterior (en una ruta circular, la meta, que
+            // coincide con la salida) no debe arrastrarse. Cerca del inicio se empieza en el km 0; si no, en el punto más cercano
+            val first = routePoints[0]
+            nearestIndex = if (planarDistM(lat to lng, first.latitude to first.longitude) <= 500.0) 0
+                else routePoints.indices.minByOrNull { planarDistM(lat to lng, routePoints[it].latitude to routePoints[it].longitude) } ?: 0
+            currentRouteDistance = routePoints[nearestIndex].distance
+            lastProjectedDist = -1.0
+            travelHeadingValid = false
+            backwardMeters = 0.0
+            uTurnConfirmTicks = 0
+        }
         if (routePoints.isNotEmpty()) {
             var minEffectiveDist = Double.MAX_VALUE
             var realMinDistance = Double.MAX_VALUE
@@ -623,6 +657,17 @@ class AltimetriaStrategyCalculator {
     }
 
     private var lastProjectedDist = -1.0
+    private var progressResetPending = false
+
+    /** Empieza una salida nueva: el avance sobre la ruta cargada se recalcula con la próxima posición. */
+    fun onRideStarted() {
+        progressResetPending = true
+        // La distancia y el desnivel de la salida cuentan desde que empieza la grabación, no desde que arrancó la app
+        rideDistanceM = 0.0
+        rideAscentM = 0.0
+        ascentRef = Double.NaN
+        liveDistanceAccumulated = 0.0
+    }
     private var travelHeading = 0.0
     private var travelHeadingValid = false
     private var anchorLat = 0.0
@@ -1478,6 +1523,35 @@ class AltimetriaStrategyCalculator {
         }
     }
 
+    private fun detectHorizonClimbs(elevs: List<Float>, stepM: Double, riderIdx: Double): List<RouteClimb> {
+        val n = elevs.size
+        if (n < 4 || stepM <= 0.0) return emptyList()
+        val out = ArrayList<RouteClimb>()
+        var i = 0
+        while (i < n - 1) {
+            var start = i; var peak = i; var j = i + 1
+            while (j < n) {
+                val e = elevs[j]
+                // Mientras no ha empezado a subir, el inicio sigue al valle; una vez arriba se tolera una bajada corta
+                if (peak == start && e < elevs[start]) { start = j; peak = j }
+                else if (e > elevs[peak]) peak = j
+                else if (elevs[peak] - e > maxOf(6f, 0.25f * (elevs[peak] - elevs[start]))) break
+                j++
+            }
+            val len = (peak - start) * stepM
+            val gain = (elevs[peak] - elevs[start]).toDouble()
+            if (len >= HORIZON_CLIMB_MIN_M && gain / len * 100.0 >= HORIZON_CLIMB_MIN_GRADE) {
+                out += RouteClimb(
+                    startDistance = (start - riderIdx) * stepM, endDistance = (peak - riderIdx) * stepM,
+                    length = len, totalElevation = gain, avgGrade = gain / len * 100.0,
+                    openEnded = peak >= n - 2
+                )
+            }
+            i = if (peak > start) peak else maxOf(i, start) + 1
+        }
+        return out
+    }
+
     private fun calculateClimbCategory(climb: RouteClimb): RouteClimb {
         var accumulatedHardness = 0.0
         var maxRamp100m = climb.avgGrade
@@ -2213,15 +2287,7 @@ class AltimetriaStrategyCalculator {
         }
 
         if (applyMapZoom && mapZoomLevel != null) {
-            // El mapa dibuja 480 píxeles a pantalla completa con esta resolución.
-            // Para que la escala encaje en nuestro view (que puede ser 480, 240, etc.),
-            // calculamos los metros por píxel y los multiplicamos por el ancho real del view.
-            val mapMetersPerPixel = 119911.96 / Math.pow(2.0, mapZoomLevel!!)
-            val actualViewWidth = if (viewWidth > 0) viewWidth.toDouble() else 480.0
-            // La pantalla de Karoo tiene doble densidad de píxeles (2x), por lo que 1 píxel físico
-            // equivale a medio píxel lógico de Mapbox. Por tanto, dividimos entre 2 el factor.
-            val calibrationFactor = 0.416
-            lookaheadDist = (actualViewWidth * mapMetersPerPixel * calibrationFactor).coerceIn(50.0, 100000.0)
+            lookaheadDist = mapZoomMeters(mapZoomLevel!!)
         } else if (speedZoomOn && speedZoomCurrent > 0.0) {
             lookaheadDist = speedZoomCurrent
             if (advance) smartLookahead = speedZoomCurrent
@@ -2245,8 +2311,18 @@ class AltimetriaStrategyCalculator {
         val horizonTarget = prefs?.horizonTarget ?: 0
         val horizonTargetOk = horizonTarget == 0 || (horizonTarget == 1 && !isFor3D) || (horizonTarget == 2 && isFor3D)
         val horizonActive = (prefs?.roadHorizonEnabled ?: true) && horizonTargetOk
+        // La distancia predictiva (ajuste del usuario) es lo que se calcula por delante; lo que se ve (zoom) es una parte de ella:
+        // con botones de zoom lo fija el usuario, sin botones lo marca el zoom del mapa
+        val horizonPredM = (prefs?.horizonDistanceM ?: 2000).toDouble()
         if (!isNavigating && horizonActive) {
-            lookaheadDist = (prefs?.horizonDistanceM ?: 2000).toDouble()
+            val minViewM = 2.0 * horizonSubBlockM.coerceAtMost(horizonPredM / 2.0)
+            val mapM = mapZoomLevel?.let { mapZoomMeters(it) }
+            lookaheadDist = when {
+                prefs?.beaconMode3d == AppPreferences.BEACON_MODE_PAGED -> horizonPredM
+                horizonManualZoom -> (prefs?.lookaheadMeters3d ?: 350).toDouble()
+                mapM != null -> mapM
+                else -> horizonPredM
+            }.coerceIn(minViewM, horizonPredM)
         }
 
         // MODO LIBRE / ENTRENAMIENTO REAL SIN RUTA PRECARGADA:
@@ -2275,9 +2351,11 @@ class AltimetriaStrategyCalculator {
             if (horizonEnabled && currentLatitude != 0.0 && currentLongitude != 0.0 && effectiveCtx != null) {
                 val pagedBeacon = prefs?.beaconMode3d == AppPreferences.BEACON_MODE_PAGED
                 val predictor = RoadHorizonPredictor.getInstance(effectiveCtx)
-                val stepM = horizonSubBlockM.coerceAtMost(lookaheadDist / 2.0)
+                val stepM = horizonSubBlockM.coerceAtMost(horizonPredM / 2.0)
                 val count = Math.round(lookaheadDist / stepM).toInt() + 1
                 val nb = Math.round(lookaheadDist * BEACON_ANCHOR_FRACTION / stepM).toInt()
+                // El trazado retenido se calcula siempre a la distancia predictiva; la ventana visible se recorta de él
+                val nbHeld = Math.round(horizonPredM * BEACON_ANCHOR_FRACTION / stepM).toInt()
                 val headingNow = if (travelHeadingValid) travelHeading else currentHeading
                 val nowReq = System.currentTimeMillis()
 
@@ -2285,12 +2363,12 @@ class AltimetriaStrategyCalculator {
                 val sig = "${prefs?.horizonJunctionMode}_${prefs?.horizonPreferCycleway}_${prefs?.horizonSmoothing}_${prefs?.horizonMaxGradePct}_${prefs?.horizonHeadingMode}_$pagedBeacon"
                 if (sig != horizonSig) {
                     horizonSig = sig
-                    heldAnchor = null; heldHorizon = null;                     horizonPending = false; horizonOffTicks = 0; horizonPrevS = -1.0; horizonBackM = 0.0
+                    heldAnchor = null; heldHorizon = null; horizonPending = false; horizonOffTicks = 0; horizonPrevS = -1.0; horizonBackM = 0.0
                     predictor.invalidate()
                 }
 
                 val held = if (pagedBeacon) heldHorizon else heldAnchor
-                val sameScale = held != null && heldAnchorLookahead == lookaheadDist && heldAnchorStep == stepM
+                val sameScale = held != null && heldAnchorLookahead == horizonPredM && heldAnchorStep == stepM
                 var s = -1.0
                 if (held != null && sameScale) {
                     val frac = projectOnHorizon(held, currentLatitude, currentLongitude)
@@ -2313,8 +2391,8 @@ class AltimetriaStrategyCalculator {
                     val size = held.elevations.size
                     if (pagedBeacon) { if (s / (size - 1) >= 0.985) need = true }
                     else {
-                        val aheadSteps = size - 1 - nb
-                        val canGrow = aheadSteps >= (2.0 * lookaheadDist / stepM) * 0.95
+                        val aheadSteps = size - 1 - nbHeld
+                        val canGrow = aheadSteps >= (2.0 * horizonPredM / stepM) * 0.95
                         if (s >= size - 2) need = true
                         else if (canGrow && s + (count - nb) > size - 3) need = true
                     }
@@ -2325,18 +2403,18 @@ class AltimetriaStrategyCalculator {
                     horizonPending = true; horizonLastReqMs = nowReq; fresh = true
                 }
                 if (horizonPending) {
-                    val r = if (pagedBeacon) predictor.predictAsync(currentLatitude, currentLongitude, headingNow, lookaheadDist, stepM, currentSpeed, 0, fresh)
-                            else predictor.predictAsync(currentLatitude, currentLongitude, headingNow, lookaheadDist * 2.0, stepM, currentSpeed, nb, fresh)
+                    val r = if (pagedBeacon) predictor.predictAsync(currentLatitude, currentLongitude, headingNow, horizonPredM, stepM, currentSpeed, 0, fresh)
+                            else predictor.predictAsync(currentLatitude, currentLongitude, headingNow, horizonPredM * 2.0, stepM, currentSpeed, nbHeld, fresh)
                     if (r != null) {
                         if (pagedBeacon) heldHorizon = r else heldAnchor = r
-                        heldAnchorLookahead = lookaheadDist; heldAnchorStep = stepM
+                        heldAnchorLookahead = horizonPredM; heldAnchorStep = stepM
                         horizonPending = false; horizonOffTicks = 0; horizonPrevS = -1.0; horizonBackM = 0.0
                     } else if (nowReq - horizonLastReqMs > 6000L) horizonPending = false // el cálculo no llegó: se reintenta
                 }
 
                 // Siempre se trabaja con el último trazado válido: un cálculo en curso nunca deja la pantalla sin perfil
                 val cur = if (pagedBeacon) heldHorizon else heldAnchor
-                if (cur != null && cur.elevations.size >= 3 && heldAnchorLookahead == lookaheadDist && heldAnchorStep == stepM) {
+                if (cur != null && cur.elevations.size >= 3 && heldAnchorLookahead == horizonPredM && heldAnchorStep == stepM) {
                     val size = cur.elevations.size
                     if (s < 0.0) {
                         val frac = projectOnHorizon(cur, currentLatitude, currentLongitude)
@@ -2350,7 +2428,10 @@ class AltimetriaStrategyCalculator {
                     } else {
                         // Baliza ancla: ventana de longitud fija con el ciclista siempre al 20 %. La rejilla de bloques queda anclada
                         // al trazado y la vista compensa la fracción (gridOffset): los bloques no se mueven ni cambian de color.
-                        val startF = s - nb
+                        var startF = s - BEACON_ANCHOR_FRACTION * (count - 1)
+                        // Desplazamiento manual (botones < >): mueve la ventana sobre el trazado ya calculado, sin salirse de él
+                        val panned = manualPanOffsetMeters != 0.0
+                        if (panned) startF = (startF + manualPanOffsetMeters / stepM).coerceIn(0.0, Math.max(0.0, (size - count).toDouble()))
                         val i0 = Math.floor(startF).toInt()
                         fun idx(i: Int) = i.coerceIn(0, size - 1)
                         val elevs = List(count) { j -> cur.elevations[idx(i0 + j)] }
@@ -2360,13 +2441,14 @@ class AltimetriaStrategyCalculator {
                         }
                         val coords = List(count) { j -> cur.coordinates[idx(i0 + j)] }
                         horizonGridOffset = (startF - i0) * stepM
-                        horizonWindowStart = Math.max(0.0, startF * stepM)
+                        // El eje cuenta la distancia acumulada de la salida: la flecha marca los km recorridos y el resto sigue la escala
+                        horizonWindowStart = rideDistanceM - (s - startF) * stepM
                         horizonResult = RoadHorizonPredictor.HorizonResult(
                             elevations = elevs, grades = grades, coordinates = coords, roadName = cur.roadName,
                             totalDistanceMeters = (count - 1) * stepM,
                             guessFromMeters = if (cur.guessFromMeters >= 0.0) cur.guessFromMeters - startF * stepM else -1.0
                         )
-                        horizonProgress = nb.toFloat() / (count - 1)
+                        horizonProgress = if (panned) ((s - startF) / (count - 1)).toFloat().coerceIn(0f, 1f) else BEACON_ANCHOR_FRACTION.toFloat()
                     }
                 }
             }
@@ -2420,7 +2502,8 @@ class AltimetriaStrategyCalculator {
                     subBlockSizeMeters = stepMeters,
                     majorBlockSizeMeters = majorBlockSize,
                     profileElevations = hElevs,
-                    activeClimbs = emptyList(),
+                    activeClimbs = detectHorizonClimbs(hElevs, stepMeters, horizonProgress.toDouble() * (nElev - 1)),
+                    isHorizon = true,
                     routeName = horizonResult.roadName ?: "Horizonte Libre",
                     routeTotalLength = 0.0, // sin ruta: la vista no debe dibujar bandera de meta ni totales de ruta
                     gridOffsetMeters = horizonGridOffset,

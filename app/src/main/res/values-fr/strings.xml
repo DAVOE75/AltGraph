@@ -79,7 +79,7 @@
     <string name="setting_custom_maps_desc">Permet de détecter et d\'importer des cartes vectorielles hors ligne haute définition (.mbtiles / .map) pour Karoo</string>
     <string name="setting_road_horizon">Horizon Tactique 3D (Aperçu sans itinéraire)</string>
     <string name="setting_road_horizon_desc">Prédit la route et le profil d\'élévation à venir à l\'aide des cartes vectorielles et des données MNT (.hgt) sans parcours chargé.</string>
-    <string name="setting_horizon_zoom">Zoom de l\'horizon (sans itinéraire)</string>
+    <string name="setting_horizon_zoom">Distance prédictive (sans itinéraire)</string>
     <string name="setting_horizon_subblock">Taille du sous-bloc</string>
     <string name="horizon_junction_mode">Priorité aux carrefours</string>
     <string name="horizon_junction_lsr">Gauche, tout droit, droite</string>
@@ -127,7 +127,7 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="horizon_speed_zoom">Zoom selon la vitesse (Route Globale)</string>
     <string name="horizon_speed_zoom_desc">Plus lent = zoom plus proche (montée) ; plus rapide = zoom plus lointain pour voir plus de terrain devant. De 250 m (8 km/h ou moins) à 5 km (40 km/h ou plus). Uniquement avec un itinéraire chargé.</string>
     <string name="horizon_btn_update_radius">Mettre à jour le téléchargement pour le nouveau rayon</string>
-    <string name="horizon_desc_zoom">Distance de route affichée devant vous sans itinéraire chargé (par pas de 500 m).</string>
+    <string name="horizon_desc_zoom">Jusqu\'où la route est prédite devant vous sans itinéraire chargé (par pas de 500 m). Le zoom affiché en est une partie : réglé par les boutons de zoom ou, s\'ils sont masqués, par le zoom de la carte.</string>
     <string name="horizon_desc_subblock">Longueur de chaque bloc coloré du profil. Plus petit = plus de détails.</string>
     <string name="horizon_desc_junction">Quelle route supposer à un carrefour quand la suite est incertaine.</string>
     <string name="horizon_desc_smoothing">Lisse les petits écarts du terrain (bâtiments, arbres) qui créent de fausses rampes. Fort pour le plat, faible pour les montées.</string>
@@ -193,8 +193,7 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="setting_header_noroute_title">En-tête 3D sans parcours</string>
     <string name="setting_header_noroute_desc">Champs au-dessus du profil quand aucun parcours n\'est chargé (Road Horizon). Avec un parcours, ceux de l\'onglet 3D sont utilisés.</string>
     <string name="setting_horizon_map_line">Ligne prédictive sur la carte</string>
-    <string name="setting_horizon_map_line_desc">Sans parcours, trace sur la carte de base la route prévue devant vous, colorée selon la pente et de la longueur du zoom de l\'horizon. Nécessite Elite et la superposition de carte activée.</string>
-    <string name="setting_horizon_map_smooth">Adoucir les transitions de couleur</string>
+    <string name="setting_horizon_map_line_desc">Sans parcours, trace sur la carte de base la route prévue devant vous, colorée selon la pente et de la longueur de la distance prédictive. Nécessite Elite.</string>    <string name="setting_horizon_map_smooth">Adoucir les transitions de couleur</string>
     <string name="setting_horizon_map_smooth_desc">Fond la couleur entre les sections de pente différente sur la ligne prédictive.</string>
     <string name="map_access_needed">Autorisez l\'accès à tous les fichiers pour qu\'AltGraph lise les cartes hors ligne du Karoo.</string>
     <string name="setting_smart_zoom">Activer Smart Zoom tactique (auto-échelle)</string>

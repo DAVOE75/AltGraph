@@ -10,6 +10,7 @@ import io.hammerhead.karooext.models.OnLocationChanged
 import io.hammerhead.karooext.models.OnMapZoomLevel
 import io.hammerhead.karooext.models.OnNavigationState
 import io.hammerhead.karooext.models.OnStreamState
+import io.hammerhead.karooext.models.RideState
 import io.hammerhead.karooext.models.StreamState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -81,6 +82,7 @@ object AltgraphRepository {
     private const val KIND_NAV = "nav"
     private const val KIND_LOC = "loc"
     private const val KIND_ZOOM = "zoom"
+    private const val KIND_RIDE = "ride"
 
     private val core = AltgraphCore()
     private val gate = TickGate()
@@ -102,6 +104,8 @@ object AltgraphRepository {
     @Volatile private var appContext: Context? = null
     // Último estado de navegación (solo se escribe en el hilo del repositorio)
     @Volatile private var lastNav: OnNavigationState? = null
+    // Último estado de la salida (solo hilo del repositorio); null hasta recibir el primero
+    private var lastRideState: RideState? = null
     // Vida del repositorio: sube en start() y stop() para descartar re-suscripciones de una vida anterior
     @Volatile private var generation = 0
     // Espera vigente por stream terminado (solo se toca en el hilo del repositorio)
@@ -132,7 +136,7 @@ object AltgraphRepository {
             add = { kind -> addConsumer(system, s, kind, gen) },
             remove = { id -> system.removeConsumer(id) }
         )
-        val kinds = listOf(KIND_NAV, KIND_LOC, KIND_ZOOM) + NavigationSync.STREAM_TYPES + KGHOST_GAP_TIME + KGHOST_GAP_DIST
+        val kinds = listOf(KIND_NAV, KIND_LOC, KIND_ZOOM, KIND_RIDE) + NavigationSync.STREAM_TYPES + KGHOST_GAP_TIME + KGHOST_GAP_DIST
         // Alta única antes de conectar: el SDK registra en cada (re)conexión todos los consumers
         // que tiene. No se tocan desde el callback de connect, que corre dentro de ese recorrido.
         registry.register(kinds)
@@ -347,6 +351,13 @@ object AltgraphRepository {
         }
         KIND_LOC -> system.addConsumer<OnLocationChanged> { event ->
             s.launch { core.calculator.updateCurrentLocation(event.lat, event.lng, event.orientation) }
+        }
+        KIND_RIDE -> system.addConsumer<RideState> { state ->
+            s.launch {
+                // Solo Idle -> Recording es una salida nueva (reanudar tras una pausa no reinicia el avance)
+                if (state is RideState.Recording && lastRideState is RideState.Idle) core.calculator.onRideStarted()
+                lastRideState = state
+            }
         }
         KIND_ZOOM -> system.addConsumer<OnMapZoomLevel> { event ->
             s.launch {

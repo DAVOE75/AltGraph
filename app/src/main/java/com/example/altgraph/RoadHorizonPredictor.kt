@@ -447,6 +447,13 @@ class RoadHorizonPredictor(private val context: Context) {
         val visitedRoads = mutableSetOf<String>()
         var guessFrom = if (deadReckon) 0.0 else -1.0
         var mainRoadName = bestRoad.name ?: bestRoad.ref
+        if (mainRoadName == null) {
+            // Tramo sin nombre en el mapa (carril, enlace, acera): se toma la calle con nombre más cercana a la posición
+            mainRoadName = nearbyRoads.filter { !it.name.isNullOrBlank() && it.kind !in FOOT_KINDS }
+                .minByOrNull { r -> (0 until r.points.size - 1).minOf { distanceToSegment(currentPoint, r.points[it], r.points[it + 1]) } }
+                ?.takeIf { r -> (0 until r.points.size - 1).minOf { distanceToSegment(currentPoint, r.points[it], r.points[it + 1]) } <= 35.0 }
+                ?.name
+        }
 
         while (accumulatedDist < distanceMeters && currentRoad != null) {
             val key = "${currentRoad.name}_${currentRoad.lengthMeters}"

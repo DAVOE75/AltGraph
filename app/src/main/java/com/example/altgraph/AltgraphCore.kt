@@ -153,11 +153,16 @@ class AltgraphCore(val calculator: AltimetriaStrategyCalculator = AltimetriaStra
         val navigating = calculator.isNavigatingRoute &&
             (calculator.routePoints.isNotEmpty() || calculator.routeElevationProfile.isNotEmpty())
         val prefs = context?.let { AppPreferences.getInstance(it) }
-        val mirrorMap3D = prefs?.match3dToRadarZoom ?: false
+        // Horizonte Táctico: con botones de zoom lo fija el usuario; sin ellos el 3D sigue siempre el zoom del mapa
+        val horizonFree = !navigating && prefs?.roadHorizonEnabled == true
+        val horizonManual = horizonFree && prefs?.showHorizonZoomControls == true
+        val mirrorMap3D = (prefs?.match3dToRadarZoom ?: false) || (horizonFree && !horizonManual)
 
-        val needsRecalc = pan3dMeters != 0.0 || (mirrorMap3D && mapZoomLevel != null)
+        val needsRecalc = pan3dMeters != 0.0 || (mirrorMap3D && mapZoomLevel != null) || horizonManual
         if (!needsRecalc && !navigating) return base.strategy
         calculator.manualPanOffsetMeters = pan3dMeters
+        calculator.horizonManualZoom = horizonManual
+        if (horizonManual) calculator.viewWidth = 0
         if (mirrorMap3D && mapZoomLevel != null) {
             calculator.mapZoomLevel = mapZoomLevel
             calculator.viewWidth = 0 // 3D usa el ancho por defecto de pantalla completa (480)
@@ -166,6 +171,7 @@ class AltgraphCore(val calculator: AltimetriaStrategyCalculator = AltimetriaStra
             return calculator.calculateStrategy(context, advance = false, alignGrid = true)
         } finally {
             calculator.manualPanOffsetMeters = 0.0
+            calculator.horizonManualZoom = false
             calculator.mapZoomLevel = null
         }
     }

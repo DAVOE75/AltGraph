@@ -95,7 +95,7 @@
     <!-- Pro Features -->
     <string name="setting_road_horizon">Horizonte Táctico 3D (Previsión sin ruta)</string>
     <string name="setting_road_horizon_desc">Predice la carretera y el perfil de elevación próximo usando los mapas vectoriales y el modelo de terreno MDT (.hgt), incluso sin track cargado.</string>
-    <string name="setting_horizon_zoom">Zoom del horizonte (sin ruta)</string>
+    <string name="setting_horizon_zoom">Distancia predictiva (sin ruta)</string>
     <string name="setting_horizon_subblock">Tamaño de subbloque</string>
     <string name="horizon_junction_mode">Prioridad al adivinar cruces</string>
     <string name="horizon_junction_lsr">Izquierda, recto, derecha</string>
@@ -143,7 +143,7 @@ Archivos de terreno: %3$d (%4$d MB)
     <string name="horizon_speed_zoom">Zoom según la velocidad (Ruta Global)</string>
     <string name="horizon_speed_zoom_desc">Más despacio = zoom más cercano (subiendo); más rápido = zoom más lejano para ver más terreno por delante. De 250 m (8 km/h o menos) a 5 km (40 km/h o más). Solo con ruta cargada.</string>
     <string name="horizon_btn_update_radius">Actualizar descarga al nuevo radio</string>
-    <string name="horizon_desc_zoom">Distancia de carretera que se muestra por delante cuando no hay ruta cargada (de 500 en 500 m).</string>
+    <string name="horizon_desc_zoom">Hasta dónde se predice la carretera por delante cuando no hay ruta cargada (de 500 en 500 m). El zoom que ves es una parte de ella: lo marcan los botones de zoom o, si están ocultos, el zoom del mapa.</string>
     <string name="horizon_desc_subblock">Longitud de cada bloque de color del perfil. Más pequeño = más detalle.</string>
     <string name="horizon_desc_junction">Qué carretera suponer en un cruce cuando el camino no está claro.</string>
     <string name="horizon_desc_smoothing">Suaviza pequeños saltos del terreno (edificios, árboles) que crean rampas falsas. Alto para llano; bajo para subidas.</string>
@@ -209,8 +209,7 @@ Archivos de terreno: %3$d (%4$d MB)
     <string name="setting_header_noroute_title">Encabezado 3D sin ruta</string>
     <string name="setting_header_noroute_desc">Campos sobre el perfil cuando no hay ruta cargada (Road Horizon). Con ruta se usan los de la pestaña 3D.</string>
     <string name="setting_horizon_map_line">Línea predictiva en el mapa</string>
-    <string name="setting_horizon_map_line_desc">Sin ruta, dibuja en el mapa base la carretera prevista por delante, coloreada por pendiente y con la longitud del zoom del horizonte. Requiere Elite y la superposición del mapa activada.</string>
-    <string name="setting_horizon_map_smooth">Difuminar transiciones de color</string>
+    <string name="setting_horizon_map_line_desc">Sin ruta, dibuja en el mapa base la carretera prevista por delante, coloreada por pendiente y con la longitud de la distancia predictiva. Requiere Elite.</string>    <string name="setting_horizon_map_smooth">Difuminar transiciones de color</string>
     <string name="setting_horizon_map_smooth_desc">Mezcla el color entre tramos de distinta pendiente en la línea predictiva.</string>
     <string name="map_access_needed">Permite el acceso a todos los archivos para que AltGraph lea los mapas offline de la Karoo.</string>
     <string name="setting_smart_zoom">Habilitar Smart Zoom Táctico (Auto-Escala)</string>

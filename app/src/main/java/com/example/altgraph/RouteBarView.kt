@@ -669,6 +669,7 @@ class RouteBarView(context: Context) : View(context) {
             tickTextPaint.textAlign = Paint.Align.CENTER
             while (tickDist < strat.windowStartMeters + lookahead * 2) {
                 val progress = (tickDist - strat.windowStartMeters) / lookahead
+                if (tickDist < 0.0) { tickDist += tickInterval; continue } // antes de la salida no hay marca
                 val px = (w * progress).toFloat() - progressOffset
                 if (px in -50f..(w + 50f)) {
                     // Dynamic scaling for horizontal ruler
@@ -690,6 +691,9 @@ class RouteBarView(context: Context) : View(context) {
                     }
                     // Baseline alignment avoiding overlap with alert bar
                     val cyTick = headerHeight + dynamicTickLen + 2f + tickTextPaint.textSize * 0.8f
+                    // El km 0 (y la última marca) no se recortan en el borde: el texto se desplaza para quedar entero
+                    val halfLabelW = tickTextPaint.measureText(kmLabel) / 2f + 2f
+                    val labelX = if (showRadar3d) px else px.coerceIn(halfLabelW, (w - halfLabelW).coerceAtLeast(halfLabelW))
                     if (showRadar3d) {
                         canvas.save()
                         canvas.translate(px, cyTick)
@@ -697,7 +701,7 @@ class RouteBarView(context: Context) : View(context) {
                         canvas.drawText(kmLabel, 0f, 0f, tickTextPaint)
                         canvas.restore()
                     } else {
-                        canvas.drawText(kmLabel, px, cyTick, tickTextPaint)
+                        canvas.drawText(kmLabel, labelX, cyTick, tickTextPaint)
                     }
                 }
                 tickDist += tickInterval
@@ -1098,8 +1102,9 @@ class RouteBarView(context: Context) : View(context) {
         fontScale: Float
     ) {
         // Usar la distancia exacta del ciclista en lugar de la relativa a la ventana
-        val trueRiderDist = strat.routeTotalLength - strat.remainingDistance
-        
+        // Horizonte Táctico: sin ruta, las distancias de los puertos virtuales son relativas al ciclista (0 = su posición)
+        val trueRiderDist = if (strat.isHorizon) 0.0 else strat.routeTotalLength - strat.remainingDistance
+        val windowStartRel = if (strat.isHorizon) -strat.riderProgress * strat.windowLengthMeters else strat.windowStartMeters
         var alertText = ""
         var alertColorHex = "#212121" // Default dark gray
         
@@ -1127,7 +1132,7 @@ class RouteBarView(context: Context) : View(context) {
             for (i in currentBlockIdx until strat.subBlocks.size) {
                 val grade = strat.subBlocks[i]
                 if (grade >= 12f) {
-                    val distToBlock = strat.windowStartMeters + (i * strat.subBlockSizeMeters) - trueRiderDist
+                    val distToBlock = windowStartRel + (i * strat.subBlockSizeMeters) - trueRiderDist
                     if (distToBlock > 0 && distToBlock < activeClimb.endDistance - trueRiderDist) {
                         steepDist = distToBlock
                         steepGrade = grade
@@ -1144,6 +1149,9 @@ class RouteBarView(context: Context) : View(context) {
                     alertText = wallText
                 }
                 alertColorHex = GradeColorScale.getColorHex(steepGrade.toDouble())
+            } else if (activeClimb.openEnded) {
+                // Cima fuera del horizonte: no hay aviso de cima ni de distancia
+                alertColorHex = GradeColorScale.getColorHex(currentGrade)
             } else {
                 val distToTop = activeClimb.endDistance - trueRiderDist
                 val summitText = context.getString(R.string.alert_summit, formatDist(distToTop))

@@ -350,6 +350,22 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
         }
     }
 
+    // Puertos virtuales del horizonte: la lista se recalcula cada tick, así que se identifican por su inicio aproximado
+    private val horizonClimbStarts = ArrayList<Pair<Int, Double>>()
+    private var horizonClimbCounter = 0
+
+    private fun horizonClimbKey(absStart: Double): Int {
+        val i = horizonClimbStarts.indexOfFirst { Math.abs(it.second - absStart) < 300.0 }
+        if (i >= 0) {
+            val key = horizonClimbStarts[i].first
+            horizonClimbStarts[i] = key to absStart
+            return key
+        }
+        val key = horizonClimbCounter++
+        horizonClimbStarts.add(key to absStart)
+        return key
+    }
+
     /**
      * Evalúa las condiciones de la ruta y genera los avisos pertinentes según los ajustes.
      */
@@ -357,12 +373,21 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
          if (!prefs.isEliteUnlocked || !prefs.voiceDirectorEnabled) return
          // Cada tick se drena la cola por si quedó algo pendiente (vigilante del TTS incluido)
          mainHandler.post { processNextInQueue() }
-         if (!snapshot.isNavigatingRoute) return
+         if (!snapshot.isNavigatingRoute && !snapshot.strategy.isHorizon) return
 
          val strategy = snapshot.strategy
+         // Sin ruta (Horizonte Táctico) la posición es el cuentakilómetros del paseo y los puertos son los detectados en el horizonte
+         val horizonMode = !snapshot.isNavigatingRoute
          // Posición exacta continua del ciclista proyectada sobre la ruta (no la ventana desplazada del 3D)
-         val currentDist = if (snapshot.currentRouteDistance > 0.0) snapshot.currentRouteDistance else strategy.windowStartMeters
-         val climbs = snapshot.routeClimbs
+         val currentDist = if (horizonMode) snapshot.rideDistanceM
+             else if (snapshot.currentRouteDistance > 0.0) snapshot.currentRouteDistance else strategy.windowStartMeters
+         val climbEntries: List<Pair<Int, RouteClimb>> = if (horizonMode) {
+             strategy.activeClimbs.map { c ->
+                 val abs = c.copy(startDistance = c.startDistance + currentDist, endDistance = c.endDistance + currentDist)
+                 horizonClimbKey(abs.startDistance) to abs
+             }
+         } else snapshot.routeClimbs.withIndex().map { it.index to it.value }
+         val climbs = climbEntries.map { it.second }
          val elev = snapshot.currentElevation
          val speed = snapshot.currentSpeed
 
@@ -394,7 +419,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
 
          // 1. AVISO DE PUERTO (Inicio, Kilómetros y Cima)
          if (prefs.voiceClimbsEnabled && climbs.isNotEmpty()) {
-             for ((idx, climb) in climbs.withIndex()) {
+             for ((idx, climb) in climbEntries) {
                  val distToClimb = climb.startDistance - currentDist
 
                  // Resumen al coronar: tiempo en el puerto, pendiente media y VAM
@@ -409,7 +434,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                      if (currentDist >= climb.startDistance && currentDist < climb.endDistance && idx !in climbEnterMs) {
                          climbEnterMs[idx] = System.currentTimeMillis()
                      }
-                     if (currentDist >= climb.endDistance && currentDist <= climb.endDistance + 80.0 && lastSummarizedClimbIndex != idx) {
+                     if (currentDist >= climb.endDistance && currentDist <= climb.endDistance + 80.0 && lastSummarizedClimbIndex != idx && !climb.openEnded) {
                          lastSummarizedClimbIndex = idx
                          val enterMs = climbEnterMs[idx]
                          val seconds = if (enterMs != null) (System.currentTimeMillis() - enterMs) / 1000L else 0L
@@ -457,7 +482,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
 
                  // Cima próxima (a 500 metros reales de la cima)
                  val distToSummit = climb.endDistance - currentDist
-                 if (distToSummit <= 540.0 && distToSummit >= 380.0 && currentDist >= climb.startDistance && lastSummit500AnnouncedClimbIndex != idx) {
+                 if (distToSummit <= 540.0 && distToSummit >= 380.0 && currentDist >= climb.startDistance && lastSummit500AnnouncedClimbIndex != idx && !climb.openEnded) {
                      lastSummit500AnnouncedClimbIndex = idx
                      val phrase = context.getString(R.string.voice_climb_summit_near, "500")
                      speak(phrase, priority = true)
@@ -465,7 +490,7 @@ class VoiceDirector private constructor(private val context: Context) : TextToSp
                  }
 
                  // Cima inminente (a 100 metros reales de la cima)
-                 if (distToSummit <= 130.0 && distToSummit >= 15.0 && currentDist >= climb.startDistance && lastSummit100AnnouncedClimbIndex != idx) {
+                 if (distToSummit <= 130.0 && distToSummit >= 15.0 && currentDist >= climb.startDistance && lastSummit100AnnouncedClimbIndex != idx && !climb.openEnded) {
                      lastSummit100AnnouncedClimbIndex = idx
                      val phrase = context.getString(R.string.voice_climb_summit_near, "100")
                      speak(phrase, priority = true)

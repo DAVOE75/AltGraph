@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "attribution": "Obra derivada de MDT05 CC-BY 4.0 scne.es (Instituto Geografico Nacional). Modelo Digital del Terreno de 5 m del CNIG, convertido a un formato propio por AltGraph. Licencia: https://creativecommons.org/licenses/by/4.0/",
+  "provinces": [
+    {
+      "id": "coruna",
+      "name": "A Coruña",
+      "url": "coruna.zip",
+      "bytes": 488461209,
+      "tiles": 180
+    },
+    {
+      "id": "albacete",
+      "name": "Albacete",
+      "url": "albacete.zip",
+      "bytes": 874875201,
+      "tiles": 284
+    },
+    {
+      "id": "alicante",
+      "name": "Alicante",
+      "url": "alicante.zip",
+      "bytes": 391900899,
+      "tiles": 130
+    },
+    {
+      "id": "almeria",
+      "name": "Almería",
+      "url": "almeria.zip",
+      "bytes": 642062536,
+      "tiles": 175
+    },
+    {
+      "id": "asturias",
+      "name": "Asturias",
+      "url": "asturias.zip",
+      "bytes": 901359317,
+      "tiles": 205
+    },
+    {
+      "id": "badajoz",
+      "name": "Badajoz",
+      "url": "badajoz.zip",
+      "bytes": 1166062099,
+      "tiles": 382
+    },
+    {
+      "id": "barcelona",
+      "name": "Barcelona",
+      "url": "barcelona.zip",
+      "bytes": 629957704,
+      "tiles": 176
+    },
+    {
+      "id": "bizkaia",
+      "name": "Bizkaia",
+      "url": "bizkaia.zip",
+      "bytes": 276996302,
+      "tiles": 77
+    },
+    {
+      "id": "burgos",
+      "name": "Burgos",
+      "url": "burgos.zip",
+      "bytes": 1087165499,
+      "tiles": 311
+    },
+    {
+      "id": "cantabria",
+      "name": "Cantabria",
+      "url": "cantabria.zip",
+      "bytes": 530067993,
+      "tiles": 144
+    },
+    {
+      "id": "castellon",
+      "name": "Castellón",
+      "url": "castellon.zip",
+      "bytes": 550147903,
+      "tiles": 161
+    },
+    {
+      "id": "ceuta",
+      "name": "Ceuta",
+      "url": "ceuta.zip",
+      "bytes": 3673345,
+      "tiles": 6
+    },
+    {
+      "id": "ciudadreal",
+      "name": "Ciudad Real",
+      "url": "ciudadreal.zip",
+      "bytes": 1092163062,
+      "tiles": 338
+    },
+    {
+      "id": "cuenca",
+      "name": "Cuenca",
+      "url": "cuenca.zip",
+      "bytes": 999756208,
+      "tiles": 308
+    },
+    {
+      "id": "caceres",
+      "name": "Cáceres",
+      "url": "caceres.zip",
+      "bytes": 1204324647,
+      "tiles": 367
+    },
+    {
+      "id": "cadiz",
+      "name": "Cádiz",
+      "url": "cadiz.zip",
+      "bytes": 441201398,
+      "tiles": 164
+    },
+    {
+      "id": "cordoba",
+      "name": "Córdoba",
+      "url": "cordoba.zip",
+      "bytes": 935344111,
+      "tiles": 273
+    },
+    {
+      "id": "madrid",
+      "name": "Madrid",
+      "url": "madrid.zip",
+      "bytes": 642043893,
+      "tiles": 195
+    },
+    {
+      "id": "murcia",
+      "name": "Murcia",
+      "url": "murcia.zip",
+      "bytes": 768784509,
+      "tiles": 230
+    },
+    {
+      "id": "valencia",
+      "name": "Valencia",
+      "url": "valencia.zip",
+      "bytes": 772959913,
+      "tiles": 227
+    },
+    {
+      "id": "alava",
+      "name": "Áraba-Álava",
+      "url": "alava.zip",
+      "bytes": 365981879,
+      "tiles": 102
+    },
+    {
+      "id": "avila",
+      "name": "Ávila",
+      "url": "avila.zip",
+      "bytes": 580570100,
+      "tiles": 181
+    }
+  ]
+}

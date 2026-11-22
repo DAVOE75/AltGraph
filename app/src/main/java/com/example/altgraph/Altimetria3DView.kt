@@ -2158,17 +2158,19 @@ class Altimetria3DView @JvmOverloads constructor(
         // Rótulos de distancia en la barra inferior (Ventana rodante de 50 metros)
         baseDistTextPaint.textSize = (barH * 0.68f).coerceIn(12f, 18f) * (1f + (fontScale - 1f) * 0.6f)
         val majorDistMeters = if (profileElevations.isNotEmpty()) majorBlockSizeMeters else (totalMetersAhead / majorBlocksCount)
+        val rulerBaseM = windowStartMeters - gridOffsetMeters
 
         // Si las etiquetas no caben (puertos largos), se rotula solo una de cada n para que no se superpongan
         val labelStride = if (majorSamples >= 2) {
             val spacing = Math.abs(majorX[1] - majorX[0]).coerceAtLeast(1f)
-            val sampleW = baseDistTextPaint.measureText(formatRulerDist(Math.round(windowStartMeters - gridOffsetMeters + majorDistMeters * (majorSamples - 1))))
+            val sampleW = baseDistTextPaint.measureText(formatRulerDist(Math.round(rulerBaseM + majorDistMeters * (majorSamples - 1))))
             Math.ceil((sampleW * 1.25f / spacing).toDouble()).toInt().coerceAtLeast(1)
         } else 1
 
         for (k in 0 until majorSamples) {
             if (k % labelStride != 0) continue
-            val m = Math.round(windowStartMeters - gridOffsetMeters + (k * majorDistMeters))
+            val m = Math.round(rulerBaseM + (k * majorDistMeters))
+            if (m < 0L) continue // antes de la salida no hay distancia
             val distLabel = formatRulerDist(m)
             val px = majorX[k]
             if (px < startX - depth3dX) continue
@@ -2187,7 +2189,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 if (i % microSubDivisions == 0) continue
                 val px = xFront[i]
                 if (px < startX + 12f || px > baseEndX - 12f) continue
-                val m = Math.round(windowStartMeters - gridOffsetMeters + i * subBlockSizeMeters)
+                val m = Math.round(rulerBaseM + i * subBlockSizeMeters)
                 val subLabel = formatRulerDist(m)
                 canvas.drawText(subLabel, px, baseGroundY + (barH * 0.75f), subDistTextPaint)
             }
