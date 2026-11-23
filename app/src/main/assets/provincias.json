@@ -122,6 +122,34 @@
       "tiles": 273
     },
     {
+      "id": "granada",
+      "name": "Granada",
+      "url": "granada.zip",
+      "bytes": 1034082291,
+      "tiles": 253
+    },
+    {
+      "id": "guadalajara",
+      "name": "Guadalajara",
+      "url": "guadalajara.zip",
+      "bytes": 786168649,
+      "tiles": 215
+    },
+    {
+      "id": "huelva",
+      "name": "Huelva",
+      "url": "huelva.zip",
+      "bytes": 633876841,
+      "tiles": 215
+    },
+    {
+      "id": "huesca",
+      "name": "Huesca",
+      "url": "huesca.zip",
+      "bytes": 1084897181,
+      "tiles": 281
+    },
+    {
       "id": "madrid",
       "name": "Madrid",
       "url": "madrid.zip",
