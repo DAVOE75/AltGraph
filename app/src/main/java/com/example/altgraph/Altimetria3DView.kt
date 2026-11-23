@@ -1150,6 +1150,13 @@ class Altimetria3DView @JvmOverloads constructor(
         subTitleLabelPaint.textAlign = Paint.Align.CENTER
         liveGradePaint.textAlign = Paint.Align.LEFT
         val unitPaint = Paint(liveGradePaint)
+        // Separador mínimo entre columnas ("|"): con 3 datos, uno a cada lado del central
+        val sepPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {         color = Color.argb(255, 85, 85, 85); strokeWidth = 0f }
+        for (i in 1 until slots.size) {
+            val sx = 16f + colW * i
+                    // Centrado en vertical sobre el bloque título + número, y más corto que antes
+                    canvas.drawLine(sx, h * 0.115f, sx, h * 0.255f, sepPaint)
+        }
         val numRegex = Regex("^([-+]?\\d+(?:[.,]\\d+)?)([^\\d:].*)?$")
         for ((idx, s) in slots.withIndex()) {
             val colCx = 16f + colW * idx + colW / 2f
@@ -1181,7 +1188,9 @@ class Altimetria3DView @JvmOverloads constructor(
                 unitPaint.color = liveGradePaint.color
                 unitPaint.setShadowLayer(0f, 0f, 0f, 0)
                 unitPaint.textSize = numSize * unitRatio
-                canvas.drawText(unit, startXc + liveGradePaint.measureText(num) + gap, baseY - numSize * 0.5f, unitPaint)
+                // El exponente no puede subir hasta pisar el título de la columna
+                val unitY = maxOf(baseY - numSize * 0.5f, h * 0.14f + subTitleLabelPaint.descent() + unitPaint.textSize * 0.72f + 3f).coerceAtMost(baseY)
+                canvas.drawText(unit, startXc + liveGradePaint.measureText(num) + gap, unitY, unitPaint)
             }
         }
         subTitleLabelPaint.textAlign = prevLabelAlign
@@ -2190,6 +2199,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 val px = xFront[i]
                 if (px < startX + 12f || px > baseEndX - 12f) continue
                 val m = Math.round(rulerBaseM + i * subBlockSizeMeters)
+                if (m < 0L) continue
                 val subLabel = formatRulerDist(m)
                 canvas.drawText(subLabel, px, baseGroundY + (barH * 0.75f), subDistTextPaint)
             }
