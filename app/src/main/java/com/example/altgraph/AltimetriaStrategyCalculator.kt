@@ -218,7 +218,16 @@ class AltimetriaStrategyCalculator {
     var viewWidth = 480
 
     var nearestIndex = 0
-    var isNavigatingRoute = false
+    // Con la ruta ya terminada (routeEnded) se comporta como sin ruta: horizonte libre, avisos y trazado de la salida
+    private var navFlag = false
+    @Volatile var offRoute = false
+    private var offRouteTicks = 0
+    private var onRouteTicks = 0
+    private val OFF_ROUTE_M = 100.0
+    private val REJOIN_M = 40.0
+    var isNavigatingRoute: Boolean
+        get() = navFlag && !routeEnded && !offRoute
+        set(value) { navFlag = value }
     var activeRouteName: String? = null
     var routePoints: List<RoutePoint> = emptyList()
 
@@ -648,6 +657,14 @@ class AltimetriaStrategyCalculator {
                 }
             }
             nearestIndex = newNearestIdx
+            // Desvío a mitad de ruta: lejos del trazado varias lecturas seguidas pasa al horizonte libre; cerca otra vez, retoma la ruta
+            if (realMinDistance > OFF_ROUTE_M) { offRouteTicks++; onRouteTicks = 0 }
+            else if (realMinDistance < REJOIN_M) { onRouteTicks++; offRouteTicks = 0 }
+            if (!offRoute && offRouteTicks >= 3) offRoute = true
+            else if (offRoute && onRouteTicks >= 2) offRoute = false
+            // Pasado el final de la ruta cargada (Karoo la mantiene activa): se sigue con el horizonte libre en vez de una ventana congelada
+            val lastPt = routePoints.last()
+            if (!routeEnded && nearestIndex >= routePoints.size - 2 && planarDistM(lat to lng, lastPt.latitude to lastPt.longitude) > 150.0) routeEnded = true
             
             var computedDist = projectedRouteDistance(lat, lng, nearestIndex)
             computedDist = detectUTurnAndJump(lat, lng, computedDist, realMinDistance) ?: computedDist
@@ -657,11 +674,15 @@ class AltimetriaStrategyCalculator {
     }
 
     private var lastProjectedDist = -1.0
+    // La ruta cargada ya se terminó y se sigue pedaleando más allá de su final
+    @Volatile var routeEnded = false
     private var progressResetPending = false
 
     /** Empieza una salida nueva: el avance sobre la ruta cargada se recalcula con la próxima posición. */
     fun onRideStarted() {
         progressResetPending = true
+        routeEnded = false
+        offRoute = false
         // La distancia y el desnivel de la salida cuentan desde que empieza la grabación, no desde que arrancó la app
         rideDistanceM = 0.0
         rideAscentM = 0.0
@@ -1977,6 +1998,8 @@ class AltimetriaStrategyCalculator {
             polylineScaleFactor = 1.0
             lastRouteNameForReset = routeName
             isNewRouteName = true
+            routeEnded = false
+            offRoute = false
             // Los puertos (también los personalizados) pertenecen a la ruta anterior
             routeClimbs = emptyList()
             routeKeyForClimbs = null
@@ -2214,6 +2237,8 @@ class AltimetriaStrategyCalculator {
         this.absoluteHairpinInfos.clear()
         this.routePois.clear()
         this.isNavigatingRoute = false
+        this.routeEnded = false
+        this.offRoute = false
         this.activeRouteName = null
         this.nearestIndex = 0
         this.currentRouteDistance = 0.0
