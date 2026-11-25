@@ -595,6 +595,10 @@ class RoadHorizonPredictor(private val context: Context) {
         }
 
         // Si faltan algunas cotas puntuales, interpolar
+        val missingCount = elevations.count { it <= -900f }
+        if (missingCount > 0 || accumulatedDist < distanceMeters * 0.9) {
+            android.util.Log.w("RoadHorizon", "short/flat risk: requested=${distanceMeters.toInt()} m, path=${accumulatedDist.toInt()} m, missing elevations=$missingCount/${elevations.size}, terrain=${elevationManager.lastSource}")
+        }
         fixMissingElevations(elevations)
         smoothElevations(elevations, sampleStepMeters)
         lastStatus = Status.OK

@@ -221,6 +221,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         // El eje ajustado se anima entre redibujados: mientras se mueve hay que seguir pintando aunque no cambie nada más
                         if (frame == lastFrame && !altimetria3DView.axisAnimating) return@safeUpdate
                         altimetria3DView.oasisDistanceToNextCrucible = strategy.oasisDistanceToNextCrucible
+                        altimetria3DView.flatProfile = prefs.flatProfile3d
                         altimetria3DView.energyBatteryLevel = strategy.energyBatteryLevel
                 
                         // ELITE & W'bal

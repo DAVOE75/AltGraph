@@ -203,6 +203,9 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="font_normal">Normal</string>
     <string name="font_large">Grande</string>
     <string name="font_xl">Muito Gr.</string>
+    <string name="font_xxl">XXL</string>
+    <string name="setting_flat_profile">Perfil plano 2D</string>
+    <string name="setting_flat_profile_desc">Desenha o gráfico 3D sem profundidade isométrica (sem aspeto de caixa). Tudo o resto fica igual.</string>
     <string name="status_saved">Configurações Salvas Automaticamente</string>
     <string name="btn_save_and_exit">Salvar e Sair</string>
     <string name="zone_green">Suave</string>

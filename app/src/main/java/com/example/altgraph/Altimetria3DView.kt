@@ -657,6 +657,8 @@ class Altimetria3DView @JvmOverloads constructor(
     private var hairpins: List<Double> = emptyList()
     private var pois: List<Poi> = emptyList()
     private var showZoomControls: Boolean = true
+    // Aspecto 2D del perfil (sin profundidad isométrica)
+    var flatProfile: Boolean = false
     private var zoomButtonsBottomY: Float = 0f
     private var showBlockPercentages: Boolean = true
     private var curvatureOffsets: List<Float> = emptyList()
@@ -1559,8 +1561,9 @@ class Altimetria3DView @JvmOverloads constructor(
         profileGridStepY = maxPeakHeight / 4f
 
         // Desplazamiento oblicuo 3D sutil y elegante (profundidad reducida a petición del usuario)
-        val depth3dX = (w * 0.012f).coerceIn(4f, 8f)
-        val depth3dY = (h * 0.015f).coerceIn(5f, 9f)
+        // Perfil 2D opcional: sin profundidad isométrica el relieve queda plano, con todo lo demás igual
+        val depth3dX = if (flatProfile) 0f else (w * 0.012f).coerceIn(4f, 8f)
+        val depth3dY = if (flatProfile) 0f else (h * 0.015f).coerceIn(5f, 9f)
 
         val totalSpanX = (baseEndX - startX) * zoomScale
         // La ventana real mide lookaheadMeters; los bloques extra de margen quedan fuera de pantalla a la derecha.

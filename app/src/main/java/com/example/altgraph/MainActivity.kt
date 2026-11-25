@@ -568,7 +568,7 @@ class MainActivity : Activity() {
         // Opción: Tamaño de Letra 3D
         val font3dCard = createCardContainer()
         val font3dLabel = createSectionLabel(getString(R.string.setting_font_size_3d))
-        val fontScales = listOf(1.0f to getString(R.string.font_normal), 1.25f to getString(R.string.font_large), 1.5f to getString(R.string.font_xl))
+        val fontScales = listOf(1.0f to getString(R.string.font_normal), 1.25f to getString(R.string.font_large), 1.5f to getString(R.string.font_xl), 2.0f to getString(R.string.font_xxl))
         val currentFontLabel = fontScales.find { it.first == prefs.fontSize3dScale }?.second ?: getString(R.string.font_normal)
         val font3dValueText = createValueText(currentFontLabel)
         val font3dRow = LinearLayout(this).apply {
@@ -603,6 +603,19 @@ class MainActivity : Activity() {
             }
         }
         showZoomCard.addView(switchShowZoom)
+
+        // Perfil plano 2D: quita la profundidad isométrica ("aspecto caja") del gráfico
+        val flatProfileCard = createCardContainer()
+        flatProfileCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_flat_profile)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            isChecked = prefs.flatProfile3d
+            setOnCheckedChangeListener { _, isChecked -> prefs.flatProfile3d = isChecked }
+        })
+        flatProfileCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_flat_profile_desc); textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 4, 0, 4)
+        })
 
         // Zoom según la velocidad: solo Ruta Global (con ruta precargada); el Horizonte Táctico usa su distancia fija
         val speedZoomCard = createCardContainer()
@@ -1526,6 +1539,7 @@ class MainActivity : Activity() {
         tab3dContainer.addView(routeDistancesCard)
         tab3dContainer.addView(blockCleanCard)
         tab3dContainer.addView(showZoomCard)
+        tab3dContainer.addView(flatProfileCard)
         tab3dContainer.addView(speedZoomCard)
         tab3dContainer.addView(panPositionCard)
         tab3dContainer.addView(gearCard)

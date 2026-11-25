@@ -220,6 +220,9 @@ Archivos de terreno: %3$d (%4$d MB)
     <string name="font_normal">Normal</string>
     <string name="font_large">Largo</string>
     <string name="font_xl">Extra Gr.</string>
+    <string name="font_xxl">XXL</string>
+    <string name="setting_flat_profile">Perfil plano 2D</string>
+    <string name="setting_flat_profile_desc">Dibuja el gráfico 3D sin profundidad isométrica (sin aspecto de caja). Todo lo demás queda igual.</string>
     <string name="status_saved">Ajustes Guardados Automáticamente</string>
     <string name="btn_save_and_exit">Guardar y Salir</string>
 

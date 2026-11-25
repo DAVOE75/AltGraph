@@ -203,6 +203,9 @@ File del terreno: %3$d (%4$d MB)
     <string name="font_normal">Normale</string>
     <string name="font_large">Grande</string>
     <string name="font_xl">Molto Gr.</string>
+    <string name="font_xxl">XXL</string>
+    <string name="setting_flat_profile">Profilo piatto 2D</string>
+    <string name="setting_flat_profile_desc">Disegna il grafico 3D senza profondità isometrica (senza effetto scatola). Il resto rimane uguale.</string>
     <string name="status_saved">Impostazioni Salvate Automaticamente</string>
     <string name="btn_save_and_exit">Salva ed Esci</string>
     <string name="zone_green">Moderata</string>
