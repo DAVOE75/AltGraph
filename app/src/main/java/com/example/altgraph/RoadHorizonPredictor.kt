@@ -474,6 +474,9 @@ class RoadHorizonPredictor(private val context: Context) {
 
             // Cruce / Bifurcación: Buscar la siguiente carretera en el extremo
             val junctionPoint = projectedPoints.last()
+            // "Ya visitado" solo cuenta con puntos de más de 30 m atrás: con tramos cortos (nodos de pasos, paradas...) el siguiente
+            // punto queda a pocos metros del propio cruce y se rechazaba, cortando el trazado en una recta
+            val olderPoints = pointsOlderThan(projectedPoints, 30.0)
             val candidateRoads = reader.getRoadsNear(junctionPoint, radiusMeters = 30.0)
                 .filter { it !== currentRoad }
 
@@ -533,7 +536,7 @@ class RoadHorizonPredictor(private val context: Context) {
                         else -> 100_000.0 + baseScore
                     }
                     val isContinuation = continuation || (onRing && score < 10_000.0)
-                    val revisits = projectedPoints.any { it.distanceTo(nextPt) < 8.0 }
+                    val revisits = olderPoints.any { it.distanceTo(nextPt) < 8.0 }
                     val eligibleTurn = turnAngle < MAX_TURN || (onRing && turnAngle <= 170.0)
                     if (!revisits && eligibleTurn) eligibleCount++
                     if (!revisits && eligibleTurn && score < bestNextAngle) {
@@ -653,6 +656,13 @@ class RoadHorizonPredictor(private val context: Context) {
             }
         }
         return result
+    }
+
+    private fun pointsOlderThan(path: List<GeoPoint>, metersBack: Double): List<GeoPoint> {
+        var acc = 0.0
+        var i = path.size - 1
+        while (i > 0 && acc < metersBack) { acc += path[i].distanceTo(path[i - 1]); i-- }
+        return path.subList(0, i + 1)
     }
 
     private fun fixMissingElevations(elevs: MutableList<Float>) {
