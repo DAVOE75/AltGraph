@@ -205,6 +205,11 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean("flat_profile_3d", false)
         set(value) = prefs.edit().putBoolean("flat_profile_3d", value).apply()
 
+    // Líneas separadoras de bloques dentro del perfil 3D (activadas por defecto)
+    var showBlockLines3d: Boolean
+        get() = prefs.getBoolean("show_block_lines_3d", true)
+        set(value) = prefs.edit().putBoolean("show_block_lines_3d", value).apply()
+
     // Botones de zoom del Horizonte Táctico (sin ruta). Hasta que se elija, hereda el ajuste anterior, que era único para 3D
     var showHorizonZoomControls: Boolean
         get() = prefs.getBoolean(KEY_SHOW_HORIZON_ZOOM, prefs.getBoolean(KEY_SHOW_3D_ZOOM, true))

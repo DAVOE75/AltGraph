@@ -659,6 +659,8 @@ class Altimetria3DView @JvmOverloads constructor(
     private var showZoomControls: Boolean = true
     // Aspecto 2D del perfil (sin profundidad isométrica)
     var flatProfile: Boolean = false
+    // Líneas verticales que separan los bloques dentro del gráfico
+    var showBlockLines: Boolean = true
     private var zoomButtonsBottomY: Float = 0f
     private var showBlockPercentages: Boolean = true
     private var curvatureOffsets: List<Float> = emptyList()
@@ -1180,8 +1182,11 @@ class Altimetria3DView @JvmOverloads constructor(
             fun totalW(): Float = liveGradePaint.measureText(num) + (if (unit.isEmpty()) 0f else gap + liveGradePaint.measureText(unit) * unitRatio)
             val wNow = totalW()
             if (wNow > maxW && wNow > 0f) liveGradePaint.textSize = (liveGradePaint.textSize * maxW / wNow).coerceAtLeast(12f)
-            val numSize = liveGradePaint.textSize
             val baseY = if (big) h * 0.27f else h * 0.26f
+            // El número no puede crecer hasta pisar el título (con letra XL/XXL): su parte alta queda por debajo de él
+            val maxNumByHeight = ((baseY - (h * 0.14f + subTitleLabelPaint.descent() + 4f)) / 0.75f).coerceAtLeast(12f)
+            if (liveGradePaint.textSize > maxNumByHeight) liveGradePaint.textSize = maxNumByHeight
+            val numSize = liveGradePaint.textSize
             val startXc = colCx - totalW() / 2f
             canvas.drawText(num, startXc, baseY, liveGradePaint)
             if (unit.isNotEmpty()) {
@@ -2714,7 +2719,7 @@ class Altimetria3DView @JvmOverloads constructor(
             wallPaint.shader = wallShader
             canvas.drawPath(wallPath, wallPaint)
             val paint = if (i % currentMicroSubDivisions == 0) majorSliceSeparatorPaint else sliceSeparatorPaint
-            if (!isMergedJoint(i)) canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], paint)
+            if (showBlockLines && !isMergedJoint(i)) canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], paint)
         }
         val lastIdx = totalMicroSamples - 1
         val lastPaint = if (lastIdx % currentMicroSubDivisions == 0) majorSliceSeparatorPaint else sliceSeparatorPaint
@@ -2795,7 +2800,7 @@ class Altimetria3DView @JvmOverloads constructor(
             wallPaint.shader = wallShader
             canvas.drawPath(wallPath, wallPaint)
             val paint = if (i % currentMicroSubDivisions == 0) majorSliceSeparatorPaint else sliceSeparatorPaint
-            if (!isMergedJoint(i)) canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], paint)
+            if (showBlockLines && !isMergedJoint(i)) canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], paint)
         }
         val lastIdx = totalMicroSamples - 1
         val lastPaint = if (lastIdx % currentMicroSubDivisions == 0) majorSliceSeparatorPaint else sliceSeparatorPaint
@@ -3130,7 +3135,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 canvas.drawLine(xFront[i], yFront[i], xFront[i] + (w * 0.04f), yBase[i], obsidianFacetPaint)
             }
             val paint = if (i % currentMicroSubDivisions == 0) majorSliceSeparatorPaint else sliceSeparatorPaint
-            if (!isMergedJoint(i)) canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], paint)
+            if (showBlockLines && !isMergedJoint(i)) canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], paint)
         }
         val lastIdx = totalMicroSamples - 1
         val lastPaint = if (lastIdx % currentMicroSubDivisions == 0) majorSliceSeparatorPaint else sliceSeparatorPaint
@@ -3221,7 +3226,7 @@ class Altimetria3DView @JvmOverloads constructor(
 
         val sepPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
         for (i in 0..totalMicroSamples - 1) {
-            if (isMergedJoint(i)) continue
+            if (!showBlockLines || isMergedJoint(i)) continue
             val major = i % currentMicroSubDivisions == 0
             sepPaint.color = if (major) gold else goldSoft
             sepPaint.strokeWidth = if (major) 1.8f else 1.0f
@@ -3773,7 +3778,7 @@ class Altimetria3DView @JvmOverloads constructor(
                 strokeWidth = if (i % currentMicroSubDivisions == 0) 1.2f else 0.6f
                 style = Paint.Style.STROKE
             }
-            if (!isMergedJoint(i)) canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], sepPaint)
+            if (showBlockLines && !isMergedJoint(i)) canvas.drawLine(xFront[i], yFront[i], xFront[i], yBase[i], sepPaint)
         }
 
         // Cap izquierdo

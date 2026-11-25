@@ -222,6 +222,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         if (frame == lastFrame && !altimetria3DView.axisAnimating) return@safeUpdate
                         altimetria3DView.oasisDistanceToNextCrucible = strategy.oasisDistanceToNextCrucible
                         altimetria3DView.flatProfile = prefs.flatProfile3d
+                        altimetria3DView.showBlockLines = prefs.showBlockLines3d
                         altimetria3DView.energyBatteryLevel = strategy.energyBatteryLevel
                 
                         // ELITE & W'bal
@@ -462,12 +463,15 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         } else {
                             remoteViews.setViewVisibility(R.id.zoom_controls_top, android.view.View.GONE)
                             remoteViews.setViewVisibility(R.id.zoom_controls_side, android.view.View.GONE)
-                            // Sin botones: cualquier toque en la gráfica hace zoom (ver ACTION_TAP_ZOOM)
-                            val tapZoom = PendingIntent.getBroadcast(context, 6, Intent(ACTION_TAP_ZOOM).apply { setPackage(context.packageName) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-                            remoteViews.setViewVisibility(R.id.tap_zoom_area, android.view.View.VISIBLE)
-                            remoteViews.setOnClickPendingIntent(R.id.tap_zoom_area, tapZoom)
-                            remoteViews.setOnClickPendingIntent(R.id.tap_zoom_in_area, tapZoom)
-                            remoteViews.setOnClickPendingIntent(R.id.tap_zoom_out_area, tapZoom)
+                            // Sin botones: cualquier toque en la gráfica hace zoom (ver ACTION_TAP_ZOOM).
+                            // En el Horizonte Táctico sin botones el zoom lo marca el mapa, así que el toque no hace nada y no se activa
+                            if (!strategy.isHorizon) {
+                                val tapZoom = PendingIntent.getBroadcast(context, 6, Intent(ACTION_TAP_ZOOM).apply { setPackage(context.packageName) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                                remoteViews.setViewVisibility(R.id.tap_zoom_area, android.view.View.VISIBLE)
+                                remoteViews.setOnClickPendingIntent(R.id.tap_zoom_area, tapZoom)
+                                remoteViews.setOnClickPendingIntent(R.id.tap_zoom_in_area, tapZoom)
+                                remoteViews.setOnClickPendingIntent(R.id.tap_zoom_out_area, tapZoom)
+                            }
                         }
                                         if (prefs.showRouteCompass && strategy.routeCoords.isNotEmpty() && prefs.altimetriaStyle == AltimetriaStyle.GLOBAL_ISOMETRIC) {
                               val intentCompass = Intent(ACTION_TOGGLE_COMPASS).apply {

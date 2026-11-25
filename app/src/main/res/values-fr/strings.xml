@@ -206,6 +206,8 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="font_xxl">XXL</string>
     <string name="setting_flat_profile">Profil plat 2D</string>
     <string name="setting_flat_profile_desc">Dessine le graphique 3D sans profondeur isométrique (sans effet de boîte). Le reste ne change pas.</string>
+    <string name="setting_block_lines">Lignes de séparation des blocs</string>
+    <string name="setting_block_lines_desc">Fines lignes verticales entre les blocs dans le graphique. Elles servent de repère ; désactivez-les pour un rendu plus épuré.</string>
     <string name="status_saved">Paramètres Enregistrés Automatiquement</string>
     <string name="btn_save_and_exit">Enregistrer et Fermer</string>
     <string name="zone_green">Modéré</string>

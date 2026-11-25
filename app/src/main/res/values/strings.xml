@@ -223,6 +223,8 @@ Terrain files: %3$d (%4$d MB)
     <string name="font_xxl">XXL</string>
     <string name="setting_flat_profile">Flat 2D profile</string>
     <string name="setting_flat_profile_desc">Draws the 3D graph without isometric depth (no boxy look). Everything else stays the same.</string>
+    <string name="setting_block_lines">Block separator lines</string>
+    <string name="setting_block_lines_desc">Thin vertical lines between blocks inside the graph. They are a useful reference; turn them off for a cleaner look.</string>
     <string name="status_saved">Settings Saved Automatically</string>
     <string name="btn_save_and_exit">Save &amp; Exit</string>
 
