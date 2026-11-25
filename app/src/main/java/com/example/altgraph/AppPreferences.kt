@@ -210,6 +210,11 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean("show_block_lines_3d", true)
         set(value) = prefs.edit().putBoolean("show_block_lines_3d", value).apply()
 
+    // Líneas verticales de las cotas de altitud en el perfil 3D (activadas por defecto)
+    var showCotaLines3d: Boolean
+        get() = prefs.getBoolean("show_cota_lines_3d", true)
+        set(value) = prefs.edit().putBoolean("show_cota_lines_3d", value).apply()
+
     // Botones de zoom del Horizonte Táctico (sin ruta). Hasta que se elija, hereda el ajuste anterior, que era único para 3D
     var showHorizonZoomControls: Boolean
         get() = prefs.getBoolean(KEY_SHOW_HORIZON_ZOOM, prefs.getBoolean(KEY_SHOW_3D_ZOOM, true))

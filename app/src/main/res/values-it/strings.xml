@@ -208,6 +208,8 @@ File del terreno: %3$d (%4$d MB)
     <string name="setting_flat_profile_desc">Disegna il grafico 3D senza profondità isometrica (senza effetto scatola). Il resto rimane uguale.</string>
     <string name="setting_block_lines">Linee separatrici dei blocchi</string>
     <string name="setting_block_lines_desc">Sottili linee verticali tra i blocchi nel grafico. Servono da riferimento; disattivale per un aspetto più pulito.</string>
+    <string name="setting_cota_lines">Linee delle quote di altitudine</string>
+    <string name="setting_cota_lines_desc">Linee verticali delle quote di altitudine (ad es. 58 m). Il testo della quota rimane; viene nascosta solo la linea.</string>
     <string name="status_saved">Impostazioni Salvate Automaticamente</string>
     <string name="btn_save_and_exit">Salva ed Esci</string>
     <string name="zone_green">Moderata</string>

@@ -223,6 +223,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         altimetria3DView.oasisDistanceToNextCrucible = strategy.oasisDistanceToNextCrucible
                         altimetria3DView.flatProfile = prefs.flatProfile3d
                         altimetria3DView.showBlockLines = prefs.showBlockLines3d
+                        altimetria3DView.showCotaLines = prefs.showCotaLines3d
                         altimetria3DView.energyBatteryLevel = strategy.energyBatteryLevel
                 
                         // ELITE & W'bal

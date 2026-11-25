@@ -33,6 +33,9 @@ private const val FIT_AXIS_HYSTERESIS = 0.20f
 // Anchura de sub-bloque (px) por debajo de la cual el modo "auto" fusiona bloques vecinos del mismo color
 private const val MERGE_AUTO_MAX_BLOCK_PX = 56f
 
+// Cada bloque del perfil se solapa un poco con el siguiente: sin ello, el suavizado de bordes deja costuras finas donde se ve el fondo
+private const val SLICE_OVERLAP_PX = 0.7f
+
 class Altimetria3DView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -661,6 +664,8 @@ class Altimetria3DView @JvmOverloads constructor(
     var flatProfile: Boolean = false
     // Líneas verticales que separan los bloques dentro del gráfico
     var showBlockLines: Boolean = true
+    // Líneas verticales de las cotas de altitud (el texto de la cota no depende de esto)
+    var showCotaLines: Boolean = true
     private var zoomButtonsBottomY: Float = 0f
     private var showBlockPercentages: Boolean = true
     private var curvatureOffsets: List<Float> = emptyList()
@@ -1901,8 +1906,8 @@ class Altimetria3DView @JvmOverloads constructor(
             val shouldDrawCota = showCotas && (!isLargeScale || k == maxMajorIdx || k == minMajorIdx)
 
             if (shouldDrawCota) {
-                // Línea vertical que sube un poco por encima del perfil
-                canvas.drawLine(px, pyTop - 12f, px, pyBase, cotaLinePaint)
+                // Línea vertical que sube un poco por encima del perfil (opcional; el texto de la cota se mantiene)
+                if (showCotaLines) canvas.drawLine(px, pyTop - 12f, px, pyBase, cotaLinePaint)
                 if (peakXs.any { abs(it - px) < 14f }) continue
                 
                 val cotaText = Units.group(majorElevations[k].toLong())
@@ -2705,8 +2710,8 @@ class Altimetria3DView @JvmOverloads constructor(
 
             wallPath.reset()
             wallPath.moveTo(xFront[i], yFront[i])
-            wallPath.lineTo(xFront[i + 1], yFront[i + 1])
-            wallPath.lineTo(xFront[i + 1], yBase[i + 1])
+            wallPath.lineTo(xFront[i + 1] + SLICE_OVERLAP_PX, yFront[i + 1])
+            wallPath.lineTo(xFront[i + 1] + SLICE_OVERLAP_PX, yBase[i + 1])
             wallPath.lineTo(xFront[i], yBase[i])
             wallPath.close()
 
@@ -2786,8 +2791,8 @@ class Altimetria3DView @JvmOverloads constructor(
 
             wallPath.reset()
             wallPath.moveTo(xFront[i], yFront[i])
-            wallPath.lineTo(xFront[i + 1], yFront[i + 1])
-            wallPath.lineTo(xFront[i + 1], yBase[i + 1])
+            wallPath.lineTo(xFront[i + 1] + SLICE_OVERLAP_PX, yFront[i + 1])
+            wallPath.lineTo(xFront[i + 1] + SLICE_OVERLAP_PX, yBase[i + 1])
             wallPath.lineTo(xFront[i], yBase[i])
             wallPath.close()
 
@@ -3124,8 +3129,8 @@ class Altimetria3DView @JvmOverloads constructor(
         for (i in 0 until totalMicroSamples - 1) {
             wallPath.reset()
             wallPath.moveTo(xFront[i], yFront[i])
-            wallPath.lineTo(xFront[i + 1], yFront[i + 1])
-            wallPath.lineTo(xFront[i + 1], yBase[i + 1])
+            wallPath.lineTo(xFront[i + 1] + SLICE_OVERLAP_PX, yFront[i + 1])
+            wallPath.lineTo(xFront[i + 1] + SLICE_OVERLAP_PX, yBase[i + 1])
             wallPath.lineTo(xFront[i], yBase[i])
             wallPath.close()
             canvas.drawPath(wallPath, wallPaint)
@@ -3217,8 +3222,8 @@ class Altimetria3DView @JvmOverloads constructor(
         for (i in 0 until totalMicroSamples - 1) {
             wallPath.reset()
             wallPath.moveTo(xFront[i], yFront[i])
-            wallPath.lineTo(xFront[i + 1], yFront[i + 1])
-            wallPath.lineTo(xFront[i + 1], yBase[i + 1])
+            wallPath.lineTo(xFront[i + 1] + SLICE_OVERLAP_PX, yFront[i + 1])
+            wallPath.lineTo(xFront[i + 1] + SLICE_OVERLAP_PX, yBase[i + 1])
             wallPath.lineTo(xFront[i], yBase[i])
             wallPath.close()
             canvas.drawPath(wallPath, wallPaint)

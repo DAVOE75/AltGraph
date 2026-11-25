@@ -627,6 +627,17 @@ class MainActivity : Activity() {
         flatProfileCard.addView(TextView(this).apply {
             text = getString(R.string.setting_block_lines_desc); textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 4, 0, 4)
         })
+        flatProfileCard.addView(Switch(this).apply {
+            text = getString(R.string.setting_cota_lines)
+            textSize = 15f
+            setTextColor(Color.WHITE)
+            setPadding(0, 12, 0, 0)
+            isChecked = prefs.showCotaLines3d
+            setOnCheckedChangeListener { _, isChecked -> prefs.showCotaLines3d = isChecked }
+        })
+        flatProfileCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_cota_lines_desc); textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 4, 0, 4)
+        })
 
         // Zoom según la velocidad: solo Ruta Global (con ruta precargada); el Horizonte Táctico usa su distancia fija
         val speedZoomCard = createCardContainer()

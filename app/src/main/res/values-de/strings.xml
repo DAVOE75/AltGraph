@@ -208,6 +208,8 @@ Gel?ndedateien: %3$d (%4$d MB)
     <string name="setting_flat_profile_desc">Zeichnet das 3D-Diagramm ohne isometrische Tiefe (ohne Kasten-Optik). Alles andere bleibt gleich.</string>
     <string name="setting_block_lines">Blocktrennlinien</string>
     <string name="setting_block_lines_desc">Dünne senkrechte Linien zwischen den Blöcken im Diagramm. Sie dienen als Orientierung; für eine sauberere Optik ausschalten.</string>
+    <string name="setting_cota_lines">Höhenmarkierungslinien</string>
+    <string name="setting_cota_lines_desc">Senkrechte Linien der Höhenmarkierungen (z. B. 58 m). Der Markierungstext bleibt; nur die Linie wird ausgeblendet.</string>
     <string name="status_saved">Einstellungen automatisch gespeichert</string>
     <string name="btn_save_and_exit">Speichern und Schließen</string>
     <string name="zone_green">Moderat</string>
