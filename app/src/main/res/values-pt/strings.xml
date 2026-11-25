@@ -603,5 +603,6 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="action_zoom_in_title">AltGraph: Ampliar Zoom</string>
     <string name="action_zoom_out_title">AltGraph: Reduzir Zoom</string>
     <string name="setting_3d_match_radar_zoom">Ajustar rota 3D ao zoom do radar</string>
+    <string name="setting_horizon_match_radar_zoom">Ajustar horizonte preditivo ao zoom do radar</string>
     <string name="setting_3d_match_radar_zoom_desc">Sincroniza a escala da Rota Global 3D com o Radar Altimétrico. Ao ajustar o zoom do mapa com os botões físicos, a vista 3D adapta-se automaticamente à mesma distância métrica mesmo noutra página.</string>
 </resources>

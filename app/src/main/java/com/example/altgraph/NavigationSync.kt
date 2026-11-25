@@ -16,6 +16,7 @@ object NavigationSync {
     val STREAM_TYPES: List<String> = listOf(
         DataType.Type.SPEED,
         DataType.Type.AVERAGE_SPEED,
+        DataType.Type.DISTANCE,
         DataType.Type.PRESSURE_ELEVATION_CORRECTION,
         DataType.Type.ELEVATION_GRADE,
         DataType.Type.POWER,
@@ -100,6 +101,11 @@ object NavigationSync {
                 val speed = values[DataType.Field.SPEED] ?: single ?: 0.0
                 // Log.v(TAG, "STREAM SPEED: $speed m/s") // Opcional, puede generar mucho ruido
                 calc.currentSpeed = speed
+            }
+            DataType.Type.DISTANCE -> {
+                // Distancia de la salida según Karoo (se reinicia con cada grabación): sustituye a la acumulada por GPS
+                val d = values[DataType.Field.DISTANCE] ?: single
+                if (d != null && d >= 0.0) calc.setRideDistanceFromKaroo(d)
             }
             DataType.Type.AVERAGE_SPEED -> {
                 calc.rideAverageSpeed = values[DataType.Field.SPEED] ?: single ?: 0.0

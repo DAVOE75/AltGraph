@@ -532,9 +532,17 @@ class AltimetriaStrategyCalculator {
         private set
     private var ascentRef = Double.NaN
 
+    // Con la distancia que da Karoo, la propia acumulación por GPS deja de sumar (si no, se contaría dos veces)
+    private var karooDistanceSeen = false
+
+    fun setRideDistanceFromKaroo(meters: Double) {
+        karooDistanceSeen = true
+        rideDistanceM = meters
+    }
+
     // Distancia y desnivel positivo de la salida; el desnivel solo suma subidas de 3 m o mas para no contar ruido
     private fun accumulateRide(lat: Double, lng: Double) {
-        if (currentLatitude != 0.0 && currentLongitude != 0.0) {
+        if (currentLatitude != 0.0 && currentLongitude != 0.0 && !karooDistanceSeen) {
             val dy = (lat - currentLatitude) * 111_320.0
             val dx = (lng - currentLongitude) * 111_320.0 * Math.cos(Math.toRadians(lat))
             val step = Math.hypot(dx, dy)
@@ -2373,6 +2381,10 @@ class AltimetriaStrategyCalculator {
             var horizonProgress = 0f
             var horizonWindowStart = 0.0
             var horizonGridOffset = 0.0
+            var horizonStep = 0.0
+            var busCoords: List<Pair<Double, Double>>? = null
+            var busGrades: List<Float> = emptyList()
+            var busS = 0.0
             if (horizonEnabled && currentLatitude != 0.0 && currentLongitude != 0.0 && effectiveCtx != null) {
                 val pagedBeacon = prefs?.beaconMode3d == AppPreferences.BEACON_MODE_PAGED
                 val predictor = RoadHorizonPredictor.getInstance(effectiveCtx)
@@ -2445,6 +2457,11 @@ class AltimetriaStrategyCalculator {
                         val frac = projectOnHorizon(cur, currentLatitude, currentLongitude)
                         s = if (frac != null) frac.toDouble() * (size - 1) else if (pagedBeacon) 0.0 else nb.toDouble()
                     }
+                    // La línea del mapa usa la distancia predictiva completa (no la ventana del zoom): desde el ciclista hasta horizonPredM por delante
+                    val mapEnd = minOf(size, Math.floor(s + horizonPredM / stepM).toInt() + 2).coerceAtLeast(2)
+                    busCoords = cur.coordinates.subList(0, mapEnd)
+                    busGrades = cur.grades.subList(0, minOf(cur.grades.size, mapEnd - 1))
+                    busS = s
                     if (pagedBeacon) {
                         // Baliza móvil: perfil estático que se conserva hasta llegar al final; longitud siempre igual a la pedida
                         val padded = padHorizon(cur, count, stepM)
@@ -2453,27 +2470,46 @@ class AltimetriaStrategyCalculator {
                     } else {
                         // Baliza ancla: ventana de longitud fija con el ciclista siempre al 20 %. La rejilla de bloques queda anclada
                         // al trazado y la vista compensa la fracción (gridOffset): los bloques no se mueven ni cambian de color.
-                        var startF = s - BEACON_ANCHOR_FRACTION * (count - 1)
+                        // La baliza arranca en 0 m (borde izquierdo), avanza hasta el 20 % de la ventana y ahí queda fija
+                        val riderOffM = minOf(rideDistanceM.coerceAtLeast(0.0), BEACON_ANCHOR_FRACTION * (count - 1) * stepM)
+                        var startF = s - riderOffM / stepM
                         // Desplazamiento manual (botones < >): mueve la ventana sobre el trazado ya calculado, sin salirse de él
                         val panned = manualPanOffsetMeters != 0.0
                         if (panned) startF = (startF + manualPanOffsetMeters / stepM).coerceIn(0.0, Math.max(0.0, (size - count).toDouble()))
-                        val i0 = Math.floor(startF).toInt()
-                        fun idx(i: Int) = i.coerceIn(0, size - 1)
-                        val elevs = List(count) { j -> cur.elevations[idx(i0 + j)] }
-                        val grades = List(count - 1) { j ->
-                            val k = i0 + j
+                        // Distancia de salida del borde izquierdo de la ventana; la rejilla de bloques se ancla a múltiplos del bloque mayor
+                        // en esa distancia (no al trazado), para que el 0 m caiga justo bajo la baliza al empezar
+                        val wsRide = rideDistanceM - (s - startF) * stepM
+                        val gq = Math.round(getMajorBlockSize(lookaheadDist) / stepM).toInt().coerceAtLeast(1) * stepM
+                        val gridStartD = Math.floor(wsRide / gq) * gq
+                        val startFn = s + (gridStartD - rideDistanceM) / stepM
+                        val n = count + Math.ceil(gq / stepM).toInt() + 2
+                        fun at(i: Int) = i.coerceIn(0, size - 1)
+                        fun lerpE(f: Double): Float {
+                            val i = Math.floor(f).toInt(); val t = (f - i).toFloat()
+                            val a = cur.elevations[at(i)]; val b = cur.elevations[at(i + 1)]
+                            return a + (b - a) * t
+                        }
+                        val elevs = List(n) { j -> lerpE(startFn + j) }
+                        val grades = List(n - 1) { j ->
+                            val k = Math.floor(startFn + j).toInt()
                             if (k < 0 || k >= cur.grades.size) 0f else cur.grades[k]
                         }
-                        val coords = List(count) { j -> cur.coordinates[idx(i0 + j)] }
-                        horizonGridOffset = (startF - i0) * stepM
+                        val coords = List(n) { j ->
+                            val f = startFn + j
+                            val i = Math.floor(f).toInt(); val t = f - i
+                            val a = cur.coordinates[at(i)]; val b = cur.coordinates[at(i + 1)]
+                            Pair(a.first + (b.first - a.first) * t, a.second + (b.second - a.second) * t)
+                        }
+                        horizonGridOffset = wsRide - gridStartD
                         // El eje cuenta la distancia acumulada de la salida: la flecha marca los km recorridos y el resto sigue la escala
-                        horizonWindowStart = rideDistanceM - (s - startF) * stepM
+                        horizonWindowStart = wsRide
+                        horizonStep = stepM
                         horizonResult = RoadHorizonPredictor.HorizonResult(
                             elevations = elevs, grades = grades, coordinates = coords, roadName = cur.roadName,
                             totalDistanceMeters = (count - 1) * stepM,
                             guessFromMeters = if (cur.guessFromMeters >= 0.0) cur.guessFromMeters - startF * stepM else -1.0
                         )
-                        horizonProgress = if (panned) ((s - startF) / (count - 1)).toFloat().coerceIn(0f, 1f) else BEACON_ANCHOR_FRACTION.toFloat()
+                        horizonProgress = ((s - startF) / (count - 1)).toFloat().coerceIn(0f, 1f)
                     }
                 }
             }
@@ -2494,8 +2530,12 @@ class AltimetriaStrategyCalculator {
                     horizonResult.elevations.map { it + off }
                 } else horizonResult.elevations
                 val hGrades = horizonResult.grades
-                val stepMeters = horizonResult.totalDistanceMeters / (hElevs.size - 1)
-                if (advance) HorizonOverlayBus.publish(horizonResult.coordinates, hGrades, stepMeters, horizonProgress.toDouble() * (nElev - 1))
+                val stepMeters = if (horizonStep > 0.0) horizonStep else horizonResult.totalDistanceMeters / (hElevs.size - 1)
+                if (advance) {
+                    val bc = busCoords
+                    if (bc != null && bc.size >= 2) HorizonOverlayBus.publish(bc, busGrades, stepMeters, busS)
+                    else HorizonOverlayBus.publish(horizonResult.coordinates, hGrades, stepMeters, horizonProgress.toDouble() * (nElev - 1))
+                }
                 val majorBlockSize = (Math.round(getMajorBlockSize(lookaheadDist) / stepMeters).toInt().coerceAtLeast(1)) * stepMeters
 
                 val alertPct = prefs?.horizonAlertPct ?: 0

@@ -212,7 +212,8 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         val strategy = AltgraphRepository.strategyFor3D(snap)
                         val prefs = AppPreferences.getInstance(context)
                         // Sin ruta el gráfico es el Horizonte Táctico; con ruta, la Ruta Global: cada uno tiene su propio ajuste de botones de zoom
-                        val zoomControls = if (strategy.routeTotalLength <= 0.0) prefs.showHorizonZoomControls else prefs.show3dZoomControls
+                        val zoomControls = if (strategy.routeTotalLength <= 0.0) prefs.showHorizonZoomControls && !prefs.horizonMatchRadarZoom
+                            else prefs.show3dZoomControls && !prefs.match3dToRadarZoom // con el zoom ligado al radar no hay botones
                         val startElev = if (strategy.windowStartElevation > 0.0) strategy.windowStartElevation else snap.currentElevation
 
                         // Nada ha cambiado (parado, sin ruta...): no redibujar ni reenviar el bitmap.
@@ -466,7 +467,7 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             remoteViews.setViewVisibility(R.id.zoom_controls_side, android.view.View.GONE)
                             // Sin botones: cualquier toque en la gráfica hace zoom (ver ACTION_TAP_ZOOM).
                             // En el Horizonte Táctico sin botones el zoom lo marca el mapa, así que el toque no hace nada y no se activa
-                            if (!strategy.isHorizon) {
+                            if (!strategy.isHorizon && !prefs.match3dToRadarZoom) {
                                 val tapZoom = PendingIntent.getBroadcast(context, 6, Intent(ACTION_TAP_ZOOM).apply { setPackage(context.packageName) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                                 remoteViews.setViewVisibility(R.id.tap_zoom_area, android.view.View.VISIBLE)
                                 remoteViews.setOnClickPendingIntent(R.id.tap_zoom_area, tapZoom)

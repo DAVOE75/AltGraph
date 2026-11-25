@@ -630,5 +630,6 @@ Terrain files: %3$d (%4$d MB)
     <string name="action_zoom_in_title">AltGraph: Zoom In</string>
     <string name="action_zoom_out_title">AltGraph: Zoom Out</string>
     <string name="setting_3d_match_radar_zoom">Match 3D route to radar zoom</string>
+    <string name="setting_horizon_match_radar_zoom">Match predictive horizon to radar zoom</string>
     <string name="setting_3d_match_radar_zoom_desc">Synchronizes the 3D Global Route zoom with the Altimetry Radar. Adjusting map zoom with Karoo buttons on the map screen automatically scales the 3D view to the same metric range, even when viewed on a different page.</string>
 </resources>

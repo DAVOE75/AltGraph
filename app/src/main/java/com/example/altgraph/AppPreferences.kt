@@ -220,6 +220,11 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_SHOW_HORIZON_ZOOM, prefs.getBoolean(KEY_SHOW_3D_ZOOM, true))
         set(value) = prefs.edit().putBoolean(KEY_SHOW_HORIZON_ZOOM, value).apply()
 
+    // Horizonte Táctico: el zoom visible sigue el del mapa/radar (sin botones de zoom)
+    var horizonMatchRadarZoom: Boolean
+        get() = prefs.getBoolean("horizon_match_radar_zoom", false)
+        set(value) = prefs.edit().putBoolean("horizon_match_radar_zoom", value).apply()
+
     // Botones de zoom del Visor de Puertos
     var showClimbZoomControls: Boolean
         get() = prefs.getBoolean(KEY_SHOW_CLIMB_ZOOM, true)

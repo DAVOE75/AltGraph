@@ -834,8 +834,11 @@ class MainActivity : Activity() {
             isChecked = prefs.match3dToRadarZoom
             setOnCheckedChangeListener { _, isChecked ->
                 prefs.match3dToRadarZoom = isChecked
+                // Con el zoom ligado al radar los botones no sirven: se ocultan y su ajuste desaparece del panel
+                showZoomCard.visibility = if (isChecked) View.GONE else View.VISIBLE
             }
         }
+        showZoomCard.visibility = if (prefs.match3dToRadarZoom) View.GONE else View.VISIBLE
         val mirrorMapDesc = TextView(this).apply {
             text = getString(R.string.setting_3d_match_radar_zoom_desc)
             textSize = 12f
@@ -1859,7 +1862,15 @@ class MainActivity : Activity() {
         addDescNow(R.string.horizon_desc_zoom)
         pendingDesc = R.string.horizon_desc_subblock
         addOpt(horizonSpinner(getString(R.string.setting_horizon_subblock), listOf(50, 100, 250, 500), prefs.horizonSubBlockM) { prefs.horizonSubBlockM = it })
-        addOpt(horizonSwitch(getString(R.string.setting_show_horizon_zoom), prefs.showHorizonZoomControls) { prefs.showHorizonZoomControls = it })
+        // Zoom ligado al radar: con él activo los botones de zoom se ocultan y su ajuste desaparece del panel
+        val horizonZoomBtnSwitch = horizonSwitch(getString(R.string.setting_show_horizon_zoom), prefs.showHorizonZoomControls) { prefs.showHorizonZoomControls = it }
+        val horizonMatchSwitch = horizonSwitch(getString(R.string.setting_horizon_match_radar_zoom), prefs.horizonMatchRadarZoom) {
+            prefs.horizonMatchRadarZoom = it
+            horizonZoomBtnSwitch.visibility = if (it) View.GONE else View.VISIBLE
+        }
+        horizonZoomBtnSwitch.visibility = if (prefs.horizonMatchRadarZoom) View.GONE else View.VISIBLE
+        addOpt(horizonMatchSwitch)
+        roadHorizonCard.addView(horizonZoomBtnSwitch)
 
         fun labelSpinner(title: String, labels: List<String>, current: Int, onPick: (Int) -> Unit): LinearLayout {
             val row = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(0, 8, 0, 4) }
