@@ -115,7 +115,20 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                         s.routeTotalLength.takeIf { it > 500.0 }?.toInt()
                             ?: if (s.strategy.isHorizon && ctx != null) AppPreferences.getInstance(ctx).horizonDistanceM else null
                     }
-                    if (intent?.action == ACTION_TAP_ZOOM && ctx != null) {
+                    val hzSnap = AltgraphRepository.snapshot.value
+                    val inHorizon = hzSnap != null && hzSnap.strategy.isHorizon && hzSnap.routeTotalLength <= 0.0
+                    val isZoomAction = intent?.action == ACTION_TAP_ZOOM || intent?.action == ACTION_ZOOM_IN || intent?.action == ACTION_ZOOM_OUT
+                    if (ctx != null && inHorizon && isZoomAction) {
+                        // Horizonte Táctico: la vista parte de la distancia predictiva; el toque baja de nivel y vuelve a ella
+                        val prefs = AppPreferences.getInstance(ctx)
+                        val pred = prefs.horizonDistanceM
+                        val view = prefs.horizonViewM
+                        prefs.horizonViewM = when (intent?.action) {
+                            ACTION_ZOOM_IN -> ZoomLadder.horizonIn(view, pred)
+                            ACTION_ZOOM_OUT -> ZoomLadder.horizonOut(view, pred)
+                            else -> ZoomLadder.horizonCycle(view, pred)
+                        }
+                    } else if (intent?.action == ACTION_TAP_ZOOM && ctx != null) {
                         val prefs = AppPreferences.getInstance(ctx)
                         val now = SystemClock.elapsedRealtime()
                         val curr = routeMaxMeters?.let { minOf(prefs.lookaheadMeters3d, it) } ?: prefs.lookaheadMeters3d
@@ -466,8 +479,9 @@ class Altimetria3DGraphDataType(extension: String) : DataTypeImpl(extension, "al
                             remoteViews.setViewVisibility(R.id.zoom_controls_top, android.view.View.GONE)
                             remoteViews.setViewVisibility(R.id.zoom_controls_side, android.view.View.GONE)
                             // Sin botones: cualquier toque en la gráfica hace zoom (ver ACTION_TAP_ZOOM).
-                            // En el Horizonte Táctico sin botones el zoom lo marca el mapa, así que el toque no hace nada y no se activa
-                            if (!strategy.isHorizon && !prefs.match3dToRadarZoom) {
+                            // En el Horizonte el toque baja de nivel y vuelve a la distancia predictiva; no actúa si el zoom va ligado al radar
+                            val tapOk = if (strategy.isHorizon) !prefs.horizonMatchRadarZoom else !prefs.match3dToRadarZoom
+                            if (tapOk) {
                                 val tapZoom = PendingIntent.getBroadcast(context, 6, Intent(ACTION_TAP_ZOOM).apply { setPackage(context.packageName) }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
                                 remoteViews.setViewVisibility(R.id.tap_zoom_area, android.view.View.VISIBLE)
                                 remoteViews.setOnClickPendingIntent(R.id.tap_zoom_area, tapZoom)

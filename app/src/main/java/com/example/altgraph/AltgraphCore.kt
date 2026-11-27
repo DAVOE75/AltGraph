@@ -153,9 +153,9 @@ class AltgraphCore(val calculator: AltimetriaStrategyCalculator = AltimetriaStra
         val navigating = calculator.isNavigatingRoute &&
             (calculator.routePoints.isNotEmpty() || calculator.routeElevationProfile.isNotEmpty())
         val prefs = context?.let { AppPreferences.getInstance(it) }
-        // Horizonte Táctico: con botones de zoom lo fija el usuario; sin ellos el 3D sigue siempre el zoom del mapa
+        // Horizonte Táctico: el zoom lo fija el usuario (botones o toque en la gráfica) salvo que se ligue al zoom del radar/mapa
         val horizonFree = !navigating && prefs?.roadHorizonEnabled == true
-        val horizonManual = horizonFree && prefs?.showHorizonZoomControls == true && prefs.horizonMatchRadarZoom.not()
+        val horizonManual = horizonFree && prefs?.horizonMatchRadarZoom == false
         val mirrorMap3D = (prefs?.match3dToRadarZoom ?: false) || (horizonFree && !horizonManual)
 
         val needsRecalc = pan3dMeters != 0.0 || (mirrorMap3D && mapZoomLevel != null) || horizonManual

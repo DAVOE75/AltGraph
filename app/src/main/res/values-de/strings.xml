@@ -127,7 +127,7 @@ Gel?ndedateien: %3$d (%4$d MB)
     <string name="horizon_speed_zoom">Geschwindigkeitsabhängiger Zoom (Globale Route)</string>
     <string name="horizon_speed_zoom_desc">Langsamer = näherer Zoom (Anstieg); schneller = weiterer Zoom, um mehr Gelände voraus zu sehen. Von 250 m (8 km/h oder weniger) bis 5 km (40 km/h oder mehr). Nur mit geladener Route.</string>
     <string name="horizon_btn_update_radius">Download für neuen Radius aktualisieren</string>
-    <string name="horizon_desc_zoom">Wie weit die Straße voraus vorhergesagt wird, wenn keine Route geladen ist (500-m-Schritte). Der sichtbare Zoom ist ein Teil davon: per Zoom-Tasten oder, wenn diese ausgeblendet sind, über den Kartenzoom.</string>
+    <string name="horizon_desc_zoom">Wie weit die Straße voraus vorhergesagt wird, wenn keine Route geladen ist (volle km, 1 bis 10, dann 15 und 20). Das ist auch die Standardansicht: Tippe auf das Diagramm (oder nutze die Zoom-Tasten), um kürzere Distanzen durchzugehen; ein weiteres Tippen kehrt hierher zurück. Mit "an Radar-Zoom anpassen" bestimmt die Karte die Ansicht.</string>
     <string name="horizon_desc_subblock">Länge jedes farbigen Blocks im Profil. Kleiner = mehr Details.</string>
     <string name="horizon_desc_junction">Welche Straße an einer Kreuzung angenommen wird, wenn der Weg unklar ist.</string>
     <string name="horizon_desc_smoothing">Glättet kleine Geländesprünge (Gebäude, Bäume), die falsche Rampen erzeugen. Hoch für Flachstücke, niedrig für Anstiege.</string>

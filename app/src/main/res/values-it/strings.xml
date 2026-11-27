@@ -127,7 +127,7 @@ File del terreno: %3$d (%4$d MB)
     <string name="horizon_speed_zoom">Zoom in base alla velocità (Percorso Globale)</string>
     <string name="horizon_speed_zoom_desc">Più lento = zoom più vicino (salita); più veloce = zoom più lontano per vedere più terreno davanti. Da 250 m (8 km/h o meno) a 5 km (40 km/h o più). Solo con un percorso caricato.</string>
     <string name="horizon_btn_update_radius">Aggiorna il download per il nuovo raggio</string>
-    <string name="horizon_desc_zoom">Fino a dove viene prevista la strada davanti senza percorso caricato (a passi di 500 m). Lo zoom visibile ne è una parte: lo decidono i pulsanti zoom o, se nascosti, lo zoom della mappa.</string>
+    <string name="horizon_desc_zoom">Fino a dove viene prevista la strada davanti senza percorso caricato (km interi, da 1 a 10, poi 15 e 20). È anche la vista predefinita: tocca il grafico (o usa i pulsanti zoom) per scorrere distanze più brevi; un altro tocco torna a questa. Con "adatta a zoom radar" la vista la decide la mappa.</string>
     <string name="horizon_desc_subblock">Lunghezza di ogni blocco colorato del profilo. Più piccolo = più dettaglio.</string>
     <string name="horizon_desc_junction">Quale strada ipotizzare a un incrocio quando la direzione non è chiara.</string>
     <string name="horizon_desc_smoothing">Attenua i piccoli salti del terreno (edifici, alberi) che creano false rampe. Alto per il piano, basso per le salite.</string>

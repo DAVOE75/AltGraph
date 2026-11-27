@@ -144,7 +144,7 @@ Terrain files: %3$d (%4$d MB)
     <string name="horizon_speed_zoom">Speed-based zoom (Global Route)</string>
     <string name="horizon_speed_zoom_desc">Slower = closer zoom (climbing); faster = farther zoom to see more terrain ahead. From 250 m (8 km/h or less) to 5 km (40 km/h or more). Only with a loaded route.</string>
     <string name="horizon_btn_update_radius">Update download for new radius</string>
-    <string name="horizon_desc_zoom">How far ahead the road is predicted when no route is loaded (500 m steps). The zoom you see is a part of it: set with the zoom buttons or, if they are hidden, by the map zoom.</string>
+    <string name="horizon_desc_zoom">How far ahead the road is predicted when no route is loaded (whole km, 1 to 10, then 15 and 20). It is also the default view: tap the graph (or use the zoom buttons) to step through shorter distances, and one more tap returns to this one. With "match to radar zoom", the map sets the view.</string>
     <string name="horizon_desc_subblock">Length of each colored block of the profile. Smaller = more detail.</string>
     <string name="horizon_desc_junction">Which road to assume at a junction when the way ahead is unclear.</string>
     <string name="horizon_desc_smoothing">Evens out small terrain bumps (buildings, trees) that create false ramps. High suits flat roads; low suits climbs.</string>

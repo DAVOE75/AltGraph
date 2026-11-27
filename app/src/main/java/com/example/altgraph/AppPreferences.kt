@@ -293,6 +293,11 @@ class AppPreferences(context: Context) {
         get() = prefs.getInt("road_horizon_distance_m", 2000)
         set(value) = prefs.edit().putInt("road_horizon_distance_m", value).apply()
 
+    // Distancia visible del Horizonte Táctico (zoom) elegida con los botones o tocando la gráfica; 0 = la distancia predictiva
+    var horizonViewM: Int
+        get() = prefs.getInt("road_horizon_view_m", 0)
+        set(value) = prefs.edit().putInt("road_horizon_view_m", value).apply()
+
     var speedZoomEnabled: Boolean
         get() = prefs.getBoolean("speed_zoom_enabled", false)
         set(value) = prefs.edit().putBoolean("speed_zoom_enabled", value).apply()

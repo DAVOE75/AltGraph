@@ -1858,7 +1858,12 @@ class MainActivity : Activity() {
             roadHorizonCard.addView(horizonDivider()); roadHorizonCard.addView(v)
             pendingDesc?.let { addDescNow(it); pendingDesc = null }
         }
-        roadHorizonCard.addView(horizonSpinner(getString(R.string.setting_horizon_zoom), (1..60).map { it * 500 }, prefs.horizonDistanceM) { prefs.horizonDistanceM = it })
+        val hzValues = listOf(1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 15000, 20000)
+        val hzCurrent = ZoomLadder.nearestHorizonLevel(prefs.horizonDistanceM)
+        roadHorizonCard.addView(horizonSpinner(getString(R.string.setting_horizon_zoom), hzValues, hzCurrent) {
+            // Al elegir otra distancia, la vista vuelve a ser esa distancia; abrir el panel sin cambiarla no toca el zoom
+            if (it != prefs.horizonDistanceM) { prefs.horizonDistanceM = it; prefs.horizonViewM = 0 }
+        })
         addDescNow(R.string.horizon_desc_zoom)
         pendingDesc = R.string.horizon_desc_subblock
         addOpt(horizonSpinner(getString(R.string.setting_horizon_subblock), listOf(50, 100, 250, 500), prefs.horizonSubBlockM) { prefs.horizonSubBlockM = it })

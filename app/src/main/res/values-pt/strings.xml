@@ -127,7 +127,7 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="horizon_speed_zoom">Zoom conforme a velocidade (Rota Global)</string>
     <string name="horizon_speed_zoom_desc">Mais lento = zoom mais próximo (a subir); mais rápido = zoom mais afastado para ver mais terreno à frente. De 250 m (8 km/h ou menos) a 5 km (40 km/h ou mais). Só com uma rota carregada.</string>
     <string name="horizon_btn_update_radius">Atualizar download para o novo raio</string>
-    <string name="horizon_desc_zoom">Até onde a estrada é prevista à frente sem rota carregada (passos de 500 m). O zoom visível é uma parte dela: definido pelos botões de zoom ou, se estiverem ocultos, pelo zoom do mapa.</string>
+    <string name="horizon_desc_zoom">Até onde a estrada é prevista à frente sem rota carregada (km inteiros, de 1 a 10, depois 15 e 20). É também a vista predefinida: toque no gráfico (ou use os botões de zoom) para passar por distâncias mais curtas; mais um toque volta a esta. Com "ajustar ao zoom do radar", o mapa define a vista.</string>
     <string name="horizon_desc_subblock">Comprimento de cada bloco colorido do perfil. Menor = mais detalhe.</string>
     <string name="horizon_desc_junction">Que estrada assumir num cruzamento quando o caminho não é claro.</string>
     <string name="horizon_desc_smoothing">Suaviza pequenos saltos do terreno (edifícios, árvores) que criam rampas falsas. Alto para plano; baixo para subidas.</string>

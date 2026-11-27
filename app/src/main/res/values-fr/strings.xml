@@ -127,7 +127,7 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="horizon_speed_zoom">Zoom selon la vitesse (Route Globale)</string>
     <string name="horizon_speed_zoom_desc">Plus lent = zoom plus proche (montée) ; plus rapide = zoom plus lointain pour voir plus de terrain devant. De 250 m (8 km/h ou moins) à 5 km (40 km/h ou plus). Uniquement avec un itinéraire chargé.</string>
     <string name="horizon_btn_update_radius">Mettre à jour le téléchargement pour le nouveau rayon</string>
-    <string name="horizon_desc_zoom">Jusqu\'où la route est prédite devant vous sans itinéraire chargé (par pas de 500 m). Le zoom affiché en est une partie : réglé par les boutons de zoom ou, s\'ils sont masqués, par le zoom de la carte.</string>
+    <string name="horizon_desc_zoom">Jusqu\'où la route est prédite devant vous sans itinéraire chargé (km entiers, de 1 à 10, puis 15 et 20). C\'est aussi la vue par défaut : touchez le graphique (ou utilisez les boutons de zoom) pour parcourir des distances plus courtes ; un touché de plus revient à celle-ci. Avec "ajuster au zoom du radar", la carte détermine la vue.</string>
     <string name="horizon_desc_subblock">Longueur de chaque bloc coloré du profil. Plus petit = plus de détails.</string>
     <string name="horizon_desc_junction">Quelle route supposer à un carrefour quand la suite est incertaine.</string>
     <string name="horizon_desc_smoothing">Lisse les petits écarts du terrain (bâtiments, arbres) qui créent de fausses rampes. Fort pour le plat, faible pour les montées.</string>

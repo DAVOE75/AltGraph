@@ -2352,7 +2352,7 @@ class AltimetriaStrategyCalculator {
             val mapM = mapZoomLevel?.let { mapZoomMeters(it) }
             lookaheadDist = when {
                 prefs?.beaconMode3d == AppPreferences.BEACON_MODE_PAGED -> horizonPredM
-                horizonManualZoom -> (prefs?.lookaheadMeters3d ?: 350).toDouble()
+                horizonManualZoom -> (prefs?.horizonViewM?.takeIf { it > 0 } ?: horizonPredM.toInt()).toDouble()
                 mapM != null -> mapM
                 else -> horizonPredM
             }.coerceIn(minViewM, horizonPredM)
