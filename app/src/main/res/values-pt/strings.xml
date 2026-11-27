@@ -605,4 +605,6 @@ Ficheiros de terreno: %3$d (%4$d MB)
     <string name="setting_3d_match_radar_zoom">Ajustar rota 3D ao zoom do radar</string>
     <string name="setting_horizon_match_radar_zoom">Ajustar horizonte preditivo ao zoom do radar</string>
     <string name="setting_3d_match_radar_zoom_desc">Sincroniza a escala da Rota Global 3D com o Radar Altimétrico. Ao ajustar o zoom do mapa com os botões físicos, a vista 3D adapta-se automaticamente à mesma distância métrica mesmo noutra página.</string>
+    <string name="setting_chart_exaggeration">Exagero vertical</string>
+    <string name="setting_chart_exaggeration_desc">Mais alto = relevo mais marcado com o eixo ajustado (x15 por predefinição). Só se aplica quando o eixo está ajustado à janela visível.</string>
 </resources>

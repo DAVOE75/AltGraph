@@ -605,4 +605,6 @@ Gel?ndedateien: %3$d (%4$d MB)
     <string name="setting_3d_match_radar_zoom">3D-Route an Radar-Zoom anpassen</string>
     <string name="setting_horizon_match_radar_zoom">Vorhersage-Horizont an Radar-Zoom anpassen</string>
     <string name="setting_3d_match_radar_zoom_desc">Synchronisiert den Maßstab der 3D-Global-Route mit dem Höhenradar. Wenn der Kartenzoom mit den Tasten geändert wird, passt sich die 3D-Ansicht automatisch derselben Distanz an.</string>
+    <string name="setting_chart_exaggeration">Vertikale Überhöhung</string>
+    <string name="setting_chart_exaggeration_desc">Höher = ausgeprägteres Relief bei angepasster Achse (x15 ist der Standard). Gilt nur, wenn die Achse an das sichtbare Fenster angepasst ist.</string>
 </resources>

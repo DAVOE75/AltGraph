@@ -1630,7 +1630,7 @@ class Altimetria3DView @JvmOverloads constructor(
             val fitRange = (medMax - medMin).coerceAtLeast(0f)
             // Eje ajustado a la ventana visible: tramo mínimo que crece con el zoom, redondeado a 5 m,
             // con el perfil en la parte alta del eje (FIT_AXIS_HEADROOM de la altura) para dejar aire arriba
-            val minSpan = (maxPeakHeight * totalMetersAhead.toFloat() / (w * FIT_AXIS_K)).coerceIn(FIT_AXIS_MIN_SPAN_M, FIT_AXIS_MAX_SPAN_M)
+            val minSpan = (maxPeakHeight * totalMetersAhead.toFloat() / (w * AppPreferences.getInstance(context).chartExaggeration.toFloat())).coerceIn(FIT_AXIS_MIN_SPAN_M, FIT_AXIS_MAX_SPAN_M)
             val span = (Math.ceil((maxOf(fitRange / FIT_AXIS_CAP, minSpan) / 5f).toDouble()) * 5.0).toFloat()
             // Histéresis: se mantiene el eje mientras los datos quepan, la cima no pase del 70 % de la altura
             // y el tramo nuevo no difiera más del 20 %

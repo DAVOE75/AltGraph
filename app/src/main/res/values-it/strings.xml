@@ -605,4 +605,6 @@ File del terreno: %3$d (%4$d MB)
     <string name="setting_3d_match_radar_zoom">Adatta percorso 3D a zoom radar</string>
     <string name="setting_horizon_match_radar_zoom">Adatta orizzonte predittivo a zoom radar</string>
     <string name="setting_3d_match_radar_zoom_desc">Sincronizza la scala del percorso 3D con il radar altimetrico. Regolando lo zoom della mappa tramite i tasti fisici, la vista 3D si adatterà automaticamente alla stessa distanza metrica anche su un\'altra pagina.</string>
+    <string name="setting_chart_exaggeration">Esagerazione verticale</string>
+    <string name="setting_chart_exaggeration_desc">Più alto = rilievo più marcato con l\'asse adattato (x15 è il valore predefinito). Si applica solo con l\'asse adattato alla finestra visibile.</string>
 </resources>

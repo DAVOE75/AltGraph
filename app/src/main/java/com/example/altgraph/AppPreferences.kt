@@ -265,6 +265,11 @@ class AppPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_SHOW_EXAGGERATION_TAG, true)
         set(value) = prefs.edit().putBoolean(KEY_SHOW_EXAGGERATION_TAG, value).apply()
 
+    // Factor de exageración vertical del eje ajustado (x15 por defecto, como hasta ahora)
+    var chartExaggeration: Int
+        get() = prefs.getInt("chart_exaggeration", 15)
+        set(value) = prefs.edit().putInt("chart_exaggeration", value).apply()
+
     var chartLightBackground: Boolean
         get() = prefs.getBoolean(KEY_CHART_LIGHT_BG, false)
         set(value) = prefs.edit().putBoolean(KEY_CHART_LIGHT_BG, value).apply()
@@ -694,7 +699,7 @@ class AppPreferences(context: Context) {
         prefs.edit()
             .remove(KEY_ALTIMETRIA_STYLE).remove(KEY_SHOW_BLOCK_PERCENTAGES).remove(KEY_SHOW_3D_COTAS).remove(KEY_SHOW_3D_RAMPS)
             .remove(KEY_SHOW_3D_SCALE_BAR).remove(KEY_SHOW_3D_BLOCK_LEGEND).remove(KEY_SHOW_CLIMB_SCALE_BAR).remove(KEY_ADAPT_GRADE_TEXT).remove(KEY_SHOW_3D_ROUTE_NAME)
-            .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_HEADER_STAT_1).remove(KEY_HEADER_STAT_2).remove(KEY_HEADER_STAT_3).remove(KEY_HEADER_STAT_4).remove(KEY_HEADER_STAT_5).remove("header_noroute_1").remove("header_noroute_2").remove("header_noroute_3").remove("header_noroute_4").remove("header_noroute_5").remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM).remove(KEY_SHOW_HORIZON_ZOOM).remove(KEY_SHOW_CLIMB_ZOOM)            .remove(KEY_CHART_FIT_AXIS).remove(KEY_SHOW_EXAGGERATION_TAG)
+            .remove(KEY_SHOW_3D_HEADER_STATS).remove(KEY_HEADER_STAT_1).remove(KEY_HEADER_STAT_2).remove(KEY_HEADER_STAT_3).remove(KEY_HEADER_STAT_4).remove(KEY_HEADER_STAT_5).remove("header_noroute_1").remove("header_noroute_2").remove("header_noroute_3").remove("header_noroute_4").remove("header_noroute_5").remove(KEY_SHOW_HAIRPINS).remove(KEY_SHOW_3D_ZOOM).remove(KEY_SHOW_HORIZON_ZOOM).remove(KEY_SHOW_CLIMB_ZOOM)            .remove(KEY_CHART_FIT_AXIS).remove(KEY_SHOW_EXAGGERATION_TAG).remove("chart_exaggeration")
             .remove(KEY_CHART_LIGHT_BG).remove(KEY_CHART_LIGHT_STYLE).remove(KEY_SHOW_SURFACE_TEXTURES).remove(KEY_SHOW_ROUTE_DISTANCES_3D)
             .remove(KEY_MERGE_MODE_3D).remove(KEY_MERGE_SIMILAR_BLOCKS_3D).remove(KEY_PCT_LABEL_STYLE_3D).remove(KEY_MERGE_MARGIN_3D).remove(KEY_BLOCK_AVG_PCT_3D)
             .remove(KEY_HIDE_GRADE_RANGE_ENABLED_3D).remove(KEY_HIDE_GRADE_MIN_3D).remove(KEY_HIDE_GRADE_MAX_3D)

@@ -513,6 +513,25 @@ class MainActivity : Activity() {
             isChecked = prefs.showExaggerationTag
             setOnCheckedChangeListener { _, isChecked -> prefs.showExaggerationTag = isChecked }
         })
+        // Factor de exageración vertical: más alto = relieve más marcado
+        val exValues = listOf(5, 8, 10, 15, 20, 25, 30, 40)
+        fitAxisCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_chart_exaggeration); textSize = 13f; setTextColor(Color.WHITE); setPadding(0, 12, 0, 0)
+        })
+        fitAxisCard.addView(Spinner(this).apply {
+            adapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_spinner_dropdown_item, exValues.map { "x$it" })
+            setSelection(exValues.indexOf(exValues.minByOrNull { Math.abs(it - prefs.chartExaggeration) } ?: 15).coerceAtLeast(0))
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(p: AdapterView<*>?, v: View?, pos: Int, id: Long) {
+                    (v as? TextView)?.setTextColor(Color.parseColor("#4CAF50"))
+                    if (exValues[pos] != prefs.chartExaggeration) prefs.chartExaggeration = exValues[pos]
+                }
+                override fun onNothingSelected(p: AdapterView<*>?) {}
+            }
+        })
+        fitAxisCard.addView(TextView(this).apply {
+            text = getString(R.string.setting_chart_exaggeration_desc); textSize = 12f; setTextColor(Color.LTGRAY); setPadding(0, 4, 0, 4)
+        })
         val climbRotate90Card = createCardContainer()
         val climbSwitchRotate90 = Switch(this).apply {
             text = getString(R.string.setting_rotate_90_cw) + getString(R.string.suffix_puertos)

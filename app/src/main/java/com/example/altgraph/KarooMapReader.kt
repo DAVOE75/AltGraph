@@ -131,6 +131,8 @@ class KarooMapReader(private val mapFiles: List<File>, private val zoomLevel: In
         var bridge = false
         var tunnel = false
 
+        var onewayNo = false
+        var roundaboutJunction = false
         for (t in tags) {
             when (t.key) {
                 "highway" -> kind = t.value
@@ -139,13 +141,20 @@ class KarooMapReader(private val mapFiles: List<File>, private val zoomLevel: In
                 "oneway" -> when (t.value) {
                     "yes", "true", "1" -> oneway = true
                     "-1" -> { oneway = true; reversed = true }
+                    "no", "false", "0" -> onewayNo = true
                 }
-                "junction" -> roundabout = t.value == "roundabout" || t.value == "circular"
+                "junction" -> {
+                    roundabout = t.value == "roundabout" || t.value == "circular"
+                    roundaboutJunction = t.value == "roundabout"
+                }
                 "bridge" -> bridge = t.value != "no"
                 "tunnel" -> tunnel = t.value != "no"
                 "area" -> if (t.value == "yes") return null
             }
         }
+        // Una rotonda es de sentido único aunque el mapa no lo etiquete (regla de OpenStreetMap): sin esto, en el cruce entre dos vías
+        // del anillo el trazado podía seguir en contra de la circulación
+        if (roundaboutJunction && !onewayNo) oneway = true
 
         if (kind == null || kind !in RIDEABLE_HIGHWAYS) return null
         val finalPts = if (reversed) points.reversed() else points

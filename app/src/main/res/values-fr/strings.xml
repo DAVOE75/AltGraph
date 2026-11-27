@@ -605,4 +605,6 @@ Fichiers de terrain : %3$d (%4$d Mo)
     <string name="setting_3d_match_radar_zoom">Ajuster la route 3D au zoom du radar</string>
     <string name="setting_horizon_match_radar_zoom">Ajuster l\'horizon prédictif au zoom du radar</string>
     <string name="setting_3d_match_radar_zoom_desc">Synchronise l\'échelle de la Route Globale 3D avec le Radar Altimétrique. Ajuster le zoom de la carte avec les boutons physiques adapte automatiquement l\'échelle 3D à la même distance métrique même sur une autre page.</string>
+    <string name="setting_chart_exaggeration">Exagération verticale</string>
+    <string name="setting_chart_exaggeration_desc">Plus élevé = relief plus marqué avec l\'axe ajusté (x15 par défaut). S\'applique uniquement quand l\'axe est ajusté à la fenêtre visible.</string>
 </resources>

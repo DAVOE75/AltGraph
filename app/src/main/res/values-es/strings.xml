@@ -632,4 +632,6 @@ Archivos de terreno: %3$d (%4$d MB)
     <string name="setting_3d_match_radar_zoom">Ajustar mapa global a zoom de radar</string>
     <string name="setting_horizon_match_radar_zoom">Ajustar horizonte predictivo a zoom de radar</string>
     <string name="setting_3d_match_radar_zoom_desc">Sincroniza la escala de la Ruta Global 3D con el Radar Altimétrico. Al cambiar el zoom del mapa con los botones físicos del Karoo en la pantalla del mapa, el 3D adaptará automáticamente su escala a la misma distancia aunque esté en otra página.</string>
+    <string name="setting_chart_exaggeration">Exageración vertical</string>
+    <string name="setting_chart_exaggeration_desc">Más alto = relieve más marcado en el eje ajustado (x15 por defecto). Solo se aplica con el eje ajustado a la ventana visible.</string>
 </resources>
